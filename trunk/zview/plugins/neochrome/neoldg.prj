@@ -1,0 +1,11 @@
+neo.ldg
+=
+pcstart.o
+neoldg.c
+
+fpuxop3.o
+pcfltlib.lib
+;pcgemlib.lib
+pcstdlib.lib
+pctoslib.lib
+ldg.lib
