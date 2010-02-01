@@ -1,0 +1,10 @@
+degas.ldg
+=
+pcstart.o
+degasldg.c
+
+fpuxop3.o
+pcfltlib.lib
+pcstdlib.lib
+pctoslib.lib
+ldg.lib

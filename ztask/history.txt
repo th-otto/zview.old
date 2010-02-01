@@ -1,0 +1,22 @@
+22 March 2006: BETA2
+====================
+
+News:
+-----
+- Preference panel added.
+- With Xaaes, "XaSys" is not more listed as a GEM process.
+
+
+Bugs fixes:
+-----------
+- The first drawn of the process list in the Task Manager 
+  was corrupted.
+- Some littles bugs fixed.
+
+
+  
+
+14 March 2006: BETA1
+======================
+
+- First public release.
