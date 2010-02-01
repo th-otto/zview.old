@@ -18,7 +18,7 @@ VDI_OBJ 	= zvdi/p2c.o zvdi/color.o zvdi/dither.o zvdi/raster.o zvdi/raresize.o z
 
 OBJ 		= $(VDI_OBJ)  img.o resize.o codecs.o mfdb.o load_img.o ztext.o mem.o
 
-TARGET		= ../lib/libzcodec.a
+TARGET		= ../lib/m68020-60/libzcodec.a
 
 $(TARGET): $(OBJ)
 	rm -f $@
