@@ -8,17 +8,16 @@ PLUGINS = \
 	jpg \
 	neochrome \
 	png \
-	raw \
 	tga \
 	tiff
 
 .PHONY: $(PLUGINS)
 $(PLUGINS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
-
-default: all
+	cp $@/*.ldg .
 
 all: $(PLUGINS)
 
 clean: $(PLUGINS)
-	rm -f *~
+	rm -f *~ *.ldg
+
