@@ -3,15 +3,9 @@
 #include "load_img.h"
 #include "img.h"
 #include "ztext.h"
-#ifdef __PUREC__
-#include "zvdi\color.h"
-#include "zvdi\raster.h"
-#include "zvdi\vdi.h"
-#else
 #include "zvdi/color.h"
 #include "zvdi/raster.h"
 #include "zvdi/vdi.h"
-#endif
 
 boolean decoder_init_done = FALSE;
 

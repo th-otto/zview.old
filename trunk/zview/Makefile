@@ -7,7 +7,6 @@ STRIP				= m68k-atari-mint-strip -s
 FLAGS				= m68k-atari-mint-flags -r
 DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
-LIBPREFIX 			= lib
 STACKSIZE			= 512k
 OPTIMISATION			= -O2 -fomit-frame-pointer
 C_CPU				= -m68020-60

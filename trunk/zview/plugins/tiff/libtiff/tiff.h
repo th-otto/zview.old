@@ -27,7 +27,7 @@
 #ifndef _TIFF_
 #define	_TIFF_
 
-#include "..\types2b.h"
+#include "types2b.h"
 
 /*
  * Tag Image File Format (TIFF)

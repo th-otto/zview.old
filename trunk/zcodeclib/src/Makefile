@@ -5,6 +5,7 @@ CC		= m68k-atari-mint-gcc
 STACK		= m68k-atari-mint-stack
 else
 AS		= as
+AR		= ar
 CC		= gcc
 STACK		= stack
 endif
@@ -12,7 +13,7 @@ endif
 OPTIMISATION	= -O2 -fomit-frame-pointer
 CPU		= -m68020-60
 
-CFLAGS		= $(CPU) $(OPTIMISATION) -Wall -I../include -I/usr/local/include
+CFLAGS		= $(CPU) $(OPTIMISATION) -Wall -I../include
 
 VDI_OBJ 	= zvdi/p2c.o zvdi/color.o zvdi/dither.o zvdi/raster.o zvdi/raresize.o zvdi/vdi.o
 

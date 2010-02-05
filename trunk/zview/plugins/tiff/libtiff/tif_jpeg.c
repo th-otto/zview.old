@@ -62,8 +62,8 @@ int TIFFFillTile(TIFF*, ttile_t);
    For such users we wil fix the problem here. See install.doc file from
    the JPEG library distribution for details.
 */
-#include "..\libjpg\jpeglib.h"
-#include "..\libjpg\jerror.h"
+#include "libjpg/jpeglib.h"
+#include "libjpg/jerror.h"
 
 /*
  * On some machines it may be worthwhile to use _setjmp or sigsetjmp

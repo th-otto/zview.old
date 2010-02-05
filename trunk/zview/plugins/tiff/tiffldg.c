@@ -233,7 +233,7 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 		alpha_composite( buffer[j++], b, a);
 	}
 
-	( uint32*)info->_priv_ptr_more += info->width;
+	info->_priv_ptr_more = ( uint32*)info->_priv_ptr_more + info->width;
 
 	return TRUE;
 }
