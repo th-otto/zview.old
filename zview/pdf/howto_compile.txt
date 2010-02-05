@@ -3,7 +3,7 @@
 2. Go xpdf-3.02 directory
 3. Apply patch sets: cat <download path>/xpdf-3.02pl1.patch | patch -p1 (for all 4 of them)
 4. Apply zView patch: cat xpdf-3.02pl4-zview.patch | patch -p1
-5. ./configure --host=m68k-atari-mint --with-freetype2-includes=$HOME/gnu-tools/m68k-atari-mint/include/freetype2 --without-x
+5. ./configure --host=m68k-atari-mint --with-freetype2-includes=/usr/m68k-atari-mint/include/freetype2 --without-x
 6. make
 7. Delete (or rename) this directory ('pdf') and rename your 'xpdf-3.02' to 'pdf'
   (and put it in the same location as old 'pdf' ofcourse!)
