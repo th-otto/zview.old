@@ -14,10 +14,8 @@ PLUGINS = \
 .PHONY: $(PLUGINS)
 $(PLUGINS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
-	cp $@/*.ldg .
 
 all: $(PLUGINS)
 
 clean: $(PLUGINS)
 	rm -f *~ *.ldg
-
