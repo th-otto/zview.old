@@ -1,6 +1,6 @@
-diff -ruN xpdf-3.02/fofi/Makefile.in pdf/fofi/Makefile.in
+diff -ruN xpdf-3.02/fofi/Makefile.in xpdf-3.02-new/fofi/Makefile.in
 --- xpdf-3.02/fofi/Makefile.in	2007-02-27 23:05:51.000000000 +0100
-+++ pdf/fofi/Makefile.in	2010-01-30 01:52:35.640884734 +0100
++++ xpdf-3.02-new/fofi/Makefile.in	2010-02-01 21:36:46.101963577 +0100
 @@ -14,7 +14,7 @@
  GOOSRCDIR = $(srcdir)/../goo
  GOOLIBDIR = ../goo
@@ -10,9 +10,9 @@ diff -ruN xpdf-3.02/fofi/Makefile.in pdf/fofi/Makefile.in
  
  CXX = @CXX@
  AR = @AR@
-diff -ruN xpdf-3.02/goo/Makefile.in pdf/goo/Makefile.in
+diff -ruN xpdf-3.02/goo/Makefile.in xpdf-3.02-new/goo/Makefile.in
 --- xpdf-3.02/goo/Makefile.in	2007-02-27 23:05:51.000000000 +0100
-+++ pdf/goo/Makefile.in	2010-01-30 01:52:35.640884734 +0100
++++ xpdf-3.02-new/goo/Makefile.in	2010-02-01 21:36:46.101963577 +0100
 @@ -11,8 +11,8 @@
  srcdir = @srcdir@
  VPATH = @srcdir@
@@ -24,9 +24,9 @@ diff -ruN xpdf-3.02/goo/Makefile.in pdf/goo/Makefile.in
  
  CC = @CC@
  CXX = @CXX@
-diff -ruN xpdf-3.02/pdflib.cc pdf/pdflib.cc
+diff -ruN xpdf-3.02/pdflib.cc xpdf-3.02-new/pdflib.cc
 --- xpdf-3.02/pdflib.cc	1970-01-01 01:00:00.000000000 +0100
-+++ pdf/pdflib.cc	2010-01-30 01:52:35.640884734 +0100
++++ xpdf-3.02-new/pdflib.cc	2010-02-01 21:36:46.101963577 +0100
 @@ -0,0 +1,486 @@
 +#include "../general.h"
 +#include "../prefs.h"
@@ -514,9 +514,9 @@ diff -ruN xpdf-3.02/pdflib.cc pdf/pdflib.cc
 +}
 +
 +}
-diff -ruN xpdf-3.02/pdflib.h pdf/pdflib.h
+diff -ruN xpdf-3.02/pdflib.h xpdf-3.02-new/pdflib.h
 --- xpdf-3.02/pdflib.h	1970-01-01 01:00:00.000000000 +0100
-+++ pdf/pdflib.h	2010-01-30 01:52:35.640884734 +0100
++++ xpdf-3.02-new/pdflib.h	2010-02-01 21:36:46.101963577 +0100
 @@ -0,0 +1,13 @@
 +boolean lib_pdf_load( const char *name, IMAGE *img);
 +void pdf_get_page_size( IMAGE *img, int page, uint16 *width, uint16 *height);
@@ -531,9 +531,9 @@ diff -ruN xpdf-3.02/pdflib.h pdf/pdflib.h
 +void delete_bookmark_child( Bookmark *book);
 +
 +
-diff -ruN xpdf-3.02/splash/Makefile.in pdf/splash/Makefile.in
+diff -ruN xpdf-3.02/splash/Makefile.in xpdf-3.02-new/splash/Makefile.in
 --- xpdf-3.02/splash/Makefile.in	2007-02-27 23:05:52.000000000 +0100
-+++ pdf/splash/Makefile.in	2010-01-30 01:52:35.640884734 +0100
++++ xpdf-3.02-new/splash/Makefile.in	2010-02-01 21:36:46.101963577 +0100
 @@ -16,7 +16,7 @@
  FOFISRCDIR = $(srcdir)/../fofi
  FOFILIBDIR = ../fofi
@@ -543,10 +543,45 @@ diff -ruN xpdf-3.02/splash/Makefile.in pdf/splash/Makefile.in
  
  CXX = @CXX@
  AR = @AR@
-diff -ruN xpdf-3.02/xpdf/GlobalParams.cc pdf/xpdf/GlobalParams.cc
+diff -ruN xpdf-3.02/xpdf/GlobalParams.cc xpdf-3.02-new/xpdf/GlobalParams.cc
 --- xpdf-3.02/xpdf/GlobalParams.cc	2007-02-27 23:05:52.000000000 +0100
-+++ pdf/xpdf/GlobalParams.cc	2010-01-30 01:52:35.644896767 +0100
-@@ -110,11 +110,14 @@
++++ xpdf-3.02-new/xpdf/GlobalParams.cc	2010-02-05 22:48:03.100968602 +0100
+@@ -85,20 +85,20 @@
+   char *t1FileName;
+   char *ttFileName;
+ } displayFontTab[] = {
+-  {"Courier",               "n022003l.pfb", "cour.ttf"},
+-  {"Courier-Bold",          "n022004l.pfb", "courbd.ttf"},
+-  {"Courier-BoldOblique",   "n022024l.pfb", "courbi.ttf"},
+-  {"Courier-Oblique",       "n022023l.pfb", "couri.ttf"},
+-  {"Helvetica",             "n019003l.pfb", "arial.ttf"},
+-  {"Helvetica-Bold",        "n019004l.pfb", "arialbd.ttf"},
+-  {"Helvetica-BoldOblique", "n019024l.pfb", "arialbi.ttf"},
+-  {"Helvetica-Oblique",     "n019023l.pfb", "ariali.ttf"},
+-  {"Symbol",                "s050000l.pfb", NULL},
+-  {"Times-Bold",            "n021004l.pfb", "timesbd.ttf"},
+-  {"Times-BoldItalic",      "n021024l.pfb", "timesbi.ttf"},
+-  {"Times-Italic",          "n021023l.pfb", "timesi.ttf"},
+-  {"Times-Roman",           "n021003l.pfb", "times.ttf"},
+-  {"ZapfDingbats",          "d050000l.pfb", NULL},
++  {"Courier",               "fonts\\n022003l.pfb", "cour.ttf"},
++  {"Courier-Bold",          "fonts\\n022004l.pfb", "courbd.ttf"},
++  {"Courier-BoldOblique",   "fonts\\n022024l.pfb", "courbi.ttf"},
++  {"Courier-Oblique",       "fonts\\n022023l.pfb", "couri.ttf"},
++  {"Helvetica",             "fonts\\n019003l.pfb", "arial.ttf"},
++  {"Helvetica-Bold",        "fonts\\n019004l.pfb", "arialbd.ttf"},
++  {"Helvetica-BoldOblique", "fonts\\n019024l.pfb", "arialbi.ttf"},
++  {"Helvetica-Oblique",     "fonts\\n019023l.pfb", "ariali.ttf"},
++  {"Symbol",                "fonts\\s050000l.pfb", NULL},
++  {"Times-Bold",            "fonts\\n021004l.pfb", "timesbd.ttf"},
++  {"Times-BoldItalic",      "fonts\\n021024l.pfb", "timesbi.ttf"},
++  {"Times-Italic",          "fonts\\n021023l.pfb", "timesi.ttf"},
++  {"Times-Roman",           "fonts\\n021003l.pfb", "times.ttf"},
++  {"ZapfDingbats",          "fonts\\d050000l.pfb", NULL},
+   {NULL}
+ };
+ 
+@@ -110,11 +110,13 @@
  };
  #else
  static char *displayFontDirs[] = {
@@ -557,13 +592,30 @@ diff -ruN xpdf-3.02/xpdf/GlobalParams.cc pdf/xpdf/GlobalParams.cc
    "/usr/share/fonts/default/ghostscript",
    "/usr/share/fonts/type1/gsfonts",
 +  */
-+  "./fonts",
    NULL
  };
  #endif
-diff -ruN xpdf-3.02/xpdf/Makefile.in pdf/xpdf/Makefile.in
+@@ -1237,7 +1239,7 @@
+     goto err1;
+   }
+   param = new DisplayFontParam(((GString *)tokens->get(1))->copy(), kind);
+-  
++
+   switch (kind) {
+   case displayFontT1:
+     if (tokens->getLength() != 3) {
+@@ -1838,7 +1840,7 @@
+   // shell32.dll (Win95 and WinNT4), so do a dynamic load
+   winFontDir[0] = '\0';
+   if ((shell32Lib = LoadLibrary("shell32.dll"))) {
+-    if ((SHGetSpecialFolderPathFunc = 
++    if ((SHGetSpecialFolderPathFunc =
+ 	 (BOOL (__stdcall *)(HWND hwndOwner, LPTSTR lpszPath,
+ 			     int nFolder, BOOL fCreate))
+ 	 GetProcAddress(shell32Lib, "SHGetSpecialFolderPathA"))) {
+diff -ruN xpdf-3.02/xpdf/Makefile.in xpdf-3.02-new/xpdf/Makefile.in
 --- xpdf-3.02/xpdf/Makefile.in	2007-02-27 23:05:52.000000000 +0100
-+++ pdf/xpdf/Makefile.in	2010-01-30 01:58:16.740899685 +0100
++++ xpdf-3.02-new/xpdf/Makefile.in	2010-02-01 21:36:46.105972187 +0100
 @@ -19,7 +19,7 @@
  SPLASHSRCDIR = $(srcdir)/../splash
  SPLASHLIBDIR = ../splash
@@ -582,3 +634,4 @@ diff -ruN xpdf-3.02/xpdf/Makefile.in pdf/xpdf/Makefile.in
 +	-lz
  
  CXX = @CXX@
+ 
