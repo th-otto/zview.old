@@ -1,10 +1,6 @@
 #include "general.h"
 #include "ztext.h"
-#ifdef __PUREC__
-#include "zvdi\vdi.h"
-#else
 #include "zvdi/vdi.h"
-#endif
 
 
 /* Prototype */

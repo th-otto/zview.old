@@ -184,7 +184,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 {
 	memcpy( buffer, ( uint8*)info->_priv_ptr_more, info->width);
-	( uint8*)info->_priv_ptr_more += info->width;
+	info->_priv_ptr_more = ( uint8*)info->_priv_ptr_more + info->width;
 
 	return TRUE;
 }

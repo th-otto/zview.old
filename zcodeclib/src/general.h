@@ -19,14 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef __PUREC__
-#include <tos.h>
-#elif defined (__GNUC__)
 #include <osbind.h>
 #include <mintbind.h>
 #include <dirent.h>
 #include <unistd.h>
-#endif
 #include <gemx.h>
 #include <ldg.h>
 #include <ldg/mem.h>

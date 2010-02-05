@@ -185,7 +185,7 @@ static int16 read_line( int16 bpl, uint8 *src, uint8 *compress_buffer)
     /* decompress the line */
     for( x = 0; x < bpl;)
     {
-        ( uint8)n = src[count++];
+        n = src[count++];
 
         if( n <= 127)           /* (n+1) literal bytes */
         {

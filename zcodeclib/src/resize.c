@@ -1,15 +1,9 @@
 #include "general.h"
 #include "load_img.h"
 #include "mfdb.h"
-#ifdef __PUREC__
-#include "zvdi\raresize.h"
-#include "zvdi\vdi.h"
-#include "zvdi\p2c.h"
-#else
 #include "zvdi/raresize.h"
 #include "zvdi/vdi.h"
 #include "zvdi/p2c.h"
-#endif
 
 
 void  ( *resize)( DECDATA, void *dst);
