@@ -62,9 +62,6 @@ static void Menu_about( void)
 {
 	OBJECT *aboutbox = get_tree( ABOUT);
 
-	ObjcStrCpy( aboutbox, ABOUT_DATE, "25 December 2005");
-	ObjcStrCpy( aboutbox, ABOUT_VERSION, " zView Beta 7 ");
-
 	WINDOW *winabout = FormCreate( aboutbox, NAME|MOVER|CLOSER, generic_form_event, get_string( ABOUT_TITLE), NULL, TRUE, FALSE);
 
 	/* Set the window modal */
