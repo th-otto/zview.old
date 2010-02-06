@@ -1,5 +1,7 @@
 #include "general.h"
-
+#ifdef DEBUG
+#include <windom/wout.h>
+#endif
 
 /*==================================================================================*
  * void zdebug:																		*
@@ -8,21 +10,21 @@
  * input:																			*
  * 		...	-> 	text and parameter are the same that sandard "printf" function.		*
  *----------------------------------------------------------------------------------*
- * returns: 																		*	
+ * returns: 																		*
  *		--																			*
  *==================================================================================*/
 
-void zdebug( const char *format, ...) 
+void zdebug( const char *format, ...)
 {
 #ifdef DEBUG
 	va_list args;
 	char fo_buff[255], *p;
-	
+
 	va_start( args, format);
 	vsprintf( fo_buff, format, args);
 	p = fo_buff;
 	va_end( args);
 
 	wout_printf("%s\n", p);
-#endif	
+#endif
 }

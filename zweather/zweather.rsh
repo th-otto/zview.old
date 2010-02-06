@@ -1,13 +1,13 @@
  /*  Resource C-Header-file v1.95 for ResourceMaster v2.06&up by ARDISOFT  */
 
 #define WEATHER 0  /* form/dial */
-#define WEATHER_PANEL3 1  /* BUTTON in tree WEATHER */
+#define WEATHER_PANEL4 1  /* BUTTON in tree WEATHER */
 #define WEATHER_CODE 2  /* FBOXTEXT in tree WEATHER */
 #define WEATHER_UPDATE_TIME 10  /* FBOXTEXT in tree WEATHER */
 #define WEATHER_METRIC 13  /* BUTTON in tree WEATHER */
 #define WEATHER_IMPERIAL 14  /* BUTTON in tree WEATHER */
 #define WEATHER_DATE 16  /* TEXT in tree WEATHER */
-#define WEATHER_STING 21  /* BUTTON in tree WEATHER */
+#define WEATHER_UPDATE 107  /* BUTTON in tree WEATHER */
 #define WEATHER_PANEL2 22  /* BUTTON in tree WEATHER */
 #define WEATHER_FORECAST1 23  /* BUTTON in tree WEATHER */
 #define WEATHER_DESCRIPTION1 24  /* TEXT in tree WEATHER */
@@ -64,7 +64,21 @@
 #define WEATHER_TIME 104  /* TEXT in tree WEATHER */
 #define WEATHER_REPORT 105  /* TEXT in tree WEATHER */
 #define WEATHER_MAIN 106  /* BUTTON in tree WEATHER */
-#define WEATHER_UPDATE 107  /* BUTTON in tree WEATHER */
+#define WEATHER_MAP 108  /* BUTTON in tree WEATHER */
+#define WEATHER_PANEL3 109  /* BUTTON in tree WEATHER */
+#define WEATHER_MAP_BOX 111  /* BOX in tree WEATHER */
+#define WEATHER_CONTINENT 112  /* BUTTON in tree WEATHER */
+#define WEATHER_STATE 113  /* BUTTON in tree WEATHER */
+
+#define CONTINENT 1  /* form/dial */
+#define CONTINENT_EUROPE 1  /* STRING in tree CONTINENT */
+#define CONTINENT_OCEANIA 2  /* STRING in tree CONTINENT */
+#define CONTINENT_ASIA 3  /* STRING in tree CONTINENT */
+#define CONTINENT_NORTHA 4  /* STRING in tree CONTINENT */
+#define CONTINENT_CENTRALA 5  /* STRING in tree CONTINENT */
+#define CONTINENT_SOUTHA 6  /* STRING in tree CONTINENT */
+#define CONTINENT_AFRICA 7  /* STRING in tree CONTINENT */
+#define CONTINENT_OCEAN 8  /* STRING in tree CONTINENT */
 
 #define NOMEM 0  /* Alert string */
 

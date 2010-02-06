@@ -2,7 +2,6 @@
 
 int		unit 				= WEATHER_METRIC;
 int		iconify_at_start	= 1;
-int		use_sting			= 0;
 char	location_code[9]	= "BEXX0006";
 clock_t	update_time 		= 360000L;
 
@@ -25,10 +24,10 @@ int prefs_read( void)
 	int time_minute;
 	int32 filepos;
 	char *env_home;
-	int16  len;	
+	int16  len;
 	boolean valid_entry_found;
 
-	
+
 	shel_envrn( &env_home, "HOME=");
 
 	/* Home directory exist? */
@@ -54,12 +53,12 @@ int prefs_read( void)
 		return( 0);
 
 loop:
-		
-	do 
+
+	do
 	{
 		valid_entry_found = FALSE;
-			
-		filepos = ftell( inffile); 
+
+		filepos = ftell( inffile);
 
 		if ( fscanf( inffile, "unit=%d ", &unit) == 1)
 		{
@@ -76,7 +75,7 @@ loop:
 		}
 		else
 			fseek( inffile, filepos, SEEK_SET);
-		
+
 		if ( fscanf( inffile, "update_time=%d ", &time_minute) == 1)
 		{
 			update_time = ( clock_t)( ( int32)time_minute * 12000L);
@@ -94,14 +93,6 @@ loop:
 		else
 			fseek( inffile, filepos, SEEK_SET);
 
-		if (fscanf( inffile, "use_sting=%d ", &use_sting) == 1)
-		{
-			valid_entry_found = TRUE;
-			continue;
-		}
-		else
-			fseek( inffile, filepos, SEEK_SET);
-
 		if ( fscanf( inffile, "%s ", unknown_s) == 1)
 		{
 			valid_entry_found = TRUE;
@@ -111,7 +102,7 @@ loop:
 			fseek( inffile, filepos, SEEK_SET);
 
 
-	} while ( valid_entry_found); 
+	} while ( valid_entry_found);
 
 	fclose( inffile);
 
@@ -132,7 +123,7 @@ int prefs_write( void)
 	FILE 	*inffile;
 	char 	*env_home;
 	int 	time_minute;
-	int16  	len;	
+	int16  	len;
 
 	shel_envrn( &env_home, "HOME=");
 
@@ -163,7 +154,6 @@ int prefs_write( void)
 	fprintf( inffile, "iconify_at_start=%d\r\n", iconify_at_start);
 	fprintf( inffile, "update_time=%d\r\n", time_minute);
 	fprintf( inffile, "location_code=%s\r\n", location_code);
-	fprintf( inffile, "use_sting=%d\r\n", use_sting);
 	fclose( inffile);
 
 	return( 1);

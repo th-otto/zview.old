@@ -3,9 +3,11 @@
 #include "parsers.h"
 #include "icon.h"
 #include "get_data.h"
+#include <mint/cookie.h>
 
 static clock_t chrono_value;
 struct xml_weather *zweatherdata = NULL;
+int	use_sting = 0;
 
 extern void init_stik (void);
 extern void weather_dialog( void);
@@ -46,16 +48,16 @@ struct xml_weather *update_weatherdata( int8 *location)
 	if( cur_node)
 	{
 		const int8 *sTmp;
-		
+
 		weather = parse_weather( cur_node);
 
-		sprintf( weather_form[WEATHER_REPORT].ob_spec.tedinfo->te_ptext, "%s", get_data(weather, DNAM));	
-		sprintf( weather_form[WEATHER_TIME].ob_spec.tedinfo->te_ptext, "Last update: %s", get_data(weather, LSUP));	
-		sprintf( weather_form[WEATHER_TEMP].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, TEMP), get_unit(unit, TEMP));	
-		sprintf( weather_form[WEATHER_FEEL].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, FLIK), get_unit(unit, FLIK));	
+		sprintf( weather_form[WEATHER_REPORT].ob_spec.tedinfo->te_ptext, "%s", get_data(weather, DNAM));
+		sprintf( weather_form[WEATHER_TIME].ob_spec.tedinfo->te_ptext, "Last update: %s", get_data(weather, LSUP));
+		sprintf( weather_form[WEATHER_TEMP].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, TEMP), get_unit(unit, TEMP));
+		sprintf( weather_form[WEATHER_FEEL].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, FLIK), get_unit(unit, FLIK));
 		zstrncpy( weather_form[WEATHER_DESCRIPTION].ob_spec.tedinfo->te_ptext, get_data(weather, TRANS), 26L);
-		sprintf( weather_form[WEATHER_DEW].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, DEWP), get_unit(unit, DEWP));	
-		sprintf( weather_form[WEATHER_WSPEED].ob_spec.tedinfo->te_ptext, "%s %s", get_data(weather, WIND_SPEED), get_unit(unit, WIND_SPEED));	
+		sprintf( weather_form[WEATHER_DEW].ob_spec.tedinfo->te_ptext, "%s%s", get_data(weather, DEWP), get_unit(unit, DEWP));
+		sprintf( weather_form[WEATHER_WSPEED].ob_spec.tedinfo->te_ptext, "%s %s", get_data(weather, WIND_SPEED), get_unit(unit, WIND_SPEED));
 
 		sprintf( weather_form[WEATHER_SUNRISE].ob_spec.tedinfo->te_ptext, "%s", get_data(weather, SUNR));
 		sprintf( weather_form[WEATHER_SUNSET].ob_spec.tedinfo->te_ptext, "%s", get_data(weather, SUNS));
@@ -86,7 +88,7 @@ struct xml_weather *update_weatherdata( int8 *location)
 			strcat( weather_form[WEATHER_WIND1].ob_spec.tedinfo->te_ptext, get_unit(unit, WIND_SPEED));
 		}
 		zstrncpy( weather_form[WEATHER_DESCRIPTION1].ob_spec.tedinfo->te_ptext, get_data_f(weather->dayf[0], TRANS_D), 18L);
-	
+
 		sprintf( ObjcString( weather_form, WEATHER_FORECAST2, NULL), " %s ", get_data_f(weather->dayf[1], WDAY));
 		sprintf( weather_form[WEATHER_DAY2].ob_spec.tedinfo->te_ptext, "%s%s",get_data_f(weather->dayf[1], TEMP_MAX), get_unit(unit, TEMP));
 		sprintf( weather_form[WEATHER_NIGHT2].ob_spec.tedinfo->te_ptext, "%s%s",get_data_f(weather->dayf[1], TEMP_MIN), get_unit(unit, TEMP));
@@ -110,42 +112,42 @@ struct xml_weather *update_weatherdata( int8 *location)
 		sprintf( weather_form[WEATHER_NIGHT5].ob_spec.tedinfo->te_ptext, "%s%s",get_data_f(weather->dayf[4], TEMP_MIN), get_unit(unit, TEMP));
 		sprintf( weather_form[WEATHER_WIND5].ob_spec.tedinfo->te_ptext, "%s %s",get_data_f(weather->dayf[4], W_SPEED_D), get_unit(unit, WIND_SPEED));
 		zstrncpy( weather_form[WEATHER_DESCRIPTION5].ob_spec.tedinfo->te_ptext, get_data_f(weather->dayf[4], TRANS_D), 18L);
-		
+
 		zstrncpy( weather_form[WEATHER_LINK1].ob_spec.tedinfo->te_ptext, get_lnks(weather->lnks, TEXT, 0), 20L);
 		zstrncpy( weather_form[WEATHER_LINK2].ob_spec.tedinfo->te_ptext, get_lnks(weather->lnks, TEXT, 1), 20L);
 		zstrncpy( weather_form[WEATHER_LINK3].ob_spec.tedinfo->te_ptext, get_lnks(weather->lnks, TEXT, 2), 20L);
 		zstrncpy( weather_form[WEATHER_LINK4].ob_spec.tedinfo->te_ptext, get_lnks(weather->lnks, TEXT, 3), 20L);
 
 		icon_to_draw = atoi( ( const char*)get_data(weather, WICON));
-		main_icon = icons[icon_to_draw];
-	
+		main_icon = &icons[icon_to_draw];
+
 		icon_to_draw = atoi( ( const char*)get_data_f(weather->dayf[0], ICON_D));
-		forecast_icon[0] = icons[icon_to_draw];
+		forecast_icon[0] = &icons[icon_to_draw];
 
 		icon_to_draw = atoi( ( const char*)get_data_f(weather->dayf[1], ICON_D));
-		forecast_icon[1] = icons[icon_to_draw];
+		forecast_icon[1] = &icons[icon_to_draw];
 
 		icon_to_draw = atoi( ( const char*)get_data_f(weather->dayf[2], ICON_D));
-		forecast_icon[2] = icons[icon_to_draw];
+		forecast_icon[2] = &icons[icon_to_draw];
 
 		icon_to_draw = atoi( ( const char*)get_data_f(weather->dayf[3], ICON_D));
-		forecast_icon[3] = icons[icon_to_draw];
+		forecast_icon[3] = &icons[icon_to_draw];
 
 		icon_to_draw = atoi( ( const char*)get_data_f(weather->dayf[4], ICON_D));
-		forecast_icon[4] = icons[icon_to_draw];
+		forecast_icon[4] = &icons[icon_to_draw];
 
 		sprintf( icon_temp, "%sø", get_data( weather, TEMP));
-		sprintf( wind_direction, "%s", get_data( weather, WIND_DIRECTION)); 
+		sprintf( wind_direction, "%s", get_data( weather, WIND_DIRECTION));
 	}
 
 	xmlFreeDoc( doc);
-	
+
 	return weather;
 }
 
-void timer_function( WINDOW *win)
+void timer_function( WINDOW *win, short buff[8])
 {
-	#ifdef DEBUG 
+	#ifdef DEBUG
 	char   tmp[15];
 	struct tm	*tmt;
 	time_t	tim;
@@ -153,15 +155,15 @@ void timer_function( WINDOW *win)
 
 	clock_t current_t = clock();
 	clock_t relative_t;
-	
+
 	relative_t = current_t - chrono_value;
-	
+
 	if( relative_t < update_time)
 		return;
-	
+
 	chrono_value = current_t;
 
-	#ifdef DEBUG 
+	#ifdef DEBUG
 	tim = time( NULL);
 	tmt = localtime( &tim);
 	strftime( tmp, 12, "%H:%M:%S", tmt);
@@ -177,25 +179,35 @@ void timer_function( WINDOW *win)
 		snd_rdw( windialog);
 }
 
-void applexit( void) 
+void applexit( WINDOW *w, short buff[8])
 {
+	WINDOW *last_closed = NULL;
+
     if( EvntFind( NULL, WM_XTIMER))
 		EvntDelete( NULL, WM_XTIMER);
 
-    while( wglb.first) 
-    {
-        snd_msg( wglb.first, WM_DESTROY, 0, 0, 0, 0);
-        EvntWindom( MU_MESAG);
-    }
+    while( wglb.first)
+	{
+		if (last_closed != wglb.first)
+		{
+			ApplWrite( _AESapid, WM_DESTROY, wglb.first->handle, 0, 0, 0, 0);
+			last_closed = wglb.first; /* to prevent sending toons of WM_CLOSED messages to each window */
+		}
+
+		if( EvntWindom( MU_MESAG | MU_TIMER) & MU_TIMER)  /* MU_TIMER event catched ? */
+			last_closed = NULL; /* then WM_CLOSED message has been lost ! it should be resent */
+	}
 
 	if( zweatherdata)
 		xml_weather_free( zweatherdata);
 
+	xmlCleanupParser();
+
 	prefs_write();
 	unregister_icons();
+
 	RsrcXtype( 0, NULL, 0);
 	RsrcFree();
-	xmlCleanupParser();
 	ApplExit();
 	exit( 0);
 }
@@ -203,9 +215,11 @@ void applexit( void)
 
 int main( int argc, char *argv[])
 {
+	int32 sting = 0;
+
 	ApplInit();
 
-	if( !RsrcLoad( "zweather.rsc")) 
+	if( !RsrcLoad( "zweather.rsc"))
 	{
 		errshow( "", E_RSC);
 		ApplExit();
@@ -213,7 +227,7 @@ int main( int argc, char *argv[])
 	}
 
 	RsrcXtype( RSRC_XTYPE, NULL, 0);
-	
+
 	if( !register_icons())
 	{
 		errshow( "", NOZCODECS);
@@ -224,10 +238,16 @@ int main( int argc, char *argv[])
 		return 0;
 	}
 
+	if( _AESnumapps == -1)
+		menu_register( _AESapid, "zWeather");
+
 	prefs_read();
 
-	if( use_sting)
-		init_stik();
+	if( Getcookie( C_STiK, ( long*)&sting) != 0)
+    {
+		use_sting = 1;
+ 		init_stik();
+	}
 
 	zweatherdata = update_weatherdata( location_code);
 
@@ -239,10 +259,8 @@ int main( int argc, char *argv[])
 	EvntAttach( NULL, WM_XTIMER, timer_function);
     EvntAttach( NULL, AP_TERM,  applexit);
 
-	for(;;) 
+	for(;;)
 		EvntWindom( MU_MESAG|MU_TIMER|MU_KEYBD|MU_BUTTON);
 
-	applexit();
 	return 0;
 }
-

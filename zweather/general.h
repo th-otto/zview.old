@@ -1,5 +1,5 @@
 /*
- * zView.
+ * zWeather.
  * Copyright (c) 2004 Zorro ( zorro270@yahoo.fr)
  *
  * This application is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include <osbind.h>
 #include <mintbind.h>
 #include <dirent.h>
@@ -31,13 +30,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-#include <windom1.h>
+#include <windom.h>
 #include <scancode.h>
 #include <ldg.h>
-#include <ldg/mem.h>
-#ifdef DEBUG
-#include <wout.h>
-#endif
 #include <libxml/parser.h>
 #include <types2b.h>
 #include <zcodec.h>
@@ -62,9 +57,9 @@
 	#define MAX_PATH	1024
 #endif
 
+extern int	use_sting;
 extern WINDOW *windialog;
-extern void timer_function( WINDOW *win);
-extern void	applexit( void);
+extern void timer_function( WINDOW *win, short buff[8]);
 extern void snd_rdw( WINDOW *win);
 extern struct xml_weather *update_weatherdata( int8 *location);
 extern void snd_msg( WINDOW *win, int msg, int par1, int par2, int par3, int par4);
