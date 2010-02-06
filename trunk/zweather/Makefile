@@ -7,7 +7,7 @@ endif
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
-LIB			= -lwindom1 -lzcodec -lldg -lgem -lxml2 -lm -lmem -lz
+LIB			= -lwindom -lzcodec -lldg -lgem -lxml2 -lm -lmem -lz
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -Wshadow -I$(LIBXML)
 ifeq ($(CROSS),no)
 CFLAGS			+= -I/usr/local/include
