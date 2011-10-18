@@ -8,7 +8,7 @@ FLAGS				= m68k-atari-mint-flags -r
 DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
 STACKSIZE			= 512k
-OPTIMISATION			= -O2 -fomit-frame-pointer
+OPTIMISATION			= -g -O2 -fomit-frame-pointer
 C_CPU				= -m68020-60
 CPP_CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
@@ -32,7 +32,7 @@ PDF_OBJ 			= pdf/xpdf/Annot.o pdf/xpdf/Array.o pdf/xpdf/BuiltinFont.o pdf/xpdf/B
 				  pdf/xpdf/Lexer.o pdf/xpdf/Link.o pdf/xpdf/NameToCharCode.o pdf/xpdf/Object.o pdf/xpdf/Outline.o pdf/xpdf/OutputDev.o \
 				  pdf/xpdf/Page.o pdf/xpdf/Parser.o pdf/xpdf/SecurityHandler.o pdf/xpdf/PDFDoc.o pdf/xpdf/PDFDocEncoding.o pdf/xpdf/PSTokenizer.o \
 				  pdf/xpdf/SplashOutputDev.o pdf/xpdf/Stream.o pdf/xpdf/TextOutputDev.o pdf/xpdf/UnicodeMap.o \
-				  pdf/xpdf/UnicodeTypeTable.o pdf/xpdf/XRef.o pdf/pdflib.o
+				  pdf/xpdf/UnicodeTypeTable.o pdf/xpdf/XRef.o pdf/pdflib.o pdf/xpdf/OptionalContent.o
 
 OBJ 				= $(PDF_OBJ) $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
@@ -45,7 +45,7 @@ PROGRAM 			= zview.app
 all: $(PROGRAM) stack strip compress
 
 $(PROGRAM): $(OBJ)
-	$(CXX) $(CPP_CPU) $(OPTIMISATION) -o$@ $(OBJ) $(XPDF_LIBS) $(LIB)
+	$(CXX) $(CPP_CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
 
 strip:
 	$(STRIP) $(PROGRAM)
