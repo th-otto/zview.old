@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <windom.h>
+#include <windom1.h>
 #include "../types2b.h"
 #include "../pdf/goo/gmem.h"
 #include "libtedit.h"
