@@ -1,0 +1,10 @@
+0. Download & install latest libfreetype2 from http://download.savannah.gnu.org/releases/freetype (simple make & make install, I use -m68020-60 with CFLAGS)
+1. Download xpdf 3.03 from http://www.foolabs.com/xpdf/download.html
+2. Go xpdf-3.03 directory
+3. Apply zView patch: cat xpdf-3.03-zview.patch | patch -p1
+4. ./configure --host=m68k-atari-mint --with-freetype2-includes=$HOME/gnu-tools/m68k-atari-mint/include/freetype2 -with-freetype2-library=$HOME/gnu-tools/m68k-atari-mint/lib/m68020-60 --without-x
+5. make
+6. Delete (or rename) this directory ('pdf') and rename your 'xpdf-3.03' to 'pdf'
+  (and put it in the same location as old 'pdf' ofcourse!)
+
+This will produce all needed libs and object files for zView.
