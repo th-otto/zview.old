@@ -9,6 +9,8 @@ DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
 STACKSIZE			= 512k
 OPTIMISATION			= -g -O2 -fomit-frame-pointer
+#C_CPU				= -mcpu=5475
+#CPP_CPU			= -mcpu=5475
 C_CPU				= -m68020-60
 CPP_CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
@@ -42,10 +44,23 @@ OBJ 				= $(PDF_OBJ) $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 
 
-all: $(PROGRAM) stack strip compress
+all: pdf $(PROGRAM) stack strip compress
 
 $(PROGRAM): $(OBJ)
 	$(CXX) $(CPP_CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
+
+
+XPDF_VERSION	= 3.03
+xpdf-${XPDF_VERSION}.tar.gz:
+	wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
+
+pdf: xpdf-${XPDF_VERSION}.tar.gz
+	tar xzf xpdf-${XPDF_VERSION}.tar.gz && mv xpdf-${XPDF_VERSION} pdf && \
+	cd $@ && \
+	cat ../xpdf/xpdf-${XPDF_VERSION}-zview.patch | patch -p1 && \
+	CXXFLAGS='-O2 -fomit-frame-pointer ${CPP_CPU}' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
+	make && \
+	cd .. && touch $@
 
 strip:
 	$(STRIP) $(PROGRAM)
@@ -61,7 +76,7 @@ clean_zview:
 	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o
 	
 clean_pdf:
-	make -C pdf clean
+	make -C pdf clean && rm pdf/*.o
 
 clean:
-	rm -f *~ *.o *.app pdf/*.o zvdi/*.o zedit/*.o file/*.o catalog/*.o
+	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o
