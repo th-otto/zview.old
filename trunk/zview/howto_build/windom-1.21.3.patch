@@ -1,0 +1,134 @@
+diff -ruw windom-1.21.3/include/windom.h windom-1.21.3-new/include/windom.h
+--- windom-1.21.3/include/windom.h	2004-11-24 22:08:29.000000000 +0100
++++ windom-1.21.3-new/include/windom.h	2011-10-17 17:13:19.440919410 +0200
+@@ -522,11 +522,7 @@
+ int     ApplGet     ( int mode, ...);
+ int     ApplSet     ( int mode, ...);
+ int     ApplName    ( char *name, int handle);
+-#ifdef __MSHORT__
+ int     ApplWrite   ( int to, int msg, ...);
+-#else
+-int     ApplWrite   ( int to, int msg, int b3, int b4, int b5, int b6, int b7);
+-#endif
+ int     ApplControl ( int ap_cid, int ap_cwhat);
+ 
+ /* AV library */
+diff -ruw windom-1.21.3/src/appl_set.c windom-1.21.3-new/src/appl_set.c
+--- windom-1.21.3/src/appl_set.c	2004-11-24 22:08:29.000000000 +0100
++++ windom-1.21.3-new/src/appl_set.c	2011-10-17 17:13:19.440919410 +0200
+@@ -44,10 +44,10 @@
+ 	if( !CONF(app)) return 2;
+ 	
+ 	va_start( list, mode);
+-	v1 = va_arg( list, short);
+-	v2 = va_arg( list, short);
+-	v3 = va_arg( list, short);
+-	v4 = va_arg( list, short);
++	v1 = va_arg( list, int);
++	v2 = va_arg( list, int);
++	v3 = va_arg( list, int);
++	v4 = va_arg( list, int);
+ 	va_end( list);
+ 
+ 	switch( mode) {
+diff -ruw windom-1.21.3/src/appl_write.c windom-1.21.3-new/src/appl_write.c
+--- windom-1.21.3/src/appl_write.c	2004-11-24 22:08:29.000000000 +0100
++++ windom-1.21.3-new/src/appl_write.c	2011-10-17 17:13:19.444252608 +0200
+@@ -34,29 +34,6 @@
+ 
+ /* A more pratical call to appl_write() */
+ 
+-#ifndef __MSHORT__
+-
+-/* en 32bits, on attend des 'int' plutot que '...' (va_args) en parametre */
+-/* car c'est le seul moyen d'‚viter l'utilisation du code genre           */
+-/* ApplWrite( to, msg, "tralala");                                        */
+-/* qui fonctionne uniquement en 16 bits si on utilise va_args             */
+-
+-int ApplWrite( int to, int msg, int b3, int b4, int b5, int b6, int b7) {
+-	INT16 buf[8];
+-
+-	buf[0] = msg;
+-	buf[1] = app.id;
+-	buf[2] = 0;
+-	buf[3] = b3;
+-	buf[4] = b4;
+-	buf[5] = b5;
+-	buf[6] = b6;
+-	buf[7] = b7;
+-	return appl_write( to, 16, buf);
+-}
+-
+-#else 
+-
+ int ApplWrite( int to, int msg, ...) {
+ 	va_list args;	
+ 	short buf[8];
+@@ -65,13 +42,11 @@
+ 	buf[1] = app.id;
+ 	buf[2] = 0;
+ 	va_start( args, msg);
+-	buf[3] = va_arg( args, short);
+-	buf[4] = va_arg( args, short);
+-	buf[5] = va_arg( args, short);
+-	buf[6] = va_arg( args, short);
+-	buf[7] = va_arg( args, short);
++	buf[3] = va_arg( args, int);
++	buf[4] = va_arg( args, int);
++	buf[5] = va_arg( args, int);
++	buf[6] = va_arg( args, int);
++	buf[7] = va_arg( args, int);
+ 	va_end( args);
+ 	return appl_write( to, 16, buf);
+ }
+-#endif
+-
+diff -ruw windom-1.21.3/src/av_init.c windom-1.21.3-new/src/av_init.c
+--- windom-1.21.3/src/av_init.c	2004-11-24 22:08:29.000000000 +0100
++++ windom-1.21.3-new/src/av_init.c	2011-10-17 17:14:40.931886052 +0200
+@@ -73,7 +73,8 @@
+ static int av_ping( int status, long idle) {
+ 	INT16 msg[8];
+ 	
+-	ApplWrite( app.avid, AV_PROTOKOLL, status, 0, 0, ADR(__av_name));
++	strcpy( app.pipe, __av_name);
++	ApplWrite( app.avid, AV_PROTOKOLL, status, 0, 0, ADR(app.pipe));
+ 	if( AvWaitfor( VA_PROTOSTATUS, msg, idle)) {
+ 		__av_status[0] = msg[3];
+ 		__av_status[1] = msg[4];
+diff -ruw windom-1.21.3/src/objc_dup.c windom-1.21.3-new/src/objc_dup.c
+--- windom-1.21.3/src/objc_dup.c	2004-11-24 22:08:30.000000000 +0100
++++ windom-1.21.3-new/src/objc_dup.c	2011-10-17 17:13:19.444252608 +0200
+@@ -133,7 +133,7 @@
+ 				case G_TITLE:
+ 					mem_adr = __malloc_obspec(&cpy[i],strlen((char*)wparm->wp_spec)+1);
+ 					strcpy(mem_adr,(char*)wparm->wp_spec);
+-					(char*)wparm->wp_spec = mem_adr;
++					wparm->wp_spec = mem_adr;
+ 					break;
+ 				}
+ 			}
+diff -ruw windom-1.21.3/src/objc_string.c windom-1.21.3-new/src/objc_string.c
+--- windom-1.21.3/src/objc_string.c	2004-11-24 22:08:30.000000000 +0100
++++ windom-1.21.3-new/src/objc_string.c	2011-10-17 17:13:19.444252608 +0200
+@@ -78,7 +78,7 @@
+ 		case XFREESTR:
+ 			user = tree[idx].ob_spec.userblk;
+ 			if( put)
+-				(char*)((W_PARM*)user->ub_parm)->wp_spec = put;
++				((W_PARM*)user->ub_parm)->wp_spec = put;
+ 			return ( (char*)((W_PARM*)user->ub_parm)->wp_spec);
+ 
+ #ifdef MODIF_XEDIT
+diff -ruw windom-1.21.3/src/popup.c windom-1.21.3-new/src/popup.c
+--- windom-1.21.3/src/popup.c	2004-11-24 22:08:30.000000000 +0100
++++ windom-1.21.3-new/src/popup.c	2011-10-17 17:13:19.444252608 +0200
+@@ -87,7 +87,7 @@
+ 
+ static void uo_init_type( OBJECT *tree, int index, void *func, 
+ 						  int extype, XUSERBLK * uo) {
+-	(W_PARM *)(uo -> user . ub_parm) = & ( uo -> w_parm );
++	uo -> user . ub_parm = & ( uo -> w_parm );
+ 	uo -> user . ub_code = func;
+ 	((W_PARM*)uo -> user . ub_parm) -> wp_type = tree[index].ob_type; 
+ 	((W_PARM*)uo -> user . ub_parm) -> wp_spec = tree[index].ob_spec.index;
