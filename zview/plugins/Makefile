@@ -11,6 +11,8 @@ PLUGINS = \
 	tga \
 	tiff
 
+default: all
+
 .PHONY: $(PLUGINS)
 $(PLUGINS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
