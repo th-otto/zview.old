@@ -1,5 +1,5 @@
+#include <gif_lib.h>
 #include "zview.h"
-#include "gif_lib.h"
 
 /* Prototypes */
 boolean CDECL reader_init( const char *name, IMGINFO info);
@@ -364,13 +364,14 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 
 	strcpy( info->info, "GIF");
 
-	if( gif->Version)
+	/*if( gif->Version)
 		strcat( info->info, "89a"); 
 	else
 		strcat( info->info, "87a"); 
+	*/
 
 	if( interlace)
-		strcat( info->info, " ( Interlaced)"); 
+		strcat( info->info, " (Interlaced)"); 
 
 	strcpy( info->compression, "LZW");	
 
