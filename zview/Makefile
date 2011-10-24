@@ -9,16 +9,14 @@ DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
 STACKSIZE			= 512k
 OPTIMISATION			= -g -O2 -fomit-frame-pointer
-#C_CPU				= -mcpu=5475
-#CPP_CPU			= -mcpu=5475
-C_CPU				= -m68020-60
-CPP_CPU				= -m68020-60
+CPU				= -mcpu=5475
+#CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lpdf/fofi -lfofi -Lpdf/goo -lGoo -Lpdf/splash -lsplash
 XPDF_INCS			= -Ipdf -Ipdf/goo -Ipdf/splash
 LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lz -lmem
-CFLAGS				= $(DEBUG) $(C_CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
-CXXFLAGS			= $(DEBUG) $(CPP_CPU) $(OPTIMISATION) $(XPDF_INCS) -I/usr/m68k-atari-mint/include/freetype2
+CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
+CXXFLAGS			= $(CFLAGS)
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
 EDIT_OBJ 			= zedit/char.o zedit/edit.o zedit/zedit.o
@@ -44,10 +42,10 @@ OBJ 				= $(PDF_OBJ) $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 
 
-all: pdf $(PROGRAM) stack strip compress
+all: pdf $(PROGRAM) stack strip #compress
 
 $(PROGRAM): $(OBJ)
-	$(CXX) $(CPP_CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
+	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
 
 
 XPDF_VERSION	= 3.03
@@ -58,7 +56,7 @@ pdf: xpdf-${XPDF_VERSION}.tar.gz
 	tar xzf xpdf-${XPDF_VERSION}.tar.gz && mv xpdf-${XPDF_VERSION} pdf && \
 	cd $@ && \
 	cat ../howto_build/xpdf-${XPDF_VERSION}-zview.patch | patch -p1 && \
-	CXXFLAGS='-O2 -fomit-frame-pointer ${CPP_CPU}' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
+	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
 	make && \
 	cd .. && touch $@
 
