@@ -1,5 +1,5 @@
 /*
- * JPG LDG plugin.
+ * LDG plugin.
  * Copyright (c) 2004-2005 Zorro ( zorro270@yahoo.fr)
  *
  * This plugin is free software; you can redistribute it and/or
@@ -20,11 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef __PUREC__
-#include "types2b.h"
-#include <tos.h>
-#else
-#include "libjpg/jpeglib.h"
 #include "types2b.h"
 #include <osbind.h>
 #include <mintbind.h>
@@ -32,10 +27,8 @@
 #include <mint/cookie.h>
 #include <setjmp.h>
 #include <libshare.h>
-#endif
 #include <mt_gem.h>
 #include <ldg.h>
-#include "jpgdh.h"
 
 #ifndef TRUE
 #define TRUE		1
@@ -56,6 +49,13 @@
 #define DSP_ERROR			1
 #define PROGRESSIVE_JPG		2
 #define ALL_OK				3
+
+typedef struct _img_data
+{
+	int16		imagecount;
+	uint16		delay[1024];
+	uint8		*image_buf[1024];
+} img_data;
 
 
 typedef struct _txt_data
@@ -90,22 +90,22 @@ typedef struct _img_info
 	uint16		num_comments;			/* Lines in the file's comment. ( 0 if none) 	 			*/
 	uint16		max_comments_length;	/* The length of the greater line in the comment 			*/
 	int16		indexed_color;			/* Picture has a palette: 0) No 1) Yes						*/
-	int16		memory_alloc;			/* where to do the memory allocation for the reader_read 
+	int16		memory_alloc;			/* where to do the memory allocation for the reader_read
 										   function buffer, possible values are ST_RAM or TT_RAM	*/
 	COLOR_MAP	palette[256];			/* Palette in standard RGB format							*/
 
 
 	/* data send to the codec */
-	uint32		background_color;		/* The wanted background's color in hexa */		
+	uint32		background_color;		/* The wanted background's color in hexa */
 	int16		thumbnail;				/* 1 if true else 0.
-										   Some format have thumbnail inside the picture, if 1, we 
+										   Some format have thumbnail inside the picture, if 1, we
 										   want only this thumbnail and not the image itself 		*/
-	uint16		page_wanted;			/* The wanted page to get for the reader_read() function 											   
-										   The first page is 0 and the last is img_info->page - 1	*/											   
+	uint16		page_wanted;			/* The wanted page to get for the reader_read() function
+										   The first page is 0 and the last is img_info->page - 1	*/
 
 
-	/* The following variable are only for Information Prupose, the zview doesn't 
-	   use it for decoding routine but only for the information dialog								*/ 
+	/* The following variable are only for Information Prupose, the zview doesn't
+	   use it for decoding routine but only for the information dialog								*/
 	int8		info[40];				/* Picture's info, for ex: "Gif 87a" 						*/
 	int8		compression[5];			/* Compression type, ex: "LZW" 								*/
 	uint16    	real_width;				/* Real picture width( if the thumbnail variable is 1)		*/
@@ -113,12 +113,10 @@ typedef struct _img_info
 
 
 	/* Private data for the plugin */
-	void		*_priv_ptr;			
-	void		*_priv_ptr_more;			
+	void		*_priv_ptr;
+	void		*_priv_ptr_more;
 	void		*__priv_ptr_more;
 
 	int32		_priv_var;
 	int32		_priv_var_more;
 } img_info;
-
-
