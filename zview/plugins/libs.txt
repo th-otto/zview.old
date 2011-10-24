@@ -1,0 +1,9 @@
+Download required libs from:
+
+https://sourceforge.net/projects/giflib/
+http://www.libpng.org/pub/png/libpng.html
+http://www.ijg.org/
+http://libtiff.maptools.org/
+http://easybmp.sourceforge.net/
+http://libexif.sourceforge.net/
+http://www.cs.wisc.edu/graphics/Gallery/LibTarga/
