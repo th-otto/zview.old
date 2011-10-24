@@ -3,7 +3,7 @@ OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
 LIB			=  -lm -lshare -lldg -lz
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall
+CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
 
 MEM_OBJ			= mem/mem_util.o
 

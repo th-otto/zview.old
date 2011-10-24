@@ -11,13 +11,11 @@ PLUGINS = \
 	tga \
 	tiff
 
-default: all
+default: $(PLUGINS)
 
 .PHONY: $(PLUGINS)
 $(PLUGINS):
-	$(MAKE) -C $@ $(MAKECMDGOALS)
-
-all: $(PLUGINS)
+	$(MAKE) -C $@ $(MAKECMDGOALS) CROSS=yes
 
 clean: $(PLUGINS)
 	rm -f *~ *.ldg

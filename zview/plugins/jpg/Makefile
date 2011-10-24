@@ -3,7 +3,7 @@ OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
 LIB			= -lshare -lldg -lm
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall
+CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
 
 JPG_OBJ			= libjpg/jcomapi.o libjpg/jutils.o libjpg/jerror.o libjpg/jmemmgr.o \
 			  libjpg/jmemnobs.o libjpg/jdapimin.o libjpg/jdapistd.o libjpg/jdtrans.o libjpg/jdatasrc.o \

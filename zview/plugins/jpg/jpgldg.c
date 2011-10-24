@@ -1,4 +1,8 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "libjpg/jpeglib.h"
 #include "zview.h"
+#include "jpgdh.h"
 #include "libexif/exif-data.h"
 #include "libexif/exif-utils.h"
 

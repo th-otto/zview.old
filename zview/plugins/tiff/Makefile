@@ -3,7 +3,7 @@ OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
 LIB			= -lshare -lm -lldg -lz
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I.
+CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I. -I../common
 
 TIFF_OBJ 		= libtiff/tif_aux.o libtiff/tif_close.o libtiff/tif_codec.o libtiff/tif_color.o \
 			  libtiff/tif_compress.o libtiff/tif_dir.o libtiff/tif_dirinfo.o libtiff/tif_dirread.o \
