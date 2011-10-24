@@ -5,7 +5,9 @@ LIB			= -lshare -lldg
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
 
-OBJ 			= gifldg.o gif_hash.o gifalloc.o dgif_lib.o egif_lib.o
+OBJ 			= gifldg.o
+
+LIB			+= -lgif
 
 PROGRAM 		= gif.ldg
 
