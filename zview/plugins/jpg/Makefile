@@ -1,7 +1,7 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
-LIB			= -lshare -lldg -lm
+LIB			= -lshare -lldg -lexif -lm
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
 
@@ -15,16 +15,9 @@ JPG_OBJ			= libjpg/jcomapi.o libjpg/jutils.o libjpg/jerror.o libjpg/jmemmgr.o \
 		          libjpg/jcprepct.o libjpg/jccoefct.o libjpg/jccolor.o libjpg/jcsample.o libjpg/jchuff.o \
         		  libjpg/jcphuff.o libjpg/jcdctmgr.o libjpg/jfdctfst.o
 
-EXIF_OBJ		= libexif/exif-byte-order.o libexif/exif-content.o libexif/exif-data.o libexif/exif-entry.o \
-			  libexif/exif-format.o libexif/exif-ifd.o libexif/exif-loader.o libexif/exif-mem.o libexif/exif-mnote-data.o \
-			  libexif/exif-tag.o libexif/exif-utils.o libexif/jpeg-marker.o \
-			  libexif/canon/exif-mnote-data-canon.o libexif/canon/mnote-canon-entry.o libexif/canon/mnote-canon-tag.o \
-			  libexif/olympus/exif-mnote-data-olympus.o libexif/olympus/mnote-olympus-entry.o libexif/olympus/mnote-olympus-tag.o \
-			  libexif/pentax/exif-mnote-data-pentax.o libexif/pentax/mnote-pentax-entry.o libexif/pentax/mnote-pentax-tag.o
-
 DSP_OBJ			= jpgdsp.o 
 
-OBJ			= $(JPG_OBJ) $(EXIF_OBJ) $(DSP_OBJ) jpgldg.o 
+OBJ			= $(JPG_OBJ) $(DSP_OBJ) jpgldg.o 
 
 PROGRAM 		= jpg.ldg
 
