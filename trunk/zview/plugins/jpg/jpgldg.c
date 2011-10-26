@@ -3,8 +3,8 @@
 #include "libjpg/jpeglib.h"
 #include "zview.h"
 #include "jpgdh.h"
-#include "libexif/exif-data.h"
-#include "libexif/exif-utils.h"
+#include <libexif/exif-data.h>
+#include <libexif/exif-utils.h>
 
 void 	CDECL init( void);
 boolean CDECL reader_init( const char *name, IMGINFO info);
