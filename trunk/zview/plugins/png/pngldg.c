@@ -1,6 +1,6 @@
 #include "zview.h"
 #include "mem/mem_util.h"
-#include "libpng/png.h"
+#include <png.h>
 
 boolean CDECL reader_init( const char *name, IMGINFO info);
 boolean CDECL reader_read( IMGINFO info, uint8 *buffer);
@@ -14,8 +14,8 @@ void	CDECL init( void);
     ( composite) = ( uint8)(( temp + ( temp >> 8)) >> 8);								\
 }
 
-PROC PNGFunc[] = 
-{ 
+PROC PNGFunc[] =
+{
 	{ "plugin_init",    "", init},
 	{ "reader_init",    "", reader_init},
 	{ "reader_get_txt", "", reader_get_txt},
@@ -30,8 +30,8 @@ LDGLIB png_plugin =
 	5,					/* Number of plugin's functions */
 	PNGFunc,			/* List of functions */
 	"PNG",				/* File's type Handled */
-	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
-						   and are shareable, we must use this flags because we don't know if the 
+	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant
+						   and are shareable, we must use this flags because we don't know if the
 						   user has ldg.prg deamon installed on his computer */
 	libshare_exit,		/* Function called when the plugin is unloaded */
 	1L					/* Howmany file type are supported by this plugin */
@@ -63,10 +63,12 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	png_infop   	info_ptr = NULL;
 	int32 			png_file;
 	char 			header[8];
-	int				header_size = sizeof( header);	
+	int				header_size = sizeof( header);
 /*  png_color_16 	my_background = {0,0xFFFF,0xFFFF,0xFFFF,0xFFFF};
     png_color_16p	image_background;
 */
+	png_textp		png_text_ptr;
+	int				num_text;
 
 	first_pass		= TRUE;
 	png_image 		= NULL;
@@ -77,7 +79,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	if ( ( png_file = Fopen( name, 0)) < 0)
 		return FALSE;
 
-	if ( Fread( png_file, header_size, header) != header_size || png_sig_cmp( header, 0, header_size)) 
+	if ( Fread( png_file, header_size, header) != header_size || png_sig_cmp( header, 0, header_size))
 	{
 		Fclose ( png_file);
 		return FALSE;
@@ -85,7 +87,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 
 	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, 0, 0);
 
-	if ( !png_ptr || ( info_ptr = png_create_info_struct ( png_ptr)) == NULL) 
+	if ( !png_ptr || ( info_ptr = png_create_info_struct ( png_ptr)) == NULL)
 	{
 		png_destroy_read_struct ( &png_ptr, &info_ptr, NULL);
 		Fclose ( png_file);
@@ -96,56 +98,58 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	{
 		png_destroy_read_struct( &png_ptr, &info_ptr, NULL);
 		Fclose ( png_file);
-		return FALSE;		
+		return FALSE;
 	}
 
 	png_init_io       ( png_ptr, png_file);
 	png_set_sig_bytes ( png_ptr, ( int)header_size);
 	png_read_info     ( png_ptr, info_ptr);
 
-    if( info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+	if( png_get_color_type( png_ptr, info_ptr) == PNG_COLOR_TYPE_PALETTE)
         png_set_expand( png_ptr);
-    if( info_ptr->color_type == PNG_COLOR_TYPE_GRAY && info_ptr->bit_depth < 8)
+	if( png_get_color_type( png_ptr, info_ptr) == PNG_COLOR_TYPE_GRAY && png_get_bit_depth( png_ptr, info_ptr) < 8)
         png_set_expand( png_ptr);
     if( png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 		png_set_tRNS_to_alpha( png_ptr);
-    if( info_ptr->bit_depth == 16)
+	if( png_get_bit_depth( png_ptr, info_ptr) == 16)
         png_set_strip_16( png_ptr);
-    if( info_ptr->color_type == PNG_COLOR_TYPE_GRAY || info_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+	if( png_get_color_type( png_ptr, info_ptr) == PNG_COLOR_TYPE_GRAY || png_get_color_type( png_ptr, info_ptr) == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb( png_ptr);
 
 	strcpy( info->info, 		"Portable Network Format ");
-	strcpy( info->compression, 	"ZIP");	
+	strcpy( info->compression, 	"ZIP");
 
-	if ( info_ptr->interlace_type == PNG_INTERLACE_ADAM7) 
-	{	
-		strcat( info->info, "( Interlaced)"); 
-		number_passes = png_set_interlace_handling( png_ptr);	
+	if ( png_get_interlace_type( png_ptr, info_ptr) == PNG_INTERLACE_ADAM7)
+	{
+		strcat( info->info, "( Interlaced)");
+		number_passes = png_set_interlace_handling( png_ptr);
 	}
 
     png_read_update_info( png_ptr, info_ptr);
 
-	info->width   				= info_ptr->width;
-	info->height  				= info_ptr->height;
+	png_get_text( png_ptr, info_ptr, &png_text_ptr, &num_text);
+
+	info->width   				= png_get_image_width( png_ptr, info_ptr);
+	info->height  				= png_get_image_height( png_ptr, info_ptr);
 	info->real_width			= info->width;
 	info->real_height			= info->height;
 	info->memory_alloc 			= TT_RAM;
-	info->components			= ( info_ptr->channels > 3) ? 3 : info_ptr->channels;
-	info->planes   				= info_ptr->bit_depth;
+	info->components			= ( png_get_channels( png_ptr, info_ptr) > 3) ? 3 : png_get_channels( png_ptr, info_ptr);
+	info->planes   				= png_get_bit_depth( png_ptr, info_ptr);
 	info->colors  				= 1 << info->planes;
 	info->delay		  			= 0;
 	info->orientation 			= UP_TO_DOWN;
 	info->page	 				= 1;
-	info->num_comments			= info_ptr->num_text;
+	info->num_comments			= num_text;
 	info->max_comments_length	= 0;
 	info->indexed_color 		= FALSE;
-	info->_priv_ptr				= ( void*)png_ptr;			
+	info->_priv_ptr				= ( void*)png_ptr;
 	info->_priv_ptr_more		= ( void*)info_ptr;
-	info->_priv_var				= png_file;	
+	info->_priv_var				= png_file;
 
-	if( info_ptr->channels == 4)
+	if( png_get_channels( png_ptr, info_ptr) == 4)
 	{
-		line_buffer = ( uint8*)malloc( info_ptr->rowbytes + 64);
+		line_buffer = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) + 64);
 
 		if( line_buffer == NULL)
 		{
@@ -154,14 +158,14 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 		}
 	}
 
-	if( info_ptr->num_text)
-	{	
+	if( num_text)
+	{
 		register int16 i;
 
-		for ( i = 0; i < info_ptr->num_text; i++) 
-			info->max_comments_length = MAX( info->max_comments_length,  ( strlen(info_ptr->text[i].key) + info_ptr->text[i].text_length));
+		for ( i = 0; i < num_text; i++)
+			info->max_comments_length = MAX( info->max_comments_length,  ( strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length));
 
-		info->max_comments_length += 4;		
+		info->max_comments_length += 4;
 	}
 
 	return TRUE;
@@ -184,9 +188,14 @@ void CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
 	register int16 i;
 	png_infop   info_ptr = ( png_infop)info->_priv_ptr_more;
+	png_structp png_ptr  = ( png_structp)info->_priv_ptr;
+	png_textp	png_text_ptr;
+	int			num_text;
 
-	for ( i = 0; i < txtdata->lines; i++) 
-		sprintf( txtdata->txt[i] , "%s: %s", info_ptr->text[i].key, info_ptr->text[i].text);
+	png_get_text( png_ptr, info_ptr, &png_text_ptr, &num_text);
+
+	for ( i = 0; i < txtdata->lines; i++)
+		sprintf( txtdata->txt[i] , "%s: %s", png_text_ptr[i].key, png_text_ptr[i].text);
 }
 
 /*==================================================================================*
@@ -207,7 +216,7 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 	uint8 			*buf;
 	int16			i;
 
-	if( info_ptr->channels == 4)
+	if( png_get_channels( png_ptr, info_ptr) == 4)
 		buf = line_buffer;
 	else
 		buf = buffer;
@@ -215,22 +224,22 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 	if( setjmp( png_jmpbuf( png_ptr)))
 		return FALSE;
 
-	if( info_ptr->interlace_type == PNG_INTERLACE_ADAM7)
+	if( png_get_interlace_type( png_ptr, info_ptr) == PNG_INTERLACE_ADAM7)
 	{
 		/* We make the first pass here and not before to avoid memory fragmentation */
 		if( first_pass == TRUE)
 		{
 			int16  	pass;
 
-			png_image   = ( uint8*)malloc( info_ptr->rowbytes * ( info->height + 1));
-        
+			png_image   = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) * ( info->height + 1));
+
 			png_image_ptr = png_image;
 
-	    	for ( pass = 1; pass < number_passes; pass++) 
+	    	for ( pass = 1; pass < number_passes; pass++)
 			{
-				for( i = 0; i < info->height; i++) 
+				for( i = 0; i < info->height; i++)
 				{
-					png_bytep row = png_image + i * info_ptr->rowbytes;
+					png_bytep row = png_image + i * png_get_rowbytes( png_ptr, info_ptr);
 				    png_read_row( png_ptr, row, NULL);
 				}
 	    	}
@@ -238,19 +247,19 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 		}
 
 		png_read_row( png_ptr, png_image_ptr, NULL);
-	    memcpy( buf, png_image_ptr, info_ptr->rowbytes); 
-		png_image_ptr += info_ptr->rowbytes;		
+		memcpy( buf, png_image_ptr, png_get_rowbytes( png_ptr, info_ptr));
+		png_image_ptr += png_get_rowbytes( png_ptr, info_ptr);
 	}
 	else
 		png_read_row( png_ptr, buf, NULL);
 
 
-	if( info_ptr->channels == 4)
+	if( png_get_channels( png_ptr, info_ptr) == 4)
 	{
-		uint8	red, green, blue, r, g, b, a;		
+		uint8	red, green, blue, r, g, b, a;
 		uint8	*dest = buffer, *buf_ptr = buf;
 
-		for ( i = info->width;  i > 0;  --i) 
+		for ( i = info->width;  i > 0;  --i)
 		{
 			r = *buf_ptr++;
 			g = *buf_ptr++;
@@ -262,17 +271,17 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 				red   = r;
 				green = g;
 				blue  = b;
-			} 
-			else if ( a == 0) 
+			}
+			else if ( a == 0)
 			{
 				red   = 0xFF;
 				green = 0xFF;
 				blue  = 0xFF;
-			} 
-			else 
+			}
+			else
 			{
 				register uint32 transparent_color = info->background_color;
-			
+
 				alpha_composite( red,   r, a, ( transparent_color >> 16) & 0xFF);
 				alpha_composite( green, g, a, ( transparent_color >> 8) & 0xFF);
 				alpha_composite( blue,  b, a, ( transparent_color) & 0xFF);
@@ -303,13 +312,13 @@ void CDECL reader_quit( IMGINFO info)
 	png_structp png_ptr  = ( png_structp)info->_priv_ptr;
 	png_infop   info_ptr = ( png_infop)info->_priv_ptr_more;
 
-	if ( png_ptr) 
+	if ( png_ptr)
 	{
-		if( png_image) 
+		if( png_image)
 			free ( png_image);
 
 		if( line_buffer)
-			free( line_buffer); 
+			free( line_buffer);
 
 		if ( !setjmp( png_jmpbuf( png_ptr)))
 			png_read_end( png_ptr, info_ptr);
