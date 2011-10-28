@@ -61,7 +61,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 {
 	png_structp 	png_ptr  = NULL;
 	png_infop   	info_ptr = NULL;
-	int32 			png_file;
+	FILE* 			png_file;
 	char 			header[8];
 	int				header_size = sizeof( header);
 /*  png_color_16 	my_background = {0,0xFFFF,0xFFFF,0xFFFF,0xFFFF};
@@ -76,12 +76,12 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	number_passes	= 0;
 
 
-	if ( ( png_file = Fopen( name, 0)) < 0)
+	if ( ( png_file = fopen( name, "rb")) == NULL)
 		return FALSE;
 
-	if ( Fread( png_file, header_size, header) != header_size || png_sig_cmp( header, 0, header_size))
+	if ( fread( header, 1, header_size, png_file) != header_size || png_sig_cmp( header, 0, header_size))
 	{
-		Fclose ( png_file);
+		fclose ( png_file);
 		return FALSE;
 	}
 
@@ -90,14 +90,14 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	if ( !png_ptr || ( info_ptr = png_create_info_struct ( png_ptr)) == NULL)
 	{
 		png_destroy_read_struct ( &png_ptr, &info_ptr, NULL);
-		Fclose ( png_file);
+		fclose ( png_file);
 		return FALSE;
 	}
 
 	if( setjmp( png_jmpbuf( png_ptr)))
 	{
 		png_destroy_read_struct( &png_ptr, &info_ptr, NULL);
-		Fclose ( png_file);
+		fclose ( png_file);
 		return FALSE;
 	}
 
@@ -145,7 +145,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	info->indexed_color 		= FALSE;
 	info->_priv_ptr				= ( void*)png_ptr;
 	info->_priv_ptr_more		= ( void*)info_ptr;
-	info->_priv_var				= png_file;
+	info->__priv_ptr_more			= png_file;
 
 	if( png_get_channels( png_ptr, info_ptr) == 4)
 	{
@@ -324,9 +324,10 @@ void CDECL reader_quit( IMGINFO info)
 			png_read_end( png_ptr, info_ptr);
 
 		png_destroy_read_struct ( &png_ptr, &info_ptr, NULL);
-		Fclose( info->_priv_var);
+		fclose( info->__priv_ptr_more);
 		info->_priv_ptr 	 = NULL;
 		info->_priv_ptr_more = NULL;
+		info->__priv_ptr_more = NULL;
 	}
 }
 
