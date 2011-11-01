@@ -1,4 +1,4 @@
- /*  Resource C-Header-file v1.95 for ResourceMaster v2.06&up by ARDISOFT  */
+ /*  Resource C-Header-File v1.97 fÅr ResourceMaster ab v2.06 by ARDISOFT  */
 
 #define MENU_BAR 0  /* menu */
 #define MENU_BAR_FILE 4  /* TITLE in tree MENU_BAR */
@@ -66,8 +66,8 @@
 
 #define ABOUT 6  /* form/dial */
 #define ABOUT_S 0  /* BOX in tree ABOUT */
-#define ABOUT_VERSION 8  /* BUTTON in tree ABOUT */
-#define ABOUT_DATE 2  /* TEXT in tree ABOUT */
+#define ABOUT_VERSION 1  /* BUTTON in tree ABOUT */
+#define ABOUT_DATE 3  /* TEXT in tree ABOUT */
 
 #define SAVE_DIAL 7  /* form/dial */
 #define SAVE_DIAL_SAVE 1  /* BUTTON in tree SAVE_DIAL */

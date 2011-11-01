@@ -1,10 +1,10 @@
-ResourceMaster v3.65   
+ResourceMaster v3.651   
 #C 15@45@0@0@
 #N 99@32@AZAaza___  _@AZAaza090___  _@@_@
 #FoHRD@rsm2out@HRD@hrd@@@[HRD-File@0@
 #FoC-Header@rsm2out@C-Header@rsh@@@[C-Header@0@
 #R 0@0@3@1@4@1@
-#M 01010110@0@7728@743@
+#M 01010110@0@7728@745@
 #T 0@1@MENU_BAR@@59@@
 #O 4@32@FILE@@
 #O 5@32@EDIT@@
@@ -63,10 +63,10 @@ ResourceMaster v3.65
 #O 2@33@DOWN@@
 #O 4@20@BACK@@
 #O 3@20@MOVER@@
-#T 6@2@ABOUT@@9@@
+#T 6@2@ABOUT@@10@@
 #O 0@20@S@@
-#O 8@26@VERSION@@
-#O 2@21@DATE@@
+#O 1@26@VERSION@@
+#O 3@21@DATE@@
 #T 7@2@SAVE_DIAL@@10@@
 #O 1@26@SAVE@@
 #O 2@26@ABORT@@
@@ -236,4 +236,4 @@ ResourceMaster v3.65
 #S 42@4@NOZCODECS@@
 #S 43@4@NOEDDI@@
 #S 44@4@NOICONS@@
-#c 31767@
+#c 7121@
