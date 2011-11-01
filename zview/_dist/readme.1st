@@ -1,8 +1,0 @@
-MagiC users must use "zview.app" being located in the "MagiC" 
-folder !
-
-That's a version compiled with the old GCC 2.95.3 because it seems 
-that MagiC can't launch the C++ application compiled with GCC 3.x :/
-
-
-
