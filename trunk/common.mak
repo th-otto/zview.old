@@ -1,3 +1,5 @@
+CROSS			= yes
+
 ifeq ($(CROSS),yes)
 AS			= m68k-atari-mint-as
 CC                      = m68k-atari-mint-gcc
@@ -18,6 +20,8 @@ STACK                   = stack
 FLAGS                   = flags -r
 endif
 COMPRESS                = upx -9
+
+CFLAGS			+= -Wno-pointer-sign
 
 all: $(PROGRAM) stack strip compress
 
