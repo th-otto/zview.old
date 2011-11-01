@@ -1,6 +1,5 @@
 #include "general.h"
 #include "pic_load.h"
-#include "mem.h"
 #include "prefs.h"
 #include "ztext.h"
 #include "zvdi//color.h"
