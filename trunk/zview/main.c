@@ -52,8 +52,6 @@ void applexit( void)
 
 	plugins_quit();
 
-	mem_quit();
-
 	icons_exit();
 
 	MenuBar ( NULL, 0);	
@@ -128,8 +126,6 @@ static void applinit( void)
 
 	prefs_read();
 
-	mem_init();
-	
 	MenuDesktop();	
 
     EvntAttach( NULL, AP_TERM,  applexit);

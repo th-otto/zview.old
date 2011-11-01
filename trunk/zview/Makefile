@@ -9,13 +9,13 @@ DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
 STACKSIZE			= 512k
 OPTIMISATION			= -g -O2 -fomit-frame-pointer
-CPU				= -mcpu=5475
-#CPU				= -m68020-60
+#CPU				= -mcpu=5475
+CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lpdf/fofi -lfofi -Lpdf/goo -lGoo -Lpdf/splash -lsplash
 XPDF_INCS			= -Ipdf -Ipdf/goo -Ipdf/splash
 LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lz -lmem
-CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
+CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow -Wno-pointer-sign
 CXXFLAGS			= $(CFLAGS)
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
@@ -37,12 +37,12 @@ PDF_OBJ 			= pdf/xpdf/Annot.o pdf/xpdf/Array.o pdf/xpdf/BuiltinFont.o pdf/xpdf/B
 OBJ 				= $(PDF_OBJ) $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
-				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o mem.o main.o
+				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o main.o
 
 PROGRAM 			= zview.app
 
 
-all: pdf $(PROGRAM) stack strip #compress
+all: pdf $(PROGRAM) stack strip compress
 
 $(PROGRAM): $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
