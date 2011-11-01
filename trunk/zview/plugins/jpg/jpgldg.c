@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "libjpg/jpeglib.h"
+#include <jpeglib.h>
 #include "zview.h"
 #include "jpgdh.h"
 #include <libexif/exif-data.h>
@@ -40,11 +40,7 @@ LDGLIB plugin =
 	LibFunc,			/* List of functions */
 	"JPGJPEPEG",		/* File's type Handled */
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. */
-#ifndef __PUREC__
-	libshare_exit,		/* Function called when the plugin is unloaded */
-#else
 	NULL,
-#endif
 	3L					/* Howmany file type are supported by this plugin */
 };
 
@@ -227,7 +223,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	jpeg_saved_marker_ptr 	mark;
 	txt_data				*comment;
 	jmp_buf 				escape;
-	int32 					jpeg_file;
+	FILE* 					jpeg_file;
 	int16 					header = 0;
 	
 	/* If Brainstorm cookie is used, we try to decode with it*/
@@ -252,7 +248,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 		}
 	}
 
-	if ( ( jpeg_file = Fopen( name, 0)) < 0)
+	if ( ( jpeg_file = fopen( name, "rb")) == NULL)
 		return FALSE;
 
 	jpeg 	= ( JPEG_DEC) malloc( sizeof( struct jpeg_decompress_struct));
@@ -264,7 +260,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 		if ( comment) 	free( comment);		
 		if ( jerr) 		free( jerr);
 		if ( jpeg) 		free( jpeg);
-		Fclose( jpeg_file);
+		fclose( jpeg_file);
 		return FALSE;
 	}
 
@@ -300,12 +296,12 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	
 		if ( jerr) 		free( jerr);
 		if ( jpeg) 		free( jpeg);
-		Fclose( jpeg_file);
+		fclose( jpeg_file);
 		return FALSE;
 	}
 			
 	jpeg_create_decompress( jpeg);
-	jpeg_stdio_src( jpeg, ( FILE*)jpeg_file);
+	jpeg_stdio_src( jpeg, jpeg_file);
     jpeg_save_markers( jpeg, JPEG_COM,  0xffff); /* comment */
     jpeg_save_markers( jpeg, M_EXIF,    0xFFFF); /* EXIF */
 	jpeg_read_header( jpeg, TRUE);
@@ -425,7 +421,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 				jpeg_destroy_decompress( jpeg);
 				free( jpeg->err);
 				free( jpeg);
-				Fclose( jpeg_file);
+				fclose( jpeg_file);
 
 				if( decompress_thumbnail_image( info->__priv_ptr_more, size, info))
 				{
@@ -527,12 +523,7 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 
 		return TRUE;
 	}
-/*
-	{
-		int32 file = Fcreate( "C:\\Quit", 0);
-		Fclose( file);
-	}			
-*/	
+
 	if( jpeg_read_scanlines(( JPEG_DEC)info->_priv_ptr, ( JSAMPROW*)&buffer, 1))
 		return TRUE;
 
@@ -559,7 +550,7 @@ void CDECL reader_quit( IMGINFO info)
 	if( dsp_decoding)
 	{
 		if( info->_priv_ptr)
-			Mfree( info->_priv_ptr);
+			free( info->_priv_ptr);
 
 		return;
 	}
@@ -595,7 +586,7 @@ void CDECL reader_quit( IMGINFO info)
 		return;
 	}
 
-	Fclose( info->_priv_var);
+	fclose( info->_priv_var);
 }
 
 
@@ -634,11 +625,11 @@ boolean CDECL encoder_init( const char *name, IMGINFO info)
 {	
 	JPEG_ERR 	jerr = NULL;
 	JPEG_ENC 	jpeg = NULL;		   
-	int32 		jpeg_file;
+	FILE* 		jpeg_file;
 	jmp_buf 	escape;
 	int16 		header = 0;
 
-	if ( ( jpeg_file = Fcreate( name, 0)) < 0)
+	if ( ( jpeg_file = fopen( name, "wb")) == NULL)
 		return FALSE;
 
 	jpeg 	= ( JPEG_ENC) malloc( sizeof( struct jpeg_decompress_struct));
@@ -648,7 +639,7 @@ boolean CDECL encoder_init( const char *name, IMGINFO info)
 	{
 		if ( jerr) 		free( jerr);
 		if ( jpeg) 		free( jpeg);
-		Fclose( jpeg_file);
+		fclose( jpeg_file);
 		return FALSE;
 	}
 	
@@ -663,7 +654,7 @@ boolean CDECL encoder_init( const char *name, IMGINFO info)
 		if ( jpeg) 		free( jpeg);
 		jerr 	= NULL;
 		jpeg 	= NULL;
-		Fclose( jpeg_file);
+		fclose( jpeg_file);
 		return FALSE;
 	}
 
@@ -673,7 +664,7 @@ boolean CDECL encoder_init( const char *name, IMGINFO info)
 	jpeg->client_data   	= &escape;	
 	
 	jpeg_create_compress( jpeg);
-	jpeg_stdio_dest( jpeg, ( FILE*)jpeg_file);
+	jpeg_stdio_dest( jpeg, jpeg_file);
 
   	jpeg->image_width 		= info->width;
   	jpeg->image_height 		= info->height;
@@ -751,7 +742,7 @@ void CDECL encoder_quit( IMGINFO info)
 	if( jpgdrv)
 	{
 		if( info->_priv_ptr)
-			Mfree( info->_priv_ptr);
+			free( info->_priv_ptr);
 
 		return;
 	}
@@ -762,7 +753,7 @@ void CDECL encoder_quit( IMGINFO info)
 		jpeg_destroy_compress( jpeg);
 		free( jpeg->err);
 		free( jpeg);
-		Fclose( info->_priv_var);
+		fclose( info->_priv_var);
 	}
 }
 
@@ -782,8 +773,6 @@ void CDECL encoder_quit( IMGINFO info)
 void CDECL init( void)
 {
 	int32 mach, cpu = 0;
-
-	libshare_init();
 
 	/* DSP decoder present */
     if( Getcookie( C__JPD, ( long*)&jpgdrv) != 0) 

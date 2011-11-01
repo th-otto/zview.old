@@ -1,18 +1,23 @@
 #ifndef __2B_UNIVERSAL_TYPES__
 #define __2B_UNIVERSAL_TYPES__
 
+#ifndef HAVE_INTS_DEFINED
 typedef signed char		int8;
 typedef unsigned char	uint8;
 typedef signed long		int32;
 typedef unsigned long	uint32;
+#endif
 typedef int32  			fix31;
 
 #ifdef __GNUC__
+	#ifndef HAVE_INTS_DEFINED
 	typedef signed short		int16;
 	typedef unsigned short		uint16;
+	#endif
 	#define	__2B_HAS64_SUPPORT						/* Compiler supports 64 Bit Integers */
 	typedef signed long long	int64;
 	typedef unsigned long long	uint64;
+	
 /*	typedef unsigned long long 	loff_t; */
 #else												/* Compiler doesn't support 64 Bit Integers */
 	typedef signed int			int16;

@@ -32,11 +32,7 @@ LDGLIB godpaint_plugin =
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
 					   	   and are shareable, we must use this flags because we don't know if the 
 					   	   user has ldg.prg deamon installed on his computer */
-#ifdef __PUREC__
 	NULL,				/* Function called when the plugin is unloaded */
-#else
-	libshare_exit,		/* Function called when the plugin is unloaded */
-#endif
 	1L					/* Howmany file type are supported by this plugin */
 };
 
@@ -313,12 +309,8 @@ void CDECL encoder_quit( IMGINFO info)
  *==================================================================================*/
 void CDECL init( void)
 {
-#ifdef __PUREC__
 	/* Make the compiler happy*/
 	return;	
-#else
-	libshare_init();	
-#endif
 }
 
 
