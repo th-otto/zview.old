@@ -1,7 +1,7 @@
 STACKSIZE		= 8k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
-LIB			= -lshare -lldg
+LIB			= -lldg
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
 

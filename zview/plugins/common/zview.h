@@ -26,7 +26,6 @@
 #include <mint/falcon.h>
 #include <mint/cookie.h>
 #include <setjmp.h>
-#include <libshare.h>
 #include <mt_gem.h>
 #include <ldg.h>
 

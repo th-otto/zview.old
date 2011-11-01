@@ -1,5 +1,6 @@
+#include <tiffio.h>
+#define HAVE_INTS_DEFINED
 #include "zview.h"
-#include "libtiff/tiffio.h"
 
 #define alpha_composite( composite, fg, alpha) {						\
     uint16 temp = (( uint16)( fg) * ( uint16)( alpha) + ( uint16)128);	\
@@ -40,11 +41,7 @@ LDGLIB tiff_plugin =
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
 					   	   and are shareable, we must use this flags because we don't know if the 
 					   	   user has ldg.prg deamon installed on his computer */
-#ifdef __PUREC__
 	NULL,				/* Function called when the plugin is unloaded */
-#else
-	libshare_exit,		/* Function called when the plugin is unloaded */
-#endif
 	2L					/* Howmany file type are supported by this plugin */
 };
 
@@ -405,12 +402,6 @@ void CDECL set_tiff_option( int16 set_quality, uint16 set_encode_compression)
  *==================================================================================*/
 void CDECL init( void)
 {
-#ifdef __PUREC__
-	/* Make the compiler happy*/
-	return;	
-#else
-	libshare_init();	
-#endif
 }
 
 
