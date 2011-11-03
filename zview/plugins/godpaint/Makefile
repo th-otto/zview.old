@@ -1,4 +1,4 @@
-STACKSIZE		= 4k
+STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
 LIB			= -lldg
