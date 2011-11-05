@@ -159,7 +159,8 @@ static short my_font_8[1280] =			/* Tableau des donn‚es de la fonte */
 void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 {
 	MFDB pic;
-	short fx_mem[16], sys_pxy[20], c, char_width, tcolor[2] = { color, WHITE};
+	short fx_mem[16], sys_pxy[20], char_width, tcolor[2] = { color, WHITE};
+	unsigned short c;
 	
 	pic.fd_addr = fx_mem;
 	pic.fd_w = 16;
@@ -177,7 +178,7 @@ void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 	sys_pxy[6] = 0;
 	sys_pxy[7] = yf + 7;
 	
-	while ( (c = *str++) != 0) {
+	while ( (c = (unsigned char)*str++) != 0) {
 		char *model = (char*) &my_font_8[(c - 1) << 2] ;
 		char *dest = (char*)fx_mem;
 		
