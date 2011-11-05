@@ -18,9 +18,9 @@ $(PLUGINS):
 	$(MAKE) -C $@ $(MAKECMDGOALS) CROSS=yes
 
 dist:
-	rm -rf plugins
-	mkdir plugins
-	for f in $(PLUGINS); do cp $$f/*.ldg plugins; done
+	rm -rf codecs
+	mkdir codecs
+	for f in $(PLUGINS); do cp $$f/*.ldg codecs; done
 
 clean: $(PLUGINS)
 	rm -f *~ *.ldg
