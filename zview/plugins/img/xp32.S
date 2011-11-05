@@ -3,13 +3,20 @@
 	.globl	_plane2packed24
 
 | int32	plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, CTAB_REF src_ctab );
+|                       d0              d1                  d2               a0         a1         4(sp)
 
 | 11x4 + 4 + 5x4
 
 _plane2packed24:
 	movem.l		d2-d7/a2-a6,-(sp)
 
-	movea.l		68(sp),a6						|source of the color table
+	move.l		11*4+4(sp),d0
+	move.l		11*4+8(sp),d1
+	move.l		11*4+12(sp),d2
+	movea.l		11*4+16(sp),a0
+	movea.l		11*4+20(sp),a1
+	
+	movea.l		11*4+24(sp),a6						|source of the color table
 
 	move.l		d0,d4
 	subq.l		#1,d4
