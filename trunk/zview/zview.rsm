@@ -1,10 +1,10 @@
-ResourceMaster v3.651   
+ResourceMaster v3.65   
 #C 15@45@0@0@
 #N 99@32@AZAaza___  _@AZAaza090___  _@@_@
 #FoHRD@rsm2out@HRD@hrd@@@[HRD-File@0@
 #FoC-Header@rsm2out@C-Header@rsh@@@[C-Header@0@
 #R 0@0@3@1@4@1@
-#M 01010110@0@7728@745@
+#M 01010110@0@7728@748@
 #T 0@1@MENU_BAR@@59@@
 #O 4@32@FILE@@
 #O 5@32@EDIT@@
@@ -236,4 +236,4 @@ ResourceMaster v3.651
 #S 42@4@NOZCODECS@@
 #S 43@4@NOEDDI@@
 #S 44@4@NOICONS@@
-#c 7121@
+#c 6920@

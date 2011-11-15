@@ -192,7 +192,7 @@ static void WindViewZoom( WINDOW *win)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-
+void WindViewTop( WINDOW *win);
 static void WindViewTool( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);	
@@ -257,8 +257,9 @@ static void WindViewTool( WINDOW *win)
 			break;							
 
 		case VIEWTOOLBAR_INFO:
+			WindViewTop( win);
 			infobox();
-			break;				
+			break;
 		
 		default:
 			break;
@@ -269,7 +270,7 @@ static void WindViewTool( WINDOW *win)
 
 
 
-static void WindViewTop( WINDOW *win) 
+void WindViewTop( WINDOW *win) 
 {
 	OBJECT *menu = get_tree( MENU_BAR);
 

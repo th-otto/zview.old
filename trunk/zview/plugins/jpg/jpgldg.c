@@ -550,8 +550,10 @@ void CDECL reader_quit( IMGINFO info)
 	if( dsp_decoding)
 	{
 		if( info->_priv_ptr)
-			free( info->_priv_ptr);
-
+		{
+		        // DSP decoder uses Mxalloc()
+			Mfree( info->_priv_ptr);
+                }
 		return;
 	}
 
@@ -575,13 +577,13 @@ void CDECL reader_quit( IMGINFO info)
 
 	jpeg_finish_decompress( jpeg);
 	jpeg_destroy_decompress( jpeg);
-
+	
 	free( jpeg->err);
 	free( jpeg);
 	
 	/* thumbnail mode? */	
 	if( info->__priv_ptr_more)
-	{	
+	{
 		free( info->__priv_ptr_more);
 		return;
 	}
@@ -622,7 +624,7 @@ void CDECL set_jpg_option( int16 set_quality, J_COLOR_SPACE set_color_space, boo
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
 boolean CDECL encoder_init( const char *name, IMGINFO info)
-{	
+{
 	JPEG_ERR 	jerr = NULL;
 	JPEG_ENC 	jpeg = NULL;		   
 	FILE* 		jpeg_file;
@@ -738,15 +740,6 @@ boolean CDECL encoder_write( IMGINFO info, uint8 *buffer)
 void CDECL encoder_quit( IMGINFO info)
 {
 	JPEG_ENC jpeg = ( JPEG_ENC)info->_priv_ptr;
-
-	if( jpgdrv)
-	{
-		if( info->_priv_ptr)
-			free( info->_priv_ptr);
-
-		return;
-	}
-
 	if( jpeg)
 	{
 		jpeg_finish_compress( jpeg);
