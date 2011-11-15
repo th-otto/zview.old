@@ -13,6 +13,8 @@ Bug fixes:
 - Long standing bugs in DSP/NF JPEG decoder fixed (no crash anymore with MP
   plus the file is correctly written)
 - "Show hidden files" works also with Unix hidden files (prefixed with a dot)
+- Regardless of "Show common files" option, folder icons are always shown
+- PDF files are treated as images (i.e. always shown)
 
 Known bugs:
 -----------
