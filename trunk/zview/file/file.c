@@ -175,7 +175,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		if ( stat( de->d_name, &file_stat) != 0)
 			continue;
 
-		if (( file_stat.st_flags & 2) == FA_HIDDEN && !show_hidden)
+		if (((( file_stat.st_flags & FA_HIDDEN) != 0) || de->d_name[0] == '.') && !show_hidden)
 			continue;
 
 		/* allocate new memory for entries if needed */
