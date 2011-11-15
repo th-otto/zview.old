@@ -1,3 +1,22 @@
+XX November 2011: 1.0
+=====================
+
+News:
+-----
+
+Bug fixes:
+----------
+- Umlauts in PDF catalog
+- Crash in IMG plugin
+- A hidden memory bug, no visible effects (it seems) but better have it
+  fixed :)
+- Long standing bugs in DSP/NF JPEG decoder fixed (no crash anymore with MP
+  plus the file is correctly written)
+
+Known bugs:
+-----------
+- NONE! :)
+
 01 November 2011: BETA8
 =======================
 

@@ -1,0 +1,39 @@
+- PDF window: zView should always remember which zoom has been set when the
+- next
+or previous page is shown. At the moment, it displays a new page with 100%
+- or
+fitted to the window (last one if the option "Fit PDF to the window" is set)
+regardless of the zoom set by the user beforehand via the zoom buttons.
+
+- Keyboard shortcuts: a) It would be great to be able to use <Control>+<U>
+- not
+just for the browser and image windows but also for the options dialogues
+- and
+the PDF windows. b) Some more shortcuts:
+
+All windows:
+<Control> + <W> = changing windows
+
+Browser and PDF window:
+<Shift> + cursor up = page up
+<Shift> + cursor down = page down
+<ClrHome> = beginning of the page
+<Shift> + <ClrHome> = end of the page
+
+Browser window:
+<Control> + <Backspace> = go back button (switches to the contents of the
+directory above the present one)
+<Esc> = update directory button
+<+> = enlarge thumbnail size button
+<-> = reduce thumbnail size button
+
+Image windows:
+<+> = enlarge picture size button (zoom)
+<-> = reduce picture size button (zoom)
+<*> = full screen button
+
+PDF windows:
+<+> = enlarge page size button (zoom)
+<-> = reduce page size button (zoom)
+<Control> + cursor right/up = next page button
+<Control> + cursor left/down = previous page button

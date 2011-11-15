@@ -662,6 +662,7 @@ static void size_popup( WINDOW *win, int obj_index)
  *      --																			*
  *==================================================================================*/
 
+void WindViewTop( WINDOW *win);
 static void WindPdfTool( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -677,6 +678,7 @@ static void WindPdfTool( WINDOW *win)
 			break;	
 
 		case PDFTOOLBAR_INFO:
+		        WindViewTop( win);
 			infobox();
 			break;					
 
