@@ -12,6 +12,7 @@ Bug fixes:
   fixed :)
 - Long standing bugs in DSP/NF JPEG decoder fixed (no crash anymore with MP
   plus the file is correctly written)
+- "Show hidden files" works also with Unix hidden files (prefixed with a dot)
 
 Known bugs:
 -----------
