@@ -567,7 +567,7 @@ void WinCatalog_Refresh( WINDOW *win)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)	
 	{  
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE)) 
+		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
 			continue;
 			
 		if ( x + wicones->case_w > xw + ww)					
@@ -787,7 +787,7 @@ static void WinCatalog_Redraw( WINDOW *wind)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)
 	{
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE)) 
+		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
 			continue;
 			
 		if ( x + wicones->case_w > xw + ww)
@@ -926,7 +926,7 @@ static void WinCatalog_Redraw( WINDOW *wind)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)
 	{
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE)) 
+		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
 			continue;
 			
 		if ( x + wicones->case_w > xw + ww)
