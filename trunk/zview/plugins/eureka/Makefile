@@ -1,11 +1,12 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
-LIB			= -lldg
+LIB			= -lldgserver
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
+LDFLAGS			= -nostdlib
 
-OBJ 			= rawldg.o
+OBJ 			= $(LDG_STARTUP_OBJ) rawldg.o
 
 PROGRAM 		= eureka.ldg
 

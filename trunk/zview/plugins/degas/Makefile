@@ -1,11 +1,12 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
-LIB			= -lldg
+LIB			= -lldgserver
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
+LDFLAGS			= -nostdlib
 
-OBJ 			= degasldg.o
+OBJ 			= $(LDG_STARTUP_OBJ) degasldg.o
 
 PROGRAM 		= degas.ldg
 

@@ -3,6 +3,5 @@
 	- things like zvdi, debug, general.h, memory in all projects
 - convert zView to windom 2.x (zWeather is done in the latest revision)
 - add right licenses, to zXXX code, plugins, libraries used by plugins, ...
-- compile own mem.ldg, I've got very bad feeling about usage some old (maybe PureC-compiled?) code...
 - implement true http links in zWeather -- now both icon and promo links are only shown, they should open
   browser with URL from weather.com license

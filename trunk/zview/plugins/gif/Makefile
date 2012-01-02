@@ -1,13 +1,12 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
-LIB			= -lldg
+LIB			= -lgif -lldgserver
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
+LDFLAGS			= -nostdlib
 
-OBJ 			= gifldg.o
-
-LIB			+= -lgif
+OBJ 			= $(LDG_STARTUP_OBJ) gifldg.o
 
 PROGRAM 		= gif.ldg
 
