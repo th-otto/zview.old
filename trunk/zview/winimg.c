@@ -477,7 +477,7 @@ static void WindViewAnim( WINDOW *win)
 
 	page_to_show = windata->page_to_show + 1;
 
-	if( page_to_show >= windata->img.page - 1)
+	if( page_to_show >= windata->img.page)
 		page_to_show = 0;
 	
 	relative_t = current_t - windata->chrono_value;
