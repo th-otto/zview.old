@@ -1,12 +1,11 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
-LIB			= -lldgserver
+LIB			= -lldg
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
-LDFLAGS			= -nostdlib
 
-OBJ 			= $(LDG_STARTUP_OBJ) tgaldg.o
+OBJ 			= tgaldg.o
 
 PROGRAM 		= tga.ldg
 

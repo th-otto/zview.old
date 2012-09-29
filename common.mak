@@ -22,7 +22,6 @@ endif
 COMPRESS                = upx -9
 
 CFLAGS			+= -Wno-pointer-sign
-LDG_STARTUP_OBJ		= /home/mikro/gnu-tools/m68k-atari-mint/lib/m68020-60/ldgstart.o
 
 all: $(PROGRAM) stack strip compress
 
@@ -40,4 +39,4 @@ compress: $(PROGRAM)
 	$(FLAGS) $(PROGRAM)
 
 clean:
-	rm -f $(filter-out $(LDG_STARTUP_OBJ),$(OBJ)) $(PROGRAM) *~
+	rm -f $(OBJ) $(PROGRAM) *~
