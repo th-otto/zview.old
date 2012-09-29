@@ -1,0 +1,355 @@
+@database "zcodeclib Dev. Guide"
+@subject "Documentation"
+@author "Zorro"
+@$VER: ZCODEC.HYP (@:"__DATE__")
+@options  +Z
+@options  -S 
+
+@default Index
+
+@node Index "zcodeclib dev."
+zcodeclib dev.
+@line  1 70 0 0 1
+
+
+	1. Introduction
+	2. Functions
+	3. Global variables
+	4. The IMAGE structure.
+	5. Do you use MEM.LDG in your application?
+
+
+@endnode
+
+
+@node "Introduction"
+1. Introduction
+@line  1 70 0 0 1
+
+Make a basic GEM application is a very easy task but problems 
+become when we have to draw something on the screen. 
+ 
+Indeed, on Atari and others TOS computers, there are many 
+different screens' formats and, of course, we can't deal with 
+it in the same manner. 
+ 
+The problem is worst when we have to load and to draw a picture 
+from, for example, a JPG file. We have to make ourselves loading 
+routines, etc... A real nightmare!  
+ 
+The goal of this library is to offer easy and fast functions for
+load images from file and for, especially, deal with the screen.
+It provide also useful functions like MFDB zooming and others. 
+ 
+This library load and use the zview's codecs, so it's fast and 
+stable. 
+ 
+@{B}For use this library, you need:@{0}
+ 
+- A VDI with a valid EDDI (like NovaVDI, NVDI > 2.5, fVDI, etc..). 
+- The zview's codec correctly installed with mem.ldg (provided in 
+the zview archive). 
+- the LDG library ( http://ldg.org.free.fr)
+- A recent GEMLIB.
+
+
+(Index)
+
+@endnode
+
+@node "Functions"
+2. Functions
+@line  1 70 0 0 1
+
+
+	1. codecs_init()
+	2. codecs_quit()
+	3. load_img()
+	4. delete_img()
+	5. pic_resize()
+	6. delete_mfdb()
+
+
+(Index)
+
+@endnode
+
+
+@node "codecs_init()"
+codecs_init()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}
+	codec_init - initialise and load the wanted codecs.
+
+@{B}PROTOTYPAGE@{0}
+	int16 codecs_init( char *codec_name);
+
+
+@{B}PARAMETERS@{0}
+	codec_name: the name of the codec to load.
+
+	return: 0 if an error occurs else 1.
+
+
+@{B}DESCRIPTION@{0}
+	It's the first function to call. 
+ 
+	The function's job is to initialize the VDI's informations,
+	load MEM.LDG ( for shareable allocation) and load the wanted
+	codecs. 
+   
+	For example: 
+	
+	codecs_init( "jpg.ldg"); 
+ 
+	If you need others codecs, you can to call this function any 
+	numbers of times like: 
+ 
+	codecs_init( "jpg.ldg"); 
+	codecs_init( "png.ldg"); 
+	.... 
+ 
+	Cool feature, you can load the complete codec's pack with: 
+ 
+	codec_init( "all"); 
+
+
+@{B}IMPORTANT@{0} 
+	Be careful, you can't load two times the same codec so, don't
+	call again this function after a codec_init( "all"). 
+ 
+
+(Index)
+
+@endnode
+
+@node "codecs_quit()"
+codecs_quit()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}
+	codecs_quit - unload the codecs and MEM.LDG.
+
+@{B}PROTOTYPAGE@{0}
+	void codecs_quit( void); 
+
+
+@{B}DESCRIPTION@{0}
+	You must call this function at the end of your code or when we
+	don't use anymore the functions form this library. 
+ 
+	It unloads MEM.LDG and the codecs previously loaded. 
+
+
+(Index)
+
+@endnode
+
+@node "load_img()"
+load_img()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}l
+	load_img() - load, convert and zoom a image.
+
+@{B}PROTOTYPAGE@{0}
+	IMAGE *load_img( const char *file, int16 w, int16 h, int16 keep_ratio);
+
+
+@{B}PARAMETERS@{0}
+	file: the file to load.
+
+	w: the wanted image's width. 
+	   -1 for to keep the image's width.
+
+	h: the wanted image's height.
+	   -1 for to keep the image's height.
+
+	keep_ratio: in the case where you set the wanted image's size
+	            with the w and h variables, if 'keep_ratio' if TRUE,
+	            the image is resized to fit in w and h for maintain 
+	            the aspect ratio else the image will be exactly at 
+	            the wanted size.
+
+
+	return: NULL if an error occurs else a valid IMAGE structure.
+
+
+@{B}DESCRIPTION@{0}
+	The most important function of this library; it loads, converts
+	to screen format and eventually, zooms a picture. All in one 
+	function!
+
+
+@{B}IMPORTANT@{0} 
+	Don't allocate the IMG structure yourself, the function make it
+	for you (see example.c).
+
+
+(Index)
+
+@endnode
+
+
+
+@endnode
+
+@node "delete_img()"
+delete_img()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}
+	delete_img - free a IMAGE structure.
+
+@{B}PROTOTYPAGE@{0}
+	void delete_img( IMAGE *img); 
+
+
+@{B}DESCRIPTION@{0}
+	This function frees all the memories previously allocated for
+	the "img" structure and also "img" itself.
+ 
+(Index)
+
+@endnode
+
+
+@node "pic_resize()"
+pic_resize()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}l
+	pic_resize() - resize a MFDB.
+
+@{B}PROTOTYPAGE@{0}
+	MFDB *pic_resize( MFDB *in, int16 w, int16 h, int16 keep_ratio);
+
+
+@{B}PARAMETERS@{0}
+	in: the input MFDB address.
+
+	w: the wanted MFDB's width.
+
+	h: the wanted MFDB's height.
+
+	keep_ratio: if 'keep_ratio' if TRUE, the MFDB is resized for to
+	            fit in 'w' and 'h' for maintain the aspect ratio 
+	            else the MFDB will be exactly at the 'w' and 'h' size.
+
+	return: NULL if an error occurs else a valid MFDB address.
+
+
+@{B}DESCRIPTION@{0}
+	Return a MFDB resized with the data of 'in'.
+
+
+@{B}IMPORTANT@{0} 
+	1) Don't allocate the "out" MFDB yourself, the function make it
+	for you (see example.c).
+	2) You can't free the MFDB youself, use delete_mfdb() for do that.
+
+
+(Index)
+
+@endnode
+
+
+
+@node "delete_mfdb()"
+delete_mfdb()
+@line  1 70 0 0 1
+
+@{B}NAME@{0}l
+	delete_mfdb() - delete one or more MFDB structure(s).
+
+@{B}PROTOTYPAGE@{0}
+	void delete_mfdb( MFDB *bm, int16 nbr);
+
+
+@{B}PARAMETERS@{0}
+	bm: the MFDB to free.
+
+	nbr: the number of MFDB in 'bm'.
+
+	return: nothing.
+
+
+@{B}DESCRIPTION@{0}
+	Free one or more MFDB created with pic_resize().
+
+
+(Index)
+
+@endnode
+
+
+@node "Global variables"
+Global variables
+@line  1 70 0 0 1
+
+
+	All this global variable are in in16 format( short).
+
+	planar: The screen format, 1 if planar else 0.
+
+	nplanes: the screen planes' number.
+	
+	vdi_work_in[10], vdi_work_out[57]: useful information about
+	the VDI.
+	
+	vdi_handle: a "ready to use" VDI handle. 
+		
+
+(Index)
+
+@endnode  
+
+
+@node "IMAGE"
+IMAGE
+@line  1 70 0 0 1
+
+
+typedef struct 
+{ 
+	int16	page; 
+	uint16	*delay;
+	MFDB	*image;
+} IMAGE;
+
+
+delay: exists only if the image is a animated one ( for example: 
+	   animated GIF, FLI, etc..).
+
+page: is the number of image returned (For animated picture or 
+      multi-pages documents like FAX).
+
+image: is one of many MFDB structure(s) ready to be transferred to
+       the screen. 
+
+
+@endnode
+
+
+@node "Do you use MEM.LDG in your application?"
+Do you use MEM.LDG in your application?
+@line  1 70 0 0 1
+
+
+Libzcodec loads already the MEM.LDG so you can't do it again in your
+code!
+
+For this prupose, in the header's file, we can find
+'shared_malloc( a)' and 'shared_free( a)'.
+
+This functions are only ldg_malloc() and ldg_free() binded; you
+can use it without any problem and if far better that Mintlib malloc's
+function. 
+
+If you need ldg_realloc or ldg_calloc, you need to make a
+ldg_find( "ldg_calloc", ldg_mem) youself. ( ldg_mem is a global
+variable used for load MEM.LDG).
+
+
+@endnode

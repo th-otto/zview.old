@@ -1,0 +1,38 @@
+diff -ur tiff-3.8.2/libtiff/Makefile.am tiff-3.8.2-new/libtiff/Makefile.am
+--- tiff-3.8.2/libtiff/Makefile.am	2006-03-23 15:31:53.000000000 +0100
++++ tiff-3.8.2-new/libtiff/Makefile.am	2011-10-24 21:19:02.146076731 +0200
+@@ -108,7 +108,7 @@
+ libtiff_la_SOURCES = $(SRCS)
+ libtiff_la_LDFLAGS = \
+ 	-no-undefined \
+-	-version-number $(LIBTIFF_VERSION_INFO)
++	-version-info $(LIBTIFF_VERSION_INFO)
+ if HAVE_RPATH
+ libtiff_la_LDFLAGS += $(LIBDIR)
+ endif
+@@ -117,7 +117,7 @@
+ libtiffxx_la_SOURCES = $(SRCSXX)
+ libtiffxx_la_LDFLAGS = \
+ 	-no-undefined \
+-	-version-number $(LIBTIFF_VERSION_INFO)
++	-version-info $(LIBTIFF_VERSION_INFO)
+ if HAVE_RPATH
+ libtiffxx_la_LDFLAGS += $(LIBDIR)
+ endif
+diff -ur tiff-3.8.2/libtiff/Makefile.in tiff-3.8.2-new/libtiff/Makefile.in
+--- tiff-3.8.2/libtiff/Makefile.in	2006-03-23 15:44:45.000000000 +0100
++++ tiff-3.8.2-new/libtiff/Makefile.in	2011-10-24 21:19:12.932758298 +0200
+@@ -355,11 +355,11 @@
+ noinst_HEADERS = $(EXTRA_HDRS)
+ lib_LTLIBRARIES = libtiff.la $(am__append_2)
+ libtiff_la_SOURCES = $(SRCS)
+-libtiff_la_LDFLAGS = -no-undefined -version-number \
++libtiff_la_LDFLAGS = -no-undefined -version-info \
+ 	$(LIBTIFF_VERSION_INFO) $(am__append_3)
+ libtiff_la_LIBADD = $(LIBPORT)
+ libtiffxx_la_SOURCES = $(SRCSXX)
+-libtiffxx_la_LDFLAGS = -no-undefined -version-number \
++libtiffxx_la_LDFLAGS = -no-undefined -version-info \
+ 	$(LIBTIFF_VERSION_INFO) $(am__append_4)
+ libtiffxx_la_LIBADD = $(LIBTIFF) $(LIBPORT)
+ libtiffxx_la_DEPENDENCIES = libtiff.la
