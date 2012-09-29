@@ -1,15 +1,14 @@
 - PDF window: zView should always remember which zoom has been set when the
-- next
-or previous page is shown. At the moment, it displays a new page with 100%
-- or
-fitted to the window (last one if the option "Fit PDF to the window" is set)
+next or previous page is shown. At the moment, it displays a new page with 100%
+or fitted to the window (last one if the option "Fit PDF to the window" is set)
 regardless of the zoom set by the user beforehand via the zoom buttons.
+==============================================================================
+- Keyboard shortcuts:
+a) It would be great to be able to use <Control>+<U>
+not just for the browser and image windows but also for the options dialogues
+and the PDF windows.
 
-- Keyboard shortcuts: a) It would be great to be able to use <Control>+<U>
-- not
-just for the browser and image windows but also for the options dialogues
-- and
-the PDF windows. b) Some more shortcuts:
+b) Some more shortcuts:
 
 All windows:
 <Control> + <W> = changing windows
@@ -37,3 +36,70 @@ PDF windows:
 <-> = reduce page size button (zoom)
 <Control> + cursor right/up = next page button
 <Control> + cursor left/down = previous page button
+==============================================================================
+Latest news. zView doesn´t work under TOS with Enhancer.prg instead of NVDI
+(crash while opening the browser) neither on the CT60 nor CT63. Lars tested it
+on both machines. If I´m not mistaken, nothing else was installed. I´d suggest
+you have a look at it. Try it on your Falcon under TOS. With some luck, this
+problem is related to the one Ektus and me have under MagiC and TOS. I´m very
+curious if you can reproduce this crash on your Falcon. If not, I´d like to buy
+your machine ;-)
+==============================================================================
+And something different. Thanks for the "Show Unsupported Files" option. Very
+good idea to rename the old one and show now always folders and PDF files. Those
+"Show Non-Images" (menu) and "Show common files" (preference dialogue) options
+were very irritating. Now it is much easier to understand.
+
+What do think about the following additional idea? We rename the "Show common
+files" option in the preference dialogue with "Show unsupported files" and
+replace the new "Show Unsupported Files" in the menu with "Show Only Images". I
+think this is the optimal solution. In the dialogue is the not-often-used option
+(some like it to see all files, other don´t), and via the menu, one can list
+quickly only images (i.e. no folders and any other files) in the browser.
+
+Additionally, as discussed before, I renamed the menu entry "Show Unsupported
+Files" by "Show Only Images", and "Show common files" in the preferences with
+"Show unsupported files" (the button name is also renamed: SHOW_NON_IMAGES ->
+SHOW_UNSUPPORTED_FILES, and therefore has to be changed everywhere in the code,
+too, along with the code changes for the "new" option ;-)
+==============================================================================
+There is small problem with the progress bar in the deleting files dialogue.
+It's one pixel too wide and high. For beta6 (7th August 2005), Zorro corrected
+this for the read progress bar but apparently not for the delete bar. Would be
+nice to have this corrected.
+==============================================================================
+And Ektus told me he got the impression that sometimes, after opening the
+browser, the thumbnails were displayed only when he´d scrolled the browser
+window. I told him he should keep an eye on it.
+==============================================================================
+a) Write-protected files can be deleted with zView's delete function.
+--> feature
+==============================================================================
+b) You solved the umlauts bug in the navigation list. Works fine. Do you know if
+there can also be such a bug for extended information (Exif and other metadata)?
+It's rather a question then a bug report since haven't found a picture or PDF
+with extended data and Umlauts so far.
+--> wont fix
+==============================================================================
+c) In full screen mode, images that take up the whole screen have a colourful
+line (one pixel thick) on the right side or at the bottom which seems not to
+belong to the picture. I don't know if these are additional lines or if these
+lines are wrongly displayed pixels of the picture. Can you see those lines?
+==============================================================================
+d) If I browse the test TIFF images archive available from the LiBTIFF website
+(http://libtiff.maptools.org/images.html), zView writes some warnings on the
+screen. And do you know why many pictures in the folder Depth can´t be
+displayed? For example, at least the 24-bit colour TIFF images shouldn´t be a
+problem for a TIFF reader, should they?
+==============================================================================
+e) If the closer button of a picture window is above an icon of the browser
+window's toolbar, the corresponding toolbar icon will be selected when the
+picture window is closed by a mouse click on the closer.
+==============================================================================
+Here´s another picture file to be stored ;-) It´s a multi-page TIFF image and
+has 8 pages/pictures. If I remember correctly, the latest zView says it has one
+picture and zView BETA7 by Zorro says it has two (information dialogue -> Format
+-> Pages). Of course, both are wrong.
+==============================================================================
+On the internet, I´ve found a PDF with an umlaut in the extended info:
+Gründerwerkstatt.pdf. The "ü" is missing, instead another character is used.
