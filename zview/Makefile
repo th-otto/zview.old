@@ -16,7 +16,7 @@ XPDF_LIBS			= -Lpdf/fofi -lfofi -Lpdf/goo -lGoo -Lpdf/splash -lsplash
 XPDF_INCS			= -Ipdf -Ipdf/goo -Ipdf/splash
 LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldgclient -lgem -lz
 CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow -Wno-pointer-sign
-CXXFLAGS			= $(CFLAGS)
+CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
 EDIT_OBJ 			= zedit/char.o zedit/edit.o zedit/zedit.o
@@ -42,7 +42,7 @@ OBJ 				= $(PDF_OBJ) $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 
 
-all: pdf $(PROGRAM) stack strip compress
+all: pdf $(PROGRAM) stack strip #compress
 
 $(PROGRAM): $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(XPDF_LIBS) $(LIB)
@@ -76,5 +76,4 @@ clean_zview:
 clean_pdf:
 	make -C pdf clean && rm pdf/*.o
 
-clean:
-	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o
+clean: clean_zview
