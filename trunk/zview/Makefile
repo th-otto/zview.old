@@ -14,7 +14,7 @@ CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lpdf/fofi -lfofi -Lpdf/goo -lGoo -Lpdf/splash -lsplash
 XPDF_INCS			= -Ipdf -Ipdf/goo -Ipdf/splash
-LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldgclient -lgem -lz
+LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lz -lmem
 CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow -Wno-pointer-sign
 CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
 

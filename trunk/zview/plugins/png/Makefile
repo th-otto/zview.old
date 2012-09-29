@@ -1,12 +1,11 @@
 STACKSIZE		= 64k
 OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
-LIB			= -lpng -lz -lldgserver
+LIB			= -lldg -lpng -lm -lz
 
 CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
-LDFLAGS			= -nostdlib
 
-OBJ			= $(LDG_STARTUP_OBJ) pngldg.o
+OBJ			= pngldg.o
 
 PROGRAM 		= png.ldg
 

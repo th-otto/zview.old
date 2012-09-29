@@ -30,6 +30,7 @@
 #include <windom1.h>
 #include <scancode.h>
 #include <ldg.h>
+#include <ldg/mem.h>
 #include "zaes.h"
 #include "zedit/libtedit.h"
 #include "pdf/goo/gmem.h"
