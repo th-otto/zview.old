@@ -34,7 +34,7 @@
 #include <scancode.h>
 #include <ldg.h>
 #include <libxml/parser.h>
-#include <types2b.h>
+#include "types2b.h"
 #include <zcodec.h>
 #include "zstring.h"
 #include "zaes.h"
