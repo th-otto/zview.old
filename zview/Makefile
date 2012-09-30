@@ -15,7 +15,7 @@ DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lpdf/fofi -lfofi -Lpdf/goo -lGoo -Lpdf/splash -lsplash
 XPDF_INCS			= -Ipdf -Ipdf/goo -Ipdf/splash
 LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lz
-CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow -Wno-pointer-sign
+CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign
 CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -Wall -Wshadow
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
