@@ -7,7 +7,7 @@ IMAGE *init_img( int16 page, int16 w, int16 h, int16 planes)
 	IMAGE *data;
 	int16 i;
 
-	data = ( IMAGE *)shared_malloc( sizeof( IMAGE));
+	data = ( IMAGE *)malloc( sizeof( IMAGE));
 	
 	if( data == NULL)
 		return NULL;
@@ -15,11 +15,11 @@ IMAGE *init_img( int16 page, int16 w, int16 h, int16 planes)
 	data->page	= page;
 	data->delay	= NULL;
 
-	data->image = ( MFDB *)shared_malloc( sizeof( MFDB) * page);
+	data->image = ( MFDB *)malloc( sizeof( MFDB) * page);
 
 	if( data->image == NULL)
 	{
-		shared_free( data);
+		free( data);
 		return NULL;
 	}
 
@@ -30,8 +30,8 @@ IMAGE *init_img( int16 page, int16 w, int16 h, int16 planes)
 			if( i)
 				delete_mfdb( data->image, i + 1);
 
-			shared_free( data->image);
-			shared_free( data);	
+			free( data->image);
+			free( data);	
 			return NULL;
 		}
 	}
@@ -47,7 +47,7 @@ void delete_img( IMAGE *data)
 	delete_mfdb( data->image, data->page);
 
 	if( data->delay)
-		shared_free( data->delay);
+		free( data->delay);
 
-	shared_free( data);	
+	free( data);	
 }

@@ -25,12 +25,7 @@
 #include <unistd.h>
 #include <gemx.h>
 #include <ldg.h>
-#include <ldg/mem.h>
-#include <types2b.h>
-#include "mem.h"
-
-#define shared_malloc( s)	_ldg_malloc( s, ldg_global[2]);
-#define shared_free( s)		_ldg_free( s, ldg_global[2]);
+#include "types2b.h"
 
 #ifndef MIN
 #define MAX(a,b) ((a)>(b)?(a):(b))
@@ -41,4 +36,3 @@
 # define TRUE 1
 # define FALSE 0
 #endif
-

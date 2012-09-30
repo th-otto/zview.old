@@ -11,7 +11,6 @@ void plugins_quit( void);
 void CDECL( *codec_init)( void) = NULL;
 
 static int16 vdi_initialised = 0;
-static int16 mem_initialised = 0;
 
 /* Global variable */
 int16 	plugins_nbr = 0;
@@ -36,8 +35,6 @@ void codecs_quit( void)
 	{
 		ldg_close( codecs[i], ldg_global);
 	}
-
-	mem_quit();
 }
 
 
@@ -85,13 +82,8 @@ int16 codecs_init( char *codec_name)
 		if( !( vdi_initialised = vdi_init()))
 			return( 0);
 
-	if( mem_initialised == 0)
-		if( !( mem_initialised = mem_init()))
-			return( 0);
-
 	if ( chdir( plugin_dir) != 0)
 	{
-		mem_quit();
 		return( 0);
 	}
 

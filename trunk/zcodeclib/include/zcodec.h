@@ -23,7 +23,4 @@ extern void		delete_img( IMAGE *img);
 extern MFDB 	*pic_resize( MFDB *in, int16 w, int16 h, int16 keep_ratio);
 extern void		delete_mfdb( MFDB *bm, int16 nbr);
 
-#define shared_malloc( s)	_ldg_malloc( s, ldg_global[2]);
-#define shared_free( s)		_ldg_free( s, ldg_global[2]);
-
 #endif
