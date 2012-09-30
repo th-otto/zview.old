@@ -3,7 +3,7 @@ OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
 CPU			= -m68020-60
 LIB			= -lshare -ltiff -ljpeg -lldg -lz -lm
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I. -I../common
+CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I. -I../../../common -I../common
 
 OBJ			= tiffldg.o
 

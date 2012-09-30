@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../types2b.h"
+#include "types2b.h"
 #include "../pdf/goo/gmem.h"
 #include "libtedit.h"
 

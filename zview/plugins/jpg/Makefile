@@ -3,7 +3,7 @@ OPTIMISATION		= -O2 -fomit-frame-pointer
 CPU			= -m68020-60
 LIB			= -lshare -lldg -ljpeg -lexif -lm
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../common
+CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../../../common -I../common
 
 DSP_OBJ			= jpgdsp.o 
 

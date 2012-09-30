@@ -29,7 +29,7 @@ void delete_txt_data( IMAGE *img)
 
 /*==================================================================================*
  * init_txt_data:																	*
- *			Initialisation with various shared_malloc of the txt_data struct.		*
+ *			Initialisation with various malloc of the txt_data struct.		*
  *			This struct. will contain the comment of the picture or the EXIF data.	*
  *----------------------------------------------------------------------------------*
  * txtdata: 			The IMAGE struct where is the txt_dataThe IMAGE struct 		*
