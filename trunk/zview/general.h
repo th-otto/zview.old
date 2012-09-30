@@ -30,7 +30,6 @@
 #include <windom1.h>
 #include <scancode.h>
 #include <ldg.h>
-#include <ldg/mem.h>
 #include "zaes.h"
 #include "zedit/libtedit.h"
 #include "pdf/goo/gmem.h"
@@ -73,10 +72,6 @@
 #ifndef MAX_PATH
 	#define MAX_PATH	1024
 #endif
-
-#define shared_malloc( s)		_ldg_malloc( s, ldg_global[2]);
-#define shared_realloc( s, b)	_ldg_realloc( s, b, ldg_global[2]);
-#define shared_free( s)			_ldg_free( s, ldg_global[2]);
 
 /* MACRO */
 #ifndef ABS
