@@ -28,6 +28,7 @@
 #include <setjmp.h>
 #include <mt_gem.h>
 #include <ldg.h>
+#include <libshare.h>
 
 #ifndef TRUE
 #define TRUE		1
