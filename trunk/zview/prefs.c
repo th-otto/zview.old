@@ -5,23 +5,24 @@ int thumbnail[8][2] = { /* 4:3 size */ { 64, 48}, { 96, 72}, { 120, 90}, { 180, 
 						/* 3:4 size */ { 48, 64}, { 72, 96}, { 90, 120}, { 135, 180}};
 
 /* File's Browser Preferences */
-int show_size					= 1;			/* show file size 											*/
-int show_hidden					= 0;			/* show hidden file 										*/
-int show_non_image				= 1;			/* show non-image file 										*/
+int show_size					= 1;			/* show file size 								*/
+int show_hidden					= 0;			/* show hidden file 								*/
+int show_only_images				= 0;			/* show only image files (neither folders)					*/
+int show_unsupported				= 1;			/* show unsupported files (but folders always)					*/
 int browser_x					= 0;			/* Win catalog x, y, w, h position/size						*/
-int browser_y					= 0;			/* "														*/
-int browser_w					= 0;			/* "														*/
-int browser_h					= 0;			/* "														*/
-int sortingmode					= 0;			/* File's sorting mode: 0) by name, 1) by size, 2) by date	*/
-int thumbnail_size				= 1;			/* thumbnail size 											*/
-int browser_frame_width			= 200;			/* folder's browser frame width								*/
-int preview_frame_height		= 200;			/* as the integer's name say :)								*/
-int show_read_progress_bar		= 1;			/* show the read progress bar								*/
-int show_write_progress_bar		= 1;			/* show the write progress bar								*/
-char skip_drive[27] 			= "ABU";		/* Skip this drives in the browser							*/
-int smooth_thumbnail 			= 0;			/* 0 = None, 1 = Triangle, 2 = Blackman, 3 = Gaussian, 4 = Quadratic, 5 = Cubic, 6 = Lanczos */
-int pdf_fit_to_win 				= 1;			/* Fit the PDF to the Window								*/
-int pdf_aa		 				= 1;			/* Font Antialiasing										*/
+int browser_y					= 0;			/* "										*/
+int browser_w					= 0;			/* "										*/
+int browser_h					= 0;			/* "										*/
+int sortingmode					= 0;			/* File's sorting mode: 0) by name, 1) by size, 2) by date			*/
+int thumbnail_size				= 1;			/* thumbnail size 								*/
+int browser_frame_width				= 200;			/* folder's browser frame width							*/
+int preview_frame_height			= 200;			/* as the integer's name say :)							*/
+int show_read_progress_bar			= 1;			/* show the read progress bar							*/
+int show_write_progress_bar			= 1;			/* show the write progress bar							*/
+char skip_drive[27] 				= "ABU";		/* Skip this drives in the browser						*/
+int smooth_thumbnail 				= 0;			/* 0 = None, 1 = Triangle, 2 = Blackman, 3 = Gaussian, 4 = Quadratic, 5 = Cubic, 6 = Lanczos */
+int pdf_fit_to_win 				= 1;			/* Fit the PDF to the Window							*/
+int pdf_aa		 			= 1;			/* Font Antialiasing								*/
 
 /* Prototype */
 int prefs_read( void);
@@ -93,7 +94,15 @@ loop:
 		else
 			fseek( inffile, filepos, SEEK_SET);
 
-		if ( fscanf( inffile, "show_non_image=%d ", &show_non_image) == 1)
+		if ( fscanf( inffile, "show_only_images=%d ", &show_only_images) == 1)
+		{
+			valid_entry_found = TRUE;
+			continue;
+		}
+		else
+			fseek( inffile, filepos, SEEK_SET);
+		
+		if ( fscanf( inffile, "show_unsupported=%d ", &show_unsupported) == 1)
 		{
 			valid_entry_found = TRUE;
 			continue;
@@ -265,7 +274,8 @@ int prefs_write( void)
 
 	fprintf( inffile, "show_size=%d\r\n", show_size);
 	fprintf( inffile, "show_hidden=%d\r\n", show_hidden);
-	fprintf( inffile, "show_non_image=%d\r\n", show_non_image);
+	fprintf( inffile, "show_only_images=%d\r\n", show_only_images);
+	fprintf( inffile, "show_unsupported=%d\r\n", show_unsupported);
 	fprintf( inffile, "browser_x=%d\r\n", browser_x);
 	fprintf( inffile, "browser_y=%d\r\n", browser_y);
 	fprintf( inffile, "browser_w=%d\r\n", browser_w);

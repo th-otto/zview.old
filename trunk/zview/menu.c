@@ -19,7 +19,7 @@ void Menu_open_image( void);
 static void Menu_preference( void);
 static void Menu_file_info( void);
 static void Menu_close_win( void);
-static void Menu_show_non_image( void);
+static void Menu_show_only_images( void);
 static void Menu_sort_by_name( void);
 static void Menu_sort_by_size( void);
 static void Menu_sort_by_date( void);
@@ -249,10 +249,15 @@ static void Menu_select_all( void)
 		exit_edit_mode( win_catalog, wicones->first_selected);
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)
-	{	
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE)) 
-			continue;
-			
+	{
+	        // only images?
+	        if( show_only_images && wicones->entry[i].type != ET_IMAGE)
+	                continue;
+                
+                // images, pdfs, folders only?
+	        if( !show_unsupported && wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_PDF && wicones->entry[i].type != ET_DIR)
+	                continue;
+	        
 		if( !check_selected_entry( wicones, &wicones->entry[i]))
 			add_selected_entry( wicones, &wicones->entry[i]);
 	}
@@ -263,10 +268,10 @@ static void Menu_select_all( void)
 }
 
 /*==================================================================================*
- * void Menu_show_non_image:														*
- *		Handle the "Show Non-Image" option in the TOS menubar.						*
- *		This function shows common file in the catalog window.						*
- * 		So, both the image files and the comon files are shown.						*
+ * void Menu_show_only_images:							    *
+ *	Handle the "Show Only Images" option in the TOS menubar.		    *
+ *	This function shows only images; folders and unsupported files		    *
+ *	are not shown. Unsupported files in from pref.c is preserved, though.	    *
  *----------------------------------------------------------------------------------*
  * input:																			*
  *		--																			*
@@ -274,22 +279,20 @@ static void Menu_select_all( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_show_non_image( void)
+static void Menu_show_only_images( void)
 {
-	if ( !show_non_image)
+	if ( !show_only_images)
 	{
-	    MenuIcheck( NULL, MENU_BAR_SHOW, 1);
-		
-		show_non_image = 1;
+                MenuIcheck( NULL, MENU_BAR_SHOW_ONLY_IMAGES, 1);
+		show_only_images = 1;
 		
 		if( win_catalog)
 			WinCatalog_filelist_redraw();
 	}
 	else
 	{
-	    MenuIcheck( NULL, MENU_BAR_SHOW, 0);
-		
-		show_non_image = 0;
+	        MenuIcheck( NULL, MENU_BAR_SHOW_ONLY_IMAGES, 0);
+		show_only_images = 0;
 
 		if( win_catalog)
 			WinCatalog_filelist_redraw();
@@ -635,7 +638,7 @@ void MenuDesktop( void)
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_QUIT, BIND_FUNC, applexit);
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_BROWSER, BIND_FUNC, WinCatalog);	
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_CLOSE, BIND_FUNC, Menu_close_win);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SHOW, BIND_FUNC, Menu_show_non_image);
+	ObjcAttach( OC_MENU, NULL, MENU_BAR_SHOW_ONLY_IMAGES, BIND_FUNC, Menu_show_only_images);
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_NAME, BIND_FUNC, Menu_sort_by_name);
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_SIZE, BIND_FUNC, Menu_sort_by_size);
 	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_DATE, BIND_FUNC, Menu_sort_by_date);
@@ -657,8 +660,8 @@ void MenuDesktop( void)
 //	if( preview_frame_height)
 //		MenuIcheck( NULL, MENU_BAR_SHOW_PREVIEW, 1);
 
-	if ( show_non_image)
-	    MenuIcheck( NULL, MENU_BAR_SHOW, 1);
+	if ( show_only_images)
+	    MenuIcheck( NULL, MENU_BAR_SHOW_ONLY_IMAGES, 1);
 
 	if ( thumbnail_size > 3)
 		MenuIcheck( NULL, MENU_BAR_LONG_THUMB, 1);

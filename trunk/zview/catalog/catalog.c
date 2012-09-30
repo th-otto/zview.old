@@ -285,7 +285,7 @@ int WinCatalog( void)
 	menu_ienable( menu, MENU_BAR_BY_SIZE, 1);
 	menu_ienable( menu, MENU_BAR_BY_DATE, 1);
 	menu_ienable( menu, MENU_BAR_SHOW_BROWSER, 1);
-	menu_ienable( menu, MENU_BAR_SHOW, 1);
+	menu_ienable( menu, MENU_BAR_SHOW_ONLY_IMAGES, 1);
 	menu_ienable( menu, MENU_BAR_LONG_THUMB, 1);
 	menu_ienable( menu, MENU_BAR_LARGE_THUMB, 1);	
 	menu_ienable( menu, MENU_BAR_INFORMATION, 0);
@@ -373,7 +373,7 @@ static void WinCatalog_Close( WINDOW *win)
 	menu_ienable( menu, MENU_BAR_BY_NAME, 0);
 	menu_ienable( menu, MENU_BAR_BY_SIZE, 0);
 	menu_ienable( menu, MENU_BAR_BY_DATE, 0);
-	menu_ienable( menu, MENU_BAR_SHOW, 0);
+	menu_ienable( menu, MENU_BAR_SHOW_ONLY_IMAGES, 0);
 	menu_ienable( menu, MENU_BAR_SHOW_BROWSER, 0);
 	menu_ienable( menu, MENU_BAR_DELETE, 0);
 	menu_ienable( menu, MENU_BAR_LONG_THUMB, 0);
@@ -567,9 +567,14 @@ void WinCatalog_Refresh( WINDOW *win)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)	
 	{  
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
+		// only images?
+		if( show_only_images && wicones->entry[i].type != ET_IMAGE)
 			continue;
-			
+		
+		// images, pdfs, folders only?
+		if( !show_unsupported && wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_PDF && wicones->entry[i].type != ET_DIR)
+			continue;
+
 		if ( x + wicones->case_w > xw + ww)					
 		{
 		 	x = xw + border_size + browser_frame_width;
@@ -787,7 +792,12 @@ static void WinCatalog_Redraw( WINDOW *wind)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)
 	{
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
+				// only images?
+		if( show_only_images && wicones->entry[i].type != ET_IMAGE)
+			continue;
+		
+		// images, pdfs, folders only?
+		if( !show_unsupported && wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_PDF && wicones->entry[i].type != ET_DIR)
 			continue;
 			
 		if ( x + wicones->case_w > xw + ww)
@@ -926,7 +936,12 @@ static void WinCatalog_Redraw( WINDOW *wind)
 
 	for ( i = 0 ; i < wicones->nbr_icons; i++)
 	{
-		if ( ( !show_non_image) && ( wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_DIR && wicones->entry[i].type != ET_PDF)) 
+		// only images?
+		if( show_only_images && wicones->entry[i].type != ET_IMAGE)
+			continue;
+		
+		// images, pdfs, folders only?
+		if( !show_unsupported && wicones->entry[i].type != ET_IMAGE && wicones->entry[i].type != ET_PDF && wicones->entry[i].type != ET_DIR)
 			continue;
 			
 		if ( x + wicones->case_w > xw + ww)

@@ -10,7 +10,7 @@ static OBJECT *pref_dialog ;
 
 static int old_show_size				= 0;
 static int old_show_hidden				= 0;
-static int old_show_non_image			= 0;
+static int old_show_unsupported			= 0;
 static int old_show_read_progress_bar	= 0;
 static int old_show_write_progress_bar	= 0;
 static int old_pdf_fit_to_win			= 0;
@@ -72,8 +72,8 @@ static void handle_preference( WINDOW *win)
 			show_hidden = ( ( pref_dialog[PREFS_SHOW_HIDDEN].ob_state & SELECTED) ? 1 : 0);
 			break;
 
-		case PREFS_SHOW_NON_IMAGE:
-			show_non_image = ( ( pref_dialog[PREFS_SHOW_NON_IMAGE].ob_state & SELECTED) ? 1 : 0);
+		case PREFS_SHOW_UNSUPPORTED_FILES:
+			show_unsupported = ( ( pref_dialog[PREFS_SHOW_UNSUPPORTED_FILES].ob_state & SELECTED) ? 1 : 0);
 			break;
 
 		case PREFS_SHOW_READ_PROGRESS:
@@ -93,7 +93,7 @@ static void handle_preference( WINDOW *win)
 			smooth_thumbnail		= old_smooth_thumbnail;
 			show_size				= old_show_size;
 			show_hidden				= old_show_hidden;
-			show_non_image			= old_show_non_image;
+			show_unsupported			= old_show_unsupported;
 			show_read_progress_bar	= old_show_read_progress_bar;
 			show_write_progress_bar	= old_show_write_progress_bar;
 			pdf_fit_to_win			= old_pdf_fit_to_win;
@@ -123,7 +123,7 @@ static void handle_preference( WINDOW *win)
 			
 			if( ( old_show_size			!= show_size)		||
 				( old_show_hidden		!= show_hidden)		||
-				( old_show_non_image	!= show_non_image))
+				( old_show_unsupported	!= show_unsupported))
 			{
 				int16 dum, w, h;
 
@@ -185,7 +185,7 @@ void preference_dialog( void)
 
 	old_show_size				= show_size;
 	old_show_hidden				= show_hidden;
-	old_show_non_image			= show_non_image;
+	old_show_unsupported			= show_unsupported;
 	old_show_read_progress_bar	= show_read_progress_bar;
 	old_show_write_progress_bar	= show_write_progress_bar;
 	old_pdf_fit_to_win			= pdf_fit_to_win;
@@ -196,7 +196,7 @@ void preference_dialog( void)
 
 	pref_dialog[PREFS_SHOW_SIZE].ob_state 			|= ( show_size ? SELECTED : NORMAL);
 	pref_dialog[PREFS_SHOW_HIDDEN].ob_state 		|= ( show_hidden ? SELECTED : NORMAL);
-	pref_dialog[PREFS_SHOW_NON_IMAGE].ob_state 	 	|= ( show_non_image ? SELECTED : NORMAL);
+	pref_dialog[PREFS_SHOW_UNSUPPORTED_FILES].ob_state 	 	|= ( show_unsupported ? SELECTED : NORMAL);
 	pref_dialog[PREFS_SHOW_READ_PROGRESS].ob_state  |= ( show_read_progress_bar ? SELECTED : NORMAL);
 	pref_dialog[PREFS_SHOW_WRITE_PROGRESS].ob_state |= ( show_write_progress_bar ? SELECTED : NORMAL);
 	pref_dialog[PREFS_PDF_ANTIALIAS].ob_state  		|= ( pdf_aa ? SELECTED : NORMAL);
