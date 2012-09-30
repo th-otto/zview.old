@@ -65,7 +65,9 @@ void clear_screen( void)
  *==================================================================================*/
 void show_fullscreen( WINDATA *windata)
 {
-	MFDB 	*out, resized_out = { NULL, app.work_out[0], app.work_out[1], 0, 0, 0, 0, 0, 0}, screen = {0};
+	int16	screenw = app.work_out[0] + 1;	// bottom-right X
+	int16	screenh = app.work_out[1] + 1;	// bottom-right Y
+	MFDB 	*out, resized_out = { NULL, screenw, screenh, 0, 0, 0, 0, 0, 0}, screen = {0};
 	int16	posx, posy, xy[8];
 	IMAGE 	*img = &windata->img;
 /*	int16   dum;
@@ -76,7 +78,7 @@ void show_fullscreen( WINDATA *windata)
  
 	out = &img->image[windata->page_to_show];
 
-	if( out->fd_w > app.work_out[0] || out->fd_h > app.work_out[1])
+	if( out->fd_w > screenw || out->fd_h > screenh)
 	{
 		if( pic_resize( &img->image[windata->page_to_show], &resized_out) == 0)
 		{
@@ -90,17 +92,17 @@ void show_fullscreen( WINDATA *windata)
 
 	clear_screen();
 	wind_update(BEG_UPDATE);
- 
-	posx    = MAX( ( 1 + app.work_out[0] - out->fd_w) >> 1, 0);
-	posy 	= MAX( ( 1 + app.work_out[1] - out->fd_h) >> 1, 0);
+	
+	posx    = MAX( ( 1 + screenw - out->fd_w) >> 1, 0);
+	posy 	= MAX( ( 1 + screenh - out->fd_h) >> 1, 0);
 
 	if (posx == 0)
-		xy[2] = app.work_out[0];
+		xy[2] = screenw - 1;
 	else
 		xy[2] = out->fd_w - 1;
   
 	if (posy == 0)
-		xy[3] = app.work_out[1];
+		xy[3] = screenh - 1;
 	else
 		xy[3] = out->fd_h - 1;
 
@@ -110,7 +112,7 @@ void show_fullscreen( WINDATA *windata)
 	xy[5] = posy;
 	xy[6] = posx + xy[2];
 	xy[7] = posy + xy[3];
-
+	
 	/* draw the image */
 	if ( out->fd_nplanes == 1)
 	{

@@ -81,11 +81,6 @@ It's rather a question then a bug report since haven't found a picture or PDF
 with extended data and Umlauts so far.
 --> wont fix
 ==============================================================================
-c) In full screen mode, images that take up the whole screen have a colourful
-line (one pixel thick) on the right side or at the bottom which seems not to
-belong to the picture. I don't know if these are additional lines or if these
-lines are wrongly displayed pixels of the picture. Can you see those lines?
-==============================================================================
 d) If I browse the test TIFF images archive available from the LiBTIFF website
 (http://libtiff.maptools.org/images.html), zView writes some warnings on the
 screen. And do you know why many pictures in the folder Depth can´t be
