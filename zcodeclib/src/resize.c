@@ -49,7 +49,7 @@ static int16 resize_setup( MFDB *in,  MFDB *out, DECDATA data, int16 w, int16 h,
 
 	if( planar)	
 	{
-		data->DstBuf = shared_malloc((( uint32)in->fd_wdwidth << 4 ) + 256uL);
+		data->DstBuf = malloc((( uint32)in->fd_wdwidth << 4 ) + 256uL);
 
 		if( data->DstBuf == NULL)
 		{
@@ -124,33 +124,33 @@ MFDB *pic_resize( MFDB *in, int16 w, int16 h, int16 keep_ratio)
 	if( in->fd_nplanes == 2)
 		return NULL;
 
-	out = ( MFDB *)shared_malloc( sizeof( MFDB));
+	out = ( MFDB *)malloc( sizeof( MFDB));
 
 	if( out == NULL)
 		return NULL;
 
-	data = ( dec_data *)shared_malloc( sizeof( dec_data));
+	data = ( dec_data *)malloc( sizeof( dec_data));
 
 	if( !data)
 	{
-		shared_free( out);
+		free( out);
 		return NULL;
 	}
 
 
 	if( !resize_setup( in, out, data, w, h, keep_ratio))
 	{
-		shared_free( data);
-		shared_free( out);
+		free( data);
+		free( out);
 		return NULL;
 	}
 
 	resize_img ( in, out, data);
 
 	if( data->DstBuf)
-		shared_free( data->DstBuf);
+		free( data->DstBuf);
 
-	shared_free( data);
+	free( data);
 
 	return( out);
 }

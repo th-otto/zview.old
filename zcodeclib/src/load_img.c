@@ -69,7 +69,7 @@ static IMAGE *setup ( IMGINFO info, DECDATA data, int16 w, int16 h, int16 keep_r
 	We add also a little more memory for avoid buffer overflow for plugin badly coded.  */
 	src_line_size = ( info->width + 64) * info->components;
 
-	data->RowBuf = ( uint8*)shared_malloc( src_line_size);	
+	data->RowBuf = ( uint8*)malloc( src_line_size);	
 
 	if( !data->RowBuf)
 		return NULL;
@@ -80,7 +80,7 @@ static IMAGE *setup ( IMGINFO info, DECDATA data, int16 w, int16 h, int16 keep_r
 	{
 		size_t size = ( display_w + 15) * 3;
 		
-		data->DthBuf = shared_malloc( size);
+		data->DthBuf = malloc( size);
 
 		if( data->DthBuf == NULL) 
 			return NULL;
@@ -163,13 +163,13 @@ void quit_img( IMGINFO info, DECDATA data)
 		decoder_quit( info);
 
 	if( data->DthBuf) 
-	   	shared_free( data->DthBuf);
+	   	free( data->DthBuf);
 
 	if( data->RowBuf) 
-	   shared_free( data->RowBuf);
+	   free( data->RowBuf);
 
-	shared_free( data);
-	shared_free( info); 
+	free( data);
+	free( info); 
 
 	decoder_init_done = FALSE;
 }
@@ -220,16 +220,16 @@ IMAGE *load_img( const char *file, int16 w, int16 h, int16 keep_ratio)
 	if( codecs[0] == NULL)
 		return( NULL);	
 
-	info = ( img_info *)shared_malloc( sizeof( img_info));
+	info = ( img_info *)malloc( sizeof( img_info));
 	
 	if( !info)
 		return( NULL);
 
-	data = ( dec_data *)shared_malloc( sizeof( dec_data));
+	data = ( dec_data *)malloc( sizeof( dec_data));
 
 	if( !data)
 	{
-		shared_free( info);
+		free( info);
 		return ( NULL);
 	}
 
@@ -238,8 +238,8 @@ IMAGE *load_img( const char *file, int16 w, int16 h, int16 keep_ratio)
 			
 	if (( decoder_init_done = get_pic_info( file, info)) == FALSE)
 	{
-		shared_free( data);
-		shared_free( info);
+		free( data);
+		free( info);
 		return ( NULL);
 	}
 
