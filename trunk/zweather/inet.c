@@ -1,5 +1,5 @@
 #include "general.h"
-#include <transprt.h>
+#include "transprt.h"
 
 static boolean timeout = FALSE;
 TPL *tpl = NULL;
