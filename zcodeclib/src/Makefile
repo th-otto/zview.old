@@ -1,9 +1,7 @@
-DEBUG                   = # -DDEBUG
-STACKSIZE               = 64k
 OPTIMISATION            = -O2 -fomit-frame-pointer
 CPU                     = -m68020-60
 
-CFLAGS                  = $(CPU) $(OPTIMISATION) $(DEBUG) -Wall -I../include -I../../common
+CFLAGS                  = $(CPU) $(OPTIMISATION) -Wall -I../include -I../../common
 
 VDI_OBJ			= zvdi/p2c.o zvdi/color.o zvdi/dither.o zvdi/raster.o zvdi/raresize.o zvdi/vdi.o
 OBJ			= $(VDI_OBJ)  img.o resize.o codecs.o mfdb.o load_img.o ztext.o
