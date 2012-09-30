@@ -5,7 +5,7 @@ Current zTools are verified to work / compile with:
 - ldg (latest SVN, mandatory)
 - libmem (same source as ldg)
 - libshare 0.1.1
-- libxml 2.3.11
+- libxml 2.9.0
 - mintlib (latest CVS)
 - pml 2.03 (from Vincent's gcc4 port)
 - transprt.h (STiK/STinG header file, available from http://mikro.atari.org)
