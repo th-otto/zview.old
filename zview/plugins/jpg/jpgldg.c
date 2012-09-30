@@ -40,7 +40,7 @@ LDGLIB plugin =
 	LibFunc,			/* List of functions */
 	"JPGJPEPEG",		/* File's type Handled */
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. */
-	NULL,
+	libshare_exit,
 	3L					/* Howmany file type are supported by this plugin */
 };
 
@@ -765,6 +765,8 @@ void CDECL encoder_quit( IMGINFO info)
  *==================================================================================*/
 void CDECL init( void)
 {
+        libshare_init();
+        
 	int32 mach, cpu = 0;
 
 	/* DSP decoder present */

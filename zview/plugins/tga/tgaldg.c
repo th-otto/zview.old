@@ -36,7 +36,7 @@ LDGLIB tga_plugin =
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
 						   and are shareable, we must use this flags because we don't know if the 
 						   user has ldg.prg deamon installed on his computer */
-	NULL,				/* Function called when the plugin is unloaded */
+	libshare_exit,				/* Function called when the plugin is unloaded */
 	1L					/* Howmany file type are supported by this plugin */
 };
 
@@ -505,6 +505,7 @@ void CDECL reader_quit( IMGINFO info)
  *==================================================================================*/
 void CDECL init( void)
 {
+	libshare_init();
 }
 
 
