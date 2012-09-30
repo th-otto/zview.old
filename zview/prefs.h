@@ -2,7 +2,8 @@
 extern int thumbnail[8][2];
 extern int show_size;
 extern int show_hidden;
-extern int show_non_image;
+extern int show_unsupported;
+extern int show_only_images;
 extern int browser_x;
 extern int browser_y;			
 extern int browser_w;

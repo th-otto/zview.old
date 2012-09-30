@@ -13,23 +13,19 @@
 #define MENU_BAR_PRINT 26  /* STRING in tree MENU_BAR */
 #define MENU_BAR_CLOSE 28  /* STRING in tree MENU_BAR */
 #define MENU_BAR_QUIT 30  /* STRING in tree MENU_BAR */
-#define MENU_BAR_UNDO 32  /* STRING in tree MENU_BAR */
-#define MENU_BAR_COPY 34  /* STRING in tree MENU_BAR */
-#define MENU_BAR_CUT 35  /* STRING in tree MENU_BAR */
-#define MENU_BAR_PASTE 36  /* STRING in tree MENU_BAR */
-#define MENU_BAR_DELETE 38  /* STRING in tree MENU_BAR */
-#define MENU_BAR_SELECT_ALL 40  /* STRING in tree MENU_BAR */
-#define MENU_BAR_PREFERENCE 42  /* STRING in tree MENU_BAR */
-#define MENU_BAR_BY_NAME 44  /* STRING in tree MENU_BAR */
-#define MENU_BAR_BY_SIZE 45  /* STRING in tree MENU_BAR */
-#define MENU_BAR_BY_DATE 46  /* STRING in tree MENU_BAR */
-#define MENU_BAR_SHOW_BROWSER 48  /* STRING in tree MENU_BAR */
-#define MENU_BAR_SHOW 50  /* STRING in tree MENU_BAR */
-#define MENU_BAR_LARGE_THUMB 52  /* STRING in tree MENU_BAR */
-#define MENU_BAR_LONG_THUMB 53  /* STRING in tree MENU_BAR */
-#define MENU_BAR_SHOW_FULLSCREEN 55  /* STRING in tree MENU_BAR */
-#define MENU_BAR_GUIDE 57  /* STRING in tree MENU_BAR */
-#define MENU_BAR_HISTORY 58  /* STRING in tree MENU_BAR */
+#define MENU_BAR_DELETE 32  /* STRING in tree MENU_BAR */
+#define MENU_BAR_SELECT_ALL 34  /* STRING in tree MENU_BAR */
+#define MENU_BAR_PREFERENCE 36  /* STRING in tree MENU_BAR */
+#define MENU_BAR_BY_NAME 38  /* STRING in tree MENU_BAR */
+#define MENU_BAR_BY_SIZE 39  /* STRING in tree MENU_BAR */
+#define MENU_BAR_BY_DATE 40  /* STRING in tree MENU_BAR */
+#define MENU_BAR_SHOW_BROWSER 42  /* STRING in tree MENU_BAR */
+#define MENU_BAR_SHOW_ONLY_IMAGES 44  /* STRING in tree MENU_BAR */
+#define MENU_BAR_LARGE_THUMB 46  /* STRING in tree MENU_BAR */
+#define MENU_BAR_LONG_THUMB 47  /* STRING in tree MENU_BAR */
+#define MENU_BAR_SHOW_FULLSCREEN 49  /* STRING in tree MENU_BAR */
+#define MENU_BAR_GUIDE 51  /* STRING in tree MENU_BAR */
+#define MENU_BAR_HISTORY 52  /* STRING in tree MENU_BAR */
 
 #define TOOLBAR 1  /* form/dial */
 #define TOOLBAR_BACK 0  /* BOX in tree TOOLBAR */
@@ -164,7 +160,7 @@
 #define PREFS_PANEL2 4  /* BUTTON in tree PREFS */
 #define PREFS_SHOW_SIZE 5  /* BUTTON in tree PREFS */
 #define PREFS_SHOW_HIDDEN 6  /* BUTTON in tree PREFS */
-#define PREFS_SHOW_NON_IMAGE 7  /* BUTTON in tree PREFS */
+#define PREFS_SHOW_UNSUPPORTED_FILES 7  /* BUTTON in tree PREFS */
 #define PREFS_SMOOTH_METHOD 9  /* BUTTON in tree PREFS */
 #define PREFS_A 12  /* BUTTON in tree PREFS */
 #define PREFS_B 13  /* BUTTON in tree PREFS */

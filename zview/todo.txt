@@ -45,24 +45,6 @@ problem is related to the one Ektus and me have under MagiC and TOS. I´m very
 curious if you can reproduce this crash on your Falcon. If not, I´d like to buy
 your machine ;-)
 ==============================================================================
-And something different. Thanks for the "Show Unsupported Files" option. Very
-good idea to rename the old one and show now always folders and PDF files. Those
-"Show Non-Images" (menu) and "Show common files" (preference dialogue) options
-were very irritating. Now it is much easier to understand.
-
-What do think about the following additional idea? We rename the "Show common
-files" option in the preference dialogue with "Show unsupported files" and
-replace the new "Show Unsupported Files" in the menu with "Show Only Images". I
-think this is the optimal solution. In the dialogue is the not-often-used option
-(some like it to see all files, other don´t), and via the menu, one can list
-quickly only images (i.e. no folders and any other files) in the browser.
-
-Additionally, as discussed before, I renamed the menu entry "Show Unsupported
-Files" by "Show Only Images", and "Show common files" in the preferences with
-"Show unsupported files" (the button name is also renamed: SHOW_NON_IMAGES ->
-SHOW_UNSUPPORTED_FILES, and therefore has to be changed everywhere in the code,
-too, along with the code changes for the "new" option ;-)
-==============================================================================
 There is small problem with the progress bar in the deleting files dialogue.
 It's one pixel too wide and high. For beta6 (7th August 2005), Zorro corrected
 this for the read progress bar but apparently not for the delete bar. Would be
@@ -71,9 +53,6 @@ nice to have this corrected.
 And Ektus told me he got the impression that sometimes, after opening the
 browser, the thumbnails were displayed only when he´d scrolled the browser
 window. I told him he should keep an eye on it.
-==============================================================================
-a) Write-protected files can be deleted with zView's delete function.
---> feature
 ==============================================================================
 b) You solved the umlauts bug in the navigation list. Works fine. Do you know if
 there can also be such a bug for extended information (Exif and other metadata)?
