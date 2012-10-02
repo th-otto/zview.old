@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <windom1.h>
 #include "types2b.h"
-#include "../pdf/goo/gmem.h"
+#include "gmem.h"
 #include "libtedit.h"
 
 /* extern function */

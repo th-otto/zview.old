@@ -32,7 +32,7 @@
 #include <ldg.h>
 #include "zaes.h"
 #include "zedit/libtedit.h"
-#include "pdf/goo/gmem.h"
+#include "gmem.h"
 #include "zview.rsh"
 
 /* Window's Attrib. */
