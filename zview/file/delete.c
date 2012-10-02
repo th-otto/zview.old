@@ -132,8 +132,8 @@ void delete_progress( WINDOW *win)
 
 	pxy[0] = rwin.g_x + form->root[OPERATION_DIAL_BAR].ob_x;
 	pxy[1] = rwin.g_y + form->root[OPERATION_DIAL_BAR].ob_y;
-	pxy[2] = pxy[0] + bar_width;
-	pxy[3] = pxy[1] + form->root[OPERATION_DIAL_BAR].ob_height;
+	pxy[2] = pxy[0] + bar_width - 1;
+	pxy[3] = pxy[1] + form->root[OPERATION_DIAL_BAR].ob_height - 1;
 
 	while( !wind_update( BEG_UPDATE));
 	graf_mouse( M_OFF, 0L);

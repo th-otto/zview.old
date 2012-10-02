@@ -45,11 +45,6 @@ problem is related to the one Ektus and me have under MagiC and TOS. I´m very
 curious if you can reproduce this crash on your Falcon. If not, I´d like to buy
 your machine ;-)
 ==============================================================================
-There is small problem with the progress bar in the deleting files dialogue.
-It's one pixel too wide and high. For beta6 (7th August 2005), Zorro corrected
-this for the read progress bar but apparently not for the delete bar. Would be
-nice to have this corrected.
-==============================================================================
 And Ektus told me he got the impression that sometimes, after opening the
 browser, the thumbnails were displayed only when he´d scrolled the browser
 window. I told him he should keep an eye on it.

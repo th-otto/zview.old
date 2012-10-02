@@ -58,7 +58,7 @@ void win_progress( int16 new_bar_width)
 	GRECT	rwin, raes;
 	W_FORM  *form 			= ( W_FORM *)DataSearch( win_read, WD_WFRM);
 
-	if ( bar_width == new_bar_width)
+	if ( bar_width == new_bar_width || !new_bar_width)
 		return;
 
 	WindGet( win_read, WF_WORKXYWH, &rwin.g_x, &rwin.g_y, &rwin.g_w, &rwin.g_h);
@@ -67,8 +67,9 @@ void win_progress( int16 new_bar_width)
 
 	pxy[0] = rwin.g_x + form->root[SINGLE_PROGRESS_CONTAINER].ob_x;
 	pxy[1] = rwin.g_y + form->root[SINGLE_PROGRESS_CONTAINER].ob_y;
-	pxy[2] = pxy[0] + bar_width;
+	pxy[2] = pxy[0] + bar_width - 1;
 	pxy[3] = pxy[1] + form->root[SINGLE_PROGRESS_CONTAINER].ob_height - 1;
+	printf( "sirka: %d, x2: %d\n", bar_width, pxy[2] - pxy[0]);
 
 	while( !wind_update( BEG_UPDATE));
 	graf_mouse( M_OFF, 0L);
