@@ -5,7 +5,7 @@
 #include "pic_load.h"
 #include "winimg.h"
 #include "pdf_load.h"
-#include "pdf/pdflib.h"
+#include "pdflib.h"
 #include "plugins.h"
 #include "av_prot.h"
 #include "wintimer.h"

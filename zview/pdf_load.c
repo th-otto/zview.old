@@ -10,7 +10,7 @@
 #include "zvdi/color.h"
 #include "zvdi/raster.h"
 #include "zvdi/vdi.h"
-#include "pdf/pdflib.h"
+#include "pdflib.h"
 
 
 int16 pdf_initialised = FALSE;
