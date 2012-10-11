@@ -69,7 +69,6 @@ void win_progress( int16 new_bar_width)
 	pxy[1] = rwin.g_y + form->root[SINGLE_PROGRESS_CONTAINER].ob_y;
 	pxy[2] = pxy[0] + bar_width - 1;
 	pxy[3] = pxy[1] + form->root[SINGLE_PROGRESS_CONTAINER].ob_height - 1;
-	printf( "sirka: %d, x2: %d\n", bar_width, pxy[2] - pxy[0]);
 
 	while( !wind_update( BEG_UPDATE));
 	graf_mouse( M_OFF, 0L);
