@@ -16,6 +16,8 @@ Bug fixes:
 - Regardless of "Show common files" option, folder icons are always shown
 - various GUI fixes
 - Show unsupported files and Show only images are now different things
+- MagiC and TOS compatibility (BETA8 introduced one nasty bug in that
+  matter)
 
 Known bugs:
 -----------
