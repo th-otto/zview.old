@@ -1,4 +1,4 @@
-XX November 2011: 1.0
+XX November 2012: 1.0
 =====================
 
 News:
@@ -14,11 +14,13 @@ Bug fixes:
   plus the file is correctly written)
 - "Show hidden files" works also with Unix hidden files (prefixed with a dot)
 - Regardless of "Show common files" option, folder icons are always shown
-- PDF files are treated as images (i.e. always shown)
+- various GUI fixes
+- Show unsupported files and Show only images are now different things
 
 Known bugs:
 -----------
-- NONE! :)
+- Umlauts in PDF 'exif' info are sometimes incorrect
+- some GIF animations can be corrupted (not updating background correcly)
 
 01 November 2011: BETA8
 =======================

@@ -49,12 +49,6 @@ And Ektus told me he got the impression that sometimes, after opening the
 browser, the thumbnails were displayed only when he´d scrolled the browser
 window. I told him he should keep an eye on it.
 ==============================================================================
-b) You solved the umlauts bug in the navigation list. Works fine. Do you know if
-there can also be such a bug for extended information (Exif and other metadata)?
-It's rather a question then a bug report since haven't found a picture or PDF
-with extended data and Umlauts so far.
---> wont fix
-==============================================================================
 d) If I browse the test TIFF images archive available from the LiBTIFF website
 (http://libtiff.maptools.org/images.html), zView writes some warnings on the
 screen. And do you know why many pictures in the folder Depth can´t be
@@ -69,6 +63,3 @@ Here´s another picture file to be stored ;-) It´s a multi-page TIFF image and
 has 8 pages/pictures. If I remember correctly, the latest zView says it has one
 picture and zView BETA7 by Zorro says it has two (information dialogue -> Format
 -> Pages). Of course, both are wrong.
-==============================================================================
-On the internet, I´ve found a PDF with an umlaut in the extended info:
-Gründerwerkstatt.pdf. The "ü" is missing, instead another character is used.
