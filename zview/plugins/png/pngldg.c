@@ -161,10 +161,9 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	{
 		register int16 i;
 
+		// '%s: %s\0'
 		for ( i = 0; i < num_text; i++)
-			info->max_comments_length = MAX( info->max_comments_length,  ( strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length));
-
-		info->max_comments_length += 4;
+			info->max_comments_length = MAX( info->max_comments_length,  ( strlen(png_text_ptr[i].key) + strlen(png_text_ptr[i].text) + 3));
 	}
 
 	return TRUE;
