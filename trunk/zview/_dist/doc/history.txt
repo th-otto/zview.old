@@ -18,6 +18,7 @@ Bug fixes:
 - Show unsupported files and Show only images are now different things
 - MagiC and TOS compatibility (BETA8 introduced one nasty bug in that
   matter)
+- Crash in PNG plugin
 
 Known bugs:
 -----------
