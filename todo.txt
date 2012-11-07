@@ -1,5 +1,0 @@
-- reuse some code parts, for example:
-	- zView should use zcodeclib, it has its own copy&pasted routines
-	- things like zvdi, debug, general.h, memory in all projects
-- convert zView to windom 2.x (zWeather is done in the latest revision)
-- add right licenses, to zXXX code, plugins, libraries used by plugins, ...
