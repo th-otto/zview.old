@@ -21,23 +21,23 @@
 
 static int16 	dum;
 static OBJECT	*menu;
-	
+
 /* Prototype */
 void calc_slider( WINDATA *windata, OBJECT *slider_root);
 
 
 /*==================================================================================*
  * void WindPdfSize:																*
- *		this function handle the WM_SIZED event for the WINDOW win					* 
+ *		this function handle the WM_SIZED event for the WINDOW win					*
  *----------------------------------------------------------------------------------*
  * input:																			*
  * 		win			-> 	The target window.											*
  *----------------------------------------------------------------------------------*
- * returns: 																		*	
+ * returns: 																		*
  *		--																			*
  *==================================================================================*/
 
-static void WindPdfSize( WINDOW *win) 
+static void WindPdfSize( WINDOW *win)
 {
 	int16 x, y, w, h, old_h, rdw_frame = 0;
 	uint32 old_frame_ypos;
@@ -50,13 +50,13 @@ static void WindPdfSize( WINDOW *win)
 	h = MIN( y, win -> h_max);
 
 	WindGet( win, WF_WORKXYWH, &dum, &dum, &dum, &old_h);
-	
+
 	wind_set( evnt.buff[3], WF_CURRXYWH, evnt.buff[4], evnt.buff[5], w, h);
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 
 	old_frame_ypos 	= windata -> ypos;
-	
+
 	if( ( uint16)h > windata -> ypos_max * windata -> h_u)
 		windata -> ypos = 0;
 	else
@@ -70,13 +70,13 @@ static void WindPdfSize( WINDOW *win)
 	if( ( uint16)w > win -> xpos_max * win -> w_u)
 		win -> xpos = 0;
 	else
-		win -> xpos = MIN( win -> xpos, win -> xpos_max - w / win -> w_u);			
+		win -> xpos = MIN( win -> xpos, win -> xpos_max - w / win -> w_u);
 
 
 	if( old_frame_ypos != windata -> ypos)
 		rdw_frame = 1;
-	
-	win->status &= ~WS_FULLSIZE; 
+
+	win->status &= ~WS_FULLSIZE;
 
 	draw_page( win, x + windata->frame_width + windata->border_width , y, w - ( windata->frame_width + windata->border_width), h);
 
@@ -101,18 +101,18 @@ static void WindPdfSize( WINDOW *win)
  * 		win			-> 	The target window.											*
  *		dy			-> 	The step fo the move.										*
  *----------------------------------------------------------------------------------*
- * returns: 																		*	
+ * returns: 																		*
  *		--																			*
  *==================================================================================*/
 
-static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata) 
+static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 {
 	int16	x, y, w, h, absolute_dy;
 	GRECT	rect, r1, r2, screen;
 
 	absolute_dy = abs( dy);
 
-	if ( dy) 
+	if ( dy)
 	{
 		WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 		y++;
@@ -120,12 +120,12 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 		w = windata->frame_width - 16;
 
 		while( !wind_update(BEG_UPDATE));
-		graf_mouse( M_OFF, 0L);		
+		graf_mouse( M_OFF, 0L);
 		rc_set( &rect, x + 1, y, w, h);
 		wind_get_grect( 0, WF_CURRXYWH, &screen);
 		wind_get( win -> handle, WF_FIRSTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
 
-		while ( r1.g_w && r1.g_h) 
+		while ( r1.g_w && r1.g_h)
 		{
 			if( rc_intersect( &rect, &r1) && rc_intersect( &screen, &r1))
 			{
@@ -133,28 +133,28 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 				{
 					r2 = r1; /* save */
 
-					if ( dy > 0) 
+					if ( dy > 0)
 					{
 						r1.g_y += dy;
 						r1.g_h -= dy;
-					} 
+					}
 					else
 						r1.g_h += dy;
-				
+
 					move_area( win->graf.handle, &r1, 0, -dy);
 
 					if ( dy)
 					{
 						r1 = r2 ;  /* restore */
 
-						if (dy > 0) 
+						if (dy > 0)
 						{
 							r1.g_y += r1.g_h - dy;
 							r1.g_h = dy;
-						} 
+						}
 						else
 							r1.g_h = -dy;
-						
+
 						rc_clip_on( win->graf.handle, &r1);
 						EvntExec( win, WM_REDRAW);
 						rc_clip_off( win->graf.handle);
@@ -175,7 +175,7 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 		if ( dy)
 		{
 			calc_slider( windata, windata->frame_slider);
-	
+
 		   	/* check it in the windom source, I'm not sure if the clipping area must be clip.g_x, clip.g_y, clip.g_w, clip.g_h  or not */
 			ObjcWindDraw( win, windata->frame_slider, SLIDERS_BACK, 2, x + windata->frame_width - 15, y, 16, h - 31);
 		}
@@ -193,7 +193,7 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
  * 		win     = the target window													*
  * 		entry	= the icon to be redraw												*
  *----------------------------------------------------------------------------------*
- * return:																			*	
+ * return:																			*
  *		--																			*
  *==================================================================================*/
 
@@ -202,7 +202,7 @@ static void redraw_bookmark( WINDOW *win, int16 frame_width, Bookmark *entry, in
 	int16 x, y, w, h;
 
 	x = entry->arrow_position.x1;
-	y = entry->arrow_position.y1 - 5; 
+	y = entry->arrow_position.y1 - 5;
 	w = entry->arrow_position.x2 + x_space + entry->txt_width + 20;
 	h = entry->arrow_position.y2 - y + 10;
 
@@ -228,7 +228,7 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 	{
 		if ( entry->child[i].valid == FALSE)
 			continue;
-	
+
 		if ( entry->child[i].state == ON)
 			if ( find_bookmark_child_on_mouse( win, windata, &entry->child[i], mouse_x, mouse_y, x, y, w, h))
 				return ( 1);
@@ -236,19 +236,19 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 		if (( mouse_x >= entry->child[i].arrow_position.x2 + x_space && mouse_x <= entry->child[i].arrow_position.x2 + x_space + entry->child[i].txt_width	&& mouse_y >= entry->child[i].arrow_position.y1 && mouse_y <= entry->child[i].arrow_position.y2))
 		{
 			if ( windata->selected != &entry->child[i])
-			{	
+			{
 				Bookmark *old_selected = windata->selected;
 				windata->selected = &entry->child[i];
-						
+
 				if ( old_selected)
 					redraw_bookmark( win, windata->frame_width, old_selected, x, y, h);
-						
+
 				redraw_bookmark( win, windata->frame_width, windata->selected, x, y, h);
 			}
-	
+
 			if( entry->child[i].linked_page == windata->page_to_show || entry->child[i].linked_page > windata->img.page || entry->child[i].linked_page < 0)
 				return( 1);
-  						
+
 			graf_mouse( BUSYBEE, NULL);
 
 			if( windata->img.image[windata->page_to_show].fd_addr != NULL)
@@ -256,38 +256,38 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 				gfree( windata->img.image[windata->page_to_show].fd_addr);
 				windata->img.image[windata->page_to_show].fd_addr = NULL;
 			}
-	
+
    		    if( pdf_fit_to_win)
 				scale = get_scale_value( &windata->img, entry->child[i].linked_page + 1, w - ( windata->frame_width + windata->border_width + 20), h - 20);
-			
+
 			zoom = windata->zoom_level;
-				
+
 			if( read_pdf( &windata->img, entry->child[i].linked_page + 1, scale))
 			{
 				scale = scale * 100.0;
 				sprintf( temp, "%.0f%%", scale);
 				windata->zoom_level	= ( int16)scale;
-				
+
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);	
-				
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
+
 				sprintf( temp, "%d of %d", entry->child[i].linked_page + 1, windata->img.page);
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PAGE, temp);
 				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PAGE, 1);
-					
+
 				windata->page_to_show = entry->child[i].linked_page;
-						
+
 				win -> ypos_max = ( int32)( ( windata->img.image[windata->page_to_show].fd_h) >> 3);
 				win -> xpos_max = ( int32)( ( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
 
 				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PREVIOUS, 1);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_NEXT, 1);			
-				
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_NEXT, 1);
+
 				if( zoom >= 200 && windata->zoom_level < 200)
-					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1); 	 	
-					
+					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1);
+
 				if( zoom <= 25 && windata->zoom_level > 25)
-					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1); 				
+					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1);
 			}
 
 			win -> ypos 	= 0;
@@ -304,7 +304,7 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 			{
 				entry->child[i].state = ( entry->child[i].state == ON) ? OFF : ON;
 
-				draw_page( win, x, y, windata->frame_width, h);   
+				draw_page( win, x, y, windata->frame_width, h);
 
 				return( 1);
 			}
@@ -318,26 +318,26 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 
 /*==================================================================================*
  * void WindPdfMouse:																*
- *		this function handle the mouse event for the winview WINDOW					* 
+ *		this function handle the mouse event for the winview WINDOW					*
  *		catalog ( the entries).														*
  *----------------------------------------------------------------------------------*
  * input:																			*
  * 		win			-> 	The window to handle.										*
  *----------------------------------------------------------------------------------*
- * returns: 																		*	
+ * returns: 																		*
  *		--																			*
  *==================================================================================*/
 
-static void WindPdfMouse( WINDOW *win) 
+static void WindPdfMouse( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	GRECT 		mouse;
-	int16 		zoom, x, y, w, h, old_x, old_y, i = 0, nb_click, in_frame_border = 0, in_bookmark_frame = 0; 
+	int16 		zoom, x, y, w, h, old_x, old_y, i = 0, nb_click, in_frame_border = 0, in_bookmark_frame = 0;
 	char		temp[20];
 	double		scale = 1.0;
 //	Entry 		*entry_ptr = NULL, *old_selected = wicones->first_selected;
-	
-	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h); 
+
+	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 
  	mouse.g_x 				= evnt.mx - x;
 	mouse.g_y 				= evnt.my - y;
@@ -358,12 +358,12 @@ static void WindPdfMouse( WINDOW *win)
 	{
 		int16 last_mouse_x;
 
-		graf_mouse( FLAT_HAND, NULL);		
+		graf_mouse( FLAT_HAND, NULL);
 
 		while( !wind_update( BEG_MCTRL));
 
 		graf_dragbox( windata->border_width, h, x + windata->frame_width, y, x + 100, y, w - ( 180), h, &last_mouse_x, &dum );
-			 
+
 		/* Set the new toolbar position */
 		if ( last_mouse_x != x + windata->frame_width)
 		{
@@ -381,27 +381,27 @@ static void WindPdfMouse( WINDOW *win)
 		graf_mouse( ARROW, NULL);
 	}
 	else if ( in_bookmark_frame)
-	{ 
+	{
 		if( ( ( windata -> ypos_max * windata -> h_u) >= h) && ( mouse.g_x > windata->frame_width - 15) && ( mouse.g_x < windata->frame_width))
 		{
 			int16 res;
 
 			windata->frame_slider->ob_x = x + windata->frame_width - 15;
-			windata->frame_slider->ob_y = y + 2;			
+			windata->frame_slider->ob_y = y + 2;
 
 			res = objc_find( windata->frame_slider, SLIDERS_BOX, 2, evnt.mx, evnt.my);
 
-			if( res != -1) 
+			if( res != -1)
 			{
 				int32 	pos, old_ypos = windata->ypos;
 				int16	dy, selected_object, page, redraw_arrow_slider = 0;
 
-				switch ( res) 
+				switch ( res)
 				{
 					case SLIDERS_UP:
 						do
 						{
-							if ( windata -> ypos > 0L) 
+							if ( windata -> ypos > 0L)
 							{
 								if( redraw_arrow_slider == 0)
 									ObjcWindChange( win, windata->frame_slider, SLIDERS_UP, windata->frame_slider->ob_x, windata->frame_slider[SLIDERS_UP].ob_y + y, windata->frame_slider[SLIDERS_UP].ob_width + 1, windata->frame_slider[SLIDERS_UP].ob_height + 1, SELECTED);
@@ -409,7 +409,7 @@ static void WindPdfMouse( WINDOW *win)
 								windata -> ypos--;
 								move_bookmark_work( win, -windata->h_u, windata);
 								redraw_arrow_slider	= 1;
-							}  				
+							}
 
 							graf_mkstate( &dum, &dum, &res, &dum);
 
@@ -423,9 +423,9 @@ static void WindPdfMouse( WINDOW *win)
 						break;
 
 					case SLIDERS_DOWN:
-						do 
+						do
 						{
-							if (( windata -> ypos < windata -> ypos_max - h / windata -> h_u) && ( windata -> ypos_max > h / windata -> h_u )) 
+							if (( windata -> ypos < windata -> ypos_max - h / windata -> h_u) && ( windata -> ypos_max > h / windata -> h_u ))
 							{
 								if( redraw_arrow_slider == 0)
 									ObjcWindChange( win, windata->frame_slider, SLIDERS_DOWN, windata->frame_slider->ob_x, windata->frame_slider[SLIDERS_DOWN].ob_y + y, windata->frame_slider[SLIDERS_DOWN].ob_width + 1, windata->frame_slider[SLIDERS_DOWN].ob_height + 1, SELECTED);
@@ -433,7 +433,7 @@ static void WindPdfMouse( WINDOW *win)
 								windata -> ypos++;
 								move_bookmark_work( win, windata->h_u, windata);
 								redraw_arrow_slider	= 1;
-							}	 		
+							}
 
 							graf_mkstate( &dum, &dum, &res, &dum);
 
@@ -447,27 +447,27 @@ static void WindPdfMouse( WINDOW *win)
 						break;
 
 					case SLIDERS_MOVER:
-						if( app.aes4 & AES4_XGMOUSE) 
+						if( app.aes4 & AES4_XGMOUSE)
 							graf_mouse( M_SAVE, 0L);
-						
+
 						graf_mouse( FLAT_HAND, NULL);
-						
+
 						while( !wind_update( BEG_MCTRL));
-						
+
 						res = graf_slidebox( windata->frame_slider, SLIDERS_BACK, SLIDERS_MOVER, 1);
-						
+
 						wind_update( END_MCTRL);
-	
-						pos = ( int32)( windata->ypos_max - h / windata->h_u) * res / 1000L;	
-	
-						if ( pos < 0) 
+
+						pos = ( int32)( windata->ypos_max - h / windata->h_u) * res / 1000L;
+
+						if ( pos < 0)
 							pos = 0;
 
 						dy = ( int16)(( pos - windata->ypos) * windata->h_u);
 
 						windata->ypos =  pos;
 
-						if( dy && ( old_ypos != windata->ypos)) 
+						if( dy && ( old_ypos != windata->ypos))
 							move_bookmark_work( win, dy, windata);
 
 						if( app.aes4 & AES4_XGMOUSE)
@@ -475,11 +475,11 @@ static void WindPdfMouse( WINDOW *win)
 
 						graf_mouse( ARROW,NULL);
 
-						break;	
+						break;
 
 					case SLIDERS_BACK:
 						objc_offset( windata->frame_slider, SLIDERS_MOVER, &dum, &dy);
-						
+
 						dum  			= ( evnt.my < dy) ? WA_UPPAGE : WA_DNPAGE;
 						selected_object = ( evnt.my < dy) ? SLIDERS_UP : SLIDERS_DOWN;
 
@@ -489,11 +489,11 @@ static void WindPdfMouse( WINDOW *win)
 
 						if( dum == WA_DNPAGE)
 						{
-							do 
+							do
 							{
 								page = h / windata -> h_u;
 
-								if ( windata -> ypos < windata -> ypos_max - page) 
+								if ( windata -> ypos < windata -> ypos_max - page)
 								{
 									windata -> ypos = MIN( windata->ypos_max, windata->ypos) + page;
 									windata -> ypos = MIN( windata -> ypos, windata -> ypos_max - page);
@@ -506,27 +506,27 @@ static void WindPdfMouse( WINDOW *win)
 						}
 						else
 						{
-							do 
+							do
 							{
-								if ( windata -> ypos > 0L) 
+								if ( windata -> ypos > 0L)
 								{
 									pos = MAX( 0L, windata->ypos - h / windata->h_u);
 									dy = ( int16) (( pos - windata->ypos) * windata->h_u);
 									windata->ypos = pos;
 									move_bookmark_work( win, dy, windata);
-								}						   
+								}
 
 								graf_mkstate( &dum, &dum, &res, &dum);
 							} while( res);
-						}						
-					
+						}
+
 						windata->frame_slider[selected_object].ob_state &= ~SELECTED;
-						
+
 						ObjcWindDraw( win, windata->frame_slider, selected_object, 1, x, y, w, h);
 
 						wind_update( END_MCTRL);
-						
-						break;	
+
+						break;
 
 					default:
 						break;
@@ -534,12 +534,12 @@ static void WindPdfMouse( WINDOW *win)
 			}
 		}
 		else
-		{  
+		{
 			for ( i = 0; i < windata->nbr_bookmark; i++)
 			{
 				if( windata->root[i].valid == FALSE)
 					continue;
-			
+
 				if ( windata->root[i].state == ON)
 					if ( find_bookmark_child_on_mouse( win, windata, &windata->root[i], mouse.g_x, mouse.g_y, x, y, w, h))
 						break;
@@ -547,19 +547,19 @@ static void WindPdfMouse( WINDOW *win)
 				if (( mouse.g_x >= windata->root[i].arrow_position.x2 + x_space && mouse.g_x <= windata->root[i].arrow_position.x2 + x_space + windata->root[i].txt_width	&& mouse.g_y >= windata->root[i].arrow_position.y1 && mouse.g_y <= windata->root[i].arrow_position.y2))
 				{
 					if ( windata->selected != &windata->root[i])
-					{	
+					{
 						Bookmark *old_selected = windata->selected;
 						windata->selected = &windata->root[i];
-						
+
 						if ( old_selected)
 							redraw_bookmark( win, windata->frame_width, old_selected, x, y, h);
-						
+
 						redraw_bookmark( win, windata->frame_width, windata->selected, x, y, h);
 					}
-	
+
 					if( windata->root[i].linked_page == windata->page_to_show || windata->root[i].linked_page > windata->img.page || windata->root[i].linked_page < 0)
 						break;
-  						
+
 					graf_mouse( BUSYBEE, NULL);
 
 					if( windata->img.image[windata->page_to_show].fd_addr != NULL)
@@ -567,12 +567,12 @@ static void WindPdfMouse( WINDOW *win)
 						gfree( windata->img.image[windata->page_to_show].fd_addr);
 						windata->img.image[windata->page_to_show].fd_addr = NULL;
 					}
-	
+
 		   		    if( pdf_fit_to_win)
 						scale = get_scale_value( &windata->img, windata->root[i].linked_page + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
 
-					zoom = windata->zoom_level;	
-											
+					zoom = windata->zoom_level;
+
 					if( read_pdf( &windata->img, windata->root[i].linked_page + 1, scale))
 					{
 						scale = scale * 100.0;
@@ -580,25 +580,25 @@ static void WindPdfMouse( WINDOW *win)
 						windata->zoom_level	= ( int16)scale;
 
 						ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-						ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);							
-						
+						ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
+
 						sprintf( temp, "%d of %d", windata->root[i].linked_page + 1, windata->img.page);
 						ObjcStrCpy( win->tool.root, PDFTOOLBAR_PAGE, temp);
 						ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PAGE, 1);
-					
+
 						windata->page_to_show = windata->root[i].linked_page;
-						
+
 						win -> ypos_max = ( int32)( ( windata->img.image[windata->page_to_show].fd_h) >> 3);
 						win -> xpos_max = ( int32)( ( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
 
 						ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PREVIOUS, 1);
 						ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_NEXT, 1);
-						
+
 						if( zoom >= 200 && windata->zoom_level < 200)
-							ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1); 	 	
-					
+							ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1);
+
 						if( zoom <= 25 && windata->zoom_level > 25)
-							ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1); 	
+							ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1);
 					}
 
 					win -> ypos 	= 0;
@@ -616,7 +616,7 @@ static void WindPdfMouse( WINDOW *win)
 					{
 						windata->root[i].state = ( windata->root[i].state == ON) ? OFF : ON;
 
-						draw_page( win, x, y, windata->frame_width, h);   
+						draw_page( win, x, y, windata->frame_width, h);
 
 						break;
 					}
@@ -625,18 +625,18 @@ static void WindPdfMouse( WINDOW *win)
 		}
 	}
 
-	/* a wait loop while the mouse button is pressed */		
+	/* a wait loop while the mouse button is pressed */
 	while(( evnt.mbut == 1) || ( evnt.mbut == 2))
-		graf_mkstate( &evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate); 				
+		graf_mkstate( &evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate);
 }
 
 /*
-static void size_popup( WINDOW *win, int obj_index) 
+static void size_popup( WINDOW *win, int obj_index)
 {
 	int16 x, y;
 	int choice;
 	char *items[] = { "200%", "150%", "100%", "50%", "25%", "-------------", "Fit to window"};
-	
+
 	objc_offset( win->tool.root, obj_index, &x, &y);
 
 	choice = MenuPopUp ( items, x, y, 7, -1, smooth_thumbnail + 1 , P_LIST + P_WNDW + P_CHCK);
@@ -645,8 +645,8 @@ static void size_popup( WINDOW *win, int obj_index)
 		return;
 
 	smooth_thumbnail = choice - 1;
-	
-	strcpy( pref_dialog[PREFS_SMOOTH_METHOD].ob_spec.free_string, items[smooth_thumbnail]); 
+
+	strcpy( pref_dialog[PREFS_SMOOTH_METHOD].ob_spec.free_string, items[smooth_thumbnail]);
    	ObjcDraw( OC_FORM, win, PREFS_SMOOTH_METHOD, 1);
 }
 */
@@ -675,29 +675,29 @@ static void WindPdfTool( WINDOW *win)
 	{
 		case PDFTOOLBAR_OPEN:
 			Menu_open_image();
-			break;	
+			break;
 
 		case PDFTOOLBAR_INFO:
 		        WindViewTop( win);
 			infobox();
-			break;					
+			break;
 
 		case PDFTOOLBAR_SMALL:
-			zoom = windata->zoom_level;	
-		
+			zoom = windata->zoom_level;
+
 			if( windata->zoom_level <= 25)
 				return;
 			else if( windata->zoom_level > 200)
-				windata->zoom_level = 200;	
+				windata->zoom_level = 200;
 			else if( windata->zoom_level > 150)
-				windata->zoom_level = 150;	
+				windata->zoom_level = 150;
 			else if( windata->zoom_level > 100)
-				windata->zoom_level = 100;	
+				windata->zoom_level = 100;
 			else if( windata->zoom_level > 50)
 				windata->zoom_level = 50;
 			else if( windata->zoom_level > 25)
 				windata->zoom_level = 25;
-		
+
 			graf_mouse( BUSYBEE, NULL);
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
@@ -712,7 +712,7 @@ static void WindPdfTool( WINDOW *win)
 			{
 				sprintf( temp, "%d%%", windata->zoom_level);
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);					
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
 
 				win -> ypos_max = ( int32)(  windata->img.image[windata->page_to_show].fd_h >> 3);
 				win -> xpos_max = ( int32)(( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
@@ -725,15 +725,15 @@ static void WindPdfTool( WINDOW *win)
 
 		    WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 			draw_page( win, x  + windata->frame_width + windata->border_width, y, w - ( windata->frame_width + windata->border_width) , h);
-	
+
 
 			if( zoom >= 200 && windata->zoom_level < 200)
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1); 	 
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1);
 			break;
 
 		case PDFTOOLBAR_BIG:
-			zoom = windata->zoom_level;		
-		
+			zoom = windata->zoom_level;
+
 			if( windata->zoom_level >= 200)
 				return;
 			else if( windata->zoom_level < 25)
@@ -741,12 +741,12 @@ static void WindPdfTool( WINDOW *win)
 			else if( windata->zoom_level < 50)
 				windata->zoom_level = 50;
 			else if( windata->zoom_level < 100)
-				windata->zoom_level = 100;	
+				windata->zoom_level = 100;
 			else if( windata->zoom_level < 150)
-				windata->zoom_level = 150;	
+				windata->zoom_level = 150;
 			else if( windata->zoom_level < 200)
-				windata->zoom_level = 200;	
-																										
+				windata->zoom_level = 200;
+
 			graf_mouse( BUSYBEE, NULL);
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
@@ -761,7 +761,7 @@ static void WindPdfTool( WINDOW *win)
 			{
 				sprintf( temp, "%d%%", windata->zoom_level);
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);					
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
 
 				win -> ypos_max = ( int32)(  windata->img.image[windata->page_to_show].fd_h >> 3);
 				win -> xpos_max = ( int32)(( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
@@ -774,10 +774,10 @@ static void WindPdfTool( WINDOW *win)
 
 		    WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 			draw_page( win, x  + windata->frame_width + windata->border_width, y, w - ( windata->frame_width + windata->border_width) , h);
-				
+
 			if( zoom <= 25 && windata->zoom_level > 25)
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1); 				
-			break;			
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1);
+			break;
 
 		case PDFTOOLBAR_NEXT:
 			if( windata->page_to_show == windata->img.page - 1)
@@ -799,15 +799,15 @@ static void WindPdfTool( WINDOW *win)
 			    scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
 
 			zoom = windata->zoom_level;
-			    
+
 			if( read_pdf( img, windata->page_to_show + 1, scale))
 			{
 				scale = scale * 100.0;
 				sprintf( temp, "%.0f%%", scale);
 				windata->zoom_level	= ( int16)scale;
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);			
-								
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
+
 				sprintf( temp, "%d of %d", windata->page_to_show + 1, img->page);
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PAGE, temp);
 				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PAGE, 1);
@@ -816,8 +816,8 @@ static void WindPdfTool( WINDOW *win)
 				win -> xpos_max = ( int32)(( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
 
 				if( zoom >= 200 && windata->zoom_level < 200)
-					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1); 	 	
-					
+					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1);
+
 				if( zoom <= 25 && windata->zoom_level > 25)
 					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1);
 			}
@@ -829,7 +829,7 @@ static void WindPdfTool( WINDOW *win)
 
 			ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PREVIOUS, 1);
 			draw_page( win, x  + windata->frame_width + windata->border_width, y, w - ( windata->frame_width + windata->border_width) , h);
-			
+
 			break;
 
 		case PDFTOOLBAR_PREVIOUS:
@@ -837,7 +837,7 @@ static void WindPdfTool( WINDOW *win)
 				return;
 
 			graf_mouse( BUSYBEE, NULL);
-	
+
 			if( img->image[windata->page_to_show].fd_addr != NULL)
 			{
 				gfree( img->image[windata->page_to_show].fd_addr);
@@ -847,12 +847,12 @@ static void WindPdfTool( WINDOW *win)
 			windata->page_to_show--;
 
 		    WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-		    
-   		    if( pdf_fit_to_win)
-				scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);			
 
-			zoom = windata->zoom_level;				
-							
+   		    if( pdf_fit_to_win)
+				scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
+
+			zoom = windata->zoom_level;
+
 			if( read_pdf( img, windata->page_to_show + 1, scale))
 			{
 				sprintf( temp, "%d of %d", windata->page_to_show + 1, img->page);
@@ -863,57 +863,57 @@ static void WindPdfTool( WINDOW *win)
 				sprintf( temp, "%.0f%%", scale);
 				windata->zoom_level	= ( int16)scale;
 				ObjcStrCpy( win->tool.root, PDFTOOLBAR_PERCENT, temp);
-				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);				
-								
+				ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_PERCENT, 1);
+
 				win -> ypos_max = ( int32)(  windata->img.image[windata->page_to_show].fd_h >> 3);
 				win -> xpos_max = ( int32)(( windata->img.image[windata->page_to_show].fd_w + windata->frame_width + windata->border_width) >> 3);
 
 				if( zoom >= 200 && windata->zoom_level < 200)
-					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1); 	 	
-					
+					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_BIG, 1);
+
 				if( zoom <= 25 && windata->zoom_level > 25)
-					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1); 					
-				
+					ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_SMALL, 1);
+
 			}
-			
+
 			win -> ypos	= 0;
 			win -> xpos	= 0;
 
-			graf_mouse( ARROW, NULL);			
+			graf_mouse( ARROW, NULL);
 
 			ObjcDraw( OC_TOOLBAR, win, PDFTOOLBAR_NEXT, 1);
 			draw_page( win, x  + windata->frame_width + windata->border_width, y, w - ( windata->frame_width + windata->border_width) , h);
 
 			break;
 
-			
+
 		case PDFTOOLBAR_PERCENT:
 		//	size_popup( win, object);
 			break;
-			
+
 		default:
 			break;
 	}
 
-	ObjcChange( OC_TOOLBAR, win, object, NORMAL, 1); 
+	ObjcChange( OC_TOOLBAR, win, object, NORMAL, 1);
 }
 
 
-static void WindPdfTop( WINDOW *win) 
+static void WindPdfTop( WINDOW *win)
 {
 	menu = get_tree( MENU_BAR);
 
-	menu_ienable( menu, MENU_BAR_SHOW_FULLSCREEN, 1); 
-	menu_ienable( menu, MENU_BAR_INFORMATION, 1); 
+	menu_ienable( menu, MENU_BAR_SHOW_FULLSCREEN, 1);
+	menu_ienable( menu, MENU_BAR_INFORMATION, 1);
 	menu_ienable( menu, MENU_BAR_SAVE, 0);
 	menu_ienable( menu, MENU_BAR_DELETE, 0);
 	WindSet( win, WF_TOP, win->handle, 0, 0, 0);
-	wglb.appfront = wglb.front = win;	
+	wglb.appfront = wglb.front = win;
 }
 
 
-static void WindPdfKeyb( WINDOW *win) 
-{ 
+static void WindPdfKeyb( WINDOW *win)
+{
 	switch ( evnt.keybd >> 8)
 	{
 		case SC_UPARW:
@@ -921,9 +921,9 @@ static void WindPdfKeyb( WINDOW *win)
 				snd_arrw( win, WA_UPLINE);
 			else
 		case SC_PGUP:
-				snd_arrw( win, WA_UPPAGE);	
+				snd_arrw( win, WA_UPPAGE);
 			break;
-					
+
 		case SC_DWARW:
 			if( !( evnt.mkstate & ( K_LSHIFT|K_RSHIFT)))
 				snd_arrw( win, WA_DNLINE);
@@ -936,28 +936,28 @@ static void WindPdfKeyb( WINDOW *win)
 			if( !( evnt.mkstate & ( K_LSHIFT|K_RSHIFT)))
 				snd_arrw( win, WA_LFLINE);
 			else
-				snd_arrw( win, WA_LFPAGE);	
+				snd_arrw( win, WA_LFPAGE);
 			break;
-					
+
 		case SC_RTARW:
 			if( !( evnt.mkstate & ( K_LSHIFT|K_RSHIFT)))
 				snd_arrw( win, WA_RTLINE);
 			else
-				snd_arrw( win, WA_RTPAGE);	
+				snd_arrw( win, WA_RTPAGE);
 			break;
 
 		case SC_MINUS:
 //			WindViewZoom( win, 2);
-//			ObjcDraw( OC_TOOLBAR, win, VIEWTOOLBAR_SMALL, 1); 
+//			ObjcDraw( OC_TOOLBAR, win, VIEWTOOLBAR_SMALL, 1);
 			break;
 
 		case SC_PLUS:
-//			WindViewZoom( win, 1); 
-//			ObjcDraw( OC_TOOLBAR, win, VIEWTOOLBAR_BIG, 1); 
+//			WindViewZoom( win, 1);
+//			ObjcDraw( OC_TOOLBAR, win, VIEWTOOLBAR_BIG, 1);
 			break;
 
 		default:
-			break;					
+			break;
 	}
 }
 
@@ -966,7 +966,7 @@ static void WindPdfKeyb( WINDOW *win)
  * draw_bookmark:																	*
  *		draw one bookmark in the WINDOW *win.										*
  *----------------------------------------------------------------------------------*
- * return:																			*	
+ * return:																			*
  *		--																			*
  *==================================================================================*/
 
@@ -976,14 +976,14 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
 
 	if( ( entry->arrow_position.y1 + y) < y || ( entry->arrow_position.y1 + y) >= y + h)
 		return;
-		
+
 	/* DRAW ARROW IS NEEDED */
 	if ( entry->state != UNKNOWN)
 	{
 		if ( entry->state == ON)
 		{
-			xy[0] =	entry->arrow_position.x1 + x; 
-			xy[1] = entry->arrow_position.y1 + 3 + y; 
+			xy[0] =	entry->arrow_position.x1 + x;
+			xy[1] = entry->arrow_position.y1 + 3 + y;
 			xy[2] = xy[0] + 10;
 			xy[3] = xy[1];
 			xy[4] = xy[0] + 5;
@@ -991,22 +991,22 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
 		}
 		else
 		{
-			xy[0] =	entry->arrow_position.x1 + x + 4; 
-			xy[1] = entry->arrow_position.y1 + y; 
+			xy[0] =	entry->arrow_position.x1 + x + 4;
+			xy[1] = entry->arrow_position.y1 + y;
 			xy[2] = xy[0];
 			xy[3] = xy[1] + 10;
 			xy[4] = xy[0] + 5;
-			xy[5] = xy[1] + 5;		
+			xy[5] = xy[1] + 5;
 		}
-		
+
 		vsf_color( win->graf.handle, LBLACK);
-		v_fillarea( win->graf.handle, 3, xy);		
+		v_fillarea( win->graf.handle, 3, xy);
 	}
 
 	/* DRAW TEXT */
-	xtext = entry->arrow_position.x2 + x + x_space;			
+	xtext = entry->arrow_position.x2 + x + x_space;
 	ytext = entry->arrow_position.y1 + y + 2;
-			
+
 	if ( entry == selected)
 	{
 		xy[0] = xtext - 2;
@@ -1020,7 +1020,7 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
 		draw_text( win->graf.handle, xtext, ytext, WHITE, entry->name);
 	}
 	else
-		draw_text( win->graf.handle, xtext, ytext, BLACK, entry->name);	
+		draw_text( win->graf.handle, xtext, ytext, BLACK, entry->name);
 }
 
 
@@ -1029,7 +1029,7 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
  * draw_bookmark_child:																*
  *		draw every bookmark's childs in the WINDOW *win.							*
  *----------------------------------------------------------------------------------*
- * return:																			*	
+ * return:																			*
  *		number of lines drawn														*
  *==================================================================================*/
 
@@ -1038,13 +1038,13 @@ static int16 draw_bookmark_child( WINDOW *win, Bookmark *selected, Bookmark *ent
 	int16 i, lines = 0;
 
 	if( entry->child == NULL)
-		 return lines;	
+		 return lines;
 
 	for ( i = 0; i < entry->nbr_child ; i++)
 	{
 		if( entry->child[i].valid == FALSE)
-			continue;		
-	
+			continue;
+
 		entry->child[i].arrow_position.x1 = x + 3;
 		entry->child[i].arrow_position.y1 = y + 3;
 		entry->child[i].arrow_position.x2 = x + 14;
@@ -1053,7 +1053,7 @@ static int16 draw_bookmark_child( WINDOW *win, Bookmark *selected, Bookmark *ent
 		draw_bookmark( win, selected, &entry->child[i], xw, yw, hw);
 		lines++;
 		y += 18;
-		
+
 		if( entry->child[i].state != ON)
 			continue;
 
@@ -1075,15 +1075,15 @@ void calc_slider( WINDATA *windata, OBJECT *slider_root)
 	int16 win_h 			= slider_root->ob_height + 3;
 
 	if ( win_h >= full_win_size)
-	{	
-		windata -> ypos = 0;	
-					
-		slider_root[SLIDERS_MOVER].ob_y 		= 0;	
+	{
+		windata -> ypos = 0;
+
+		slider_root[SLIDERS_MOVER].ob_y 		= 0;
 		slider_root[SLIDERS_MOVER].ob_height  	= max_mover_size;
-	
-	}										
+
+	}
 	else
-	{	
+	{
 		int16 ligne_reste;
 		float mover_position	= 0L;
 		float position_step		= 0L;
@@ -1100,11 +1100,11 @@ void calc_slider( WINDATA *windata, OBJECT *slider_root)
 				windata->ypos--;
 				mover_position 	-= position_step;
 			}
-		}	
-			
+		}
+
 		slider_root[SLIDERS_MOVER].ob_height  	= ( int16)mover_size;
 		slider_root[SLIDERS_MOVER].ob_y 		= ( int16)mover_position;
-	}	
+	}
 }
 
 
@@ -1116,26 +1116,26 @@ static void WindPdfRedraw( WINDOW *win)
 
 	page = windata->page_to_show;
 
-	WindGet( win, WF_WORKXYWH, &xw, &yw, &ww, &hw);	
+	WindGet( win, WF_WORKXYWH, &xw, &yw, &ww, &hw);
 
 	/* Multipages ? */
 	if( windata->frame_width) /* browser active */
-	{	 
+	{
 		pxy[0] = xw;
 		pxy[1] = yw;
 		pxy[2] = pxy[0] + windata->frame_width;
 		pxy[3] = pxy[1] + hw - 1;
 
-		/* clean the first frame */	
+		/* clean the first frame */
 		vsf_color( win->graf.handle, WHITE);
-		v_bar( win->graf.handle, pxy);	
-	
-	
+		v_bar( win->graf.handle, pxy);
+
+
 		/* Draw the 1st frame ( navigation folder) */
 		y = 0 - ( ( int16)windata -> ypos * windata -> h_u);
 
 		for ( i = 0 ; i < windata->nbr_bookmark; i++)
-		{	
+		{
 			if( windata->root[i].valid == FALSE)
 				continue;
 
@@ -1152,13 +1152,13 @@ static void WindPdfRedraw( WINDOW *win)
 
 			if( windata->root[i].state != ON)
 				continue;
-	
+
 			dum = draw_bookmark_child( win, windata->selected, &windata->root[i], 15, y, xw, yw, hw);
 
 			y += ( dum * windata -> h_u);
 
 			lines += dum;
-		}	
+		}
 
 		windata -> ypos_max = lines;
 
@@ -1179,7 +1179,7 @@ static void WindPdfRedraw( WINDOW *win)
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		v_pline( win->graf.handle, 2, pxy);	
+		v_pline( win->graf.handle, 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
@@ -1190,20 +1190,20 @@ static void WindPdfRedraw( WINDOW *win)
 		pxy[1] = yw;
 		pxy[2] = pxy[0] + windata->frame_width - 1;
 		pxy[3] = yw;
-		v_pline( win->graf.handle, 2, pxy);	
+		v_pline( win->graf.handle, 2, pxy);
 
 		if( ( windata -> ypos_max * windata -> h_u) >= hw)
 		{
 			windata->frame_slider->ob_x 					= xw + windata->frame_width - 15;
 			windata->frame_slider->ob_y 					= yw + 2;
 			windata->frame_slider->ob_height  				= hw - 3;
-			windata->frame_slider[SLIDERS_BACK].ob_height 	= hw - 31;			
-			windata->frame_slider[SLIDERS_UP].ob_y 			= windata->frame_slider->ob_height - 31;	
+			windata->frame_slider[SLIDERS_BACK].ob_height 	= hw - 31;
+			windata->frame_slider[SLIDERS_UP].ob_y 			= windata->frame_slider->ob_height - 31;
 			windata->frame_slider[SLIDERS_DOWN].ob_y 		= windata->frame_slider->ob_height - 15;
 
 			calc_slider( windata, windata->frame_slider);
 			objc_draw( windata->frame_slider, SLIDERS_BOX, 2, clip.g_x, clip.g_y, clip.g_w, clip.g_h);
-		}	
+		}
 
 		xw +=  ( windata->frame_width + border_size);
 		ww -=  ( windata->frame_width + border_size);
@@ -1231,7 +1231,7 @@ static void WindPdfRedraw( WINDOW *win)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( win->graf.handle, LWHITE);		
+		vsf_color( win->graf.handle, LWHITE);
 		v_bar( win->graf.handle, pxy);
 		return;
 	}
@@ -1240,7 +1240,7 @@ static void WindPdfRedraw( WINDOW *win)
 	xy[4] = xw;
 
 	if( picture->fd_w < ww)
-		xy[4] += ( ( ww - picture->fd_w) >> 1);	
+		xy[4] += ( ( ww - picture->fd_w) >> 1);
 
 	tmp = MIN( ww, ( ( picture->fd_w) - xy[0]));
 
@@ -1252,8 +1252,8 @@ static void WindPdfRedraw( WINDOW *win)
 	xy[5] = yw;
 
 	if( picture->fd_h < hw)
-		xy[5] += ( ( hw - picture->fd_h) >> 1);	
-	
+		xy[5] += ( ( hw - picture->fd_h) >> 1);
+
 	tmp = MIN( hw, ( ( picture->fd_h) - xy[1]));
 
 	xy[3] = xy[1] + tmp - 1;
@@ -1288,8 +1288,8 @@ static void WindPdfClose( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
- 
-	delete_txt_data( img);	
+
+	delete_txt_data( img);
 	delete_mfdb( img->image, img->page);
 
 	if( windata->icon.fd_addr != NULL)
@@ -1301,24 +1301,24 @@ static void WindPdfClose( WINDOW *win)
 	pdf_quit( img);
 
 	if( windata->root)
-	{	 
+	{
 		int i;
-		  	
+
 		for ( i = 0; i < windata->nbr_bookmark; i++)
-		{	
+		{
 			if ( windata->root[i].nbr_child)
 				delete_bookmark_child( &windata->root[i]);
 		}
-	
+
 		gfree( windata->root);
 	}
 
-	if( windata->frame_slider)		
+	if( windata->frame_slider)
 		ObjcFree( windata->frame_slider);
 
 	gfree( windata);
 
-	DataDelete( win, WD_DATA);	
+	DataDelete( win, WD_DATA);
 	WindDelete( win);
 
 	if( wglb.first)
@@ -1330,7 +1330,8 @@ static void WindPdfClose( WINDOW *win)
 		menu_ienable( menu, MENU_BAR_SHOW_FULLSCREEN, 0);
 		menu_ienable( menu, MENU_BAR_SAVE, 0);
 		menu_ienable( menu, MENU_BAR_INFORMATION, 0);
-	}	
+		menu_ienable( menu, MENU_BAR_CLOSE, 0);
+	}
 }
 
 
@@ -1360,7 +1361,7 @@ WINDOW *WindPdf( char *filename)
 	windata->frame_width 			= 0;
 	windata->border_width 			= 0;
 	windata->root					= NULL;
-	windata->selected				= NULL;	
+	windata->selected				= NULL;
 	windata->frame_slider			= NULL;
 	windata->nbr_bookmark 			= 0;
 
@@ -1369,21 +1370,21 @@ WINDOW *WindPdf( char *filename)
 	img->_priv_ptr 		= NULL;
 	img->view_mode 		= full_size;
 	img->progress_bar 	= show_read_progress_bar;
-	
+
 	strcpy( windata->name, filename);
 
 	if ( ( winview	= WindCreate( WAT_NOINFO, app.x, app.y, app.w, app.h)) == NULL)
 	{
 		gfree( windata);
-		errshow( "", ALERT_WINDOW);		
+		errshow( "", ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 
 	WindSetPtr( winview, WF_TOOLBAR,  get_tree( PDFTOOLBAR), WindPdfTool);
-	
+
 	WindCalc( WC_WORK, winview, 0, 0, app.w, app.h, &dum, &dum, &w, &h);
-		
+
 	if( !pdf_load( filename, img, w - 225, h - 20))
 	{
 		WindDelete( winview);
@@ -1395,7 +1396,7 @@ WINDOW *WindPdf( char *filename)
 
 	strcpy( windata->title, get_pdf_title());
 	sprintf( windata->info, "zView - [%s]", fullpathname_to_filename( windata->name));
-	
+
 	if( img->page > 1)
 	{
 		pdf_build_bookmark( windata, winview);
@@ -1421,7 +1422,7 @@ WINDOW *WindPdf( char *filename)
 	windata -> h_u   	= 18;
 	windata -> ypos   	= 0;
 	windata -> ypos_max = 1;
-	
+
     DataAttach( winview, WD_DATA, 	  windata);
 	EvntAttach( winview, WM_REDRAW,	  WindPdfRedraw);
 	EvntAttach( winview, WM_DESTROY,  WindPdfClose);
@@ -1438,9 +1439,9 @@ WINDOW *WindPdf( char *filename)
 	EvntAttach( winview, WM_LFLINE,   Win_LeftLine);
 	EvntAttach( winview, WM_VSLID ,   Win_VSlide);
 	EvntAttach( winview, WM_HSLID ,   Win_HSlide);
-		
 
-	WindSetStr( winview, WF_ICONDRAW, WindViewIcon); 
+
+	WindSetStr( winview, WF_ICONDRAW, WindViewIcon);
 	WindSetStr( winview, WF_NAME,	  windata->info);
 
 	RsrcUserDraw ( OC_TOOLBAR, winview, PDFTOOLBAR_BIG, draw_icon_greater, windata);
@@ -1452,33 +1453,34 @@ WINDOW *WindPdf( char *filename)
 //	RsrcUserDraw ( OC_TOOLBAR, winview, PDFTOOLBAR_SAVE, draw_icon_save, NULL);
 	RsrcUserDraw ( OC_TOOLBAR, winview, PDFTOOLBAR_PRINT, draw_icon_printer, NULL);
 	RsrcUserDraw ( OC_TOOLBAR, winview, PDFTOOLBAR_FIND, draw_icon_find, NULL);
-	
+
 	sprintf( temp, "1 of %d", img->page);
 	ObjcStrCpy( winview->tool.root, PDFTOOLBAR_PAGE, temp);
 
     if( pdf_fit_to_win)
-		scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);			
-	
+		scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
+
 	sprintf( temp, "%.0f%%", scale * 100);
 
 	ObjcStrCpy( winview->tool.root, PDFTOOLBAR_PERCENT, temp);
-		
-				
+
+
 	if ( !( WindOpen( winview, app.x, app.y, app.w, app.h)))
 	{
 		WindPdfClose( winview);
-		errshow( "", ALERT_WINDOW);		
+		errshow( "", ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 
 	menu = get_tree( MENU_BAR);
-	
+
 	menu_ienable( menu, MENU_BAR_INFORMATION, 1);
 	menu_ienable( menu, MENU_BAR_SAVE, 0);
 	menu_ienable( menu, MENU_BAR_SHOW_FULLSCREEN, 1);
+	menu_ienable( menu, MENU_BAR_CLOSE, 1);
 
-	graf_mouse( ARROW, NULL);		
+	graf_mouse( ARROW, NULL);
 
 	return winview;
 }
