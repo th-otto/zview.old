@@ -366,6 +366,7 @@ static void WinCatalog_Close( WINDOW *win)
 	else
 	{
 		menu_ienable( menu, MENU_BAR_SAVE, 0);
+		menu_ienable( menu, MENU_BAR_CLOSE, 0);
 		menu_ienable( menu, MENU_BAR_INFORMATION, 0);
 	}
 
