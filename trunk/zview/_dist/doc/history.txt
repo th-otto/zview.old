@@ -1,8 +1,10 @@
-XX November 2012: 1.0
+10 February 2013: 1.0
 =====================
 
 News:
 -----
+- persistent PDF zoom
+- a lot of small improvements here and there
 
 Bug fixes:
 ----------
@@ -19,6 +21,7 @@ Bug fixes:
 - MagiC and TOS compatibility (BETA8 introduced one nasty bug in that
   matter)
 - Crash in PNG plugin
+- AV protocol accepts also filenames with apostrophes
 
 Known bugs:
 -----------
