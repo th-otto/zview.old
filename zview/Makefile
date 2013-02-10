@@ -34,10 +34,13 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
 
-all: $(PROGRAM) stack strip #compress
+all: $(PROGRAM) stack strip compress copy
 
 $(PROGRAM): $(PDF_LIB) $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) -L. -lpdf $(XPDF_LIBS) $(LIB)
+
+copy:
+	cp $(PROGRAM) _dist/zview.app
 
 ##############################################################################
 

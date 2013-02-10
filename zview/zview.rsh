@@ -1,4 +1,4 @@
- /*  Resource C-Header-File v1.97 fÅr ResourceMaster ab v2.06 by ARDISOFT  */
+ /*  Resource C-Header-file v1.95 for ResourceMaster v2.06&up by ARDISOFT  */
 
 #define MENU_BAR 0  /* menu */
 #define MENU_BAR_FILE 4  /* TITLE in tree MENU_BAR */
