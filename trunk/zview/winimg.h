@@ -12,8 +12,8 @@ typedef struct _bookm
 	int16 			nbr_child;				/*  number of valid child's entries		*/
 	int16 			txt_width;				/*  Text width for screen output		*/
 	int16			state;					/*  Deployed or not ( ON/OFF)			*/
-	int16			linked_page;			
-	int16			valid;						
+	int16			linked_page;
+	int16			valid;
 } Bookmark;
 
 typedef struct
@@ -23,7 +23,8 @@ typedef struct
 	int8		title[256];					/* document's title text buffer		*/
 
 	int16		zoom_level;					/* Allowed values:
-											25, 50, 100, 150, 200, fit the window */ 
+											25, 50, 100, 150, 200, fit the window */
+	double		scale;						/* TODO: merge with zoom_level      */
 	int16		pause;						/* make a "pause" in the animation	*/
 	uint16		page_to_show;				/* Page to show in the window		*/
 	clock_t 	chrono_value;				/* for animation function			*/
@@ -39,8 +40,8 @@ typedef struct
 	int32       ypos_max;	 				/* Maximal values of ypos variables		 	*/
 	int16       h_u;    	   				/* vertical scroll offset					*/
 	OBJECT 		*frame_slider;				/* vertical slider OBJECT if any			*/
-	Bookmark	*selected;			
-	Bookmark	*root;		
+	Bookmark	*selected;
+	Bookmark	*root;
 	int16 		nbr_bookmark;				/* Number of valid root's bookmarks	*/
 }WINDATA;
 
@@ -53,7 +54,7 @@ extern void Win_RightPage( WINDOW *win);
 extern void Win_LeftPage( WINDOW *win);
 extern void Win_UpPage( WINDOW *win);
 extern void Win_UpLine( WINDOW *win);
-extern void Win_LeftLine( WINDOW *win); 
+extern void Win_LeftLine( WINDOW *win);
 extern void Win_RightLine( WINDOW *win);
 extern void Win_DownLine( WINDOW *win);
 extern void Win_Arrow( WINDOW *win);
