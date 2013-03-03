@@ -70,6 +70,8 @@ static char* ParseArgs( char* cmdline )
 
 		}
 	}
+
+	return cmdline;
 }
 
 
