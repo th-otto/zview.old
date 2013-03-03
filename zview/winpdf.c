@@ -669,14 +669,13 @@ static void WindPdfTool( WINDOW *win)
     IMAGE 	*img 	 = &windata->img;
     int16	x, y, w, h, zoom, object = evnt.buff[4];
     double  scale = 1.0;
-	static double current_scale = 1.0;
     char	temp[20];
 
 	switch( object)
 	{
 		case PDFTOOLBAR_OPEN:
 			Menu_open_image();
-			current_scale = 1.0;
+			windata->scale = 1.0;
 			break;
 
 		case PDFTOOLBAR_INFO:
@@ -709,7 +708,7 @@ static void WindPdfTool( WINDOW *win)
 			}
 
 		    scale = ( scale / 100.0) * ( double)windata->zoom_level;
-			current_scale = scale;
+			windata->scale = scale;
 
 			if( read_pdf( img, windata->page_to_show + 1, scale))
 			{
@@ -759,7 +758,7 @@ static void WindPdfTool( WINDOW *win)
 			}
 
 		    scale = ( scale / 100.0) * ( double)windata->zoom_level;
-			current_scale = scale;
+			windata->scale = scale;
 
 			if( read_pdf( img, windata->page_to_show + 1, scale))
 			{
@@ -802,7 +801,7 @@ static void WindPdfTool( WINDOW *win)
 		    if( pdf_fit_to_win)
 			    scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
 			else
-				scale = current_scale;
+				scale = windata->scale;
 
 			zoom = windata->zoom_level;
 
@@ -857,7 +856,7 @@ static void WindPdfTool( WINDOW *win)
    		    if( pdf_fit_to_win)
 				scale = get_scale_value( img, windata->page_to_show + 1, w - ( windata->frame_width + windata->border_width + 20) , h - 20);
 			else
-				scale = current_scale;
+				scale = windata->scale;
 
 			zoom = windata->zoom_level;
 
@@ -1364,6 +1363,7 @@ WINDOW *WindPdf( char *filename)
 	windata->icon.fd_addr 			= NULL;
 	windata->zoom_picture.fd_addr	= NULL;
 	windata->zoom_level				= 100;
+	windata->scale					= 1.0;
 	windata->page_to_show			= 0;
 	windata->pause			 		= FALSE;
 	windata->frame_width 			= 0;
