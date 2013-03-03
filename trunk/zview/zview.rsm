@@ -4,7 +4,7 @@ ResourceMaster v3.65
 #FoHRD@rsm2out@HRD@hrd@@@[HRD-File@0@
 #FoC-Header@rsm2out@C-Header@rsh@@@[C-Header@0@
 #R 0@0@3@1@4@1@
-#M 01010110@0@7728@764@
+#M 01010110@0@7728@765@
 #T 0@1@MENU_BAR@@53@@
 #O 4@32@FILE@@
 #O 5@32@EDIT@@
@@ -232,4 +232,4 @@ ResourceMaster v3.65
 #S 42@4@NOZCODECS@@
 #S 43@4@NOEDDI@@
 #S 44@4@NOICONS@@
-#c 4474@
+#c 3508@
