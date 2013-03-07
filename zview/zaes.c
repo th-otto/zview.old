@@ -607,59 +607,59 @@ void errshow( const char *name, int16 error)
 			( void)FormAlert( 1 , get_string( NOMEM));
 			break;
 		case E_RSC:
- 			( void)FormAlert( 1 , "[1][zview.rsc not found!][Abort]");
-      		break;
+ 			( void)FormAlert( 1 , "[3][zview.rsc not found!][Quit]");
+ 			break;
 		case NO_EDDI:
- 			( void)FormAlert( 1 , get_string( NOEDDI));
-      		break;
+ 			( void)FormAlert( 1 , "[3][zView needs a VDI|with EdDI standard.][Quit]");
+              		break;
 		case LDG_LIB_FULLED:
  			( void)FormAlert( 1 , get_string( LDG_LIB_FULLED), name);
-      		break;
+              		break;
 		case LDG_APP_FULLED:
  			( void)FormAlert( 1 , get_string( APP_FULLED), name);
-      		break;
+              		break;
 		case LDG_ERR_EXEC:
  			( void)FormAlert( 1 , get_string( ERR_EXEC), name);
-      		break;
+              		break;
 		case LDG_BAD_FORMAT:
  			( void)FormAlert( 1 , get_string( BAD_LFORMAT), name);
-      		break;
+              		break;
 		case LDG_LIB_LOCKED:
  			( void)FormAlert( 1 , get_string( LIB_LOCKED), name);
-      		break;
+              		break;
 		case LDG_NOT_FOUND:
  			( void)FormAlert( 1 , get_string( NOT_FOUND), name);
-      		break;
+              		break;
 		case LDG_NO_MEMORY:
  			( void)FormAlert( 1 , get_string( NO_MEMORY), name);
-      		break;
+              		break;
 		case LDG_NO_FUNC:
  			( void)FormAlert( 1 , get_string( NOFUNC), name);
-      		break;
+              		break;
 		case PLUGIN_DECODER_ABSENT: 
  			( void)FormAlert( 1 , get_string( PLUGIN_DECODER_ABSENT));
-      		break;	
+              		break;	
 		case PLUGIN_ENCODER_ABSENT: 
  			( void)FormAlert( 1 , get_string( PLUGIN_ENCODER_ABSENT));
-      		break;			
+              		break;			
 		case CANT_LOAD_IMG:
  			( void)FormAlert( 1 , get_string( CANT_LOAD_IMG), name);
-      		break;
+              		break;
 		case CANT_SAVE_IMG:
  			( void)FormAlert( 1 , get_string( CANT_SAVE_IMG));
-      		break;
+              		break;
 		case IMG_NO_VALID:
  			( void)FormAlert( 1 , get_string( IMG_NO_VALID));
-      		break;	
+              		break;	
 		case SOURCE_TARGET_SAME:
  			( void)FormAlert( 1 , get_string( SOURCE_TARGET_SAME));
-      		break;	
+              		break;	
 		case NOZCODECS:
  			( void)FormAlert( 1 , get_string( NOZCODECS));
-      		break;	
+              		break;	
 		case NO_ICON:
  			( void)FormAlert( 1 , get_string( NOICONS));
-      		break;	      		
+              		break;	      		
 		default:
 			( void)FormAlert( 1 , get_string( GENERIC));
 			break;				

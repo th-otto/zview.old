@@ -86,12 +86,12 @@ void applexit( void)
 static void applinit( void)
 {		
 	ApplInit();
-
+	
 	if( !vdi_init())
 	{
 		errshow( "", NO_EDDI);
 		ApplExit();
-		exit( 0);
+		exit( 1);
 	}
 
 
@@ -103,7 +103,7 @@ static void applinit( void)
 	{
 		errshow( "", E_RSC);
 		ApplExit();
-		exit( 0);
+		exit( 1);
 	}
 
 	magic_os = vq_magx();
@@ -128,7 +128,7 @@ static void applinit( void)
 
 	MenuDesktop();	
 
-    EvntAttach( NULL, AP_TERM,  applexit);
+	EvntAttach( NULL, AP_TERM,  applexit);
 
 	/* Load the plugins.. */
 	
