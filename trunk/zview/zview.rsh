@@ -261,28 +261,26 @@
 
 #define SOURCE_TARGET_SAME 31  /* Alert string */
 
-#define SAVE_TITLE 32  /* Free string */
+#define SAVE_TITLE 32  /*  */
 
-#define LOAD_TITLE 33  /* Free string */
+#define LOAD_TITLE 33  /*  */
 
-#define DELETE_TITLE 34  /* Free string */
+#define DELETE_TITLE 34  /*  */
 
-#define DELETE_INFO 35  /* Free string */
+#define DELETE_INFO 35  /*  */
 
-#define CALCUL 36  /* Free string */
+#define CALCUL 36  /*  */
 
-#define PROGRESS_TXT 37  /* Free string */
+#define PROGRESS_TXT 37  /*  */
 
-#define ABOUT_TITLE 38  /* Free string */
+#define ABOUT_TITLE 38  /*  */
 
-#define DELETE_ASK 39  /* Free string */
+#define DELETE_ASK 39  /*  */
 
-#define JPG_OPTION_TITLE 40  /* Free string */
+#define JPG_OPTION_TITLE 40  /*  */
 
-#define TIFF_OPTION_TITLE 41  /* Free string */
+#define TIFF_OPTION_TITLE 41  /*  */
 
 #define NOZCODECS 42  /* Alert string */
 
-#define NOEDDI 43  /* Alert string */
-
-#define NOICONS 44  /* Alert string */
+#define NOICONS 43  /* Alert string */

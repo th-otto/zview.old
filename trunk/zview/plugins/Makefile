@@ -21,6 +21,7 @@ dist:
 	rm -rf codecs
 	mkdir codecs
 	for f in $(PLUGINS); do cp $$f/*.ldg codecs; done
+	m68k-atari-mint-strip -s codecs/*.ldg
 
 clean: $(PLUGINS)
 	rm -f *~ *.ldg
