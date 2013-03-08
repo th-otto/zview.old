@@ -1,0 +1,9 @@
+This is a maintainance and unofficial release fixing some crashes when running
+under FreeMiNT with memory protection. You don't need to install anything,
+however if you want to make new plugins usable for other applications, copy
+"codecs" directory into c:\gemsys\ldg (or any other location you use for LDG
+modules).
+
+Miro Kropacek
+Bratislava/Slovakia
+01.11.2011
