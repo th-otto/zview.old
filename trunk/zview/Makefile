@@ -62,7 +62,8 @@ xpdf-${XPDF_VERSION}: xpdf-${XPDF_VERSION}.tar.gz
 	tar xzf xpdf-${XPDF_VERSION}.tar.gz && \
 	cd $@ && \
 	cat ../howto_build/xpdf-${XPDF_VERSION}-zview.patch | patch -p1 && \
-	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
+	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68000/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
+	#CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint-elf/devkitMINT/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
 	make && \
 	cd .. && \
 	touch $@
