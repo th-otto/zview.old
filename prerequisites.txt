@@ -12,7 +12,7 @@ Current zTools are verified to work / compile with:
 - windom 1.21.3 (plus fix for gcc4 and memory protection) [zView, current zWeather]
 - windom (latest from CVS) [zTask, zWeather in future release]
 - xpdf 3.03
-- zlib 1.2.7
+- zlib 1.2.8
 
-Compiler used for development is gcc / g++ 4.6.x with binutils 2.21, CFLAGS
+Compiler used for development is gcc / g++ 4.6.4 with binutils 2.24, CFLAGS
 and CXXFLAGS for all components are '-m68060-20 -O2 -fomit-frame-pointer'.

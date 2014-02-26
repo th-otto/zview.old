@@ -1,11 +1,12 @@
 Building zView is a little bit complicated but not that much.
 
-1. Download & compile & install libfreetype2 (the most recent version is
+1. Download & compile & install libfreetype2 (most recent version is
    2.4.6 in time of writing this, it's proven to work).
 2. Download & compile & install windom 1.21.3 after applying the patch.
 3. Rename libwindom.a -> libwindom1.a, same for the header file (windom.h ->
    windom1.h)
 4. Checkout & compile & install ldg (from the official sf.net site). You
    must not use the latest stable version (2.33).
-5. Edit the path to libfreetype2 in the toplevel Makefile.
-6. make
+5. Download & compile & install zlib (most recent is 1.2.8)
+6. Edit the path to libfreetype2 in the toplevel Makefile.
+7. make
