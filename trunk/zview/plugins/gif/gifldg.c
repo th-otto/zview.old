@@ -342,7 +342,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 				free( ( void*)img.image_buf[i]);
 		}	
 
-		DGifCloseFile ( gif);
+		DGifCloseFile ( gif, NULL);
 		return FALSE;
 	}
 
@@ -372,7 +372,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 
 	strcpy( info->compression, "LZW");	
 
-	DGifCloseFile( gif);
+	DGifCloseFile( gif, NULL);
 	
 	return TRUE;
 }

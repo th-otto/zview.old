@@ -37,7 +37,7 @@ LDGLIB png_plugin =
 };
 
 boolean		first_pass;
-uint8 		*line_buffer, *png_image, *png_image_ptr;
+uint8 		*line_buffer, *png_image1, *png_image_ptr;
 int16		number_passes;
 
 
@@ -70,7 +70,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	int				num_text;
 
 	first_pass		= TRUE;
-	png_image 		= NULL;
+	png_image1 		= NULL;
 	line_buffer		= NULL;
 	number_passes	= 0;
 
@@ -229,15 +229,15 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 		{
 			int16  	pass;
 
-			png_image   = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) * ( info->height + 1));
+			png_image1  = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) * ( info->height + 1));
 
-			png_image_ptr = png_image;
+			png_image_ptr = png_image1;
 
 	    	for ( pass = 1; pass < number_passes; pass++)
 			{
 				for( i = 0; i < info->height; i++)
 				{
-					png_bytep row = png_image + i * png_get_rowbytes( png_ptr, info_ptr);
+					png_bytep row = png_image1 + i * png_get_rowbytes( png_ptr, info_ptr);
 				    png_read_row( png_ptr, row, NULL);
 				}
 	    	}
@@ -312,8 +312,8 @@ void CDECL reader_quit( IMGINFO info)
 
 	if ( png_ptr)
 	{
-		if( png_image)
-			free ( png_image);
+		if( png_image1)
+			free ( png_image1);
 
 		if( line_buffer)
 			free( line_buffer);
