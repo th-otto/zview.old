@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <jpeglib.h>
+#define HAVE_BOOLEAN
 #include "zview.h"
 #include "jpgdh.h"
 #include <libexif/exif-data.h>
