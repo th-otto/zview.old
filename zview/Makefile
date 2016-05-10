@@ -14,7 +14,7 @@ CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lxpdf-${XPDF_VERSION}/fofi -lfofi -Lxpdf-${XPDF_VERSION}/goo -lGoo -Lxpdf-${XPDF_VERSION}/splash -lsplash
 XPDF_INCS			= -Ixpdf-${XPDF_VERSION} -Ixpdf-${XPDF_VERSION}/goo -Ixpdf-${XPDF_VERSION}/splash
-LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lz
+LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lpng -lz
 CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign
 CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow
 
@@ -44,7 +44,7 @@ copy:
 
 ##############################################################################
 
-XPDF_VERSION			= 3.03
+XPDF_VERSION			= 3.04
 
 PDF_OBJ				= xpdf-${XPDF_VERSION}/xpdf/Annot.o xpdf-${XPDF_VERSION}/xpdf/Array.o xpdf-${XPDF_VERSION}/xpdf/BuiltinFont.o xpdf-${XPDF_VERSION}/xpdf/BuiltinFontTables.o \
                                   xpdf-${XPDF_VERSION}/xpdf/Catalog.o xpdf-${XPDF_VERSION}/xpdf/CharCodeToUnicode.o xpdf-${XPDF_VERSION}/xpdf/CMap.o xpdf-${XPDF_VERSION}/xpdf/Decrypt.o xpdf-${XPDF_VERSION}/xpdf/Dict.o xpdf-${XPDF_VERSION}/xpdf/Error.o \
@@ -52,8 +52,9 @@ PDF_OBJ				= xpdf-${XPDF_VERSION}/xpdf/Annot.o xpdf-${XPDF_VERSION}/xpdf/Array.o
                                   xpdf-${XPDF_VERSION}/xpdf/GlobalParams.o xpdf-${XPDF_VERSION}/xpdf/JArithmeticDecoder.o xpdf-${XPDF_VERSION}/xpdf/JBIG2Stream.o xpdf-${XPDF_VERSION}/xpdf/JPXStream.o \
                                   xpdf-${XPDF_VERSION}/xpdf/Lexer.o xpdf-${XPDF_VERSION}/xpdf/Link.o xpdf-${XPDF_VERSION}/xpdf/NameToCharCode.o xpdf-${XPDF_VERSION}/xpdf/Object.o xpdf-${XPDF_VERSION}/xpdf/Outline.o xpdf-${XPDF_VERSION}/xpdf/OutputDev.o \
                                   xpdf-${XPDF_VERSION}/xpdf/Page.o xpdf-${XPDF_VERSION}/xpdf/Parser.o xpdf-${XPDF_VERSION}/xpdf/SecurityHandler.o xpdf-${XPDF_VERSION}/xpdf/PDFDoc.o xpdf-${XPDF_VERSION}/xpdf/PDFDocEncoding.o xpdf-${XPDF_VERSION}/xpdf/PSTokenizer.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/SplashOutputDev.o xpdf-${XPDF_VERSION}/xpdf/Stream.o xpdf-${XPDF_VERSION}/xpdf/TextOutputDev.o xpdf-${XPDF_VERSION}/xpdf/UnicodeMap.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/UnicodeTypeTable.o xpdf-${XPDF_VERSION}/xpdf/XRef.o xpdf-${XPDF_VERSION}/xpdf/OptionalContent.o pdflib.o
+                                  xpdf-${XPDF_VERSION}/xpdf/SplashOutputDev.o xpdf-${XPDF_VERSION}/xpdf/Stream.o xpdf-${XPDF_VERSION}/xpdf/TextOutputDev.o xpdf-${XPDF_VERSION}/xpdf/TextString.o xpdf-${XPDF_VERSION}/xpdf/UnicodeMap.o \
+                                  xpdf-${XPDF_VERSION}/xpdf/UnicodeTypeTable.o xpdf-${XPDF_VERSION}/xpdf/XRef.o xpdf-${XPDF_VERSION}/xpdf/OptionalContent.o \
+                                  pdflib.o
                                   
 xpdf-${XPDF_VERSION}.tar.gz:
 	wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz

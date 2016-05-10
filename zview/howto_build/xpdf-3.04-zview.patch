@@ -1,0 +1,88 @@
+diff -ru xpdf-3.04.orig/configure xpdf-3.04/configure
+--- xpdf-3.04.orig/configure	2014-05-29 04:50:50.000000000 +1000
++++ xpdf-3.04/configure	2016-05-10 15:04:42.767817568 +1000
+@@ -7463,7 +7463,7 @@
+ 
+   case x"$smr_cv_with_freetype2_library" in
+       xyes | xmaybe)
+-          freetype2_LIBS="-lfreetype"
++          freetype2_LIBS="-lfreetype -lpng"
+           with_freetype2=$smr_cv_with_freetype2_library
+           ;;
+       xno)
+@@ -7678,7 +7678,7 @@
+ 
+   case x"$smr_cv_with_libpng_library" in
+       xyes | xmaybe)
+-          libpng_LIBS="-lpng"
++          libpng_LIBS="-lpng -lm -lz"
+           with_libpng=$smr_cv_with_libpng_library
+           ;;
+       xno)
+diff -ru xpdf-3.04.orig/xpdf/Catalog.cc xpdf-3.04/xpdf/Catalog.cc
+--- xpdf-3.04.orig/xpdf/Catalog.cc	2014-05-29 04:50:50.000000000 +1000
++++ xpdf-3.04/xpdf/Catalog.cc	2016-05-10 15:02:27.751819272 +1000
+@@ -164,9 +164,11 @@
+   // get the AcroForm dictionary
+   catDict.dictLookup("AcroForm", &acroForm);
+ 
++  /*
+   if (!acroForm.isNull()) {
+     form = Form::load(doc, this, &acroForm);
+   }
++  */
+ 
+   // get the OCProperties dictionary
+   catDict.dictLookup("OCProperties", &ocProperties);
+diff -ru xpdf-3.04.orig/xpdf/GlobalParams.cc xpdf-3.04/xpdf/GlobalParams.cc
+--- xpdf-3.04.orig/xpdf/GlobalParams.cc	2014-05-29 04:50:50.000000000 +1000
++++ xpdf-3.04/xpdf/GlobalParams.cc	2016-05-10 15:02:27.751819272 +1000
+@@ -95,20 +95,20 @@
+   const char *obliqueFont;	// name of font to oblique
+   double obliqueFactor;		// oblique sheer factor
+ } displayFontTab[] = {
+-  {"Courier",               "n022003l.pfb", "cour.ttf",    "Courier",      "Courier",                NULL,             0},
+-  {"Courier-Bold",          "n022004l.pfb", "courbd.ttf",  "Courier",      "Courier Bold",           NULL,             0},
+-  {"Courier-BoldOblique",   "n022024l.pfb", "courbi.ttf",  "Courier",      "Courier Bold Oblique",   "Courier-Bold",   0.212557},
+-  {"Courier-Oblique",       "n022023l.pfb", "couri.ttf",   "Courier",      "Courier Oblique",        "Courier",        0.212557},
+-  {"Helvetica",             "n019003l.pfb", "arial.ttf",   "Helvetica",    "Helvetica",              NULL,             0},
+-  {"Helvetica-Bold",        "n019004l.pfb", "arialbd.ttf", "Helvetica",    "Helvetica-Bold",         NULL,             0},
+-  {"Helvetica-BoldOblique", "n019024l.pfb", "arialbi.ttf", "Helvetica",    "Helvetica Bold Oblique", "Helvetica-Bold", 0.212557},
+-  {"Helvetica-Oblique",     "n019023l.pfb", "ariali.ttf",  "Helvetica",    "Helvetica Oblique",      "Helvetica",      0.212557},
+-  {"Symbol",                "s050000l.pfb", NULL,          "Symbol",       "Symbol",                 NULL,             0},
+-  {"Times-Bold",            "n021004l.pfb", "timesbd.ttf", "Times",        "Times-Bold",             NULL,             0},
+-  {"Times-BoldItalic",      "n021024l.pfb", "timesbi.ttf", "Times",        "Times-BoldItalic",       NULL,             0},
+-  {"Times-Italic",          "n021023l.pfb", "timesi.ttf",  "Times",        "Times-Italic",           NULL,             0},
+-  {"Times-Roman",           "n021003l.pfb", "times.ttf",   "Times",        "Times-Roman",            NULL,             0},
+-  {"ZapfDingbats",          "d050000l.pfb", NULL,          "ZapfDingbats", "Zapf Dingbats",          NULL,             0},
++  {"Courier",               "fonts\\n022003l.pfb", "cour.ttf",    "Courier",      "Courier",                NULL,             0},
++  {"Courier-Bold",          "fonts\\n022004l.pfb", "courbd.ttf",  "Courier",      "Courier Bold",           NULL,             0},
++  {"Courier-BoldOblique",   "fonts\\n022024l.pfb", "courbi.ttf",  "Courier",      "Courier Bold Oblique",   "Courier-Bold",   0.212557},
++  {"Courier-Oblique",       "fonts\\n022023l.pfb", "couri.ttf",   "Courier",      "Courier Oblique",        "Courier",        0.212557},
++  {"Helvetica",             "fonts\\n019003l.pfb", "arial.ttf",   "Helvetica",    "Helvetica",              NULL,             0},
++  {"Helvetica-Bold",        "fonts\\n019004l.pfb", "arialbd.ttf", "Helvetica",    "Helvetica-Bold",         NULL,             0},
++  {"Helvetica-BoldOblique", "fonts\\n019024l.pfb", "arialbi.ttf", "Helvetica",    "Helvetica Bold Oblique", "Helvetica-Bold", 0.212557},
++  {"Helvetica-Oblique",     "fonts\\n019023l.pfb", "ariali.ttf",  "Helvetica",    "Helvetica Oblique",      "Helvetica",      0.212557},
++  {"Symbol",                "fonts\\s050000l.pfb", NULL,          "Symbol",       "Symbol",                 NULL,             0},
++  {"Times-Bold",            "fonts\\n021004l.pfb", "timesbd.ttf", "Times",        "Times-Bold",             NULL,             0},
++  {"Times-BoldItalic",      "fonts\\n021024l.pfb", "timesbi.ttf", "Times",        "Times-BoldItalic",       NULL,             0},
++  {"Times-Italic",          "fonts\\n021023l.pfb", "timesi.ttf",  "Times",        "Times-Italic",           NULL,             0},
++  {"Times-Roman",           "fonts\\n021003l.pfb", "times.ttf",   "Times",        "Times-Roman",            NULL,             0},
++  {"ZapfDingbats",          "fonts\\d050000l.pfb", NULL,          "ZapfDingbats", "Zapf Dingbats",          NULL,             0},
+   {NULL}
+ };
+ 
+@@ -120,11 +120,13 @@
+ };
+ #else
+ static const char *displayFontDirs[] = {
++/*
+   "/usr/share/ghostscript/fonts",
+   "/usr/local/share/ghostscript/fonts",
+   "/usr/share/fonts/default/Type1",
+   "/usr/share/fonts/default/ghostscript",
+   "/usr/share/fonts/type1/gsfonts",
++*/
+ #if defined(__sun) && defined(__SVR4)
+   "/usr/sfw/share/ghostscript/fonts",
+ #endif
