@@ -1,7 +1,7 @@
 Building zView is a little bit complicated but not that much.
 
 1. Download & compile & install libfreetype2 (most recent version is
-   2.4.6 in time of writing this, it's proven to work).
+   2.6.3 in time of writing this, it's proven to work).
 2. Download & compile & install windom 1.21.3 after applying the patch.
 3. Rename libwindom.a -> libwindom1.a, same for the header file (windom.h ->
    windom1.h)
