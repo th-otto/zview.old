@@ -17,6 +17,7 @@
 #include "catalog/catalog_other_event.h"
 #include "catalog/catalog_icons.h"
 #include "catalog/catalog_slider.h"
+#include "scancode.h"
 
 
 static int16 	dum;

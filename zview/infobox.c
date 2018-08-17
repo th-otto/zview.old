@@ -21,6 +21,14 @@ static	OBJECT	*infotext;
 static txt_data *exif_box;
 static OBJECT *slider_root;
 
+#ifndef VDI_INTINMAX
+#define VDI_CNTRLMAX     16		/* max size of vdi_control[] ; actually 15; use 16 to make it long aligned */
+#define VDI_INTINMAX   1024		/**< max size of vdi_intin[] */
+#define VDI_INTOUTMAX   256		/**< max size of vdi_intout[] */
+#define VDI_PTSINMAX    256		/**< max size of vdi_ptsin[] */
+#define VDI_PTSOUTMAX   256		/**< max size of vdi_ptsout[] */
+#endif
+
 static short vdi_intin[VDI_INTINMAX];
 static short vdi_intout[VDI_INTOUTMAX];
 static short vdi_ptsin[VDI_PTSINMAX];

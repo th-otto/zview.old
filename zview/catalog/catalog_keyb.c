@@ -14,6 +14,7 @@
 #include "catalog.h"
 #include "../mfdb.h"
 #include "../custom_font.h"
+#include "scancode.h"
 
 /* local constant */
 static const char allowed_char[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ‚Šˆ‰‡€¡‹Œ—–£… ƒ„†‘”¤’¥0123456789 &\"'(İ!)-_`œ^[]*{},?;.:/=+%#|@~<>";

@@ -28,7 +28,6 @@
 #include <unistd.h>
 #include <time.h>
 #include <windom1.h>
-#include <scancode.h>
 #include <ldg.h>
 #include "zaes.h"
 #include "zedit/libtedit.h"
@@ -78,7 +77,8 @@
 	#define ABS(val) ( ( ( val) < 0) ? -( val) : ( val))
 #endif
 
-#ifndef XATTR
+#ifndef __XATTR
+#define __XATTR
 typedef struct
 {
 	uint16	mode;

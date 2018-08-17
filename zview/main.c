@@ -11,7 +11,10 @@
 #include "wintimer.h"
 #include "zvdi/vdi.h"
 #include "catalog/catalog.h"
-#include <av.h>
+
+#ifndef VA_START
+#define VA_START 0x4711
+#endif
 
 
 WINDOW *win_catalog = NULL;

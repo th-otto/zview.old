@@ -2,12 +2,8 @@ CC				= m68k-atari-mint-gcc
 CXX				= m68k-atari-mint-g++
 AR 				= m68k-atari-mint-ar
 RANLIB 				= m68k-atari-mint-ranlib
-STACK				= m68k-atari-mint-stack
-STRIP				= m68k-atari-mint-strip -s
-FLAGS				= m68k-atari-mint-flags -r
 DEBUG				= # -DDEBUG
 COMPRESS			= upx -9
-STACKSIZE			= 512k
 OPTIMISATION			= -g -O2 -fomit-frame-pointer
 #CPU				= -mcpu=5475
 CPU				= -m68020-60
@@ -15,8 +11,9 @@ DEBUG_LIB			= # -lwout
 XPDF_LIBS			= -Lxpdf-${XPDF_VERSION}/fofi -lfofi -Lxpdf-${XPDF_VERSION}/goo -lGoo -Lxpdf-${XPDF_VERSION}/splash -lsplash
 XPDF_INCS			= -Ixpdf-${XPDF_VERSION} -Ixpdf-${XPDF_VERSION}/goo -Ixpdf-${XPDF_VERSION}/splash
 LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lpng -lz
-CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign
+CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes
 CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow
+LDFLAGS                         = -s
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
 EDIT_OBJ 			= zedit/char.o zedit/edit.o zedit/zedit.o
@@ -34,13 +31,12 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
 
-all: $(PROGRAM) stack strip compress copy
+all: $(PROGRAM)
 
 $(PROGRAM): $(PDF_LIB) $(OBJ)
-	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) -L. -lpdf $(XPDF_LIBS) $(LIB)
-
-copy:
+	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,512k -L. -lpdf $(XPDF_LIBS) $(LIB)
 	cp $(PROGRAM) _dist/zview.app
+	: $(COMPRESS) $(PROGRAM)
 
 ##############################################################################
 
@@ -55,34 +51,23 @@ PDF_OBJ				= xpdf-${XPDF_VERSION}/xpdf/Annot.o xpdf-${XPDF_VERSION}/xpdf/Array.o
                                   xpdf-${XPDF_VERSION}/xpdf/SplashOutputDev.o xpdf-${XPDF_VERSION}/xpdf/Stream.o xpdf-${XPDF_VERSION}/xpdf/TextOutputDev.o xpdf-${XPDF_VERSION}/xpdf/TextString.o xpdf-${XPDF_VERSION}/xpdf/UnicodeMap.o \
                                   xpdf-${XPDF_VERSION}/xpdf/UnicodeTypeTable.o xpdf-${XPDF_VERSION}/xpdf/XRef.o xpdf-${XPDF_VERSION}/xpdf/OptionalContent.o \
                                   pdflib.o
-                                  
+
 xpdf-${XPDF_VERSION}.tar.gz:
-	wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
+	: wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
+	wget https://xpdfreader-dl.s3.amazonaws.com/old/xpdf-${XPDF_VERSION}.tar.gz
 	
 xpdf-${XPDF_VERSION}: xpdf-${XPDF_VERSION}.tar.gz
 	tar xzf xpdf-${XPDF_VERSION}.tar.gz && \
 	cd $@ && \
 	cat ../howto_build/xpdf-${XPDF_VERSION}-zview.patch | patch -p1 && \
-	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68000/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
-	#CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --with-freetype2-includes=$$HOME/gnu-tools/m68k-atari-mint-elf/devkitMINT/m68k-atari-mint/include/freetype2 --without-x --host=m68k-atari-mint && \
-	make && \
-	cd .. && \
-	touch $@
+	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --without-x --host=m68k-atari-mint && \
+	$(MAKE)
 	
 $(PDF_LIB): xpdf-${XPDF_VERSION} $(PDF_OBJ)
 	rm -f $@
 	$(AR) cru $@ $(PDF_OBJ)
 
 ##############################################################################
-strip:
-	$(STRIP) $(PROGRAM)
-
-stack:
-	$(STACK) -S $(STACKSIZE) $(PROGRAM)
-
-compress:
-	$(COMPRESS) $(PROGRAM)
-	$(FLAGS) $(PROGRAM)
 
 clean_zview:
 	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o

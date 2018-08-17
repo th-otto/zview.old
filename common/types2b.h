@@ -7,7 +7,6 @@ typedef unsigned char	uint8;
 typedef signed long		int32;
 typedef unsigned long	uint32;
 #endif
-typedef int32  			fix31;
 
 #ifdef __GNUC__
 	#ifndef HAVE_INTS_DEFINED
