@@ -1,3 +1,5 @@
+include ../../configvars
+
 PLUGINS = \
 	bmp \
 	degas \
@@ -11,17 +13,21 @@ PLUGINS = \
 	tga \
 	tiff
 
-default: $(PLUGINS)
+all: $(PLUGINS)
 
 .PHONY: $(PLUGINS)
-$(PLUGINS):
-	$(MAKE) -C $@ $(MAKECMDGOALS) CROSS=yes
+$(PLUGINS): libshare
+	$(MAKE) -C $@ all
+
+libshare::
+	$(MAKE) -C $@ all
 
 dist:
-	rm -rf codecs
-	mkdir codecs
-	for f in $(PLUGINS); do cp $$f/*.ldg codecs; done
-	m68k-atari-mint-strip -s codecs/*.ldg
+	rm -rf ../_dist/codecs
+	mkdir ../_dist/codecs
+	for f in $(PLUGINS); do cp $$f/*.ldg ../_dist/codecs; done
+	$(STRIP) -s ../_dist/codecs/*.ldg
 
-clean: $(PLUGINS)
-	rm -f *~ *.ldg
+clean:
+	rm -f *~ */*.ldg
+	$(MAKE) -C libshare clean

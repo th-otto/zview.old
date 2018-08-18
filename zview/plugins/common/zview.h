@@ -28,7 +28,7 @@
 #include <setjmp.h>
 #include <mt_gem.h>
 #include <ldg.h>
-#include <libshare.h>
+#include "../libshare/libshare.h"
 
 #ifndef TRUE
 #define TRUE		1
@@ -80,7 +80,7 @@ typedef struct _img_info
 {
 	/* Data returned by the decoder Picture's initialisation */
 	uint16    	width;					/* Picture width 											*/
-	uint16		height;					/* Picture Height											*/
+	uint16		height;					/* Picture height											*/
 	uint16 		components;  			/* Picture components 										*/
 	uint16	 	planes;					/* Picture bits by pixel									*/
 	uint32     	colors;					/* Picture colors number									*/
@@ -104,12 +104,12 @@ typedef struct _img_info
 										   The first page is 0 and the last is img_info->page - 1	*/
 
 
-	/* The following variable are only for Information Prupose, the zview doesn't
+	/* The following variable are only for Information Purpose, the zview doesn't
 	   use it for decoding routine but only for the information dialog								*/
 	int8		info[40];				/* Picture's info, for ex: "Gif 87a" 						*/
 	int8		compression[5];			/* Compression type, ex: "LZW" 								*/
 	uint16    	real_width;				/* Real picture width( if the thumbnail variable is 1)		*/
-	uint16		real_height;			/* Ral picture Height( if the thumbnail variable is 1)		*/
+	uint16		real_height;			/* Real picture height( if the thumbnail variable is 1)		*/
 
 
 	/* Private data for the plugin */

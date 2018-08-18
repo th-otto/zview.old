@@ -32,7 +32,7 @@ LDGLIB raw_plugin =
 };
 
 
-void swap( uint8 *a, uint8 *b)
+static void swap( uint8 *a, uint8 *b)
 {
 	uint8 temp;
 
@@ -60,7 +60,8 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	int16 		handle;
 	int32		file_size, palette[768];
 	uint8     	header[4], *img_buffer;
-
+	uint16 *p;
+	
 	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
 		return FALSE;
 
@@ -75,8 +76,9 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	}
 
 	info->planes 				= 8;
-	info->width 				= *((uint16*)&header[0]);
-	info->height 				= *((uint16*)&header[2]);
+	p = (uint16 *)&header[0];
+	info->width 				= p[0];
+	info->height 				= p[1];
 	info->colors  				= 256;
 	info->components			= 3;
 	info->real_width			= info->width;

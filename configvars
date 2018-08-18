@@ -1,0 +1,26 @@
+CROSS_PREFIX = m68k-atari-mint-
+CC				= $(CROSS_PREFIX)gcc
+CXX				= $(CROSS_PREFIX)g++
+AR 				= $(CROSS_PREFIX)ar
+RANLIB 				= $(CROSS_PREFIX)ranlib
+STRIP				= $(CROSS_PREFIX)strip
+
+COMPRESS			= : upx -9
+
+#CPU				= -mcpu=5475
+CPU				= -m68020-60
+OPTIMISATION			= -g -O2 -fomit-frame-pointer
+DEBUG				= # -DDEBUG
+
+USE_WINDOM2=0
+ifeq ($(USE_WINDOM2),1)
+WINDOM_LIBS=-lwindom
+WINDOM_CFLAGS=-DUSE_WINDOM2
+else
+WINDOM_LIBS=-lwindom1
+endif
+
+CFLAGS   = $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
+CXXFLAGS = $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror
+LDFLAGS  = -s
+ARFLAGS  = rcs

@@ -42,7 +42,7 @@ LDGLIB bmp_plugin =
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-uint32 ToL( uint8 * puffer)
+static uint32 ToL( uint8 * puffer)
 {
   return ( puffer[0] | ( puffer[1] << 8) | ( puffer[2] << 16) | ( puffer[3] << 24));
 }
@@ -58,7 +58,7 @@ uint32 ToL( uint8 * puffer)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-uint16 ToS( uint8 *puffer)
+static uint16 ToS( uint8 *puffer)
 {
   return ( puffer[0] | ( puffer[1] << 8));
 }

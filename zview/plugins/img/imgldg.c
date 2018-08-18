@@ -159,7 +159,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 }
 
 
-void fill_img_buf( IMG_REF *pic)
+static void fill_img_buf( IMG_REF *pic)
 {
 	XIMG_DATA	*info = &pic->info;
 	int32		read  = info->img_buf_len;							
@@ -173,7 +173,7 @@ void fill_img_buf( IMG_REF *pic)
 }
 
 
-void	refill_img_buf( IMG_REF *pic, int32 read)
+static void	refill_img_buf( IMG_REF *pic, int32 read)
 {	
 	XIMG_DATA	*info = &pic->info;
 
@@ -200,7 +200,7 @@ void	refill_img_buf( IMG_REF *pic, int32 read)
 
 
 
-uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
+static uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 {
 	register int16	i, cnt;
 
@@ -249,7 +249,7 @@ uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 }
 
 
-uint8 *unpack_line1( uint8 *img, uint8 *des, int16 pat_len, int16 len)
+static uint8 *unpack_line1( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 {
 	if (( img[0] == 0 ) && ( img[1] == 0 ) && ( img[2] == 0xff))	
 	{
@@ -267,7 +267,7 @@ uint8 *unpack_line1( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 }
 
 
-void unpack_line( IMG_REF *pic, uint8 *des)
+static void unpack_line( IMG_REF *pic, uint8 *des)
 {
 	XIMG_DATA	*info = &pic->info;
 	uint8		*img_line;
@@ -285,16 +285,16 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 {
 	int16		even_len;
 	IMG_REF 	*pic 		= ( IMG_REF *)info->_priv_ptr;
-	XIMG_DATA	*img_info	= &pic->info;
+	XIMG_DATA	*ximg_info	= &pic->info;
 	IMGHDR		*head		= &pic->img;
 
 
-	if ( img_info->img_buf_valid == 0)		
+	if ( ximg_info->img_buf_valid == 0)		
 	{
 		Fseek( head->length << 1, pic->file_handle, 0);			
-		img_info->rest_length = img_info->file_length - ( head->length << 1);
+		ximg_info->rest_length = ximg_info->file_length - ( head->length << 1);
 		fill_img_buf( pic);
-		img_info->img_buf_valid = 1;
+		ximg_info->img_buf_valid = 1;
 	}										
 
 	if( info->planes > 8)
@@ -303,28 +303,28 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 		return TRUE;
 	}
 
-	even_len = ( img_info->line_len + 1) & ~1;
+	even_len = ( ximg_info->line_len + 1) & ~1;
 
-	unpack_line( pic, img_info->line_buffer);
+	unpack_line( pic, ximg_info->line_buffer);
 
-	if ( img_info->line_len & 1)								
+	if ( ximg_info->line_len & 1)								
 	{
 		uint8	*odd, *even;
 		int16	i;
 
-		odd = img_info->line_buffer + ( img_info->line_len * head->planes);	
+		odd = ximg_info->line_buffer + ( ximg_info->line_len * head->planes);	
 		even = odd + head->planes;							
 
 		for ( i = 0; i < head->planes; i++)
 		{
 			*( --even) = 0;				
-			odd -= img_info->line_len;
-			even -= img_info->line_len;
-			memcpy( even, odd, img_info->line_len);
+			odd -= ximg_info->line_len;
+			even -= ximg_info->line_len;
+			memcpy( even, odd, ximg_info->line_len);
 		}
 	}
 
-	if( !plane2packed24( even_len >> 1, even_len, head->planes, img_info->line_buffer, buffer, info->palette))
+	if( !plane2packed24( even_len >> 1, even_len, head->planes, ximg_info->line_buffer, buffer, info->palette))
 		return FALSE;
 
 	return TRUE;

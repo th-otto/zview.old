@@ -1,12 +1,17 @@
-STACKSIZE		= 64k
-OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
-CPU			= -m68020-60
-LIB			= -lshare -ltiff -ljpeg -lldg -lz -llzma -lm
+include ../../../configvars
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I. -I../../../common -I../common
+LIB			= ../libshare/libshare.a -ltiff -ljpeg -lldg -lz -llzma -lm
+
+CFLAGS			+= -I../../../common -I../common
 
 OBJ			= tiffldg.o
 
 PROGRAM 		= tiff.ldg
 
-include ../../../common.mak
+all:: $(PROGRAM)
+
+$(PROGRAM): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+
+clean:
+	rm -f *.o *.a *.ldg

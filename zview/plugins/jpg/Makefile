@@ -1,9 +1,8 @@
-STACKSIZE		= 64k
-OPTIMISATION		= -O2 -fomit-frame-pointer
-CPU			= -m68020-60
-LIB			= -lshare -lldg -ljpeg -lexif -lm
+include ../../../configvars
 
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -I../../../common -I../common
+LIB			= ../libshare/libshare.a -lldg -ljpeg -lexif -lm
+
+CFLAGS			+= -I../../../common -I../common
 
 DSP_OBJ			= jpgdsp.o 
 
@@ -11,4 +10,10 @@ OBJ			= $(DSP_OBJ) jpgldg.o
 
 PROGRAM 		= jpg.ldg
 
-include ../../../common.mak
+all:: $(PROGRAM)
+
+$(PROGRAM): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+
+clean:
+	rm -f *.o *.a *.ldg

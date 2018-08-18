@@ -1,28 +1,12 @@
-CC				= m68k-atari-mint-gcc
-CXX				= m68k-atari-mint-g++
-AR 				= m68k-atari-mint-ar
-RANLIB 				= m68k-atari-mint-ranlib
-DEBUG				= # -DDEBUG
-COMPRESS			= upx -9
-OPTIMISATION			= -g -O2 -fomit-frame-pointer
-#CPU				= -mcpu=5475
-CPU				= -m68020-60
-DEBUG_LIB			= # -lwout
+include ../configvars
 
-USE_WINDOM2=0
-ifeq ($(USE_WINDOM2),1)
-WINDOM_LIBS=-lwindom
-WINDOM_CFLAGS=-DUSE_WINDOM2
-else
-WINDOM_LIBS=-lwindom1
-endif
+DEBUG_LIB			= # -lwout
 
 XPDF_LIBS			= -Lxpdf-${XPDF_VERSION}/fofi -lfofi -Lxpdf-${XPDF_VERSION}/goo -lGoo -Lxpdf-${XPDF_VERSION}/splash -lsplash
 XPDF_INCS			= -Ixpdf-${XPDF_VERSION} -Ixpdf-${XPDF_VERSION}/goo -Ixpdf-${XPDF_VERSION}/splash
 LIB				= -lfreetype $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lpng -lz
-CFLAGS				= $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
-CXXFLAGS			= $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Werror
-LDFLAGS                         = -s
+CFLAGS				+= $(XPDF_INCS) -I../common
+CXXFLAGS			+= $(XPDF_INCS) -I../common
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
 EDIT_OBJ 			= zedit/char.o zedit/edit.o zedit/zedit.o
@@ -40,12 +24,12 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
 
-all: $(PROGRAM)
+all:: $(PROGRAM)
 
 $(PROGRAM): $(PDF_LIB) $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,512k -L. -lpdf $(XPDF_LIBS) $(LIB)
 	cp $(PROGRAM) _dist/zview.app
-	: $(COMPRESS) $(PROGRAM)
+	$(COMPRESS) $(PROGRAM)
 
 ##############################################################################
 

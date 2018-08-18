@@ -115,7 +115,7 @@ static void term_source (j_decompress_ptr cinfo)
 }
 
 
-boolean decompress_thumbnail_image( void *source, uint32 size, IMGINFO info)
+static boolean decompress_thumbnail_image( void *source, uint32 size, IMGINFO info)
 {
 	int 		header = 0;
 	jmp_buf 	escape;
@@ -308,7 +308,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	jpeg_read_header( jpeg, TRUE);
 
 	
-	// faster that the default method ( 10%) for a very little output quality lost
+	/* faster that the default method ( 10%) for a very little output quality lost */
 	jpeg->dct_method 			= JDCT_IFAST;
 	jpeg->do_fancy_upsampling 	= FALSE;
 	
@@ -432,15 +432,13 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 					
 					return TRUE;
 				}
-				else // We can't extract the thumbnail :/
+				else /* We can't extract the thumbnail :/ */
 				{
 					free( info->__priv_ptr_more);
 					exif_data_unref( exifData);
 
 					if ( comment)
 					{
-						register int16 i;
-
 						for ( i = 0; i < comment->lines; i++)
 						{
 							if( comment->txt[i])
@@ -466,7 +464,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 	info->_priv_ptr				= ( void*)jpeg;			
 	info->_priv_ptr_more		= ( void*)comment;
 	info->__priv_ptr_more		= NULL;
-	info->_priv_var				= jpeg_file;		
+	info->_priv_var				= (int32)jpeg_file;		
 	info->_priv_var_more		= 0; /* 1 for exif thumbnail */
 
 	jpeg->client_data = NULL;
@@ -552,7 +550,7 @@ void CDECL reader_quit( IMGINFO info)
 	{
 		if( info->_priv_ptr)
 		{
-		        // DSP decoder uses Mxalloc()
+		        /* DSP decoder uses Mxalloc() */
 			Mfree( info->_priv_ptr);
                 }
 		return;
@@ -589,7 +587,7 @@ void CDECL reader_quit( IMGINFO info)
 		return;
 	}
 
-	fclose( info->_priv_var);
+	fclose( (FILE *)info->_priv_var);
 }
 
 
@@ -699,7 +697,7 @@ boolean CDECL encoder_init( const char *name, IMGINFO info)
 	info->_priv_ptr	 		= ( void*)jpeg;
 	info->_priv_ptr_more	= NULL;				
 	info->__priv_ptr_more	= NULL;	
-	info->_priv_var	 		= jpeg_file;
+	info->_priv_var	 		= (int32)jpeg_file;
 	info->_priv_var_more	= 0;
 
 	jpeg->client_data  		= NULL;
@@ -747,7 +745,7 @@ void CDECL encoder_quit( IMGINFO info)
 		jpeg_destroy_compress( jpeg);
 		free( jpeg->err);
 		free( jpeg);
-		fclose( info->_priv_var);
+		fclose( (FILE *)info->_priv_var);
 	}
 }
 
@@ -775,8 +773,6 @@ void CDECL init( void)
 		jpgdrv = NULL; 
 	else
 	{
-		// Cconws("JPG Cookie found \n\r");
-
 		Getcookie( C__MCH, ( long*)&mach);
 
 		/* If Aranym is detected, we decode with the DSP routine */
@@ -784,7 +780,6 @@ void CDECL init( void)
 		if( mach == 0x50000L)			
 		{	
 			dsp_ram = 3;
-			// Cconws("JPG Cookie used \n\r");
 			return; 
 		}
 
