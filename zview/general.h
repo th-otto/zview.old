@@ -74,7 +74,7 @@ typedef int boolean;
 #include "zaes.h"
 #include "zedit/libtedit.h"
 #include "gmem.h"
-#include "zview.rsh"
+#include "zview.h"
 
 /* Window's Attrib. */
 #define WINATTRIB  MOVER|NAME|VSLIDE|MOVER|CLOSER|DNARROW|UPARROW|SIZER|SMALLER|FULLER  
