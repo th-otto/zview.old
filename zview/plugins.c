@@ -1,9 +1,7 @@
 #include "general.h"
 #include "ztext.h"
+#include "plugins.h"
 
-/* Prototype */
-int16 plugins_init( void);
-void plugins_quit( void);
 
 
 /* LDG function */
@@ -95,9 +93,9 @@ int16 plugins_init( void)
 
 			if( strcmp ( extention, "ldg") == 0)
 			{
-				if ( ( codecs[plugins_nbr] = ldg_open( de->d_name, ldg_global)))
+				if ( ( codecs[plugins_nbr] = ldg_open( de->d_name, ldg_global)) != NULL)
 				{
-					if ( ( codec_init = ldg_find( "plugin_init", codecs[plugins_nbr])))
+					if ( ( codec_init = ldg_find( "plugin_init", codecs[plugins_nbr])) != NULL)
 					{
 						codec_init();
 						plugins_nbr++;
@@ -121,4 +119,3 @@ int16 plugins_init( void)
 
 	return plugins_nbr;
 }
-

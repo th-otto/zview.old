@@ -1,2 +1,1 @@
-void va_start( void);
-
+void __CDECL va_start(void);

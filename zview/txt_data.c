@@ -1,5 +1,6 @@
 #include "general.h"
 #include "pic_load.h"
+#include "txt_data.h"
 
 /*==================================================================================*
  * delete_txt_data:																	*
@@ -69,4 +70,3 @@ int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 
 	return( 1);
 }
-

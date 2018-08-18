@@ -1,9 +1,6 @@
 #include "../general.h"
 #include "file.h"
-
-/* Prototype */
-int16 count_files( WINDICON *wicones, fileinfo *file);
-int16 count_dir( const char *path, fileinfo *file);
+#include "count.h"
 
 /*==================================================================================*
  * int16 count_dir	:																*
@@ -18,7 +15,7 @@ int16 count_dir( const char *path, fileinfo *file);
  *      1 is ok else 0																*
  *==================================================================================*/
 
-int16 count_dir( const char *path, fileinfo *file)
+static int16 count_dir( const char *path, fileinfo *file)
 {
 	char 			old_dir[MAX_PATH];
 	DIR	 			*dir;

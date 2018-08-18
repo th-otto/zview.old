@@ -1,9 +1,9 @@
 #include "general.h"
 #include "custom_font.h"
 
-static MFDB  	screen = {0};
+static MFDB screen;
 
-static short ofwf[256] =					/* tableau espacements des caractäres */
+static short const ofwf[256] =
 {
 	0, 7, 7, 7, 7, 8, 8, 8, 7, 8, 7, 7, 7, 7, 6, 7,
 	6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7,
@@ -23,7 +23,7 @@ static short ofwf[256] =					/* tableau espacements des caractäres */
 	6, 6, 6, 6, 8, 8, 6, 7, 5, 5, 4, 7, 5, 5, 5, 6
 };
 
-static short my_font_8[1280] =			/* Tableau des donnÇes de la fonte */
+static short const my_font_8[1280] =
 {
 	0x0018, 0x3C7E, 0x1818, 0x1800, 0x0018, 0x1818, 0x7E3C, 0x1800, 
 	0x0008, 0x0C7E, 0x7E0C, 0x0800, 0x0010, 0x307E, 0x7E30, 0x1000, 
@@ -179,7 +179,7 @@ void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 	sys_pxy[7] = yf + 7;
 	
 	while ( (c = (unsigned char)*str++) != 0) {
-		char *model = (char*) &my_font_8[(c - 1) << 2] ;
+		const char *model = (const char*) &my_font_8[(c - 1) << 2] ;
 		char *dest = (char*)fx_mem;
 		
 		char_width = ofwf[c];

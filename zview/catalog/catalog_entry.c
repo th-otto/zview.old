@@ -1,11 +1,6 @@
 #include "../general.h"
+#include "catalog_entry.h"
 
-/* Prototype */
-void add_selected_entry( WINDICON *wicones, Entry *entry);
-void remove_selected_entry( WINDICON *wicones, Entry *entry);
-boolean check_selected_entry( WINDICON *wicones, Entry *entry);
-void remove_all_selected_entry( WINDICON *wicones);
-int16 return_entry_nbr( WINDICON *wicones, Entry *entry);
 
 
 void add_selected_entry( WINDICON *wicones, Entry *entry)

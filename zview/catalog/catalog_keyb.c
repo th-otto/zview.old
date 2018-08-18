@@ -9,6 +9,7 @@
 #include "catalog_entry.h"
 #include "catalog_mini_entry.h"
 #include "catalog_icons.h"
+#include "catalog_keyb.h"
 #include "../pic_load.h"
 #include "../winimg.h"
 #include "catalog.h"
@@ -20,10 +21,6 @@
 static const char allowed_char[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÇäàâáÄê°çãåóñ£ÅÖ†ÉÑÜëÅî§èí•0123456789 &\"'(›!)-_`ú^[]*{},?;.:/=+%#|@~<>";
 char fullname[MAX_PATH+MAXNAMLEN];
 
-/* Prototype */
-void WinCatalog_Keyb( WINDOW *win);
-
-// extern boolean create_icon( const char *filename, MFDB *icon, MFDB *icon_selected, MFDB *icon_mask);
 
 /*==================================================================================*
  * void WinCatalog_Keyb:															*
@@ -37,7 +34,7 @@ void WinCatalog_Keyb( WINDOW *win);
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_Keyb( WINDOW *win) 
+void __CDECL WinCatalog_Keyb( WINDOW *win) 
 {
 	WINDICON *wicones = (WINDICON *)DataSearch( win, WD_ICON); 
 	Mini_Entry	*old_selected;

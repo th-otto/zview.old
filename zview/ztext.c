@@ -1,4 +1,5 @@
 #include "general.h"
+#include "ztext.h"
 
 
 /* Local variable */
@@ -14,14 +15,6 @@ static CUL c[] = { 	{'A', 'a'}, {'B', 'b'}, {'C', 'c'}, {'D', 'd'}, {'E', 'e'}, 
 				 	{'Q', 'q'}, {'R', 'r'}, {'S', 's'}, {'T', 't'}, {'U', 'u'}, {'V', 'v'}, {'W', 'w'}, {'X', 'x'},
 					{'Y', 'y'}, {'Z', 'z'}, {'ö', 'Å'}, {'ê', 'Ç'}, {'é', 'Ñ'}, {0xb6, 'Ö'}, {'è', 'Ü'}, {'Ä', 'á'},
 					{'í', 'ë'}, {'ô', 'î'}, {'•', '§'}, {0xb7, 0xb0}, {0xb8, 0xb1}, {0xb2, 0xb3}, {0xb5, 0xb4} };
-
-
-/* Prototype */
-void size_to_text( char *txt, float size);
-void str2lower(char *str);
-void str2upper(char *str);
-int16 name_shorter( int16 handle, int16 max_size, char *str);
-char *zstrncpy( char *dst, const char *src, size_t n);
 
 
 /*==================================================================================*
@@ -170,4 +163,3 @@ void str2upper(char *str)
 		i++;
 	}
 }
-

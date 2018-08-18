@@ -2,11 +2,12 @@
 #include "pic_load.h"
 #include "prefs.h"
 #include "ztext.h"
-#include "zvdi//color.h"
-#include "zvdi//raster.h"
-#include "zvdi//vdi.h"
+#include "zvdi/color.h"
+#include "zvdi/raster.h"
+#include "zvdi/vdi.h"
 #include "plugins.h"
 #include "progress.h"
+#include "pic_save.h"
 
 extern void 	CDECL ( *decoder_quit)	( IMGINFO);
 extern boolean	CDECL ( *decoder_read)	( IMGINFO, uint8 *);

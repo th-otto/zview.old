@@ -1,4 +1,5 @@
 #include "../general.h"
+#include "catalog_iconify.h"
 
 
 /*==================================================================================*
@@ -12,7 +13,7 @@
  *      --																			*
  *==================================================================================*/
  
-void catalog_iconify( WINDOW *win)
+void __CDECL catalog_iconify( WINDOW *win)
 {		
 	WindSetStr( win, WF_NAME, "Zview"); 
 }
@@ -29,10 +30,9 @@ void catalog_iconify( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-void catalog_uniconify( WINDOW *win)
-{		
+void __CDECL catalog_uniconify( WINDOW *win)
+{
 	WINDICON *wicones = ( WINDICON *)DataSearch( win, WD_ICON);
 	
 	WindSetStr( win, WF_NAME, wicones->directory);
 }
-

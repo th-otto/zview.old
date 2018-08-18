@@ -11,17 +11,10 @@
 #include "../txt_data.h"
 #include "../custom_font.h"
 #include "sort.h"
+#include "file.h"
 
 #define ALLOC_NDIRENTRIES (4)				/* number of entries that should be allocated at once by readdir() */
 
-/* Prototype */
-boolean dir_parent( char *dir, char *old_dir);
-boolean dir_cd( const char *new_dir, char *old_dir, int16 bufflen);
-boolean check_write_perm( const struct stat *file_stat);
-boolean scan_dir( WINDOW *win, const char *dirpath);								   
-boolean scan_mini_drv( WINDOW *win);
-void check_mini_dir( int16 nbr_child, Mini_Entry *entry);
-boolean scan_mini_dir( WINDOW *win, Mini_Entry *parent);
 
 
 /*==================================================================================*

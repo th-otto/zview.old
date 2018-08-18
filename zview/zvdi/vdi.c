@@ -7,16 +7,13 @@
 #include "p2c.h"
 #include "pixel.h"
 #include <mint/cookie.h>
+#include "vdi.h"
 
 int16 	pixel_val[256];
 uint32 	cube216[216];
 uint32  graymap[32];
 int16	planar = 0;
 
-extern void 	save_colors( void);
-
-/* prototype */
-int16 vdi_init ( void);
 
 int16 vdi_init( void)
 {

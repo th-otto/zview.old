@@ -65,7 +65,7 @@ static int my_vsl_color (short handle, short idx) {
 
 /* *** end of the workaround for TOS *** */
 
-void generic_form_event( WINDOW *win) 
+void __CDECL generic_form_event( WINDOW *win) 
 {
 	ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, FALSE);
 	ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
@@ -587,9 +587,6 @@ void errshow( const char *name, int16 error)
 		case ENOTDIR:
 			( void)FormAlert( 1 , get_string( NOTDIR));
 			break;								
-		case E_NAMEEXIST:
-			( void)FormAlert( 1 , get_string( NAMEALREADYUSED));
-			break;		
 		case EXDEV:
 			( void)FormAlert( 1 , get_string( XDEV));
 			break;		
@@ -620,6 +617,9 @@ void errshow( const char *name, int16 error)
 		case NO_EDDI:
  			( void)FormAlert( 1 , "[3][zView needs a VDI|with EdDI standard.][Quit]");
               		break;
+		case NAMEALREADYUSED:
+			( void)FormAlert( 1 , get_string( NAMEALREADYUSED));
+			break;		
 		case LDG_LIB_FULLED:
  			( void)FormAlert( 1 , get_string( LDG_LIB_FULLED), name);
               		break;
@@ -665,17 +665,11 @@ void errshow( const char *name, int16 error)
 		case NOZCODECS:
  			( void)FormAlert( 1 , get_string( NOZCODECS));
               		break;	
-		case NO_ICON:
+		case NOICONS:
  			( void)FormAlert( 1 , get_string( NOICONS));
               		break;	      		
 		default:
 			( void)FormAlert( 1 , get_string( GENERIC));
 			break;				
 	}
-} 
-
-
-
-
-
-
+}

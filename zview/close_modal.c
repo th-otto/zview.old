@@ -1,7 +1,5 @@
 #include "general.h"
-
-/* Prototype */
-void close_modal( WINDOW *win); 
+#include "close_modal.h"
 
 
 /*==================================================================================*
@@ -15,21 +13,8 @@ void close_modal( WINDOW *win);
  *      --																			*
  *==================================================================================*/
 
-void close_modal( WINDOW *win) 
+void __CDECL close_modal( WINDOW *win) 
 {
 	MenuEnable();
 	frm_cls( win);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

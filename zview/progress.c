@@ -1,10 +1,6 @@
 #include "general.h"
 #include "ztext.h"
-
-/* Prototype */
-void win_progress_begin( char *string);
-void win_progress( int16 new_bar_width);
-void win_progress_end( void);
+#include "progress.h"
 
 /* Local variable */
 WINDOW *win_read = NULL;
@@ -23,7 +19,6 @@ WINDOW *win_read = NULL;
 
 void win_progress_begin( char *string)
 {
-	W_FORM *form;
 	OBJECT	*progress_bar = get_tree( SINGLE_PROGRESS);	
 
 //	wind_update( BEG_MCTRL);
@@ -32,7 +27,7 @@ void win_progress_begin( char *string)
 
 	win_read = FormCreate( progress_bar, MOVER|NAME, NULL, "", NULL, 0, 0);
 
-	form = ( W_FORM *)DataSearch( win_read, WD_WFRM);
+	/* form = ( W_FORM *)DataSearch( win_read, WD_WFRM); */
 
 	vsf_color( win_read->graf.handle, BLUE);
 		

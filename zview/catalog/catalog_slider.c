@@ -2,18 +2,7 @@
 #include "../prefs.h"
 #include "catalog_mini_entry.h"
 #include "catalog.h"
-
-
-/* prototype */
-void WinCatalog_Arrow( WINDOW *win);
-void WinCatalog_VSlide( WINDOW *win);
-void WinCatalog_DownLine( WINDOW *win);
-void WinCatalog_UpLine( WINDOW *win);
-void WinCatalog_DownPage( WINDOW *win);
-void WinCatalog_UpPage( WINDOW *win);
-void move_area( int16 handle, GRECT *screen, int16 dx, int16 dy);
-void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 dx, int16 dy, int16 first_frame_width, int16 border_width); 
-void move_frame_work( WINDOW *win, int16 dy); 
+#include "catalog_slider.h"
 
 
 /*==================================================================================*

@@ -1,4 +1,6 @@
 #include "general.h"
+#include "wintimer.h"
+
 typedef struct xtimer
 {
 	void (*func)( WINDOW *);
@@ -6,7 +8,7 @@ typedef struct xtimer
 	struct xtimer *next;
 } XTIMER;
 static XTIMER *root = NULL;
-static void std_xtimer( void) 
+static void __CDECL std_xtimer( void) 
 {
 	XTIMER *scan;
 	for( scan = root; scan; scan = scan->next) 

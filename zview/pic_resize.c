@@ -4,11 +4,10 @@
 #include "zvdi/raster_resize.h"
 #include "zvdi/vdi.h"
 #include "zvdi/p2c.h"
+#include "pic_resize.h"
 
 void  ( *resize)( DECDATA, void *dst);
 void  ( *my_resize)( DECDATA, void *dst);
-
-extern int32 plane2packed( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst); 
 
 static int16 resize_setup( MFDB *in,  MFDB *out, DECDATA data)
 {
@@ -62,7 +61,8 @@ static int16 resize_setup( MFDB *in,  MFDB *out, DECDATA data)
  * img: 		The struct. with the MFDB to be fitted.								*
  * info:		The struct. with the line and dither buffer							*
  *----------------------------------------------------------------------------------*
- * returns: 	-									io;p^=		* *==================================================================================*/
+ * returns: 	-									io;p^=		*
+ *==================================================================================*/
 static inline void resize_img( MFDB *in,  MFDB *out, DECDATA data)
 {
 	uint16 		*dst = out->fd_addr;

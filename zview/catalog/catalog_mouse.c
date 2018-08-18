@@ -12,13 +12,11 @@
 #include "catalog_icons.h"
 #include "catalog_slider.h"
 #include "catalog_popup.h"
+#include "catalog_mouse.h"
+#include "catalog_keyb.h"
 
 /* Local variable */
 static int16 	dum;
-extern char 	fullname[MAX_PATH+MAXNAMLEN];
-
-/* Prototype */
-void WinCatalog_Mouse( WINDOW *win); 
 
 /*==================================================================================*
  * void WinCatalog_Mouse:															*
@@ -32,11 +30,14 @@ void WinCatalog_Mouse( WINDOW *win);
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_Mouse( WINDOW *win) 
+void __CDECL WinCatalog_Mouse( WINDOW *win) 
 {
 	WINDICON 	*wicones = (WINDICON *)DataSearch( win, WD_ICON);
 	GRECT 		mouse;
-	int16 		x, y, w, h, old_x, old_entry = 0, old_y, i = 0, nb_click, in_txt = 0, in_icn = 0, in_frame_border = 0, in_browser = 0; 
+	int16 		x, y, w, h, old_entry = 0, i = 0, nb_click, in_txt = 0, in_icn = 0, in_frame_border = 0, in_browser = 0; 
+#if 0
+	short old_x, old_y;
+#endif
 	Entry 		*entry_ptr = NULL, *old_selected = wicones->first_selected;
 	EntryType	old_type = ET_FILE;
 	
@@ -51,8 +52,10 @@ void WinCatalog_Mouse( WINDOW *win)
 
  	mouse.g_x 				= evnt.mx - x;
 	mouse.g_y 				= evnt.my - y;
+#if 0
 	old_x     				= evnt.mx;
 	old_y     				= evnt.my;
+#endif
 	nb_click  				= evnt.nb_click;
 
 	if ( browser_frame_width && ( mouse.g_x >= wicones->border_position[0] && mouse.g_x <= wicones->border_position[1]))
@@ -122,12 +125,12 @@ void WinCatalog_Mouse( WINDOW *win)
 
 			redraw_icon( win, wicones->first_selected);
 		}
-/*
+#if 0
 		graf_mkstate( &evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate); 
 
 		if (( evnt.mbut == 1) && ( ( evnt.mx != old_x) || ( evnt.my != old_y)))
 			move_icon( win, wicones);					
-*/
+#endif
 
 		if ( nb_click == 2 && evnt.mbut == 1)
 		{

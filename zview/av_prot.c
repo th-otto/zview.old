@@ -1,14 +1,13 @@
 #include "general.h"
 #include "pic_load.h"
 #include "winimg.h"
+#include "av_prot.h"
 
-/* Prototype */
-void va_start( void);
 
 /* taken from mxPlay - simplified version, takes only one argument */
 static char* ParseArgs( char* cmdline )
 {
-	BOOL	inQuote = FALSE;
+	int	inQuote = FALSE;
 	int		i = 0;
 	int		j = 0;
 	char	all[1023+1];
@@ -86,7 +85,7 @@ static char* ParseArgs( char* cmdline )
  *      --																			*
  *==================================================================================*/
 
-void va_start( void)
+void __CDECL va_start(void)
 {
 	char *p = *(char **) &evnt.buff[3];
 

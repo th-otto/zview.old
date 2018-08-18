@@ -10,26 +10,10 @@
 #include "file/delete.h"
 #include "catalog/catalog.h"
 #include "catalog/catalog_entry.h"
+#include "catalog/catalog_keyb.h"
 #include "zedit/zedit.h"
+#include "menu.h"
 
-/* Prototype */
-static void MenuHandle( void);
-static void Menu_about( void);
-void Menu_open_image( void);
-static void Menu_preference( void);
-static void Menu_file_info( void);
-static void Menu_close_win( void);
-static void Menu_show_only_images( void);
-static void Menu_sort_by_name( void);
-static void Menu_sort_by_size( void);
-static void Menu_sort_by_date( void);
-static void Menu_thumb_size( void);
-static void Menu_delete( void);
-static void Menu_show_browser( void);
-void MenuDesktop( void);
-
-extern char	fullname[MAX_PATH+MAXNAMLEN];
-extern void save_dialog( const char *fullfilename);
 
 
 /*==================================================================================*
@@ -42,7 +26,7 @@ extern void save_dialog( const char *fullfilename);
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void MenuHandle( void) 			 
+static void __CDECL MenuHandle(WINDOW *win) 			 
 {	
 	MenuTnormal( NULL, evnt.buff[3], 1);
 }
@@ -58,7 +42,7 @@ static void MenuHandle( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_about( void)
+static void __CDECL Menu_about( void)
 {
 	OBJECT *aboutbox = get_tree( ABOUT);
 
@@ -85,7 +69,7 @@ static void Menu_about( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-void Menu_open_image( void)
+void __CDECL Menu_open_image(void)
 {
 	static char path[MAX_PATH]	= "C:\\"; /* Fist usage : current directory */
     char 		name[MAXNAMLEN]	= ""; 
@@ -114,7 +98,7 @@ void Menu_open_image( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_file_info( void)
+static void __CDECL Menu_file_info(void)
 {
 	infobox();
 }
@@ -131,7 +115,7 @@ static void Menu_file_info( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_preference( void)
+static void __CDECL Menu_preference(void)
 {
 	preference_dialog();
 }
@@ -149,7 +133,7 @@ static void Menu_preference( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_file_save( void)
+static void __CDECL Menu_file_save(void)
 {
 	WINDICON 	*wicones;
 	WINDATA		*windata;
@@ -184,7 +168,7 @@ static void Menu_file_save( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_close_win( void)
+static void __CDECL Menu_close_win(void)
 {
 	if( wglb.front) 
     {
@@ -204,7 +188,7 @@ static void Menu_close_win( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_delete( void)
+static void __CDECL Menu_delete(void)
 {
 	WINDICON *wicones;
 
@@ -235,7 +219,7 @@ static void Menu_delete( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_select_all( void)
+static void __CDECL Menu_select_all(void)
 {
 	WINDICON *wicones;
 	int16 i, x, y, w, h;
@@ -279,7 +263,7 @@ static void Menu_select_all( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_show_only_images( void)
+static void __CDECL Menu_show_only_images(void)
 {
 	if ( !show_only_images)
 	{
@@ -313,7 +297,7 @@ static void Menu_show_only_images( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_sort_by_name( void)
+static void __CDECL Menu_sort_by_name(void)
 {	
 	if ( sortingmode != 0)
 	{		
@@ -348,7 +332,7 @@ static void Menu_sort_by_name( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_sort_by_size( void)
+static void __CDECL Menu_sort_by_size(void)
 {	
 	if ( sortingmode != 1)
 	{		
@@ -383,7 +367,7 @@ static void Menu_sort_by_size( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_sort_by_date( void)
+static void __CDECL Menu_sort_by_date(void)
 {	
 	if ( sortingmode != 2)
 	{		
@@ -417,7 +401,7 @@ static void Menu_sort_by_date( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_fullscreen( void)
+static void __CDECL Menu_fullscreen(void)
 {	
 	WINDATA	*windata;
 
@@ -444,7 +428,7 @@ static void Menu_fullscreen( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_show_browser( void)
+static void __CDECL Menu_show_browser(void)
 {	
 	if( browser_frame_width)
 	{   
@@ -511,7 +495,8 @@ static void Menu_show_browser( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-/* static void Menu_show_preview_area( void)
+#if 0
+static void __CDECL Menu_show_preview_area(void)
 {	
 	if( preview_frame_height)
 	{   
@@ -535,7 +520,8 @@ static void Menu_show_browser( void)
 		WindMakePreview( win_catalog);				
 	}
 }
-*/
+#endif
+
 
 /*==================================================================================*
  * void Menu_thumb_size:															*
@@ -547,7 +533,7 @@ static void Menu_show_browser( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_thumb_size( void)
+static void __CDECL Menu_thumb_size(void)
 {	
 	if ( thumbnail_size > 3)
 	{		
@@ -590,7 +576,7 @@ static void Menu_thumb_size( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_show_help( void)
+static void __CDECL Menu_show_help(void)
 {	
 	strcpy( fullname, zview_path);
 	strcat( fullname, "\\doc\\zview.hyp");
@@ -609,7 +595,7 @@ static void Menu_show_help( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void Menu_show_history( void)
+static void __CDECL Menu_show_history(void)
 {	
 	strcpy( fullname, zview_path);
 	strcat( fullname, "\\doc\\history.txt");

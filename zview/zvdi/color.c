@@ -1,6 +1,7 @@
-#include "..//general.h"
-#include "..//pic_load.h"
+#include "../general.h"
+#include "../pic_load.h"
 #include "vdi.h"
+#include "color.h"
 
 typedef struct 
 {
@@ -9,18 +10,6 @@ typedef struct
 } SRGB;
 
 static SRGB screen_colortab[256];
-
-
-/* prototype */
-void save_colors(void);
-int16 remap_color (int32 value);
-uint32 color_lookup ( uint32 rgb, int16 *trans);
-void cnvpal_mono ( IMGINFO info, DECDATA data);
-void cnvpal_1_2 (IMGINFO info, DECDATA data);
-void cnvpal_4_8( IMGINFO info, DECDATA data);
-void cnvpal_15( IMGINFO info, DECDATA data);
-void cnvpal_high( IMGINFO info, DECDATA data);
-void cnvpal_true( IMGINFO info, DECDATA data);
 
 
 static uint8 saturation (uint8 * rgb)

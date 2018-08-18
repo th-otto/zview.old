@@ -1,11 +1,8 @@
 #include "../general.h"
 #include "catalog.h"
 #include "../prefs.h"
+#include "catalog_other_event.h"
 
-/* Prototype */
-void WinCatalog_Fulled( WINDOW *win); 
-void WinCatalog_top( WINDOW *win); 
-void WinCatalog_bottom( WINDOW *win);
 
 
 /*==================================================================================*

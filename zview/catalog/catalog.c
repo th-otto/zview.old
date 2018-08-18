@@ -18,6 +18,8 @@
 #include "catalog_size.h"
 #include "catalog_iconify.h"
 #include "catalog_other_event.h"
+#include "catalog.h"
+#include "../menu.h"
 
 /* Global variable */
 int16	border_size 			= 5;
@@ -36,18 +38,10 @@ static int16 		dum, xw, yw, ww, hw;
 
 
 /* Prototype */
-static void WinCatalog_Close( WINDOW *win);
-static void WinCatalog_Redraw( WINDOW *wind);
-static void WinCatalog_Tool( WINDOW *win);
-void 	WinCatalog_Refresh( WINDOW *win);
-int 	WindMakePreview_needed( WINDOW *win);
-void 	WindMakePreview( WINDOW *win);
-int 	WinCatalog( void);
-void 	WinCatalog_filelist_redraw( void);
-void 	WinCatalog_set_thumbnails_size( WINDOW *win);
+static void __CDECL WinCatalog_Close( WINDOW *win);
+static void __CDECL WinCatalog_Redraw( WINDOW *wind);
+static void __CDECL WinCatalog_Tool( WINDOW *win);
 
-
-extern void save_dialog( const char *fullfilename);
 
 /*==================================================================================*
  * int WindMakePreview_needed:														*
@@ -161,7 +155,7 @@ int WinCatalog( void)
 
 	if ( !icons_init())
 	{
-		errshow( "", NO_ICON);
+		errshow( "", NOICONS);
 		applexit();
 	}
 
@@ -233,7 +227,7 @@ int WinCatalog( void)
 
 	WindSetStr( win_catalog, WF_NAME,	 	wicones->directory);
 	WindSetPtr( win_catalog, WF_TOOLBAR, 	get_tree( TOOLBAR), WinCatalog_Tool);
-	WindSetStr( win_catalog, WF_ICONDRAW,	draw_window_iconified);
+	WindSetPtr( win_catalog, WF_ICONDRAW,	draw_window_iconified, NULL);
 
 	WindCalc( WC_BORDER, win_catalog, 0, 0, wicones->case_w + border_size + browser_frame_width, wicones->case_h, &dum, &dum, &w, &h);
 
@@ -311,7 +305,7 @@ int WinCatalog( void)
  *      --																			*
  *==================================================================================*/
 
-static void WinCatalog_Close( WINDOW *win)
+static void __CDECL WinCatalog_Close( WINDOW *win)
 {
 	int16 	i;
 	OBJECT	*menu = get_tree( MENU_BAR);
@@ -396,7 +390,7 @@ static void WinCatalog_Close( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-static void WinCatalog_Tool( WINDOW *win)
+static void __CDECL WinCatalog_Tool( WINDOW *win)
 {
 	WINDICON *wicones = ( WINDICON *)DataSearch( win, WD_ICON);
 	Mini_Entry	*old_selected;
@@ -647,7 +641,7 @@ void WinCatalog_Refresh( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-static void WinCatalog_Redraw( WINDOW *wind)
+static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 {
 	int16 		icon_w, icon_h, i, x, y, xtext, ytext, pxy[4], lines = 0, extent[10];
 	RECT16		dst_rect;

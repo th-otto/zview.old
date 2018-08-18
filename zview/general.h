@@ -42,10 +42,8 @@
 #define WD_WIMG		0x57494D47L
 
 /* Custom error code */
-#define E_NAMEEXIST	10001
 #define E_RSC		10002
 #define NO_EDDI		10003
-#define NO_ICON		10004
 
 /* custom def */
 #define preview_mode	1
@@ -246,3 +244,7 @@ extern void	frm_cls( WINDOW *win);
 extern void snd_rdw( WINDOW *win);
 extern void snd_msg( WINDOW *win, int msg, int par1, int par2, int par3, int par4);
 extern void draw_page( WINDOW *win, int x, int y, int w, int h);
+
+void jpg_option_dialog( char *source_file);
+void tiff_option_dialog( void);
+int CallStGuide ( char *);

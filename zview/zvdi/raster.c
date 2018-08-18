@@ -678,7 +678,7 @@ inline void dither_P8 (DECDATA info, void * _dst)
 }
 
 
-inline void dither32_P8 (DECDATA info, void * _dst)
+static inline void dither32_P8 (DECDATA info, void * _dst)
 {
 	uint8 	*dst  	= _dst;
 	int16  	width 	= info->DthWidth;

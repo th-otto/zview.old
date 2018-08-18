@@ -1,8 +1,5 @@
 #include "general.h"
-
-/* Prototype  */
-void chrono_off( char *info);
-void chrono_on( void);
+#include "chrono.h"
 
 /* Global variable */
 int32 start_time, end_time;

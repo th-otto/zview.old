@@ -7,10 +7,11 @@
 #include "ztext.h"
 #include "chrono.h"
 #include "txt_data.h"
-#include "zvdi//color.h"
-#include "zvdi//raster.h"
-#include "zvdi//vdi.h"
+#include "zvdi/color.h"
+#include "zvdi/raster.h"
+#include "zvdi/vdi.h"
 #include <math.h>
+#include "resample.h"
 
 boolean decoder_init_done = FALSE;
 
@@ -24,8 +25,6 @@ void 	CDECL ( *decoder_quit)			( IMGINFO);
 boolean	CDECL ( *decoder_init)			( const char *, IMGINFO);
 boolean	CDECL ( *decoder_read)			( IMGINFO, uint8 *);
 void	CDECL ( *decoder_get_txt)		( IMGINFO, txt_data *);
-
-extern int16 smooth_resize( MFDB *source_image, MFDB *resized_image, int resize_algo);
 
 
 

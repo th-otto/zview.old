@@ -4,9 +4,7 @@
 #include "../general.h"
 #include "../catalog/catalog_icons.h"
 #include "file.h"
-
-/* prototype */
-boolean rename_entry( WINDOW *win, const char *new_name);
+#include "rename.h"
 
 
 /*==================================================================================*
@@ -36,7 +34,7 @@ boolean rename_entry( WINDOW *win, const char *new_name)
 	for ( i = 0 ; i < wicones->nbr_icons ; i++)					
 		if ( !strcmp( wicones->entry[i].name, new_name))
 		{	
-			errshow( "", E_NAMEEXIST);
+			errshow( "", NAMEALREADYUSED);
 			return FALSE;
 		}
 

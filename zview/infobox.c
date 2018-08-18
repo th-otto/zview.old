@@ -9,10 +9,6 @@
 #include "custom_font.h"
 #include <math.h>
 
-/* Prototype */
-void generic_form_event( WINDOW *win);
-void infobox( void);
-
 static int16 dum, res;
 static int16 posy, xy[8], dum;
 static uint32 ypos_max, ypos;
@@ -56,7 +52,7 @@ static int my_vsl_color (short handle, short idx) {
 	return ((int)vdi_intout[0]);
 }
 
-void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
+static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 {
 	exif_box = (txt_data *) data; 
 
@@ -92,7 +88,7 @@ void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 }
 
 
-void calc_exif_slider( WINDOW *win)
+static void calc_exif_slider( WINDOW *win)
 {
 	int16 max_mover_size;
 	int16 full_win_size = ypos_max * 12;
@@ -115,8 +111,9 @@ void calc_exif_slider( WINDOW *win)
 
 
 
-static void slid_up( WINDOW *win, int obj_index, int mode) 
+static void __CDECL slid_up( WINDOW *win, int obj_index, int mode, void *data)
 {
+	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
 	
 	do 
@@ -137,8 +134,9 @@ static void slid_up( WINDOW *win, int obj_index, int mode)
 }
 
 
-static void slid_down( WINDOW *win, int obj_index, int mode) 
+static void slid_down( WINDOW *win, int obj_index, int mode, void *data)
 {
+	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
 
 	do 
@@ -159,10 +157,11 @@ static void slid_down( WINDOW *win, int obj_index, int mode)
 }
 
 
-static void slid_vmover( WINDOW *win, int obj_index, int mode) 
+static void slid_vmover( WINDOW *win, int obj_index, int mode, void *data)
 {
 	int32 old_ypos = ypos;
 
+	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
 
 	graf_mouse( FLAT_HAND, NULL);
@@ -347,4 +346,3 @@ void infobox( void)
 
 	MenuDisable();
 }
-

@@ -23,11 +23,6 @@
 
 static int16 dum;
 
-extern void save_dialog( const char *fullfilename);
-
-/* Prototype */
-WINDOW *WindView( char *filename);
-
 /*==================================================================================*
  * void WindViewIcon:																*
  *		Function to handle iconfied windows drawing... If the icon doesn't exist,	*
@@ -40,7 +35,7 @@ WINDOW *WindView( char *filename);
  *      --																			*
  *==================================================================================*/
 
-void WindViewIcon( WINDOW *win)
+void __CDECL WindViewIcon( WINDOW *win)
 {
 	int16 	posx, posy, x, y, w, h, xy[8];
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -193,8 +188,7 @@ static void WindViewZoom( WINDOW *win)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-void WindViewTop( WINDOW *win);
-static void WindViewTool( WINDOW *win)
+static void __CDECL WindViewTool( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	int16 zoom;
@@ -271,7 +265,7 @@ static void WindViewTool( WINDOW *win)
 
 
 
-void WindViewTop( WINDOW *win)
+void __CDECL WindViewTop( WINDOW *win)
 {
 	OBJECT *menu = get_tree( MENU_BAR);
 
@@ -284,7 +278,7 @@ void WindViewTop( WINDOW *win)
 }
 
 
-static void WindViewKeyb( WINDOW *win)
+static void __CDECL WindViewKeyb( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	int16 zoom;
@@ -383,7 +377,7 @@ static void WindViewKeyb( WINDOW *win)
 }
 
 
-static void WindViewRedraw( WINDOW *win)
+static void __CDECL WindViewRedraw( WINDOW *win)
 {
 	int16	xw, yw, ww, hw, tmp, xy[8], pxy[4], page;
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -546,7 +540,7 @@ static void WindViewAnim( WINDOW *win)
 }
 
 
-static void WindViewClose( WINDOW *win)
+static void __CDECL WindViewClose( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
@@ -582,7 +576,7 @@ static void WindViewClose( WINDOW *win)
 }
 
 
-static void WindViewIconify( WINDOW *win)
+static void __CDECL WindViewIconify( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 //	zdebug( "iconify");
@@ -590,7 +584,7 @@ static void WindViewIconify( WINDOW *win)
 }
 
 
-static void WindViewUniconify( WINDOW *win)
+static void __CDECL WindViewUniconify( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 //	zdebug( "uniconify");
@@ -610,7 +604,7 @@ static void WindViewUniconify( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_VSlide( WINDOW *win)
+void __CDECL Win_VSlide( WINDOW *win)
 {
 	int32 	pos;
 	int16	x, y, w, h, dy;
@@ -645,7 +639,7 @@ void Win_VSlide( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_HSlide( WINDOW *win)
+void __CDECL Win_HSlide( WINDOW *win)
 {
 	int32 	pos;
 	int16	x, y, w, h, dx;
@@ -682,7 +676,7 @@ void Win_HSlide( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_DownPage( WINDOW *win)
+void __CDECL Win_DownPage( WINDOW *win)
 {
 	int16	page, x, y, w, h, dy;
 	int32	old_pos = win -> ypos;
@@ -714,7 +708,7 @@ void Win_DownPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_RightPage( WINDOW *win)
+void __CDECL Win_RightPage( WINDOW *win)
 {
 	int16	page, x, y, w, h, dx;
 	int32	old_pos = win -> xpos;
@@ -747,7 +741,7 @@ void Win_RightPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_LeftPage( WINDOW *win)
+void __CDECL Win_LeftPage( WINDOW *win)
 {
 	int32	pos;
 	int16	x, y, w, h, dx;
@@ -777,7 +771,7 @@ void Win_LeftPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_UpPage( WINDOW *win)
+void __CDECL Win_UpPage( WINDOW *win)
 {
 	int32	pos;
 	int16	x, y, w, h, dy;
@@ -806,7 +800,7 @@ void Win_UpPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_UpLine( WINDOW *win)
+void __CDECL Win_UpLine( WINDOW *win)
 {
 	int16	x, y, w, h;
 
@@ -831,7 +825,7 @@ void Win_UpLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_LeftLine( WINDOW *win)
+void __CDECL Win_LeftLine( WINDOW *win)
 {
 	int16	x, y, w, h;
 
@@ -857,7 +851,7 @@ void Win_LeftLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_RightLine( WINDOW *win)
+void __CDECL Win_RightLine( WINDOW *win)
 {
 	int16	x, y, w, h;
 
@@ -883,7 +877,7 @@ void Win_RightLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_DownLine( WINDOW *win)
+void __CDECL Win_DownLine( WINDOW *win)
 {
 	int16	x, y, w, h;
 
@@ -910,7 +904,7 @@ void Win_DownLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void Win_Arrow( WINDOW *win)
+void __CDECL Win_Arrow( WINDOW *win)
 {
 	switch( evnt.buff[4])
 	{
@@ -959,7 +953,7 @@ WINDOW *WindView( char *filename)
 	if ( !icons_init())
 	{
 		graf_mouse( ARROW, NULL);
-		errshow( "", NO_ICON);
+		errshow( "", NOICONS);
 		applexit();
 	}
 
@@ -1036,7 +1030,7 @@ WINDOW *WindView( char *filename)
 	EvntAdd( 	winview, WM_UNICONIFY,WindViewUniconify, EV_BOT);
 
 	WindSetStr( winview, WF_NAME,	  windata->name);
-	WindSetStr( winview, WF_ICONDRAW, WindViewIcon);
+	WindSetPtr( winview, WF_ICONDRAW, WindViewIcon, NULL);
 	WindSetStr( winview, WF_INFO,	  windata->info);
 
 	WindSetPtr( winview, WF_TOOLBAR,  get_tree( VIEWTOOLBAR), WindViewTool);

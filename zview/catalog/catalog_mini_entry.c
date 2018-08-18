@@ -5,19 +5,8 @@
 #include "catalog_entry.h"
 #include "../file/file.h"
 #include "catalog.h"
+#include "catalog_mini_entry.h"
 
-/* Prototype */
-void delete_mini_entry_child( Mini_Entry *entry);
-void redraw_mini_entry( WINDOW *win, Mini_Entry *entry);
-void draw_mini_entry( WINDOW *win, Mini_Entry *selected, Mini_Entry *entry, int16 xw, int16 yw, int16 hw);
-int16 draw_mini_entry_child( WINDOW *win, Mini_Entry *selected, Mini_Entry *entry, int16 x, int16 y, int16 xw, int16 yw, int16 hw);
-int find_mini_entry_child_on_mouse( WINDOW *win, Mini_Entry *entry, int16 mouse_x, int16 mouse_y);
-Mini_Entry *find_mini_entry_child_by_path( Mini_Entry *parent, char *path);
-Mini_Entry *find_mini_entry_by_path( WINDICON *wicones, char *path);
-void calc_mini_entry_slider( WINDICON *wicones, OBJECT *slider_root);
-
-/* extern variable */
-extern int16 need_frame_slider;
 
 
 /*==================================================================================*

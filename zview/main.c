@@ -15,6 +15,8 @@
 #ifndef VA_START
 #define VA_START 0x4711
 #endif
+int     vq_magx     ( void);
+int 	vq_mint		( void);
 
 
 WINDOW *win_catalog = NULL;

@@ -4,12 +4,11 @@
  *	module : edit.c
  *  descr. : 
  */
+#include "../general.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types2b.h"
 #include "gmem.h"
-#include "libtedit.h"
 
 /* NewLine: cr‚‚ une nouvelle ligne */
 

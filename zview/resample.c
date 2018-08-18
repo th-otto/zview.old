@@ -3,6 +3,7 @@
 #include "pic_load.h"
 #include "zvdi/pixel.h"
 #include <math.h>
+#include "resample.h"
 
 #define MagickEpsilon  1.0e-6
 
@@ -155,7 +156,7 @@ static void HorizontalFilter( MFDB *source, MFDB *destination, double x_factor, 
 					 /* source->fd_h  */
     	for( y = 0; y < destination->fd_h; y++)
     	{
-    		register double gamma 	= 0.0;
+    		register double gammav 	= 0.0;
     		register double red 	= 0.0;
     		register double green 	= 0.0;
     		register double blue 	= 0.0;
@@ -167,12 +168,12 @@ static void HorizontalFilter( MFDB *source, MFDB *destination, double x_factor, 
          		red		+= contribution[i].weight * source_red;
         		green	+= contribution[i].weight * source_green;
 				blue	+= contribution[i].weight * source_blue;
-        		gamma	+= contribution[i].weight;
+        		gammav	+= contribution[i].weight;
       		}
       
-      		gamma = 1.0 / ( fabs( gamma) <= MagickEpsilon ? 1.0 : gamma);
+      		gammav = 1.0 / ( fabs( gammav) <= MagickEpsilon ? 1.0 : gammav);
 
-      		setPixel( x, y, dst_line_size, RoundToQuantum( gamma * red), RoundToQuantum( gamma * green), RoundToQuantum( gamma * blue), destination->fd_addr);
+      		setPixel( x, y, dst_line_size, RoundToQuantum( gammav * red), RoundToQuantum( gammav * green), RoundToQuantum( gammav * blue), destination->fd_addr);
     	}
     }
 }
@@ -226,7 +227,7 @@ static void VerticalFilter( MFDB *source, MFDB *destination, double y_factor, Co
         
     	for ( x = 0; x < destination->fd_w; x++)
        	{
-    		register double gamma 	= 0.0;
+    		register double gammav 	= 0.0;
     		register double red 	= 0.0;
     		register double green 	= 0.0;
     		register double blue 	= 0.0;
@@ -238,12 +239,12 @@ static void VerticalFilter( MFDB *source, MFDB *destination, double y_factor, Co
          		red		+= contribution[i].weight * source_red;
         		green	+= contribution[i].weight * source_green;
 				blue	+= contribution[i].weight * source_blue;
-     			gamma	+= contribution[i].weight;
+     			gammav	+= contribution[i].weight;
       		}
       
-      		gamma = 1.0 / ( fabs( gamma) <= MagickEpsilon ? 1.0 : gamma);
+      		gammav = 1.0 / ( fabs( gammav) <= MagickEpsilon ? 1.0 : gammav);
 
-      		setPixel( x, y, dst_line_size, RoundToQuantum( gamma * red), RoundToQuantum( gamma * green), RoundToQuantum( gamma * blue), destination->fd_addr);
+      		setPixel( x, y, dst_line_size, RoundToQuantum( gammav * red), RoundToQuantum( gammav * green), RoundToQuantum( gammav * blue), destination->fd_addr);
     	}
   	}
 }

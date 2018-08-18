@@ -2,9 +2,7 @@
 #include "../prefs.h"
 #include "catalog_mini_entry.h"
 #include "catalog.h"
-
-/* Prototype */
-void WinCatalog_Size( WINDOW *win);
+#include "catalog_size.h"
 
 /*==================================================================================*
  * void WinCatalog_Size:															*
@@ -18,7 +16,7 @@ void WinCatalog_Size( WINDOW *win);
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_Size( WINDOW *win) 
+void __CDECL WinCatalog_Size( WINDOW *win) 
 {
 	int16 dum, x, y, w, h, old_h, rdw_win = 0, rdw_frame = 0;
 	uint32 old_win_ypos, old_frame_ypos;

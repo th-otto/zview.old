@@ -1,4 +1,5 @@
 #include "../general.h"
+#include "pixel.h"
 
 void  ( *getPixel)( int, int, uint32, uint8*, uint8*, uint8*, uint8*);
 void  ( *setPixel)( int, int, uint32, uint8, uint8, uint8, uint8*);

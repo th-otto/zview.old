@@ -64,4 +64,3 @@ extern void gscale_32r ( DECDATA info, void * _dst);
 extern void raster_32z ( DECDATA info, void * _dst);
 extern void dither_32z ( DECDATA info, void * _dst);
 extern void gscale_32z ( DECDATA info, void * _dst);
-

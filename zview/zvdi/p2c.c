@@ -1,4 +1,5 @@
 #include "../general.h"
+#include "p2c.h"
 
 void ( *planar_to_chunky)( uint8 *in, uint8 *out, int16 width);
 
@@ -79,4 +80,3 @@ inline void planar2_to_chunky8( uint8 *in, uint8 *out, int16 width)
         }
     }
 }
-

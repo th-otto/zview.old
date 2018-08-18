@@ -46,16 +46,16 @@ typedef struct
 }WINDATA;
 
 extern WINDOW *WindView( char *filename);
-extern void WindViewIcon( WINDOW *win);
-extern void Win_VSlide( WINDOW *win);
-extern void Win_HSlide( WINDOW *win);
-extern void Win_DownPage( WINDOW *win);
-extern void Win_RightPage( WINDOW *win);
-extern void Win_LeftPage( WINDOW *win);
-extern void Win_UpPage( WINDOW *win);
-extern void Win_UpLine( WINDOW *win);
-extern void Win_LeftLine( WINDOW *win);
-extern void Win_RightLine( WINDOW *win);
-extern void Win_DownLine( WINDOW *win);
-extern void Win_Arrow( WINDOW *win);
-
+extern void __CDECL WindViewIcon( WINDOW *win);
+extern void __CDECL Win_VSlide( WINDOW *win);
+extern void __CDECL Win_HSlide( WINDOW *win);
+extern void __CDECL Win_DownPage( WINDOW *win);
+extern void __CDECL Win_RightPage( WINDOW *win);
+extern void __CDECL Win_LeftPage( WINDOW *win);
+extern void __CDECL Win_UpPage( WINDOW *win);
+extern void __CDECL Win_UpLine( WINDOW *win);
+extern void __CDECL Win_LeftLine( WINDOW *win);
+extern void __CDECL Win_RightLine( WINDOW *win);
+extern void __CDECL Win_DownLine( WINDOW *win);
+extern void __CDECL Win_Arrow( WINDOW *win);
+void __CDECL WindViewTop( WINDOW *win);

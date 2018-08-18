@@ -18,13 +18,14 @@
 #include "catalog/catalog_icons.h"
 #include "catalog/catalog_slider.h"
 #include "scancode.h"
+#include "winpdf.h"
 
 
 static int16 	dum;
 static OBJECT	*menu;
 
-/* Prototype */
-void calc_slider( WINDATA *windata, OBJECT *slider_root);
+
+static void calc_slider( WINDATA *windata, OBJECT *slider_root);
 
 
 /*==================================================================================*
@@ -38,7 +39,7 @@ void calc_slider( WINDATA *windata, OBJECT *slider_root);
  *		--																			*
  *==================================================================================*/
 
-static void WindPdfSize( WINDOW *win)
+static void __CDECL WindPdfSize( WINDOW *win)
 {
 	int16 x, y, w, h, old_h, rdw_frame = 0;
 	uint32 old_frame_ypos;
@@ -329,11 +330,11 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
  *		--																			*
  *==================================================================================*/
 
-static void WindPdfMouse( WINDOW *win)
+static void __CDECL WindPdfMouse( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	GRECT 		mouse;
-	int16 		zoom, x, y, w, h, old_x, old_y, i = 0, nb_click, in_frame_border = 0, in_bookmark_frame = 0;
+	int16 		zoom, x, y, w, h, i = 0, in_frame_border = 0, in_bookmark_frame = 0;
 	char		temp[20];
 	double		scale = 1.0;
 //	Entry 		*entry_ptr = NULL, *old_selected = wicones->first_selected;
@@ -342,9 +343,6 @@ static void WindPdfMouse( WINDOW *win)
 
  	mouse.g_x 				= evnt.mx - x;
 	mouse.g_y 				= evnt.my - y;
-	old_x     				= evnt.mx;
-	old_y     				= evnt.my;
-	nb_click  				= evnt.nb_click;
 
 	if ( windata->frame_width && ( mouse.g_x >= windata->frame_width  && mouse.g_x <= windata->frame_width + windata->border_width))
 	{	/* mouse on frame border */
@@ -631,7 +629,7 @@ static void WindPdfMouse( WINDOW *win)
 		graf_mkstate( &evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate);
 }
 
-/*
+#if 0
 static void size_popup( WINDOW *win, int obj_index)
 {
 	int16 x, y;
@@ -650,7 +648,8 @@ static void size_popup( WINDOW *win, int obj_index)
 	strcpy( pref_dialog[PREFS_SMOOTH_METHOD].ob_spec.free_string, items[smooth_thumbnail]);
    	ObjcDraw( OC_FORM, win, PREFS_SMOOTH_METHOD, 1);
 }
-*/
+#endif
+
 
 /*==================================================================================*
  * WindPdfTool:																		*
@@ -663,8 +662,7 @@ static void size_popup( WINDOW *win, int obj_index)
  *      --																			*
  *==================================================================================*/
 
-void WindViewTop( WINDOW *win);
-static void WindPdfTool( WINDOW *win)
+static void __CDECL WindPdfTool( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
@@ -907,7 +905,7 @@ static void WindPdfTool( WINDOW *win)
 }
 
 
-static void WindPdfTop( WINDOW *win)
+static void __CDECL WindPdfTop( WINDOW *win)
 {
 	menu = get_tree( MENU_BAR);
 
@@ -920,7 +918,7 @@ static void WindPdfTop( WINDOW *win)
 }
 
 
-static void WindPdfKeyb( WINDOW *win)
+static void __CDECL WindPdfKeyb( WINDOW *win)
 {
 	switch ( evnt.keybd >> 8)
 	{
@@ -1076,7 +1074,7 @@ static int16 draw_bookmark_child( WINDOW *win, Bookmark *selected, Bookmark *ent
 }
 
 
-void calc_slider( WINDATA *windata, OBJECT *slider_root)
+static void calc_slider( WINDATA *windata, OBJECT *slider_root)
 {
 	int16 max_mover_size 	= slider_root[SLIDERS_BACK].ob_height;
 	int16 full_win_size  	= windata->ypos_max * windata->h_u;
@@ -1116,7 +1114,7 @@ void calc_slider( WINDATA *windata, OBJECT *slider_root)
 }
 
 
-static void WindPdfRedraw( WINDOW *win)
+static void __CDECL WindPdfRedraw( WINDOW *win)
 {
 	int16	lines = 0, y, i, xw, yw, ww, hw, tmp, xy[8], pxy[4], page;
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -1292,7 +1290,7 @@ static void WindPdfRedraw( WINDOW *win)
 
 
 
-static void WindPdfClose( WINDOW *win)
+static void __CDECL WindPdfClose( WINDOW *win)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
@@ -1450,7 +1448,7 @@ WINDOW *WindPdf( char *filename)
 	EvntAttach( winview, WM_HSLID ,   Win_HSlide);
 
 
-	WindSetStr( winview, WF_ICONDRAW, WindViewIcon);
+	WindSetPtr( winview, WF_ICONDRAW, WindViewIcon, NULL);
 	WindSetStr( winview, WF_NAME,	  windata->info);
 
 	RsrcUserDraw ( OC_TOOLBAR, winview, PDFTOOLBAR_BIG, draw_icon_greater, windata);

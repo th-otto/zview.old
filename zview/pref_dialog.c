@@ -5,6 +5,7 @@
 #include "ztext.h"
 #include "file/file.h"
 #include "close_modal.h"
+#include "pref_dialog.h"
 
 static OBJECT *pref_dialog ;
 
@@ -52,7 +53,7 @@ static void format_popup( WINDOW *win, int obj_index)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void handle_preference( WINDOW *win)
+static void __CDECL handle_preference( WINDOW *win)
 {
 	switch( evnt.buff[4])
 	{
@@ -220,4 +221,3 @@ void preference_dialog( void)
 
 	MenuDisable();
 }
-

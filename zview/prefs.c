@@ -1,4 +1,5 @@
 #include "general.h"
+#include "prefs.h"
 
 /* thumbnail size in a 3D integer*/
 int thumbnail[8][2] = { /* 4:3 size */ { 64, 48}, { 96, 72}, { 120, 90}, { 180, 135}, 
@@ -19,14 +20,10 @@ int browser_frame_width				= 200;			/* folder's browser frame width							*/
 int preview_frame_height			= 200;			/* as the integer's name say :)							*/
 int show_read_progress_bar			= 1;			/* show the read progress bar							*/
 int show_write_progress_bar			= 1;			/* show the write progress bar							*/
-char skip_drive[27] 				= "ABU";		/* Skip this drives in the browser						*/
+char skip_drive[32] 				= "ABU";		/* Skip this drives in the browser						*/
 int smooth_thumbnail 				= 0;			/* 0 = None, 1 = Triangle, 2 = Blackman, 3 = Gaussian, 4 = Quadratic, 5 = Cubic, 6 = Lanczos */
 int pdf_fit_to_win 				= 1;			/* Fit the PDF to the Window							*/
 int pdf_aa		 			= 1;			/* Font Antialiasing								*/
-
-/* Prototype */
-int prefs_read( void);
-int prefs_write( void);
 
 
 /*==================================================================================*

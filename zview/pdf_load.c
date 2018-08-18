@@ -11,6 +11,7 @@
 #include "zvdi/raster.h"
 #include "zvdi/vdi.h"
 #include "pdflib.h"
+#include "pdf_load.h"
 
 
 int16 pdf_initialised = FALSE;

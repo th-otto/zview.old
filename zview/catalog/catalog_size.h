@@ -1,2 +1,2 @@
-extern void WinCatalog_Size( WINDOW *win);
+void __CDECL WinCatalog_Size( WINDOW *win);
 

@@ -3,6 +3,8 @@
 #include "../mfdb.h"
 #include "catalog_entry.h"
 #include "../plugins.h"
+#include "catalog_icons.h"
+#include "catalog.h"
 
 /* Global variable */
 IMAGE icon_image;
@@ -45,17 +47,6 @@ MFDB mini_save_on		= { NULL, 16, 16, 1, 0, 1, 0, 0, 0};
 /* local variable */
 static uint16 initialised 		= 0;
 
-/* extern variable */
-extern int16 draw_frame_slider;
-
-/* Prototype */
-void icons_exit(void);
-int16 icons_init( void);
-void set_entry_icon( Entry *entry);
-void redraw_icon( WINDOW *win, Entry *entry);
-void draw_icon( int16 handle, Entry *entry, boolean selected, RECT16 *dst_rect);
-boolean icon_is_visible( Entry *entry, int16 window_height);
-int16 redraw_icon_border( WINDOW *win, Entry *entry, int16 selected);
 
 
 /*==================================================================================*
@@ -412,5 +403,3 @@ boolean icon_is_visible( Entry *entry, int16 window_height)
 	
 	return FALSE;
 }
-
-

@@ -4,31 +4,17 @@
  *	Insertion/Suppressions de caractŠres
  */
 
+#include "../general.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <windom1.h>
-#include "types2b.h"
 #include "gmem.h"
-#include "libtedit.h"
-
-/* extern function */
-extern EDLINE *line_new( char *buf);
-extern void line_add( EDIT *edit, EDLINE *line, int16 mode);
-extern void line_rem( EDIT *edit);
-
-
-/* prototype */
-void char_shift_right( char *buf);
-void char_shift_left( char *buf); 
-
-
 
 /* d‚calage vers la droite du buffer */
 
-void char_shift_right( char *buf) 
+static void char_shift_right( char *buf) 
 {
-	int16 l = ( int16)strlen(buf);
+	int16 l = (int16)strlen(buf);
 	
 	buf += l;
 	*(buf+1) = '\0';
@@ -43,7 +29,7 @@ void char_shift_right( char *buf)
 
 /* d‚calage vers la gauche du buffer */
 
-void char_shift_left( char *buf) 
+static void char_shift_left( char *buf) 
 {
 	do 
 	{

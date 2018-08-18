@@ -6,6 +6,8 @@
 #include "pic_load.h"
 #include "catalog/catalog.h"
 #include "file/file.h"
+#include "pic_save.h"
+#include "menu.h"
 
 
 void 	CDECL ( *encoder_quit)	 ( IMGINFO);
@@ -14,17 +16,8 @@ boolean	CDECL ( *encoder_init)	 ( const char *, IMGINFO);
 void 	CDECL ( *set_jpg_option) ( int16 set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive) = NULL;
 void 	CDECL ( *set_tiff_option)( int16 set_quality, uint16 set_encode_compression) = NULL;
 
-/* extern function */
-extern int16 pic_save( const char *in_file, const char *out_file);
-extern void jpg_option_dialog( char *source_file);
-extern void tiff_option_dialog( void);
-
 int16 encoder_plugins_nbr = 0;
 LDG *encoder[100];
-
-
-/* Prototype */
-void save_dialog( const char *fullfilename);
 
 
 /* local variable */
@@ -100,7 +93,7 @@ static void format_popup( WINDOW *win, int obj_index)
 }
 
 
-static void save_dialog_event( WINDOW *win) 
+static void __CDECL save_dialog_event( WINDOW *win) 
 {
 	char target_file[MAX_PATH+MAXNAMLEN];
 	char target_file_path[MAX_PATH];
@@ -270,4 +263,3 @@ void save_dialog( const char *fullfilename)
 	MenuDisable();
 
 }
-

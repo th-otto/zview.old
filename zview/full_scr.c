@@ -3,6 +3,7 @@
 #include "winimg.h"
 #include "mfdb.h"
 #include "pic_resize.h"
+#include "full_scr.h"
 
 int16 full_screen = FALSE;
 

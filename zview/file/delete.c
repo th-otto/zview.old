@@ -7,6 +7,7 @@
 #include "../catalog/catalog_mini_entry.h"
 #include "file.h"
 #include "count.h"
+#include "delete.h"
 
 
 /* local variable */
@@ -17,12 +18,6 @@ static uint32	item_to_delete;
 
 static OBJECT *save_dialog; 
 
-/* prototype */
-boolean delete_file( const char *name, struct stat *file_stat);
-boolean delete_dir( WINDOW *win, const char *path);
-void delete_entry( WINDOW *win);
-void delete_progress( WINDOW *win);
-
 
 /*==================================================================================*
  * delete_file:																		*
@@ -32,7 +27,7 @@ void delete_progress( WINDOW *win);
  * returns: TRUE = success, FALSE = error											*
  *==================================================================================*/
 
-boolean delete_file( const char *name, struct stat *file_stat)
+static boolean delete_file( const char *name, struct stat *file_stat)
 {
 	if ( unlink( name) != 0)
 	{   
@@ -45,68 +40,7 @@ boolean delete_file( const char *name, struct stat *file_stat)
 }
 
 
-/*==================================================================================*
- * delete_dir:																		*
- *		Delete a directory.															*
- *----------------------------------------------------------------------------------*
- * returns: TRUE = success, FALSE = error											*
- *==================================================================================*/
-
-boolean delete_dir( WINDOW *win, const char *path)
-{
-	char 			old_dir[MAX_PATH];
-	DIR	 			*dir;
-	struct dirent	*de;
-	struct stat		file_stat;
-	
-	if ( rmdir( path) == 0)
-	   return TRUE;										
-	else
-	{
-		if ( dir_cd( path, old_dir, ( int16)( sizeof old_dir)))
-		{
-			if (( dir = opendir( ".")) != NULL)
-			{
-				while(( de = readdir( dir)) != NULL)
-				{
-					if (( strcmp( de->d_name, ".") == 0) || ( strcmp( de->d_name, "..") == 0))
-						continue;	
-
-					if ( lstat( de->d_name, &file_stat) != 0)
-						break;
-					
-					if ( S_ISDIR( file_stat.st_mode))   
-					{
-						if ( delete_dir( win, de->d_name) == FALSE)
-							break;
-						else
-						{
-							item_deleted++;
-							delete_progress( win);
-						}   							
-					}
-					else
-					{
-						if ( delete_file( de->d_name, &file_stat) == FALSE)
-							break;
-						else
-						{
-							item_deleted++;
-							size_deleted += file_stat.st_size;
-							delete_progress( win);
-						}   
-					}
-				}
-				closedir( dir);
-			}
-			dir_cd( old_dir, NULL, 0);
-		}
-
-		return rmdir( path) == 0 ? TRUE : FALSE;
-	}
-}
-
-void delete_progress( WINDOW *win)
+static void delete_progress( WINDOW *win)
 {
 	static int32 bar_width 	= 0L;
 	int32	new_bar_width 	= ( ( item_deleted * 100L) / item_to_delete) * 3;
@@ -160,7 +94,68 @@ void delete_progress( WINDOW *win)
 
 
 
-void delete_function( WINDOW *win)
+/*==================================================================================*
+ * delete_dir:																		*
+ *		Delete a directory.															*
+ *----------------------------------------------------------------------------------*
+ * returns: TRUE = success, FALSE = error											*
+ *==================================================================================*/
+
+static boolean delete_dir( WINDOW *win, const char *path)
+{
+	char 			old_dir[MAX_PATH];
+	DIR	 			*dir;
+	struct dirent	*de;
+	struct stat		file_stat;
+	
+	if ( rmdir( path) == 0)
+	   return TRUE;										
+	else
+	{
+		if ( dir_cd( path, old_dir, ( int16)( sizeof old_dir)))
+		{
+			if (( dir = opendir( ".")) != NULL)
+			{
+				while(( de = readdir( dir)) != NULL)
+				{
+					if (( strcmp( de->d_name, ".") == 0) || ( strcmp( de->d_name, "..") == 0))
+						continue;	
+
+					if ( lstat( de->d_name, &file_stat) != 0)
+						break;
+					
+					if ( S_ISDIR( file_stat.st_mode))   
+					{
+						if ( delete_dir( win, de->d_name) == FALSE)
+							break;
+						else
+						{
+							item_deleted++;
+							delete_progress( win);
+						}   							
+					}
+					else
+					{
+						if ( delete_file( de->d_name, &file_stat) == FALSE)
+							break;
+						else
+						{
+							item_deleted++;
+							size_deleted += file_stat.st_size;
+							delete_progress( win);
+						}   
+					}
+				}
+				closedir( dir);
+			}
+			dir_cd( old_dir, NULL, 0);
+		}
+
+		return rmdir( path) == 0 ? TRUE : FALSE;
+	}
+}
+
+static void delete_function( WINDOW *win)
 {
 	WINDICON 	*wicones 		= ( WINDICON *)DataSearch( win_catalog, WD_ICON);	
 	Mini_Entry	*mini_entry;
@@ -309,4 +304,3 @@ void delete_entry( WINDOW *win)
 
 	MenuDisable();
 }
-

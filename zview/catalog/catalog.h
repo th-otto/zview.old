@@ -1,5 +1,4 @@
 extern int WinCatalog( void);
-extern void WinCatalog_Close( WINDOW *win);
 extern void WinCatalog_Refresh( WINDOW *wind);
 extern void WindMakePreview( WINDOW *win);
 extern int WindMakePreview_needed( WINDOW *win);
@@ -16,4 +15,3 @@ extern int16 	old_border_size;
 extern int16	need_frame_slider;
 extern int16 	draw_frame_slider;
 extern OBJECT 	*frame_slider_root;
-

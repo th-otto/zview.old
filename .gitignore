@@ -61,3 +61,4 @@ zview/xpdf-*
 *.jpg
 *.bmp
 zview/_dist/zview.rsc
+zview/tests

@@ -1,14 +1,1 @@
-extern void close_modal( WINDOW *win);
-
-
-
-
-
-
-
-
-
-
-
-
-
+extern void __CDECL close_modal( WINDOW *win);

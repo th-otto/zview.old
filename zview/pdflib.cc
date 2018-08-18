@@ -292,7 +292,7 @@ uint32 *pdf_get_page_addr( IMAGE *img)
 	return ( uint32*)( data); // ( data.rgb8);
 }
 
-static char *InfoString(Dict *infoDict, char *key, UnicodeMap *uMap)
+static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
 {
 	Object obj;
 	GString *s1;
@@ -352,7 +352,7 @@ static char *InfoString(Dict *infoDict, char *key, UnicodeMap *uMap)
   	return ( char*)&text;
 }
 
-static char *InfoDate(Dict *infoDict, char *key)
+static char *InfoDate(Dict *infoDict, const char *key)
 {
 	Object obj;
 	char *s;

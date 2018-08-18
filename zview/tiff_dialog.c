@@ -21,13 +21,13 @@ static  int		compression_button 	= 0;
 extern void CDECL ( *set_tiff_option)( int16 set_quality, uint16 set_encode_compression);
 
 
-static void tiff_option_close( WINDOW *win) 
+static void __CDECL tiff_option_close( WINDOW *win) 
 {
 	free( tiff_option_slider);
 	frm_cls( win);
 }
 
-static void tiff_option_ok_event( WINDOW *win, int16 obj_index) 
+static void __CDECL tiff_option_ok_event( WINDOW *win, int obj_index, int mode, void *data)
 {
 	switch( compression_button)
 	{ 
@@ -55,8 +55,9 @@ static void tiff_option_ok_event( WINDOW *win, int16 obj_index)
 }
 
 
-static void tiff_option_slider_event( WINDOW *win, int mode, float value) 
+static void tiff_option_slider_event( WINDOW *win, int mode, float value, void *data)
 {
+	(void)data;
 	quality = ( int16)value;
 	evnt_timer( 50);
 	sprintf( ObjcString( FORM( win), TIFFPREF_PERCENT, NULL), "%d", quality);
@@ -114,4 +115,3 @@ void tiff_option_dialog( void)
 
 	ObjcAttach( OC_FORM, win, TIFFPREF_OK, BIND_FUNC, tiff_option_ok_event);
 }
-

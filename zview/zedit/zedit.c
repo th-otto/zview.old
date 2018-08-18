@@ -2,12 +2,8 @@
 #include	"../catalog/catalog.h"
 #include	"../zaes.h"
 #include	"../custom_font.h"
+#include "zedit.h"
 
-/* prototype */
-void cursor_position( WINDOW *win, int16 *x, int16 *y, int16 *w, int16 *h); 
-void edit_icon_txt( WINDOW *win, Entry *entry);
-void init_edit_mode( WINDOW *win, Entry *entry);
-void exit_edit_mode( WINDOW *win, Entry *entry);
 
 
 /*==================================================================================*
@@ -138,4 +134,3 @@ void exit_edit_mode( WINDOW *win, Entry *entry)
 
 	draw_page( win, x, y, w, h);
 }
-
