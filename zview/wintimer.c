@@ -8,9 +8,10 @@ typedef struct xtimer
 	struct xtimer *next;
 } XTIMER;
 static XTIMER *root = NULL;
-static void __CDECL std_xtimer( void) 
+static void __CDECL std_xtimer(WINDOW *win EVNT_BUFF_PARAM)
 {
 	XTIMER *scan;
+	(void)win;
 	for( scan = root; scan; scan = scan->next) 
 		(*scan->func)( scan->win);
 }

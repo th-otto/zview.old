@@ -8,11 +8,20 @@ OPTIMISATION			= -g -O2 -fomit-frame-pointer
 #CPU				= -mcpu=5475
 CPU				= -m68020-60
 DEBUG_LIB			= # -lwout
+
+USE_WINDOM2=0
+ifeq ($(USE_WINDOM2),1)
+WINDOM_LIBS=-lwindom
+WINDOM_CFLAGS=-DUSE_WINDOM2
+else
+WINDOM_LIBS=-lwindom1
+endif
+
 XPDF_LIBS			= -Lxpdf-${XPDF_VERSION}/fofi -lfofi -Lxpdf-${XPDF_VERSION}/goo -lGoo -Lxpdf-${XPDF_VERSION}/splash -lsplash
 XPDF_INCS			= -Ixpdf-${XPDF_VERSION} -Ixpdf-${XPDF_VERSION}/goo -Ixpdf-${XPDF_VERSION}/splash
-LIB				= -lfreetype $(DEBUG_LIB) -lwindom1 -lldg -lgem -lpng -lz
-CFLAGS				= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes
-CXXFLAGS			= $(DEBUG) $(CPU) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow
+LIB				= -lfreetype $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lpng -lz
+CFLAGS				= $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
+CXXFLAGS			= $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) $(XPDF_INCS) -I../common -Wall -Wshadow -Werror
 LDFLAGS                         = -s
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o

@@ -34,7 +34,7 @@ char fullname[MAX_PATH+MAXNAMLEN];
  *		--																			*
  *==================================================================================*/
 
-void __CDECL WinCatalog_Keyb( WINDOW *win) 
+void __CDECL WinCatalog_Keyb( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON *wicones = (WINDICON *)DataSearch( win, WD_ICON); 
 	Mini_Entry	*old_selected;

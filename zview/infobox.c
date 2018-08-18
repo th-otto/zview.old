@@ -61,8 +61,8 @@ static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[2] = xy[0] + pblk->pb_w - 2;
 	xy[3] = xy[1] + pblk->pb_h - 1;
 
-	vsf_color( win->graf.handle, WHITE);
-	v_bar( win->graf.handle, xy);
+	vsf_color( WIN_GRAF_HANDLE(win), WHITE);
+	v_bar( WIN_GRAF_HANDLE(win), xy);
 
 	xy[0] = pblk->pb_x + pblk->pb_w - 1;
 	xy[1] = pblk->pb_y;
@@ -73,8 +73,8 @@ static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[0];
 	xy[7] = xy[5];
 	
-	my_vsl_color( win->graf.handle, BLACK);
-	v_pline( win->graf.handle, 4, xy);
+	my_vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+	v_pline( WIN_GRAF_HANDLE(win), 4, xy);
 
 	posy = pblk->pb_y;  
 
@@ -83,7 +83,7 @@ static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 		if( posy >= ( pblk->pb_y + pblk->pb_h - 1))
 			break;
 
-		draw_text( win->graf.handle, pblk->pb_x + 3, posy + 3, BLACK, exif_box->txt[dum]);
+		draw_text( WIN_GRAF_HANDLE(win), pblk->pb_x + 3, posy + 3, BLACK, exif_box->txt[dum]);
 	}
 }
 
@@ -338,9 +338,9 @@ void infobox( void)
 
 		// draw_exif_info( wininfo);
 
-		ObjcAttach( OC_FORM, wininfo, FILE_INFO_UP, BIND_FUNC, slid_up);
-		ObjcAttach( OC_FORM, wininfo, FILE_INFO_DOWN, BIND_FUNC, slid_down);
-		ObjcAttach( OC_FORM, wininfo, FILE_INFO_VMOVER, BIND_FUNC, slid_vmover);
+		ObjcAttachFormFunc( wininfo, FILE_INFO_UP, slid_up, NULL);
+		ObjcAttachFormFunc( wininfo, FILE_INFO_DOWN, slid_down, NULL);
+		ObjcAttachFormFunc( wininfo, FILE_INFO_VMOVER, slid_vmover, NULL);
 	}
 
 

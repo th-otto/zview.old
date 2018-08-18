@@ -22,7 +22,7 @@ void restore_screen( void)
 {
 	form_dial( FMD_FINISH, 0, 0, 1 + app.work_out[0], 1 + app.work_out[1], 0, 0, 1 + app.work_out[0], 1 + app.work_out[1]);
 	menu_bar( app.menu, 1) ;
-	v_show_c( app.handle, 0);
+	v_show_c( APP_GRAF_HANDLE, 0);
 }
 
 
@@ -42,16 +42,16 @@ void clear_screen( void)
 {
 	int16 xy[8];
 
-	vswr_mode( app.handle, MD_REPLACE);
+	vswr_mode( APP_GRAF_HANDLE, MD_REPLACE);
 	form_dial( FMD_START, 0, 0, 1 + app.work_out[0], 1 + app.work_out[1], 0, 0, 1 + app.work_out[0], 1 + app.work_out[1]);
-	vsf_perimeter( app.handle, 0);
-	vsf_interior( app.handle, FIS_SOLID);
+	vsf_perimeter( APP_GRAF_HANDLE, 0);
+	vsf_interior( APP_GRAF_HANDLE, FIS_SOLID);
 	xy[0] = xy[1] = 0;
 	xy[2] = app.work_out[0];
 	xy[3] = app.work_out[1];
-	v_hide_c( app.handle);
-	vsf_color( app.handle, BLACK);
-	vr_recfl( app.handle, xy);
+	v_hide_c( APP_GRAF_HANDLE);
+	vsf_color( APP_GRAF_HANDLE, BLACK);
+	vr_recfl( APP_GRAF_HANDLE, xy);
 }
 
 /*==================================================================================*
@@ -119,19 +119,20 @@ void show_fullscreen( WINDATA *windata)
 	{
 		int16	color[2] = { BLACK, WHITE};
 
-		vrt_cpyfm( app.handle, MD_REPLACE, xy, out, &screen, color);
+		vrt_cpyfm( APP_GRAF_HANDLE, MD_REPLACE, xy, out, &screen, color);
 	}
 	else
-		vro_cpyfm( app.handle, S_ONLY, xy, out, &screen);
+		vro_cpyfm( APP_GRAF_HANDLE, S_ONLY, xy, out, &screen);
 	
 	/* and now the image's information */
-	/* sprintf( info, "%dx%dx%d | %ld colors | %s", img->img_w, img->img_h, img->bits, img->colors, img->info);
+#if 0
+	sprintf( info, "%dx%dx%d | %ld colors | %s", img->img_w, img->img_h, img->bits, img->colors, img->info);
 
-	vst_alignment( app.handle, 2, 4, &dum, &dum);
-	vst_color( app.handle, BLACK);
-	vst_point( app.handle, 8, &dum, &dum, &dum, &dum);
-	v_ftext( app.handle, app.work_out[0] - 4, app.work_out[1] - 4, info);
-	*/
+	vst_alignment( APP_GRAF_HANDLE, 2, 4, &dum, &dum);
+	vst_color( APP_GRAF_HANDLE, BLACK);
+	vst_point( APP_GRAF_HANDLE, 8, &dum, &dum, &dum, &dum);
+	v_ftext( APP_GRAF_HANDLE, app.work_out[0] - 4, app.work_out[1] - 4, info);
+#endif
 
 	/* We wait for a keyboard event and after, restore the screen */
 	evnt_keybd();

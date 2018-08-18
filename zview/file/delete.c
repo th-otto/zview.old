@@ -77,11 +77,11 @@ static void delete_progress( WINDOW *win)
 	{
 		if( rc_intersect( &rwin, &raes)) 
 		{
-			rc_clip_on( win->graf.handle, &raes);
+			WinClipOn( win, &raes);
 
-			v_bar( win->graf.handle, pxy);
+			v_bar( WIN_GRAF_HANDLE(win), pxy);
 
-			rc_clip_off( win->graf.handle);
+			WinClipOff( win);
 		}
 	
 		wind_get( win->handle, WF_NEXTXYWH, &raes.g_x, &raes.g_y, &raes.g_w, &raes.g_h);
@@ -155,29 +155,29 @@ static boolean delete_dir( WINDOW *win, const char *path)
 	}
 }
 
-static void delete_function( WINDOW *win)
+static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON 	*wicones 		= ( WINDICON *)DataSearch( win_catalog, WD_ICON);	
 	Mini_Entry	*mini_entry;
 	fileinfo	file;
 	int16 		x, y, w, h, deleted_entry = 0;
 	
-	switch( evnt.buff[4])
+	switch( EVNT_BUFF[4])
 	{	   
 		case OPERATION_DIAL_CANCEL:
 			ObjcChange( OC_FORM, win, OPERATION_DIAL_CANCEL, ~SELECTED, TRUE);
-			ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 			break;
 
 		case OPERATION_DIAL_OK:
 			ObjcChange( OC_FORM, win, OPERATION_DIAL_OK, ~SELECTED, TRUE);
 			strcpy( save_dialog[OPERATION_DIAL_INFO].ob_spec.tedinfo->te_ptext, get_string( CALCUL));
 
-			vsf_color( win->graf.handle, RED);
+			vsf_color( WIN_GRAF_HANDLE(win), RED);
 	
 			if( !count_files( wicones, &file))
 			{
-				ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+				ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 				errshow( "", errno);
 				return;
 			}
@@ -252,7 +252,7 @@ static void delete_function( WINDOW *win)
 			}
 			ObjcDraw( OC_FORM, win, OPERATION_DIAL_INFO, FALSE);
 
-			close_modal( win);	
+			close_modal( win EVNT_BUFF_NULL);	
 
 			if ( deleted_entry)
 			{

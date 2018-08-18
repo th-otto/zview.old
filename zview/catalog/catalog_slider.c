@@ -54,7 +54,7 @@ void move_area( int16 handle, GRECT *screen, int16 dx, int16 dy)
  *		--																			*
  *==================================================================================*/
 
-void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 dx, int16 dy, int16 first_frame_width, int16 border_width) 
+void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 dx, int16 dy, int16 first_frame_width, int16 border_width EVNT_BUFF_PARAM)
 {
 	int16	x = xw, y = yw + 1, w = ww, h = hw - 1, absolute_dy, absolute_dx;
 	GRECT	rect, r1, r2, screen;
@@ -98,7 +98,7 @@ void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 
 					else 
 						r1.g_w += dx;
 				
-					move_area( win->graf.handle, &r1, -dx, -dy);
+					move_area( WIN_GRAF_HANDLE(win), &r1, -dx, -dy);
 
 					if (dx)
 					{
@@ -119,9 +119,14 @@ void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 
 							r1.g_y -= dy;
 							r1.g_h += dy;
 						}
-						rc_clip_on( win->graf.handle, &r1);
+						WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+						EVNT_BUFF[0] = WM_REDRAW;
+						EvntExec( win EVNT_BUFF_ARG);
+#else
 						EvntExec( win, WM_REDRAW);
-						rc_clip_off( win->graf.handle);
+#endif
+						WinClipOff( win);
 					}
 
 					if ( dy)
@@ -136,16 +141,26 @@ void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 
 						else
 							r1.g_h = -dy;
 						
-						rc_clip_on( win->graf.handle, &r1);
+						WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+						EVNT_BUFF[0] = WM_REDRAW;
+						EvntExec( win EVNT_BUFF_ARG);
+#else
 						EvntExec( win, WM_REDRAW);
-						rc_clip_off( win->graf.handle);
+#endif
+						WinClipOff( win);
 					}
 				}
 				else
 				{
-					rc_clip_on( win->graf.handle, &r1);
+					WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+					EVNT_BUFF[0] = WM_REDRAW;
+					EvntExec( win EVNT_BUFF_ARG);
+#else
 					EvntExec( win, WM_REDRAW);
-					rc_clip_off( win->graf.handle);
+#endif
+					WinClipOff( win);
 				}
 			}
 			wind_get( win->handle, WF_NEXTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
@@ -174,7 +189,7 @@ void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 
  *		--																			*
  *==================================================================================*/
 
-void move_frame_work( WINDOW *win, int16 dy) 
+void move_frame_work( WINDOW *win, int16 dy EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h, absolute_dy;
 	GRECT	rect, r1, r2, screen;
@@ -210,7 +225,7 @@ void move_frame_work( WINDOW *win, int16 dy)
 					else
 						r1.g_h += dy;
 				
-					move_area( win->graf.handle, &r1, 0, -dy);
+					move_area( WIN_GRAF_HANDLE(win), &r1, 0, -dy);
 
 					if ( dy)
 					{
@@ -224,16 +239,26 @@ void move_frame_work( WINDOW *win, int16 dy)
 						else
 							r1.g_h = -dy;
 						
-						rc_clip_on( win->graf.handle, &r1);
+						WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+						EVNT_BUFF[0] = WM_REDRAW;
+						EvntExec( win EVNT_BUFF_ARG);
+#else
 						EvntExec( win, WM_REDRAW);
-						rc_clip_off( win->graf.handle);
+#endif
+						WinClipOff( win);
 					}
 				}
 				else
 				{
-					rc_clip_on( win->graf.handle, &r1);
+					WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+					EVNT_BUFF[0] = WM_REDRAW;
+					EvntExec( win EVNT_BUFF_ARG);
+#else
 					EvntExec( win, WM_REDRAW);
-					rc_clip_off( win->graf.handle);
+#endif
+					WinClipOff( win);
 				}
 			}
 			wind_get( win->handle, WF_NEXTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
@@ -267,14 +292,14 @@ void move_frame_work( WINDOW *win, int16 dy)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_VSlide( WINDOW *win) 
+void __CDECL WinCatalog_VSlide( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32 	pos;
 	int16	x, y, w, h, dy;
 	int16 	old_ypos = win->ypos;
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-	pos = ( int32)( win->ypos_max - h / win->h_u) * ( int32)evnt.buff[4] / 1000L;
+	pos = ( int32)( win->ypos_max - h / win->h_u) * ( int32)EVNT_BUFF[4] / 1000L;
 
 	if ( pos < 0) 
 		pos = 0;
@@ -284,7 +309,7 @@ void WinCatalog_VSlide( WINDOW *win)
 
 	if( dy && ( old_ypos != win->ypos)) 
 	{
-		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size);
+		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size EVNT_BUFF_ARG);
 
 		/* we look if image are visible and we create the preview */		
 		WindMakePreview( win);
@@ -307,7 +332,7 @@ void WinCatalog_VSlide( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_DownPage( WINDOW *win) 
+void __CDECL WinCatalog_DownPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	page, x, y, w, h, dy;
 	int32	old_pos = win -> ypos;
@@ -321,7 +346,7 @@ void WinCatalog_DownPage( WINDOW *win)
 		win -> ypos = MIN( win->ypos_max, win->ypos) + page;
 		win -> ypos = MIN( win -> ypos, win -> ypos_max - page);
 		dy = ( int16) (( win->ypos - old_pos) * win->h_u);
-		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size);
+		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size EVNT_BUFF_ARG);
 
 		/* After each 'downpage', we look if image are visible and we create the preview */
 		WindMakePreview( win);
@@ -341,7 +366,7 @@ void WinCatalog_DownPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_UpPage( WINDOW *win) 
+void __CDECL WinCatalog_UpPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32	pos;
 	int16	x, y, w, h, dy;
@@ -352,7 +377,7 @@ void WinCatalog_UpPage( WINDOW *win)
 		pos = MAX( 0L, win->ypos - h / win->h_u);
 		dy = ( int16) (( pos - win->ypos) * win->h_u);
 		win->ypos = pos;
-		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size);
+		move_main_work( win, x, y, w, h, 0, dy, browser_frame_width, border_size EVNT_BUFF_ARG);
 
 		/* After each 'uppage', we look if image are visible and we create the preview */
 		WindMakePreview( win);
@@ -372,7 +397,7 @@ void WinCatalog_UpPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_UpLine( WINDOW *win) 
+void __CDECL WinCatalog_UpLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	if ( win -> ypos > 0L) 
 	{
@@ -380,7 +405,7 @@ void WinCatalog_UpLine( WINDOW *win)
 		
 		win->ypos --;
 		WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-		move_main_work( win, x, y, w, h, 0, -win->h_u, browser_frame_width, border_size);
+		move_main_work( win, x, y, w, h, 0, -win->h_u, browser_frame_width, border_size EVNT_BUFF_ARG);
 
 		/* After each 'upline', we look if image are visible and we create the preview */
 		WindMakePreview( win);
@@ -400,7 +425,7 @@ void WinCatalog_UpLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_DownLine( WINDOW *win) 
+void __CDECL WinCatalog_DownLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h;
 
@@ -409,7 +434,7 @@ void WinCatalog_DownLine( WINDOW *win)
 	if (( win -> ypos < win -> ypos_max - h / win -> h_u) && ( win -> ypos_max > h / win -> h_u )) 
 	{
 		win -> ypos ++;
-		move_main_work( win, x, y, w, h, 0, win->h_u, browser_frame_width, border_size);
+		move_main_work( win, x, y, w, h, 0, win->h_u, browser_frame_width, border_size EVNT_BUFF_ARG);
 
 		/* After each 'downpage', we look if image are visible and we create the preview */
 		WindMakePreview( win);
@@ -429,24 +454,23 @@ void WinCatalog_DownLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_Arrow( WINDOW *win) 
+void __CDECL WinCatalog_Arrow( WINDOW *win EVNT_BUFF_PARAM)
 {
-	switch( evnt.buff[4]) 
+	switch( EVNT_BUFF[4]) 
 	{
 		case WA_UPPAGE:
-			WinCatalog_UpPage( win);
+			WinCatalog_UpPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_DNPAGE:
-			WinCatalog_DownPage( win);
+			WinCatalog_DownPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_UPLINE:
-			WinCatalog_UpLine( win);
+			WinCatalog_UpLine( win EVNT_BUFF_ARG);
 			break;
 		case WA_DNLINE:
-			WinCatalog_DownLine( win);
+			WinCatalog_DownLine( win EVNT_BUFF_ARG);
 			break;
 		default:
 			break;
 	}
 }
-

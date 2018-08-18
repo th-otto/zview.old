@@ -119,8 +119,8 @@ void draw_mini_entry( WINDOW *win, Mini_Entry *selected, Mini_Entry *entry, int1
 			xy[5] = xy[1] + 5;		
 		}
 
-		vsf_color( win->graf.handle, LBLACK);
-		v_fillarea( win->graf.handle, 3, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), LBLACK);
+		v_fillarea( WIN_GRAF_HANDLE(win), 3, xy);
 	}
 
 
@@ -158,10 +158,10 @@ void draw_mini_entry( WINDOW *win, Mini_Entry *selected, Mini_Entry *entry, int1
 		color[0] = WHITE;
 		color[1] = BLACK;
 
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, icon, &screen, color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, icon, &screen, color);
 	}
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, icon, &screen);
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, icon, &screen);
 		
 
 	/* DRAW TEXT */
@@ -175,13 +175,13 @@ void draw_mini_entry( WINDOW *win, Mini_Entry *selected, Mini_Entry *entry, int1
 		xy[1] = ytext - 1;
 		xy[3] = xy[1] + hcell + 2;
 
-		vsf_color( win->graf.handle, BLACK);
-		v_bar( win->graf.handle, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), BLACK);
+		v_bar( WIN_GRAF_HANDLE(win), xy);
 
-		draw_text( win->graf.handle, xtext, ytext, WHITE, entry->name);
+		draw_text( WIN_GRAF_HANDLE(win), xtext, ytext, WHITE, entry->name);
 	}
 	else
-		draw_text( win->graf.handle, xtext, ytext, BLACK, entry->name);
+		draw_text( WIN_GRAF_HANDLE(win), xtext, ytext, BLACK, entry->name);
 }
 
 

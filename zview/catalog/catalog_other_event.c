@@ -17,17 +17,17 @@
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_Fulled( WINDOW *win) 
+void WinCatalog_Fulled( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16 		x, y, w, h;
 	WINDICON 	*wicones = (WINDICON *)DataSearch( win, WD_ICON);
 
 	if( win->status & WS_FULLSIZE) 
 	{
-		wind_get( evnt.buff[3], WF_PREVXYWH, &x, &y, &w, &h);
-		wind_set( evnt.buff[3], WF_CURRXYWH, x, y, w, h);
+		wind_get( EVNT_BUFF[3], WF_PREVXYWH, &x, &y, &w, &h);
+		wind_set( EVNT_BUFF[3], WF_CURRXYWH, x, y, w, h);
 	} else
-		wind_set( evnt.buff[3], WF_CURRXYWH, app.x, app.y, win->w_max, win->h_max);
+		wind_set( EVNT_BUFF[3], WF_CURRXYWH, app.x, app.y, win->w_max, win->h_max);
 	
 	win->status ^= WS_FULLSIZE;
 
@@ -54,7 +54,7 @@ void WinCatalog_Fulled( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_top( WINDOW *win) 
+void WinCatalog_top( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON *wicones = (WINDICON *)DataSearch( win, WD_ICON);
 	OBJECT *menu = get_tree( MENU_BAR);
@@ -90,11 +90,10 @@ void WinCatalog_top( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void WinCatalog_bottom( WINDOW *win) 
+void WinCatalog_bottom( WINDOW *win EVNT_BUFF_PARAM)
 {
 	win = win; // for prevent compiler warning
 	menu_ienable( get_tree( MENU_BAR), MENU_BAR_INFORMATION, 0); 
 	menu_ienable( get_tree( MENU_BAR), MENU_BAR_SAVE, 0);
 	menu_ienable( get_tree( MENU_BAR), MENU_BAR_DELETE, 0);
 }
-

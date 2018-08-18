@@ -1,7 +1,7 @@
 extern OBJECT *get_tree( int16 obj_index);
 extern char *get_string( int16 str_index);
 extern void errshow( const char *name, int16 error);
-extern void __CDECL generic_form_event( WINDOW *win);
+extern void __CDECL generic_form_event( WINDOW *win EVNT_BUFF_PARAM);
 
 extern void CDECL draw_icon_up( WINDOW *win, PARMBLK *pblk, void *data);
 extern void CDECL draw_icon_reload( WINDOW *win, PARMBLK *pblk, void *data);

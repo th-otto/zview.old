@@ -45,9 +45,15 @@ void save_colors(void)
 
 	for( i = 0; i < app.color; i++)
 	{
+#if __WINDOM_MAJOR__ >= 2
+		screen_colortab[i].red   = ((((int32)app.graf.palette[i][0] << 8 ) - app.graf.palette[i][0]) + 500) / 1000;
+		screen_colortab[i].green = ((((int32)app.graf.palette[i][1] << 8 ) - app.graf.palette[i][1]) + 500) / 1000;
+		screen_colortab[i].blue  = ((((int32)app.graf.palette[i][2] << 8 ) - app.graf.palette[i][2]) + 500) / 1000;
+#else
 		screen_colortab[i].red   = ((((int32)app.palette[i][0] << 8 ) - app.palette[i][0]) + 500) / 1000;
 		screen_colortab[i].green = ((((int32)app.palette[i][1] << 8 ) - app.palette[i][1]) + 500) / 1000;
 		screen_colortab[i].blue  = ((((int32)app.palette[i][2] << 8 ) - app.palette[i][2]) + 500) / 1000;
+#endif
 		screen_colortab[i].satur = saturation ( &screen_colortab[i].red);
 	}
 }

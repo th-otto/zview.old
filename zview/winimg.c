@@ -35,7 +35,7 @@ static int16 dum;
  *      --																			*
  *==================================================================================*/
 
-void __CDECL WindViewIcon( WINDOW *win)
+void __CDECL WindViewIcon( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16 	posx, posy, x, y, w, h, xy[8];
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -64,8 +64,8 @@ void __CDECL WindViewIcon( WINDOW *win)
 	xy[2] = xy[0] + w - 1;
 	xy[3] = xy[1] + h - 1;
 
-	vsf_color( win->graf.handle, BLACK);
-	v_bar( win->graf.handle, xy);
+	vsf_color( WIN_GRAF_HANDLE(win), BLACK);
+	v_bar( WIN_GRAF_HANDLE(win), xy);
 
 	if( windata->icon.fd_addr)
 		out = &windata->icon;
@@ -97,10 +97,10 @@ void __CDECL WindViewIcon( WINDOW *win)
 	{
 		int16 color[2] = { BLACK, WHITE};
 
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, out, &screen, color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, out, &screen, color);
 	}
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, out, &screen);
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, out, &screen);
 }
 
 
@@ -188,12 +188,12 @@ static void WindViewZoom( WINDOW *win)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL WindViewTool( WINDOW *win)
+static void __CDECL WindViewTool( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	int16 zoom;
 
-	switch( evnt.buff[4])
+	switch( EVNT_BUFF[4])
 	{
 		case VIEWTOOLBAR_SMALL:
 			zoom = windata->zoom_level;
@@ -240,7 +240,7 @@ static void __CDECL WindViewTool( WINDOW *win)
 			break;
 
 		case VIEWTOOLBAR_OPEN:
-			Menu_open_image();
+			Menu_open_image(NULL, 0, 0, NULL);
 			break;
 
 		case VIEWTOOLBAR_FULLSCREEN:
@@ -252,7 +252,7 @@ static void __CDECL WindViewTool( WINDOW *win)
 			break;
 
 		case VIEWTOOLBAR_INFO:
-			WindViewTop( win);
+			WindViewTop( win EVNT_BUFF_ARG);
 			infobox();
 			break;
 
@@ -260,12 +260,12 @@ static void __CDECL WindViewTool( WINDOW *win)
 			break;
 	}
 
-	ObjcChange( OC_TOOLBAR, win, evnt.buff[4], NORMAL, 1);
+	ObjcChange( OC_TOOLBAR, win, EVNT_BUFF[4], NORMAL, 1);
 }
 
 
 
-void __CDECL WindViewTop( WINDOW *win)
+void __CDECL WindViewTop( WINDOW *win EVNT_BUFF_PARAM)
 {
 	OBJECT *menu = get_tree( MENU_BAR);
 
@@ -278,7 +278,7 @@ void __CDECL WindViewTop( WINDOW *win)
 }
 
 
-static void __CDECL WindViewKeyb( WINDOW *win)
+static void __CDECL WindViewKeyb( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	int16 zoom;
@@ -377,7 +377,7 @@ static void __CDECL WindViewKeyb( WINDOW *win)
 }
 
 
-static void __CDECL WindViewRedraw( WINDOW *win)
+static void __CDECL WindViewRedraw( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	xw, yw, ww, hw, tmp, xy[8], pxy[4], page;
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -392,8 +392,8 @@ static void __CDECL WindViewRedraw( WINDOW *win)
 	pxy[2] = pxy[0] + ww - 1;
 	pxy[3] = yw;
 
-	vsl_color( win->graf.handle, BLACK);
-	v_pline( win->graf.handle, 2, pxy);
+	vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+	v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 	yw++;
 
@@ -409,8 +409,8 @@ static void __CDECL WindViewRedraw( WINDOW *win)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( win->graf.handle, LWHITE);
-		v_bar( win->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(win), LWHITE);
+		v_bar( WIN_GRAF_HANDLE(win), pxy);
 		return;
 	}
 
@@ -439,18 +439,18 @@ static void __CDECL WindViewRedraw( WINDOW *win)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( win->graf.handle, LWHITE);
-		v_bar( win->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(win), LWHITE);
+		v_bar( WIN_GRAF_HANDLE(win), pxy);
 	}
 
 	if ( picture->fd_nplanes == 1)
 	{
 		int16	color[2] = { BLACK, WHITE};
 
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, picture, &screen, color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, picture, &screen, color);
 	}
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, picture, &screen);
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, picture, &screen);
 
 
 	WindSlider ( win, VSLIDER|HSLIDER);
@@ -516,18 +516,18 @@ static void WindViewAnim( WINDOW *win)
 	{
 		if( rc_intersect( &rect, &r1))
 		{
-			rc_clip_on( win->graf.handle, &r1);
+			WinClipOn( win, &r1);
 
 			if ( picture->fd_nplanes == 1)
 			{
 				int16	color[2] = { BLACK, WHITE};
 
-				vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, picture, &screen, color);
+				vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, picture, &screen, color);
 			}
 			else
-				vro_cpyfm( win->graf.handle, S_ONLY, xy, picture, &screen);
+				vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, picture, &screen);
 
-			rc_clip_off( win->graf.handle);
+			WinClipOff( win);
 		}
 
 		wind_get( win -> handle, WF_NEXTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
@@ -540,7 +540,7 @@ static void WindViewAnim( WINDOW *win)
 }
 
 
-static void __CDECL WindViewClose( WINDOW *win)
+static void __CDECL WindViewClose( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
@@ -576,7 +576,7 @@ static void __CDECL WindViewClose( WINDOW *win)
 }
 
 
-static void __CDECL WindViewIconify( WINDOW *win)
+static void __CDECL WindViewIconify( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 //	zdebug( "iconify");
@@ -584,7 +584,7 @@ static void __CDECL WindViewIconify( WINDOW *win)
 }
 
 
-static void __CDECL WindViewUniconify( WINDOW *win)
+static void __CDECL WindViewUniconify( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 //	zdebug( "uniconify");
@@ -604,14 +604,14 @@ static void __CDECL WindViewUniconify( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_VSlide( WINDOW *win)
+void __CDECL Win_VSlide( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32 	pos;
 	int16	x, y, w, h, dy;
 	int16 	old_ypos = win->ypos;
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-	pos = ( int32)( win->ypos_max - h / win->h_u) * ( int32)evnt.buff[4] / 1000L;
+	pos = ( int32)( win->ypos_max - h / win->h_u) * ( int32)EVNT_BUFF[4] / 1000L;
 
 	if ( pos < 0)
 		pos = 0;
@@ -622,7 +622,7 @@ void __CDECL Win_VSlide( WINDOW *win)
 	if( dy && ( old_ypos != win->ypos))
 	{
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
-		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -639,7 +639,7 @@ void __CDECL Win_VSlide( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_HSlide( WINDOW *win)
+void __CDECL Win_HSlide( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32 	pos;
 	int16	x, y, w, h, dx;
@@ -647,7 +647,7 @@ void __CDECL Win_HSlide( WINDOW *win)
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 
-	pos = ( int32)( win->xpos_max - w / win->w_u) * ( int32)evnt.buff[4] / 1000L;
+	pos = ( int32)( win->xpos_max - w / win->w_u) * ( int32)EVNT_BUFF[4] / 1000L;
 
 	if ( pos < 0)
 		pos = 0;
@@ -658,7 +658,7 @@ void __CDECL Win_HSlide( WINDOW *win)
 	if( dx && ( old_xpos != win->xpos))
 	{
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
-		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -676,7 +676,7 @@ void __CDECL Win_HSlide( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_DownPage( WINDOW *win)
+void __CDECL Win_DownPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	page, x, y, w, h, dy;
 	int32	old_pos = win -> ypos;
@@ -691,7 +691,7 @@ void __CDECL Win_DownPage( WINDOW *win)
 		win -> ypos = MIN( win->ypos_max, win->ypos) + page;
 		win -> ypos = MIN( win -> ypos, win -> ypos_max - page);
 		dy = ( int16) (( win->ypos - old_pos) * win->h_u);
-		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -708,7 +708,7 @@ void __CDECL Win_DownPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_RightPage( WINDOW *win)
+void __CDECL Win_RightPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	page, x, y, w, h, dx;
 	int32	old_pos = win -> xpos;
@@ -723,7 +723,7 @@ void __CDECL Win_RightPage( WINDOW *win)
 		win -> xpos = MIN( win->xpos_max, win->xpos) + page;
 		win -> xpos = MIN( win -> xpos, win -> xpos_max - page);
 		dx = ( int16) (( win->xpos - old_pos) * win->w_u);
-		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -741,7 +741,7 @@ void __CDECL Win_RightPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_LeftPage( WINDOW *win)
+void __CDECL Win_LeftPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32	pos;
 	int16	x, y, w, h, dx;
@@ -753,7 +753,7 @@ void __CDECL Win_LeftPage( WINDOW *win)
 		pos = MAX( 0L, win->xpos - w / win->w_u);
 		dx = ( int16) (( pos - win->xpos) * win->w_u);
 		win->xpos = pos;
-		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, dx, 0, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -771,7 +771,7 @@ void __CDECL Win_LeftPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_UpPage( WINDOW *win)
+void __CDECL Win_UpPage( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int32	pos;
 	int16	x, y, w, h, dy;
@@ -783,7 +783,7 @@ void __CDECL Win_UpPage( WINDOW *win)
 		pos = MAX( 0L, win->ypos - h / win->h_u);
 		dy = ( int16) (( pos - win->ypos) * win->h_u);
 		win->ypos = pos;
-		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, 0, dy, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -800,7 +800,7 @@ void __CDECL Win_UpPage( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_UpLine( WINDOW *win)
+void __CDECL Win_UpLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h;
 
@@ -809,7 +809,7 @@ void __CDECL Win_UpLine( WINDOW *win)
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 		win->ypos --;
 		WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-		move_main_work( win, x, y, w, h, 0, -win->h_u, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, 0, -win->h_u, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -825,7 +825,7 @@ void __CDECL Win_UpLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_LeftLine( WINDOW *win)
+void __CDECL Win_LeftLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h;
 
@@ -834,7 +834,7 @@ void __CDECL Win_LeftLine( WINDOW *win)
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 		win->xpos --;
 		WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
-		move_main_work( win, x, y, w, h, -win->w_u, 0, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, -win->w_u, 0, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -851,7 +851,7 @@ void __CDECL Win_LeftLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_RightLine( WINDOW *win)
+void __CDECL Win_RightLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h;
 
@@ -861,7 +861,7 @@ void __CDECL Win_RightLine( WINDOW *win)
 	{
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 		win -> xpos++;
-		move_main_work( win, x, y, w, h, win->w_u, 0, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, win->w_u, 0, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -877,7 +877,7 @@ void __CDECL Win_RightLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_DownLine( WINDOW *win)
+void __CDECL Win_DownLine( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h;
 
@@ -887,7 +887,7 @@ void __CDECL Win_DownLine( WINDOW *win)
 	{
 		WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 		win -> ypos ++;
-		move_main_work( win, x, y, w, h, 0, win->h_u, windata->frame_width, windata->border_width);
+		move_main_work( win, x, y, w, h, 0, win->h_u, windata->frame_width, windata->border_width EVNT_BUFF_ARG);
 	}
 }
 
@@ -904,33 +904,33 @@ void __CDECL Win_DownLine( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-void __CDECL Win_Arrow( WINDOW *win)
+void __CDECL Win_Arrow( WINDOW *win EVNT_BUFF_PARAM)
 {
-	switch( evnt.buff[4])
+	switch( EVNT_BUFF[4])
 	{
 		case WA_UPPAGE:
-			Win_UpPage( win);
+			Win_UpPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_DNPAGE:
-			Win_DownPage( win);
+			Win_DownPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_LFPAGE:
-			Win_LeftPage( win);
+			Win_LeftPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_RTPAGE:
-			Win_RightPage( win);
+			Win_RightPage( win EVNT_BUFF_ARG);
 			break;
 		case WA_UPLINE:
-			Win_UpLine( win);
+			Win_UpLine( win EVNT_BUFF_ARG);
 			break;
 		case WA_DNLINE:
-			Win_DownLine( win);
+			Win_DownLine( win EVNT_BUFF_ARG);
 			break;
 		case WA_LFLINE:
-			Win_LeftLine( win);
+			Win_LeftLine( win EVNT_BUFF_ARG);
 			break;
 		case WA_RTLINE:
-			Win_RightLine( win);
+			Win_RightLine( win EVNT_BUFF_ARG);
 			break;
 		default:
 			break;
@@ -1059,7 +1059,7 @@ WINDOW *WindView( char *filename)
 
 	if ( !( WindOpen( winview, -1, -1, w, h)))
 	{
-		WindViewClose( winview);
+		WindViewClose( winview EVNT_BUFF_NULL);
 		errshow( "", ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;

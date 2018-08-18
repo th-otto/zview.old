@@ -13,7 +13,7 @@
  *      --																			*
  *==================================================================================*/
 
-void __CDECL close_modal( WINDOW *win) 
+void __CDECL close_modal( WINDOW *win EVNT_BUFF_PARAM)
 {
 	MenuEnable();
 	frm_cls( win);

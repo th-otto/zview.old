@@ -88,6 +88,12 @@ void applexit( void)
  *      --																			*
  *==================================================================================*/
 
+static void __CDECL evnt_applexit(WINDOW *win, short buff[8])
+{
+	applexit();
+}
+
+
 static void applinit( void)
 {		
 	ApplInit();
@@ -102,7 +108,7 @@ static void applinit( void)
 
 /*	is it unusefull ? */
 	if( _AESnumapps == -1)
-		menu_register( app.id, "  zView   ");
+		menu_register( _AESapid, "  zView   ");
 
 	if( !RsrcLoad( "zview.rsc")) 
 	{
@@ -133,7 +139,7 @@ static void applinit( void)
 
 	MenuDesktop();	
 
-	EvntAttach( NULL, AP_TERM,  applexit);
+	EvntAttach( NULL, AP_TERM, evnt_applexit);
 
 	/* Load the plugins.. */
 	
@@ -149,6 +155,25 @@ static void applinit( void)
 	evnt.bmask   	= 3;
 	evnt.bstate   	= 0; 
 }
+
+
+#if __WINDOM_MAJOR__ >= 2
+void snd_msg( WINDOW *win, int msg, int par1, int par2, int par3, int par4) {
+	ApplWrite( _AESapid, msg, win?win->handle : 0, par1, par2, par3, par4);
+}
+
+
+void frm_cls( WINDOW *win)
+{
+	stdFormClose(win, 0, 0, NULL);
+}
+
+
+int CallStGuide(char *path)
+{
+	return ApplWrite( appl_find("ST-GUIDE"), VA_START, ADR(path), 0, 0, 0);
+}
+#endif
 
 
 /*==================================================================================*

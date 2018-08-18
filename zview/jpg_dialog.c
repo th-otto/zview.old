@@ -16,7 +16,7 @@ void 	*jpg_option_slider = NULL;
 extern void CDECL ( *set_jpg_option)( int16 set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive);
 
 
-static void __CDECL jpg_option_close( WINDOW *win) 
+static void __CDECL jpg_option_close( WINDOW *win EVNT_BUFF_PARAM)
 {
 	free( jpg_option_slider);
 	frm_cls( win);
@@ -56,10 +56,16 @@ static void jpg_option_ok_event( WINDOW *win, int obj_index, int mode, void *dat
 	set_jpg_option( quality, color_space, progressive);
 
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
-	ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 }
 
-static void __CDECL jpg_option_slider_event( WINDOW *win, int mode, float value, void *data)
+static void __CDECL jpg_option_slider_event( WINDOW *win, int mode,
+#if __WINDOM_MAJOR__ >= 2
+	short value,
+#else
+	float value,
+#endif
+	void *data)
 {
 	(void)data;
 	quality = ( int16)value;
@@ -118,9 +124,9 @@ void jpg_option_dialog( char *source_file)
 	SlidSetFunc( jpg_option_slider, jpg_option_slider_event, NULL);
 
 #if 0
-	ObjcAttach( OC_FORM, win, JPGPREF_PREVIEW, BIND_FUNC, jpg_option_show_preview);
+	ObjcAttachFormFunc( win, JPGPREF_PREVIEW, jpg_option_show_preview, NULL);
 #endif
-	ObjcAttach( OC_FORM, win, JPGPREF_GRAY, BIND_FUNC, jpg_option_gray_event);
-	ObjcAttach( OC_FORM, win, JPGPREF_OK, BIND_FUNC, jpg_option_ok_event);
-	ObjcAttach( OC_FORM, win, JPGPREF_PROGRESSIVE, BIND_FUNC, jpg_option_progressive_event);
+	ObjcAttachFormFunc( win, JPGPREF_GRAY, jpg_option_gray_event, NULL);
+	ObjcAttachFormFunc( win, JPGPREF_OK, jpg_option_ok_event, NULL);
+	ObjcAttachFormFunc( win, JPGPREF_PROGRESSIVE, jpg_option_progressive_event, NULL);
 }

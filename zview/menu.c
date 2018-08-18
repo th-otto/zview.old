@@ -26,9 +26,9 @@
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL MenuHandle(WINDOW *win) 			 
+static void __CDECL MenuHandle(WINDOW *win EVNT_BUFF_PARAM)
 {	
-	MenuTnormal( NULL, evnt.buff[3], 1);
+	MenuTnormal( NULL, EVNT_BUFF[3], 1);
 }
 
 
@@ -42,7 +42,7 @@ static void __CDECL MenuHandle(WINDOW *win)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_about( void)
+static void __CDECL Menu_about(WINDOW *win, int item, int title, void *data)
 {
 	OBJECT *aboutbox = get_tree( ABOUT);
 
@@ -69,7 +69,7 @@ static void __CDECL Menu_about( void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-void __CDECL Menu_open_image(void)
+void __CDECL Menu_open_image(WINDOW *win, int item, int title, void *data)
 {
 	static char path[MAX_PATH]	= "C:\\"; /* Fist usage : current directory */
     char 		name[MAXNAMLEN]	= ""; 
@@ -98,7 +98,7 @@ void __CDECL Menu_open_image(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_file_info(void)
+static void __CDECL Menu_file_info(WINDOW *win, int item, int title, void *data)
 {
 	infobox();
 }
@@ -115,7 +115,7 @@ static void __CDECL Menu_file_info(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_preference(void)
+static void __CDECL Menu_preference(WINDOW *win, int item, int title, void *data)
 {
 	preference_dialog();
 }
@@ -133,7 +133,7 @@ static void __CDECL Menu_preference(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_file_save(void)
+static void __CDECL Menu_file_save(WINDOW *win, int item, int title, void *data)
 {
 	WINDICON 	*wicones;
 	WINDATA		*windata;
@@ -168,11 +168,11 @@ static void __CDECL Menu_file_save(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_close_win(void)
+static void __CDECL Menu_close_win(WINDOW *win, int item, int title, void *data)
 {
 	if( wglb.front) 
     {
-		ApplWrite( app.id, WM_DESTROY, wglb.front->handle, 0, 0, 0, 0);
+		ApplWrite( _AESapid, WM_DESTROY, wglb.front->handle, 0, 0, 0, 0);
     }
 }
 
@@ -188,7 +188,7 @@ static void __CDECL Menu_close_win(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_delete(void)
+static void __CDECL Menu_delete(WINDOW *win, int item, int title, void *data)
 {
 	WINDICON *wicones;
 
@@ -219,7 +219,7 @@ static void __CDECL Menu_delete(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_select_all(void)
+static void __CDECL Menu_select_all(WINDOW *win, int item, int title, void *data)
 {
 	WINDICON *wicones;
 	int16 i, x, y, w, h;
@@ -263,7 +263,7 @@ static void __CDECL Menu_select_all(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_show_only_images(void)
+static void __CDECL Menu_show_only_images(WINDOW *win, int item, int title, void *data)
 {
 	if ( !show_only_images)
 	{
@@ -297,7 +297,7 @@ static void __CDECL Menu_show_only_images(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_sort_by_name(void)
+static void __CDECL Menu_sort_by_name(WINDOW *win, int item, int title, void *data)
 {	
 	if ( sortingmode != 0)
 	{		
@@ -332,7 +332,7 @@ static void __CDECL Menu_sort_by_name(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_sort_by_size(void)
+static void __CDECL Menu_sort_by_size(WINDOW *win, int item, int title, void *data)
 {	
 	if ( sortingmode != 1)
 	{		
@@ -367,7 +367,7 @@ static void __CDECL Menu_sort_by_size(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_sort_by_date(void)
+static void __CDECL Menu_sort_by_date(WINDOW *win, int item, int title, void *data)
 {	
 	if ( sortingmode != 2)
 	{		
@@ -401,7 +401,7 @@ static void __CDECL Menu_sort_by_date(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_fullscreen(void)
+static void __CDECL Menu_fullscreen(WINDOW *win, int item, int title, void *data)
 {	
 	WINDATA	*windata;
 
@@ -428,7 +428,7 @@ static void __CDECL Menu_fullscreen(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_show_browser(void)
+static void __CDECL Menu_show_browser(WINDOW *win, int item, int title, void *data)
 {	
 	if( browser_frame_width)
 	{   
@@ -496,7 +496,7 @@ static void __CDECL Menu_show_browser(void)
  *      --																			*
  *==================================================================================*/
 #if 0
-static void __CDECL Menu_show_preview_area(void)
+static void __CDECL Menu_show_preview_area(WINDOW *win, int item, int title, void *data)
 {	
 	if( preview_frame_height)
 	{   
@@ -533,7 +533,7 @@ static void __CDECL Menu_show_preview_area(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_thumb_size(void)
+static void __CDECL Menu_thumb_size(WINDOW *win, int item, int title, void *data)
 {	
 	if ( thumbnail_size > 3)
 	{		
@@ -576,7 +576,7 @@ static void __CDECL Menu_thumb_size(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_show_help(void)
+static void __CDECL Menu_show_help(WINDOW *win, int item, int title, void *data)
 {	
 	strcpy( fullname, zview_path);
 	strcat( fullname, "\\doc\\zview.hyp");
@@ -595,12 +595,23 @@ static void __CDECL Menu_show_help(void)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL Menu_show_history(void)
+static void __CDECL Menu_show_history(WINDOW *win, int item, int title, void *data)
 {	
 	strcpy( fullname, zview_path);
 	strcat( fullname, "\\doc\\history.txt");
 
 	CallStGuide( fullname);
+}
+
+
+static void __CDECL menu_applexit(WINDOW *win, int item, int title, void *data)
+{
+	applexit();
+}
+
+static void __CDECL menu_wincatalog(WINDOW *win, int item, int title, void *data)
+{
+	WinCatalog();
 }
 
 
@@ -619,26 +630,26 @@ void MenuDesktop( void)
 	MenuBar ( get_tree( MENU_BAR), 1);
 	
 	/* Attach Menu functions */
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_OPEN, BIND_FUNC, Menu_open_image);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_ABOUT, BIND_FUNC, Menu_about);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_QUIT, BIND_FUNC, applexit);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_BROWSER, BIND_FUNC, WinCatalog);	
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_CLOSE, BIND_FUNC, Menu_close_win);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SHOW_ONLY_IMAGES, BIND_FUNC, Menu_show_only_images);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_NAME, BIND_FUNC, Menu_sort_by_name);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_SIZE, BIND_FUNC, Menu_sort_by_size);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_BY_DATE, BIND_FUNC, Menu_sort_by_date);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SHOW_BROWSER, BIND_FUNC, Menu_show_browser);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SELECT_ALL, BIND_FUNC, Menu_select_all);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_LARGE_THUMB, BIND_FUNC, Menu_thumb_size);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_LONG_THUMB, BIND_FUNC, Menu_thumb_size);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_INFORMATION, BIND_FUNC, Menu_file_info);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_PREFERENCE, BIND_FUNC, Menu_preference);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SAVE, BIND_FUNC, Menu_file_save);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_DELETE, BIND_FUNC, Menu_delete);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_HISTORY, BIND_FUNC, Menu_show_history);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_GUIDE, BIND_FUNC, Menu_show_help);
-	ObjcAttach( OC_MENU, NULL, MENU_BAR_SHOW_FULLSCREEN, BIND_FUNC, Menu_fullscreen);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_OPEN, Menu_open_image, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_ABOUT, Menu_about, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_QUIT, menu_applexit, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_BROWSER, menu_wincatalog, NULL);	
+	ObjcAttachMenuFunc( NULL, MENU_BAR_CLOSE, Menu_close_win, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_SHOW_ONLY_IMAGES, Menu_show_only_images, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_BY_NAME, Menu_sort_by_name, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_BY_SIZE, Menu_sort_by_size, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_BY_DATE, Menu_sort_by_date, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_SHOW_BROWSER, Menu_show_browser, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_SELECT_ALL, Menu_select_all, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_LARGE_THUMB, Menu_thumb_size, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_LONG_THUMB, Menu_thumb_size, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_INFORMATION, Menu_file_info, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_PREFERENCE, Menu_preference, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_SAVE, Menu_file_save, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_DELETE, Menu_delete, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_HISTORY, Menu_show_history, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_GUIDE, Menu_show_help, NULL);
+	ObjcAttachMenuFunc( NULL, MENU_BAR_SHOW_FULLSCREEN, Menu_fullscreen, NULL);
 
 	if( browser_frame_width)
 		MenuIcheck( NULL, MENU_BAR_SHOW_BROWSER, 1);

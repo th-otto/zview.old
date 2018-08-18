@@ -30,7 +30,7 @@ static int16 	dum;
  *		--																			*
  *==================================================================================*/
 
-void __CDECL WinCatalog_Mouse( WINDOW *win) 
+void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON 	*wicones = (WINDICON *)DataSearch( win, WD_ICON);
 	GRECT 		mouse;
@@ -274,7 +274,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win)
 							if ( wicones -> ypos > 0L) 
 							{
 								wicones -> ypos--;
-								move_frame_work( win, -wicones->h_u);
+								move_frame_work( win, -wicones->h_u EVNT_BUFF_ARG);
 								redraw_arrow_slider	= 1;
 							}  				
 
@@ -300,7 +300,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win)
 									ObjcWindChange( win, frame_slider_root, SLIDERS_DOWN, frame_slider_root->ob_x, frame_slider_root[SLIDERS_DOWN].ob_y + y, frame_slider_root[SLIDERS_DOWN].ob_width + 1, frame_slider_root[SLIDERS_DOWN].ob_height + 1, SELECTED);
 
 								wicones -> ypos++;
-								move_frame_work( win, wicones->h_u);
+								move_frame_work( win, wicones->h_u EVNT_BUFF_ARG);
 								redraw_arrow_slider	= 1;
 							}	 		
 
@@ -338,7 +338,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win)
 						wicones->ypos =  pos;
 
 						if( dy && ( old_ypos != wicones->ypos)) 
-							move_frame_work( win, dy);
+							move_frame_work( win, dy EVNT_BUFF_ARG);
 
 						if( app.aes4 & AES4_XGMOUSE)
 							graf_mouse( M_RESTORE, 0L);
@@ -368,7 +368,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win)
 									wicones -> ypos = MIN( wicones->ypos_max, wicones->ypos) + page;
 									wicones -> ypos = MIN( wicones -> ypos, wicones -> ypos_max - page);
 									dy = ( int16) (( wicones->ypos - old_ypos) * wicones->h_u);
-									move_frame_work( win, dy);
+									move_frame_work( win, dy EVNT_BUFF_ARG);
 								}
 
 								graf_mkstate( &dum, &dum, &res, &dum);
@@ -383,7 +383,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win)
 									pos = MAX( 0L, wicones->ypos - h / wicones->h_u);
 									dy = ( int16) (( pos - wicones->ypos) * wicones->h_u);
 									wicones->ypos = pos;
-									move_frame_work( win, dy);
+									move_frame_work( win, dy EVNT_BUFF_ARG);
 								}						   
 
 								graf_mkstate( &dum, &dum, &res, &dum);

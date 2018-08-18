@@ -16,21 +16,21 @@
  *		--																			*
  *==================================================================================*/
 
-void __CDECL WinCatalog_Size( WINDOW *win) 
+void __CDECL WinCatalog_Size( WINDOW *win EVNT_BUFF_PARAM) 
 {
 	int16 dum, x, y, w, h, old_h, rdw_win = 0, rdw_frame = 0;
 	uint32 old_win_ypos, old_frame_ypos;
     WINDICON *wicones = (WINDICON *)DataSearch( win, WD_ICON);	
 
-	x = MAX( evnt.buff[6], win -> w_min);
-	y = MAX( evnt.buff[7], win -> h_min);
+	x = MAX( EVNT_BUFF[6], win -> w_min);
+	y = MAX( EVNT_BUFF[7], win -> h_min);
 
 	w = MIN( x, win -> w_max);
 	h = MIN( y, win -> h_max);
 
 	WindGet( win, WF_WORKXYWH, &dum, &dum, &dum, &old_h);
 	
-	wind_set( evnt.buff[3], WF_CURRXYWH, evnt.buff[4], evnt.buff[5], w, h);
+	wind_set( EVNT_BUFF[3], WF_CURRXYWH, EVNT_BUFF[4], EVNT_BUFF[5], w, h);
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 

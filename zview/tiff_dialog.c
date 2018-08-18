@@ -21,7 +21,7 @@ static  int		compression_button 	= 0;
 extern void CDECL ( *set_tiff_option)( int16 set_quality, uint16 set_encode_compression);
 
 
-static void __CDECL tiff_option_close( WINDOW *win) 
+static void __CDECL tiff_option_close( WINDOW *win EVNT_BUFF_PARAM)
 {
 	free( tiff_option_slider);
 	frm_cls( win);
@@ -51,11 +51,17 @@ static void __CDECL tiff_option_ok_event( WINDOW *win, int obj_index, int mode, 
 	set_tiff_option( quality, compression);
 
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
-	ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 }
 
 
-static void tiff_option_slider_event( WINDOW *win, int mode, float value, void *data)
+static void tiff_option_slider_event( WINDOW *win, int mode,
+#if __WINDOM_MAJOR__ >= 2
+	int16 value,
+#else
+	float value,
+#endif
+	void *data)
 {
 	(void)data;
 	quality = ( int16)value;
@@ -107,11 +113,11 @@ void tiff_option_dialog( void)
 	if( compression == COMPRESSION_NONE)
 		ObjcChange( OC_FORM, win, TIFFPREF_None, SELECTED, TRUE);	
 	
-	ObjcAttach( OC_FORM, win, TIFFPREF_None, 	BIND_VAR,	&compression_button);
-	ObjcAttach( OC_FORM, win, TIFFPREF_RLE, 	BIND_VAR,	&compression_button);
-	ObjcAttach( OC_FORM, win, TIFFPREF_LZW, 	BIND_VAR,	&compression_button);
-	ObjcAttach( OC_FORM, win, TIFFPREF_JPEG, 	BIND_VAR,	&compression_button);
-	ObjcAttach( OC_FORM, win, TIFFPREF_DEFLATE, BIND_VAR, 	&compression_button);
+	ObjcAttachVar( OC_FORM, win, TIFFPREF_None, 	&compression_button, TIFFPREF_None);
+	ObjcAttachVar( OC_FORM, win, TIFFPREF_RLE, 	&compression_button, TIFFPREF_RLE);
+	ObjcAttachVar( OC_FORM, win, TIFFPREF_LZW, 	&compression_button, TIFFPREF_LZW);
+	ObjcAttachVar( OC_FORM, win, TIFFPREF_JPEG, 	&compression_button, TIFFPREF_JPEG);
+	ObjcAttachVar( OC_FORM, win, TIFFPREF_DEFLATE, &compression_button, TIFFPREF_DEFLATE);
 
-	ObjcAttach( OC_FORM, win, TIFFPREF_OK, BIND_FUNC, tiff_option_ok_event);
+	ObjcAttachFormFunc( win, TIFFPREF_OK, tiff_option_ok_event, NULL);
 }

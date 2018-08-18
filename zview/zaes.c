@@ -65,10 +65,10 @@ static int my_vsl_color (short handle, short idx) {
 
 /* *** end of the workaround for TOS *** */
 
-void __CDECL generic_form_event( WINDOW *win) 
+void __CDECL generic_form_event( WINDOW *win EVNT_BUFF_PARAM)
 {
-	ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, FALSE);
-	ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+	ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, FALSE);
+	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 }
 
 
@@ -101,8 +101,8 @@ void CDECL draw_object_image( WINDOW *win, PARMBLK *pblk, void *data)
 		xy[2] = xy[0] + 127;
 		xy[3] = xy[1] + 127;
 
-		vsf_color( win->graf.handle, WHITE);
-		v_bar( win->graf.handle, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), WHITE);
+		v_bar( WIN_GRAF_HANDLE(win), xy);
 
 		xy[0] = pblk->pb_x;
 		xy[1] = pblk->pb_y;
@@ -115,8 +115,8 @@ void CDECL draw_object_image( WINDOW *win, PARMBLK *pblk, void *data)
 		xy[8] = pblk->pb_x;
 		xy[9] = pblk->pb_y;
 
-		vsl_color( win->graf.handle, BLACK);
-		v_pline( win->graf.handle, 5, xy);
+		vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+		v_pline( WIN_GRAF_HANDLE(win), 5, xy);
 
 		return;
 	}
@@ -127,8 +127,8 @@ void CDECL draw_object_image( WINDOW *win, PARMBLK *pblk, void *data)
 		xy[2] = xy[0] + 127;
 		xy[3] = xy[1] + 127;
 
-		vsf_color( win->graf.handle, WHITE);
-		v_bar( win->graf.handle, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), WHITE);
+		v_bar( WIN_GRAF_HANDLE(win), xy);
 	}
 
 	posx    = MAX( ( 128 - source->fd_w) >> 1, 0);
@@ -152,9 +152,9 @@ void CDECL draw_object_image( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + xy[3];
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);
 		
 	xy[0] = pblk->pb_x;
 	xy[1] = pblk->pb_y;
@@ -167,8 +167,8 @@ void CDECL draw_object_image( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[8] = pblk->pb_x;
 	xy[9] = pblk->pb_y;
 
-	vsl_color( win->graf.handle, BLACK);
-	v_pline( win->graf.handle, 5, xy);
+	vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+	v_pline( WIN_GRAF_HANDLE(win), 5, xy);
 }
 
 
@@ -188,9 +188,9 @@ void CDECL draw_icon_up( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 	
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);		
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);		
 }
 
 void CDECL draw_icon_find( WINDOW *win, PARMBLK *pblk, void *data) 
@@ -209,9 +209,9 @@ void CDECL draw_icon_find( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 
@@ -231,9 +231,9 @@ void CDECL draw_icon_reload( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_greater( WINDOW *win, PARMBLK *pblk, void *data)   
@@ -265,9 +265,9 @@ void CDECL draw_icon_greater( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_smaller( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -300,9 +300,9 @@ void CDECL draw_icon_smaller( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_back( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -330,9 +330,9 @@ void CDECL draw_icon_back( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_forward( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -360,9 +360,9 @@ void CDECL draw_icon_forward( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_printer( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -378,9 +378,9 @@ void CDECL draw_icon_printer( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 
@@ -400,9 +400,9 @@ void CDECL draw_icon_open( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_fullscreen( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -421,9 +421,9 @@ void CDECL draw_icon_fullscreen( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 
@@ -459,9 +459,9 @@ void CDECL draw_icon_info( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 
@@ -497,9 +497,9 @@ void CDECL draw_icon_save( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 void CDECL draw_icon_delete( WINDOW *win, PARMBLK *pblk, void *data)  
@@ -524,9 +524,9 @@ void CDECL draw_icon_delete( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[7] = xy[5] + 15;
 
 	if ( source->fd_nplanes == 1)
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, source, &screen, wanted_color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, source, &screen, wanted_color);
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, source, &screen);	
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, source, &screen);	
 }
 
 /*==================================================================================*
@@ -554,13 +554,13 @@ void draw_window_iconified( WINDOW *win)
 	pxy[2] = pxy[0] + w - 1;
 	pxy[3] = pxy[1] + h - 1;
 
-	vsf_color( win->graf.handle, LWHITE);
-	v_bar( win->graf.handle, pxy);
+	vsf_color( WIN_GRAF_HANDLE(win), LWHITE);
+	v_bar( WIN_GRAF_HANDLE(win), pxy);
 
 	tree->ob_x = x + (( w - 32) >> 1);
 	tree->ob_y = y + (( h - 32) >> 1);
 
-	objc_draw( tree, MINI_ICON_SNIPE, 0, clip.g_x, clip.g_y, clip.g_w, clip.g_h);	
+	objc_draw_grect( tree, MINI_ICON_SNIPE, 0, WIN_GRAF_CLIP(win));	
 }
 
 

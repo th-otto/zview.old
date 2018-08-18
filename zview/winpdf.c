@@ -39,21 +39,21 @@ static void calc_slider( WINDATA *windata, OBJECT *slider_root);
  *		--																			*
  *==================================================================================*/
 
-static void __CDECL WindPdfSize( WINDOW *win)
+static void __CDECL WindPdfSize( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16 x, y, w, h, old_h, rdw_frame = 0;
 	uint32 old_frame_ypos;
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 
-	x = MAX( evnt.buff[6], win -> w_min);
-	y = MAX( evnt.buff[7], win -> h_min);
+	x = MAX( EVNT_BUFF[6], win -> w_min);
+	y = MAX( EVNT_BUFF[7], win -> h_min);
 
 	w = MIN( x, win -> w_max);
 	h = MIN( y, win -> h_max);
 
 	WindGet( win, WF_WORKXYWH, &dum, &dum, &dum, &old_h);
 
-	wind_set( evnt.buff[3], WF_CURRXYWH, evnt.buff[4], evnt.buff[5], w, h);
+	wind_set( EVNT_BUFF[3], WF_CURRXYWH, EVNT_BUFF[4], EVNT_BUFF[5], w, h);
 
 	WindGet( win, WF_WORKXYWH, &x, &y, &w, &h);
 
@@ -107,7 +107,7 @@ static void __CDECL WindPdfSize( WINDOW *win)
  *		--																			*
  *==================================================================================*/
 
-static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
+static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata EVNT_BUFF_PARAM)
 {
 	int16	x, y, w, h, absolute_dy;
 	GRECT	rect, r1, r2, screen;
@@ -143,7 +143,7 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 					else
 						r1.g_h += dy;
 
-					move_area( win->graf.handle, &r1, 0, -dy);
+					move_area( WIN_GRAF_HANDLE(win), &r1, 0, -dy);
 
 					if ( dy)
 					{
@@ -157,16 +157,26 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata)
 						else
 							r1.g_h = -dy;
 
-						rc_clip_on( win->graf.handle, &r1);
+						WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+						EVNT_BUFF[0] = WM_REDRAW;
+						EvntExec( win EVNT_BUFF_ARG);
+#else
 						EvntExec( win, WM_REDRAW);
-						rc_clip_off( win->graf.handle);
+#endif
+						WinClipOff( win);
 					}
 				}
 				else
 				{
-					rc_clip_on( win->graf.handle, &r1);
+					WinClipOn( win, &r1);
+#if __WINDOM_MAJOR__ >= 2
+					EVNT_BUFF[0] = WM_REDRAW;
+					EvntExec( win EVNT_BUFF_ARG);
+#else
 					EvntExec( win, WM_REDRAW);
-					rc_clip_off( win->graf.handle);
+#endif
+					WinClipOff( win);
 				}
 			}
 			wind_get( win->handle, WF_NEXTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
@@ -330,7 +340,7 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
  *		--																			*
  *==================================================================================*/
 
-static void __CDECL WindPdfMouse( WINDOW *win)
+static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
 	GRECT 		mouse;
@@ -406,7 +416,7 @@ static void __CDECL WindPdfMouse( WINDOW *win)
 									ObjcWindChange( win, windata->frame_slider, SLIDERS_UP, windata->frame_slider->ob_x, windata->frame_slider[SLIDERS_UP].ob_y + y, windata->frame_slider[SLIDERS_UP].ob_width + 1, windata->frame_slider[SLIDERS_UP].ob_height + 1, SELECTED);
 
 								windata -> ypos--;
-								move_bookmark_work( win, -windata->h_u, windata);
+								move_bookmark_work( win, -windata->h_u, windata EVNT_BUFF_ARG);
 								redraw_arrow_slider	= 1;
 							}
 
@@ -430,7 +440,7 @@ static void __CDECL WindPdfMouse( WINDOW *win)
 									ObjcWindChange( win, windata->frame_slider, SLIDERS_DOWN, windata->frame_slider->ob_x, windata->frame_slider[SLIDERS_DOWN].ob_y + y, windata->frame_slider[SLIDERS_DOWN].ob_width + 1, windata->frame_slider[SLIDERS_DOWN].ob_height + 1, SELECTED);
 
 								windata -> ypos++;
-								move_bookmark_work( win, windata->h_u, windata);
+								move_bookmark_work( win, windata->h_u, windata EVNT_BUFF_ARG);
 								redraw_arrow_slider	= 1;
 							}
 
@@ -467,7 +477,7 @@ static void __CDECL WindPdfMouse( WINDOW *win)
 						windata->ypos =  pos;
 
 						if( dy && ( old_ypos != windata->ypos))
-							move_bookmark_work( win, dy, windata);
+							move_bookmark_work( win, dy, windata EVNT_BUFF_ARG);
 
 						if( app.aes4 & AES4_XGMOUSE)
 							graf_mouse( M_RESTORE, 0L);
@@ -497,7 +507,7 @@ static void __CDECL WindPdfMouse( WINDOW *win)
 									windata -> ypos = MIN( windata->ypos_max, windata->ypos) + page;
 									windata -> ypos = MIN( windata -> ypos, windata -> ypos_max - page);
 									dy = ( int16) (( windata->ypos - old_ypos) * windata->h_u);
-									move_bookmark_work( win, dy, windata);
+									move_bookmark_work( win, dy, windata EVNT_BUFF_ARG);
 								}
 
 								graf_mkstate( &dum, &dum, &res, &dum);
@@ -512,7 +522,7 @@ static void __CDECL WindPdfMouse( WINDOW *win)
 									pos = MAX( 0L, windata->ypos - h / windata->h_u);
 									dy = ( int16) (( pos - windata->ypos) * windata->h_u);
 									windata->ypos = pos;
-									move_bookmark_work( win, dy, windata);
+									move_bookmark_work( win, dy, windata EVNT_BUFF_ARG);
 								}
 
 								graf_mkstate( &dum, &dum, &res, &dum);
@@ -662,23 +672,23 @@ static void size_popup( WINDOW *win, int obj_index)
  *      --																			*
  *==================================================================================*/
 
-static void __CDECL WindPdfTool( WINDOW *win)
+static void __CDECL WindPdfTool( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
-    int16	x, y, w, h, zoom, object = evnt.buff[4];
+    int16	x, y, w, h, zoom, object = EVNT_BUFF[4];
     double  scale = 1.0;
     char	temp[20];
 
 	switch( object)
 	{
 		case PDFTOOLBAR_OPEN:
-			Menu_open_image();
+			Menu_open_image(NULL, 0, 0, NULL);
 			windata->scale = 1.0;
 			break;
 
 		case PDFTOOLBAR_INFO:
-		        WindViewTop( win);
+		        WindViewTop( win EVNT_BUFF_ARG);
 			infobox();
 			break;
 
@@ -905,7 +915,7 @@ static void __CDECL WindPdfTool( WINDOW *win)
 }
 
 
-static void __CDECL WindPdfTop( WINDOW *win)
+static void __CDECL WindPdfTop( WINDOW *win EVNT_BUFF_PARAM)
 {
 	menu = get_tree( MENU_BAR);
 
@@ -918,7 +928,7 @@ static void __CDECL WindPdfTop( WINDOW *win)
 }
 
 
-static void __CDECL WindPdfKeyb( WINDOW *win)
+static void __CDECL WindPdfKeyb( WINDOW *win EVNT_BUFF_PARAM)
 {
 	switch ( evnt.keybd >> 8)
 	{
@@ -1005,8 +1015,8 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
 			xy[5] = xy[1] + 5;
 		}
 
-		vsf_color( win->graf.handle, LBLACK);
-		v_fillarea( win->graf.handle, 3, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), LBLACK);
+		v_fillarea( WIN_GRAF_HANDLE(win), 3, xy);
 	}
 
 	/* DRAW TEXT */
@@ -1020,13 +1030,13 @@ static void draw_bookmark( WINDOW *win, Bookmark *selected, Bookmark *entry, int
 		xy[1] = ytext - 1;
 		xy[3] = xy[1] + hcell + 2;
 
-		vsf_color( win->graf.handle, BLACK);
-		v_bar( win->graf.handle, xy);
+		vsf_color( WIN_GRAF_HANDLE(win), BLACK);
+		v_bar( WIN_GRAF_HANDLE(win), xy);
 
-		draw_text( win->graf.handle, xtext, ytext, WHITE, entry->name);
+		draw_text( WIN_GRAF_HANDLE(win), xtext, ytext, WHITE, entry->name);
 	}
 	else
-		draw_text( win->graf.handle, xtext, ytext, BLACK, entry->name);
+		draw_text( WIN_GRAF_HANDLE(win), xtext, ytext, BLACK, entry->name);
 }
 
 
@@ -1114,7 +1124,7 @@ static void calc_slider( WINDATA *windata, OBJECT *slider_root)
 }
 
 
-static void __CDECL WindPdfRedraw( WINDOW *win)
+static void __CDECL WindPdfRedraw( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16	lines = 0, y, i, xw, yw, ww, hw, tmp, xy[8], pxy[4], page;
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
@@ -1133,8 +1143,8 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 		pxy[3] = pxy[1] + hw - 1;
 
 		/* clean the first frame */
-		vsf_color( win->graf.handle, WHITE);
-		v_bar( win->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(win), WHITE);
+		v_bar( WIN_GRAF_HANDLE(win), pxy);
 
 
 		/* Draw the 1st frame ( navigation folder) */
@@ -1170,33 +1180,33 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 
 		/* Draw the frame border */
 		pxy[0] = pxy[2];
-		vsl_color( win->graf.handle, BLACK);
-		v_pline( win->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( win->graf.handle, WHITE);
-		v_pline( win->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(win), WHITE);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( win->graf.handle, LWHITE);
-		v_pline( win->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(win), LWHITE);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		v_pline( win->graf.handle, 2, pxy);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( win->graf.handle, BLACK);
-		v_pline( win->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		pxy[0] = xw;
 		pxy[1] = yw;
 		pxy[2] = pxy[0] + windata->frame_width - 1;
 		pxy[3] = yw;
-		v_pline( win->graf.handle, 2, pxy);
+		v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 		if( ( windata -> ypos_max * windata -> h_u) >= hw)
 		{
@@ -1208,7 +1218,7 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 			windata->frame_slider[SLIDERS_DOWN].ob_y 		= windata->frame_slider->ob_height - 15;
 
 			calc_slider( windata, windata->frame_slider);
-			objc_draw( windata->frame_slider, SLIDERS_BOX, 2, clip.g_x, clip.g_y, clip.g_w, clip.g_h);
+			objc_draw_grect( windata->frame_slider, SLIDERS_BOX, 2, WIN_GRAF_CLIP(win));
 		}
 
 		xw +=  ( windata->frame_width + border_size);
@@ -1220,8 +1230,8 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 	pxy[2] = pxy[0] + ww - 1;
 	pxy[3] = yw;
 
-	vsl_color( win->graf.handle, BLACK);
-	v_pline( win->graf.handle, 2, pxy);
+	vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+	v_pline( WIN_GRAF_HANDLE(win), 2, pxy);
 
 	yw++;
 
@@ -1237,8 +1247,8 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( win->graf.handle, LWHITE);
-		v_bar( win->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(win), LWHITE);
+		v_bar( WIN_GRAF_HANDLE(win), pxy);
 		return;
 	}
 
@@ -1272,25 +1282,25 @@ static void __CDECL WindPdfRedraw( WINDOW *win)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( win->graf.handle, LWHITE);
-		v_bar( win->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(win), LWHITE);
+		v_bar( WIN_GRAF_HANDLE(win), pxy);
 	}
 
 	if ( picture->fd_nplanes == 1)
 	{
 		int16	color[2] = { BLACK, WHITE};
 
-		vrt_cpyfm( win->graf.handle, MD_REPLACE, xy, picture, &screen, color);
+		vrt_cpyfm( WIN_GRAF_HANDLE(win), MD_REPLACE, xy, picture, &screen, color);
 	}
 	else
-		vro_cpyfm( win->graf.handle, S_ONLY, xy, picture, &screen);
+		vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, picture, &screen);
 
 	WindSlider ( win, VSLIDER|HSLIDER);
 }
 
 
 
-static void __CDECL WindPdfClose( WINDOW *win)
+static void __CDECL WindPdfClose( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDATA	*windata = ( WINDATA *)DataSearch( win, WD_DATA);
     IMAGE 	*img 	 = &windata->img;
@@ -1474,7 +1484,7 @@ WINDOW *WindPdf( char *filename)
 
 	if ( !( WindOpen( winview, app.x, app.y, app.w, app.h)))
 	{
-		WindPdfClose( winview);
+		WindPdfClose( winview EVNT_BUFF_NULL);
 		errshow( "", ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;

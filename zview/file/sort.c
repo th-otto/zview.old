@@ -1,16 +1,11 @@
 /*----------------------------------------------------------------------*/
 /*							Sortring Operations							*/
 /*------------------- ---------------------------------------------------*/
-#include "..//general.h"
-#include "..//ztext.h"
-#include "..//prefs.h"
+#include "../general.h"
+#include "../ztext.h"
+#include "../prefs.h"
+#include "sort.h"
 
-/* prototype */
-int cmp_entries_name( const void *obj_a, const void *obj_b);
-static int cmp_entries_size( const void *obj_a, const void *obj_b);
-static int cmp_entries_date( const void *obj_a, const void *obj_b);
-static int cmp_entries_dirsbeforefiles(const void *obj_a, const void *obj_b);
-int16 sort_entries( WINDICON *dirfile);
 
 
 int cmp_entries_name(const void *obj_a, const void *obj_b)

@@ -29,7 +29,7 @@ void win_progress_begin( char *string)
 
 	/* form = ( W_FORM *)DataSearch( win_read, WD_WFRM); */
 
-	vsf_color( win_read->graf.handle, BLUE);
+	vsf_color( WIN_GRAF_HANDLE(win_read), BLUE);
 		
 	EvntRedraw( win_read);
 }
@@ -73,11 +73,11 @@ void win_progress( int16 new_bar_width)
 	{
 		if( rc_intersect( &rwin, &raes)) 
 		{
-			rc_clip_on( win_read->graf.handle, &raes);
+			WinClipOn( win_read, &raes);
 
-			v_bar( win_read->graf.handle, pxy);
+			v_bar( WIN_GRAF_HANDLE(win_read), pxy);
 
-			rc_clip_off( win_read->graf.handle);
+			WinClipOff( win_read);
 		}
 	
 		wind_get( win_read->handle, WF_NEXTXYWH, &raes.g_x, &raes.g_y, &raes.g_w, &raes.g_h);

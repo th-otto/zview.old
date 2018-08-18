@@ -25,7 +25,7 @@ int16 vdi_init( void)
 	if( !get_cookie( C_EdDI, (long*)&dum))
 		return( 0);
 	
-	vq_scrninfo ( app.handle, out);
+	vq_scrninfo ( APP_GRAF_HANDLE, out);
 
  	if ( app.nplanes <= 8)
 	{
@@ -216,4 +216,3 @@ int16 vdi_init( void)
 
 	return( 1);
 }
-

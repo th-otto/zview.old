@@ -93,20 +93,20 @@ static void format_popup( WINDOW *win, int obj_index)
 }
 
 
-static void __CDECL save_dialog_event( WINDOW *win) 
+static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 {
 	char target_file[MAX_PATH+MAXNAMLEN];
 	char target_file_path[MAX_PATH];
 	char target_file_name[MAXNAMLEN];
 	char extention[3];
 	char file_mask[5];
-	int16 object = evnt.buff[4], source_file_len, source_name_len, source_path_len, i;
+	int16 object = EVNT_BUFF[4], source_file_len, source_name_len, source_path_len, i;
 
 	switch( object)
 	{	   
 		case SAVE_DIAL_FORMAT:
-			format_popup( win, evnt.buff[4]);
-			ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, TRUE);
+			format_popup( win, EVNT_BUFF[4]);
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, TRUE);
 			break;
 
 		case SAVE_DIAL_OPTIONS:
@@ -152,8 +152,8 @@ static void __CDECL save_dialog_event( WINDOW *win)
 			strcpy( file_mask, "*.");
 			strcat( file_mask, extention);
 
-			ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, FALSE);
-			close_modal( win);			
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, FALSE);
+			close_modal( win EVNT_BUFF_NULL);
 
 			if( FselInput( target_file_path, target_file_name, file_mask, get_string( SAVE_TITLE), NULL, NULL)) 
 			{
@@ -212,8 +212,8 @@ static void __CDECL save_dialog_event( WINDOW *win)
 			break;
 
 		case SAVE_DIAL_ABORT:
-			ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, FALSE);
-			ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, FALSE);
+			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 			break;
 	}
 }

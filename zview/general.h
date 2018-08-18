@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types2b.h"
 #include <osbind.h>
 #include <mintbind.h>
 #include <dirent.h>
@@ -27,8 +26,51 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#ifdef USE_WINDOM2
+#include <windom.h>
+#else
 #include <windom1.h>
+#endif
 #include <ldg.h>
+
+typedef signed char int8;
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef short int16;
+typedef long int32;
+typedef unsigned long uint32;
+typedef int boolean;
+
+#undef _AESapid
+#if __WINDOM_MAJOR__ >= 2
+#define WIN_GRAF_HANDLE(win) (win)->graf->handle
+#define APP_GRAF_HANDLE app.graf.handle
+#define WIN_GRAF_CLIP(win) &(win)->graf->clip
+#define WinClipOn(win, r) ClipOn((win)->graf, r)
+#define WinClipOff(win) ClipOff((win)->graf)
+#define _AESapid mt_AppAESapid(gl_appvar)
+#define EVNT_BUFF_PARAM , short buff[8]
+#define EVNT_BUFF_ARG , buff
+#define EVNT_BUFF_NULL , NULL
+#define EVNT_BUFF buff
+#else
+#define WIN_GRAF_HANDLE(win) (win)->graf.handle
+#define APP_GRAF_HANDLE app.handle
+#define WIN_GRAF_CLIP(win) &clip
+#define WinClipOn(win, r) rc_clip_on(WIN_GRAF_HANDLE(win), r)
+#define WinClipOff(win) rc_clip_off(WIN_GRAF_HANDLE(win))
+#define _AESapid app.id
+#define EVNT_BUFF_PARAM
+#define EVNT_BUFF_ARG
+#define EVNT_BUFF_NULL
+#define EVNT_BUFF evnt.buff
+
+#define ObjcAttachFormFunc(win, index, func, data) ObjcAttach(OC_FORM, win, index, BIND_FUNC, func)
+#define ObjcAttachMenuFunc(win, index, func, data) ObjcAttach(OC_MENU, win, index, BIND_FUNC, func)
+#define ObjcAttachVar(mode, win, index, var, val) ObjcAttach(OC_FORM, win, index, BIND_VAR, var)
+
+#endif
+
 #include "zaes.h"
 #include "zedit/libtedit.h"
 #include "gmem.h"
@@ -73,33 +115,6 @@
 /* MACRO */
 #ifndef ABS
 	#define ABS(val) ( ( ( val) < 0) ? -( val) : ( val))
-#endif
-
-#ifndef __XATTR
-#define __XATTR
-typedef struct
-{
-	uint16	mode;
-	int32	index;
-	uint16	dev;
-	uint16	reserved1;
-	uint16	nlink;
-	uint16	uid;
-	uint16	gid;
-	int32	size;
-	int32	blksize;
-	int32	nblocks;
-	int16	mtime;
-	int16	mdate;
-	int16	atime;
-	int16	adate;
-	int16	ctime;
-	int16	cdate;
-	int16	attr;
-	int16	reserved2;
-	int32	reserved3;
-	int32	reserved4;
-} XATTR;
 #endif
 
 typedef struct

@@ -53,9 +53,9 @@ static void format_popup( WINDOW *win, int obj_index)
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL handle_preference( WINDOW *win)
+static void __CDECL handle_preference( WINDOW *win EVNT_BUFF_PARAM)
 {
-	switch( evnt.buff[4])
+	switch( EVNT_BUFF[4])
 	{
 		case PREFS_PDF_FIT_TO_WINDOW:
 			pdf_fit_to_win = ( ( pref_dialog[PREFS_PDF_FIT_TO_WINDOW].ob_state & SELECTED) ? 1 : 0);
@@ -86,8 +86,8 @@ static void __CDECL handle_preference( WINDOW *win)
 			break;
 			
 		case PREFS_SMOOTH_METHOD:
-			format_popup( win, evnt.buff[4]);
-			ObjcChange( OC_FORM, win, evnt.buff[4], NORMAL, TRUE);
+			format_popup( win, EVNT_BUFF[4]);
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, TRUE);
 			break;
 									
 		case PREFS_CANCEL:
@@ -100,13 +100,13 @@ static void __CDECL handle_preference( WINDOW *win)
 			pdf_fit_to_win			= old_pdf_fit_to_win;
 			pdf_aa					= old_pdf_aa;			
 
-			ObjcChange( OC_FORM, win, evnt.buff[4], ~SELECTED, TRUE) ;
-			ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], ~SELECTED, TRUE) ;
+			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 			break;
 
 		case PREFS_OK:
-			ObjcChange( OC_FORM, win, evnt.buff[4], ~SELECTED, TRUE);
-			ApplWrite( app.id, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			ObjcChange( OC_FORM, win, EVNT_BUFF[4], ~SELECTED, TRUE);
+			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 
 			skip_drive[0] = '\0';
 			

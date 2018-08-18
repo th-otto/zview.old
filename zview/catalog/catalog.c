@@ -38,9 +38,9 @@ static int16 		dum, xw, yw, ww, hw;
 
 
 /* Prototype */
-static void __CDECL WinCatalog_Close( WINDOW *win);
-static void __CDECL WinCatalog_Redraw( WINDOW *wind);
-static void __CDECL WinCatalog_Tool( WINDOW *win);
+static void __CDECL WinCatalog_Close( WINDOW *win EVNT_BUFF_PARAM);
+static void __CDECL WinCatalog_Redraw( WINDOW *wind EVNT_BUFF_PARAM);
+static void __CDECL WinCatalog_Tool( WINDOW *win EVNT_BUFF_PARAM);
 
 
 /*==================================================================================*
@@ -202,7 +202,7 @@ int WinCatalog( void)
 	if( !scan_dir( win_catalog, "C:\\"))
 	{
 		zdebug( "can't scan the dir");
-		WinCatalog_Close( win_catalog);
+		WinCatalog_Close( win_catalog EVNT_BUFF_NULL);
 		return( 0);
 	}
 
@@ -264,7 +264,7 @@ int WinCatalog( void)
 
 	if( !WindOpen( win_catalog, browser_x, browser_y, browser_w, browser_h))
 	{
-		WinCatalog_Close( win_catalog);
+		WinCatalog_Close( win_catalog EVNT_BUFF_NULL);
 		errshow( "", ALERT_WINDOW);
 		return( 0);
 	}
@@ -305,7 +305,7 @@ int WinCatalog( void)
  *      --																			*
  *==================================================================================*/
 
-static void __CDECL WinCatalog_Close( WINDOW *win)
+static void __CDECL WinCatalog_Close( WINDOW *win EVNT_BUFF_PARAM)
 {
 	int16 	i;
 	OBJECT	*menu = get_tree( MENU_BAR);
@@ -390,7 +390,7 @@ static void __CDECL WinCatalog_Close( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-static void __CDECL WinCatalog_Tool( WINDOW *win)
+static void __CDECL WinCatalog_Tool( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON *wicones = ( WINDICON *)DataSearch( win, WD_ICON);
 	Mini_Entry	*old_selected;
@@ -399,7 +399,7 @@ static void __CDECL WinCatalog_Tool( WINDOW *win)
 
 	WindGet ( win, WF_WORKXYWH, &xw, &yw, &ww, &hw);
 
-	switch( evnt.buff[4])
+	switch( EVNT_BUFF[4])
 	{
 		case TOOLBAR_UP:
 			if ( !dir_parent( wicones->directory, temp))
@@ -473,7 +473,7 @@ static void __CDECL WinCatalog_Tool( WINDOW *win)
 			break;
 
 		case TOOLBAR_OPEN:
-			Menu_open_image();
+			Menu_open_image(NULL, 0, 0, NULL);
 			break;
 
 		case TOOLBAR_INFO:
@@ -508,7 +508,7 @@ static void __CDECL WinCatalog_Tool( WINDOW *win)
 			break;
 	}
 
-	ObjcChange( OC_TOOLBAR, win, evnt.buff[4], NORMAL, 1);
+	ObjcChange( OC_TOOLBAR, win, EVNT_BUFF[4], NORMAL, 1);
 }
 
 
@@ -641,7 +641,7 @@ void WinCatalog_Refresh( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-static void __CDECL WinCatalog_Redraw( WINDOW *wind)
+static void __CDECL WinCatalog_Redraw( WINDOW *wind EVNT_BUFF_PARAM)
 {
 	int16 		icon_w, icon_h, i, x, y, xtext, ytext, pxy[4], lines = 0, extent[10];
 	RECT16		dst_rect;
@@ -660,8 +660,8 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 		pxy[3] = pxy[1] + hw - 1;
 
 		/* clean browser frame */
-		vsf_color( wind->graf.handle, WHITE);
-		v_bar( wind->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(wind), WHITE);
+		v_bar( WIN_GRAF_HANDLE(wind), pxy);
 
 		wicones -> border_position[0] = browser_frame_width;
 		wicones -> border_position[1] = browser_frame_width + border_size;
@@ -709,7 +709,7 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 				frame_slider_root[SLIDERS_DOWN].ob_y 		= frame_slider_root->ob_height - 15;
 
 				calc_mini_entry_slider( wicones, frame_slider_root);
-				objc_draw( frame_slider_root, SLIDERS_BOX, 2, clip.g_x, clip.g_y, clip.g_w, clip.g_h);
+				objc_draw_grect( frame_slider_root, SLIDERS_BOX, 2, WIN_GRAF_CLIP(wind));
 			}
 
 			need_frame_slider = 1;
@@ -719,40 +719,40 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 
 		/* Draw the frame border */
 		pxy[0] = pxy[2];
-		vsl_color( wind->graf.handle, BLACK);
-		v_pline( wind->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(wind), BLACK);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( wind->graf.handle, WHITE);
-		v_pline( wind->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(wind), WHITE);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( wind->graf.handle, LWHITE);
-		v_pline( wind->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(wind), LWHITE);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		v_pline( wind->graf.handle, 2, pxy);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 		pxy[0]++;
 		pxy[2] = pxy[0];
-		vsl_color( wind->graf.handle, BLACK);
-		v_pline( wind->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(wind), BLACK);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 		pxy[0]++;
 
 		/* Draw the 2nd frame ( the file) */
 		pxy[2] = pxy[0] + ww - ( browser_frame_width + border_size) - 1;
-		vsf_color( wind->graf.handle, WHITE);
-		v_bar( wind->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(wind), WHITE);
+		v_bar( WIN_GRAF_HANDLE(wind), pxy);
 
 		pxy[3] = yw;
-		v_pline( wind->graf.handle, 2, pxy);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 		pxy[0] = xw;
 		pxy[2] = pxy[0] + browser_frame_width;
-		v_pline( wind->graf.handle, 2, pxy);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 	}
 	else
 	{
@@ -762,13 +762,13 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 		pxy[2] = pxy[0] + ww - 1;
 		pxy[3] = pxy[1] + hw - 1;
 
-		vsf_color( wind->graf.handle, WHITE);
-		v_bar( wind->graf.handle, pxy);
+		vsf_color( WIN_GRAF_HANDLE(wind), WHITE);
+		v_bar( WIN_GRAF_HANDLE(wind), pxy);
 
 		/* Draw a horizontal line at the window top */
 		pxy[3] = pxy[1];
-		vsl_color( wind->graf.handle, BLACK);
-		v_pline( wind->graf.handle, 2, pxy);
+		vsl_color( WIN_GRAF_HANDLE(wind), BLACK);
+		v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 	}
 
 //	yw++;
@@ -847,13 +847,13 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 
 		if ( !check_selected_entry( wicones, &wicones->entry[i]))
 		{
-			draw_icon( wind->graf.handle, &wicones->entry[i], FALSE, &dst_rect);
-			draw_text( wind->graf.handle, xtext, ytext, BLACK, wicones->entry[i].name_shown);
-			vsl_color( wind->graf.handle, LWHITE);
+			draw_icon( WIN_GRAF_HANDLE(wind), &wicones->entry[i], FALSE, &dst_rect);
+			draw_text( WIN_GRAF_HANDLE(wind), xtext, ytext, BLACK, wicones->entry[i].name_shown);
+			vsl_color( WIN_GRAF_HANDLE(wind), LWHITE);
 		}
 		else
 		{
-			draw_icon( wind->graf.handle, &wicones->entry[i], TRUE, &dst_rect);
+			draw_icon( WIN_GRAF_HANDLE(wind), &wicones->entry[i], TRUE, &dst_rect);
 		}
 
 		/* Draw the case 'contour' */
@@ -873,14 +873,15 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 		extent[8] = pxy[0];
 		extent[9] = pxy[1];
 
-		v_pline( wind->graf.handle, 5, extent);
-		vsl_color( wind->graf.handle, BLACK);
+		v_pline( WIN_GRAF_HANDLE(wind), 5, extent);
+		vsl_color( WIN_GRAF_HANDLE(wind), BLACK);
 
 
-/*		if ( !check_selected_entry( wicones, &wicones->entry[i]))
+#if 0
+		if ( !check_selected_entry( wicones, &wicones->entry[i]))
 		{
-			draw_icon( wind->graf.handle, &wicones->entry[i], FALSE, &dst_rect);
-			draw_text( wind->graf.handle, xtext, ytext, BLACK, wicones->entry[i].name_shown);
+			draw_icon( WIN_GRAF_HANDLE(wind), &wicones->entry[i], FALSE, &dst_rect);
+			draw_text( WIN_GRAF_HANDLE(wind), xtext, ytext, BLACK, wicones->entry[i].name_shown);
 		}
 		else
 		{
@@ -900,18 +901,18 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 			extent[8] = pxy[0];
 			extent[9] = pxy[1];
 
-			v_pline( wind->graf.handle, 5, extent);
+			v_pline( WIN_GRAF_HANDLE(wind), 5, extent);
 
-			draw_icon( wind->graf.handle, &wicones->entry[i], TRUE, &dst_rect);
+			draw_icon( WIN_GRAF_HANDLE(wind), &wicones->entry[i], TRUE, &dst_rect);
 		}
-*/
+#endif
 
 		if ( show_size)
 		{
 			if ( !S_ISDIR( wicones->entry[i].stat.st_mode))
 			{
 				int16 size_x_pos = x + (( wicones->case_w - 1 - get_text_width( wicones->entry[i].size))>> 1);
-				draw_text( wind->graf.handle, size_x_pos, ytext + y_space + hcell, LBLACK, wicones->entry[i].size);
+				draw_text( WIN_GRAF_HANDLE(wind), size_x_pos, ytext + y_space + hcell, LBLACK, wicones->entry[i].size);
 			}
 		}
 
@@ -968,8 +969,8 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 
 				pxy[0] = x + (( wicones->case_w - 1 - width) >> 1) - 2;
 				pxy[2] = pxy[0] + width + 4;
-		   		vsf_color( wind->graf.handle, LWHITE);
-				v_bar( wind->graf.handle, pxy);
+		   		vsf_color( WIN_GRAF_HANDLE(wind), LWHITE);
+				v_bar( WIN_GRAF_HANDLE(wind), pxy);
 
 				extent[0] = pxy[0];
 				extent[1] = pxy[1];
@@ -982,9 +983,9 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 				extent[8] = pxy[0];
 				extent[9] = pxy[1];
 
-				v_pline( wind->graf.handle, 5, extent);
+				v_pline( WIN_GRAF_HANDLE(wind), 5, extent);
 
-				draw_text( wind->graf.handle, xtext, ytext, BLACK, wicones->edit->top->buf);
+				draw_text( WIN_GRAF_HANDLE(wind), xtext, ytext, BLACK, wicones->edit->top->buf);
 
 				cursor_position( wind, &xc, &dum, &dum, &hc);
 
@@ -993,7 +994,7 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 				pxy[1] = ytext + 1;
 				pxy[3] = pxy[1] + hc - 2;
 
-				v_pline( wind->graf.handle, 2, pxy);
+				v_pline( WIN_GRAF_HANDLE(wind), 2, pxy);
 
 				/* save the text position in the structure */
 				wicones->entry[i].txt_pos.x1 = xtext - 2 - xw;
@@ -1008,10 +1009,10 @@ static void __CDECL WinCatalog_Redraw( WINDOW *wind)
 				pxy[0] = xtext - 1;
 				pxy[2] = pxy[0] + wicones->entry[i].icon_txt_w + 2;
 
-				vsf_color( wind->graf.handle, LBLACK);
-				v_bar( wind->graf.handle, pxy);
+				vsf_color( WIN_GRAF_HANDLE(wind), LBLACK);
+				v_bar( WIN_GRAF_HANDLE(wind), pxy);
 
-				draw_text( wind->graf.handle, xtext, ytext, WHITE, wicones->entry[i].name_shown);
+				draw_text( WIN_GRAF_HANDLE(wind), xtext, ytext, WHITE, wicones->entry[i].name_shown);
 			}
 		}
 

@@ -13,7 +13,7 @@
  *      --																			*
  *==================================================================================*/
  
-void __CDECL catalog_iconify( WINDOW *win)
+void __CDECL catalog_iconify( WINDOW *win EVNT_BUFF_PARAM)
 {		
 	WindSetStr( win, WF_NAME, "Zview"); 
 }
@@ -30,7 +30,7 @@ void __CDECL catalog_iconify( WINDOW *win)
  *      --																			*
  *==================================================================================*/
 
-void __CDECL catalog_uniconify( WINDOW *win)
+void __CDECL catalog_uniconify( WINDOW *win EVNT_BUFF_PARAM)
 {
 	WINDICON *wicones = ( WINDICON *)DataSearch( win, WD_ICON);
 	
