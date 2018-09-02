@@ -1,42 +1,62 @@
 /*	JPEGD header file
-	½1992-93 Brainstorm & Atari Corporation.
+	(C) 1992-93 Brainstorm & Atari Corporation.
 	to be included after vdi.h
 	Last modification on 8-apr-1993.
 */
 
-typedef struct _JPGD_STRUCT {
-	void	*InPointer;								/* JPEG Image Pointer */
-	void	*OutPointer;							/* Output Buffer/Filename Pointer (see OutFlag) */
-	long	InSize;									/* JPEG Image Size (Bytes) */
-	long	OutSize;								/* Output Image Size (Bytes) */
+#if defined(__atarist__) || defined(__TOS__)
+#define VOID_PTR	void *
+#define UCHAR_PTR	unsigned char *
+#define FUNC_PTR(x,y)	short (*x)(y)
+#define _LONG		long
+#define _ULONG		unsigned long
+#else
+/* otherwise in emulator */
+#define	VOID_PTR	uint32
+#define	UCHAR_PTR	uint32
+#define FUNC_PTR(x,y)	uint32 x
+#define _LONG		int32
+#define _ULONG		uint32
+#endif
+
+typedef struct _JPGD_STRUCT JPGD_STRUCT;
+typedef JPGD_STRUCT	*JPGD_PTR;
+
+struct _JPGD_STRUCT {
+	VOID_PTR	InPointer;							/* JPEG Image Pointer */
+	VOID_PTR	OutPointer;							/* Output Buffer/Filename Pointer (see OutFlag) */
+	_LONG	InSize;									/* JPEG Image Size (Bytes) */
+	_LONG	OutSize;								/* Output Image Size (Bytes) */
 	short	InComponents;							/* JPEG Image Components Number (1->4) */
 	short	OutComponents;							/* Output Components Number (1->4) */
 	short	OutPixelSize;							/* Output Pixel Size (1->4) */
 	short	OutFlag;								/* 0 (RAM Output) / -1 (Disk Output) */
 	short	XLoopCounter;							/* Number of MCUs per Row */
 	short	YLoopCounter;							/* Number of MCUs per Column */
-	short	(*Create)(struct _JPGD_STRUCT *);		/* Pointer to User Routine / NULL */
-	short	(*Write)(struct _JPGD_STRUCT *);		/* Pointer to User Routine / NULL */
-	short	(*Close)(struct _JPGD_STRUCT *);		/* Pointer to User Routine / NULL */
-	short	(*SigTerm)(struct _JPGD_STRUCT *);		/* Pointer to User Routine / NULL */
-	uint8	*Comp1GammaPtr;							/* Component 1 Gamma Table / NULL */
-	uint8	*Comp2GammaPtr;							/* Component 2 Gamma Table / NULL */
-	uint8	*Comp3GammaPtr;							/* Component 3 Gamma Table / NULL */
-	uint8	*Comp4GammaPtr;							/* Component 4 Gamma Table / NULL */
-	short	(*UserRoutine)(struct _JPGD_STRUCT *);	/* Pointer to User Routine (Called during Decompression) / NULL */
-	void	*OutTmpPointer;							/* Current OutPointer / Temporary Disk Buffer Pointer (see OutFlag) */
+	FUNC_PTR(Create, JPGD_STRUCT *);				/* Pointer to User Routine / NULL */
+	FUNC_PTR(Write, JPGD_STRUCT *);					/* Pointer to User Routine / NULL */
+	FUNC_PTR(Close, JPGD_STRUCT *);					/* Pointer to User Routine / NULL */
+	FUNC_PTR(SigTerm, JPGD_STRUCT *);				/* Pointer to User Routine / NULL */
+	UCHAR_PTR	Comp1GammaPtr;						/* Component 1 Gamma Table / NULL */
+	UCHAR_PTR	Comp2GammaPtr;						/* Component 2 Gamma Table / NULL */
+	UCHAR_PTR	Comp3GammaPtr;						/* Component 3 Gamma Table / NULL */
+	UCHAR_PTR	Comp4GammaPtr;						/* Component 4 Gamma Table / NULL */
+	FUNC_PTR(UserRoutine, JPGD_STRUCT *);			/* Pointer to User Routine (Called during Decompression) / NULL */
+	VOID_PTR	OutTmpPointer;						/* Current OutPointer / Temporary Disk Buffer Pointer (see OutFlag) */
 	short	MCUsCounter;							/* Number of MCUs not Decoded */
 	short	OutTmpHeight;							/* Number of Lines in OutTmpPointer */
-	long	User[2];								/* Free, Available for User */
+	_LONG	User[2];								/* Free, Available for User */
 	short	OutHandle;								/* 0 / Output File Handle (see OutFlag) */
 	MFDB	MFDBStruct;								/* Output Image MFDB */
-} JPGD_STRUCT;
-typedef JPGD_STRUCT	*JPGD_PTR;
 
-#define	JPGD_MAGIC	'_JPD'
+	/* Official structure stop here, what follows is decoder-dependant */
+};
+
+#define	JPGD_MAGIC	0x5F4A5044L /* '_JPD' */
 #define	JPGD_VERSION	1
 
-enum JPGD_ENUM {
+#undef NOERROR
+enum _JPGD_ENUM {
 	NOERROR=0,			/* File correctly uncompressed */
 	UNKNOWNFORMAT,		/* File is not JFIF (Error) */
 	INVALIDMARKER,		/* Reserved CCITT Marker Found (Error) */
@@ -85,7 +105,7 @@ typedef struct {
 	long		JPGDVersion;
 	JPGD_ENUM	(*JPGDOpenDriver)(JPGD_PTR);
 	JPGD_ENUM	(*JPGDCloseDriver)(JPGD_PTR);
-	long        (*JPGDGetStructSize)(void);
+	long		(*JPGDGetStructSize)(void);
 	JPGD_ENUM	(*JPGDGetImageInfo)(JPGD_PTR);
 	JPGD_ENUM	(*JPGDGetImageSize)(JPGD_PTR);
 	JPGD_ENUM	(*JPGDDecodeImage)(JPGD_PTR);

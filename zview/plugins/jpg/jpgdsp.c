@@ -7,85 +7,80 @@ int16 reader_dsp_init( const char *name, IMGINFO info);
 
 JPGDDRV_PTR jpgdrv = NULL;
 
-#define	JPGDOpenDriver( jpgd, jpgdrv)		\
-__extension__								\
-({	register int32 retv __asm__("d0");		\
-	__asm__ volatile						\
-	("	movl	%1,a0;						\
-		movl	(%2,4),a1;					\
-		jsr		a1@;						\
-	"	/* end of code */					\
-	:	"=r"	(retv)		/* out */		\
-	:	"a"		(jpgd)		/* in */		\
-	,	"a"		(jpgdrv)	/* in */		\
-	:	"a0", "a1"							\
-	);										\
-	retv;									\
-})
+static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
+{
+	register int32 retv __asm__("d0");
+	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDOpenDriver;
+	__asm__ volatile(
+	"	movl	%1,a0\n"
+	"	jsr		a1@\n"
+	:	"=r"	(retv)		/* out */
+	:	"a"		(jpgd)		/* in */
+	,	"a"		(func)		/* in */
+	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
+	);
+	return retv;
+}
 
-#define	JPGDCloseDriver( jpgd, jpgdrv)		\
-__extension__								\
-({	register int32 retv __asm__("d0");		\
-	__asm__ volatile						\
-	("	movl	%1,a0;						\
-		movl	(%2,8),a1;					\
-		jsr		a1@;						\
-	"	/* end of code */					\
-	:	"=r"	(retv)		/* out */		\
-	:	"a"		(jpgd)		/* in */		\
-	,	"a"		(jpgdrv)	/* in */		\
-	:	"a0", "a1"							\
-	);										\
-	retv;									\
-})
+static JPGD_ENUM JPGDCloseDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
+{
+	register int32 retv __asm__("d0");
+	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDCloseDriver;
+	__asm__ volatile(
+	"	movl	%1,a0\n"
+	"	jsr		a1@\n"
+	:	"=r"	(retv)		/* out */
+	:	"a"		(jpgd)		/* in */
+	,	"a"		(func)	/* in */
+	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
+	);
+	return retv;
+}
 
-#define	JPGDGetImageInfo( jpgd, jpgdrv)		\
-__extension__								\
-({	register int32 retv __asm__("d0");		\
-	__asm__ volatile						\
-	("	movl	%1,a0;						\
-		movl	(%2,16),a1;					\
-		jsr		a1@;						\
-	"	/* end of code */					\
-	:	"=r"	(retv)		/* out */		\
-	:	"a"		(jpgd)		/* in */		\
-	,	"a"		(jpgdrv)	/* in */		\
-	:	"a0", "a1"							\
-	);										\
-	retv;									\
-})
+static JPGD_ENUM JPGDGetImageInfo(JPGD_PTR jpgd, JPGDDRV_PTR drv)
+{
+	register int32 retv __asm__("d0");
+	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageInfo;
+	__asm__ volatile(
+	"	movl	%1,a0\n"
+	"	jsr		a1@\n"
+	:	"=r"	(retv)		/* out */
+	:	"a"		(jpgd)		/* in */
+	,	"a"		(func)		/* in */
+	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
+	);
+	return retv;
+}
 
-#define	JPGDGetImageSize( jpgd, jpgdrv)		\
-__extension__								\
-({	register int32 retv __asm__("d0");		\
-	__asm__ volatile						\
-	("	movl	%1,a0;						\
-		movl	(%2,20),a1;					\
-		jsr		a1@;						\
-	"	/* end of code */					\
-	:	"=r"	(retv)		/* out */		\
-	:	"a"		(jpgd)		/* in */		\
-	,	"a"		(jpgdrv)	/* in */		\
-	:	"a0", "a1"							\
-	);										\
-	retv;									\
-})
+static JPGD_ENUM JPGDGetImageSize(JPGD_PTR jpgd, JPGDDRV_PTR drv)
+{
+	register int32 retv __asm__("d0");
+	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageSize;
+	__asm__ volatile(
+	"	movl	%1,a0\n"
+	"	jsr		a1@\n"
+	:	"=r"	(retv)		/* out */
+	:	"a"		(jpgd)		/* in */
+	,	"a"		(func)		/* in */
+	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
+	);
+	return retv;
+}
 
-#define	JPGDDecodeImage( jpgd, jpgdrv)		\
-__extension__								\
-({	register int32 retv __asm__("d0");		\
-	__asm__ volatile						\
-	("	movl	%1,a0;						\
-		movl	(%2,24),a1;					\
-		jsr		a1@;						\
-	"	/* end of code */					\
-	:	"=r"	(retv)		/* out */		\
-	:	"a"		(jpgd)		/* in */		\
-	,	"a"		(jpgdrv)	/* in */		\
-	:	"a0", "a1"							\
-	);										\
-	retv;									\
-})
+static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
+{
+	register int32 retv __asm__("d0");
+	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDDecodeImage;
+	__asm__ volatile(
+	"	movl	%1,a0\n"
+	"	jsr		a1@\n"
+	:	"=r"	(retv)		/* out */
+	:	"a"		(jpgd)		/* in */
+	,	"a"		(func)	/* in */
+	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
+	);
+	return retv;
+}
 
 /*==================================================================================*
  * boolean CDECL reader_init:														*
@@ -101,7 +96,7 @@ __extension__								\
  *==================================================================================*/
 int16 reader_dsp_init( const char *name, IMGINFO info)
 {
-	char		pad[] = { -1, -1, -1, -1, -1, -1, -1, -1, 0, 0};
+	char		pad[] = { -1, -1, -1, -1, -1, -1, -1, -1, 0, 0 };
 	void		*src, *dst;
 	int16		jpeg_file;
 	int32		jpgdsize, jpeg_file_size;
@@ -151,7 +146,6 @@ int16 reader_dsp_init( const char *name, IMGINFO info)
 
 	if( JPGDOpenDriver( jpgd, jpgdrv) != 0)
 	{
-		Dsp_Unlock();
 		Mfree( jpgd);
 		Mfree( src);
 		return DSP_ERROR;
@@ -163,7 +157,6 @@ int16 reader_dsp_init( const char *name, IMGINFO info)
 	if( JPGDGetImageInfo( jpgd, jpgdrv) != 0)
 	{
 		JPGDCloseDriver( jpgd, jpgdrv);
-		Dsp_Unlock();
 		Mfree( jpgd);
 		Mfree( src);
 		return DSP_ERROR;
@@ -209,7 +202,7 @@ int16 reader_dsp_init( const char *name, IMGINFO info)
 	info->memory_alloc 			= TT_RAM;
 	info->planes   				= 24;
 	info->orientation 			= UP_TO_DOWN;
-	info->colors  				= 1uL << ( uint32)info->planes;
+	info->colors  				= 1uL << info->planes;
 	info->indexed_color 		= FALSE;
 	info->page	 				= 1;
 	info->delay		 			= 0;
@@ -230,4 +223,3 @@ int16 reader_dsp_init( const char *name, IMGINFO info)
 
 	return ALL_OK;
 }
-
