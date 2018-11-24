@@ -4,6 +4,7 @@
 #include "popup.h"
 #include "string.h"
 #include "taskman.h"
+#include "win.h"
 
 static clock_t chrono_value, update_time = ( clock_t)( 100L);
 int16 cpu_usage 				= 0;
@@ -56,10 +57,10 @@ static void CDECL timer_function( WINDOW *win, int16 buff[8])
 		else if( menu_enabled == TRUE)
 		{
 			if( !IS_IN( evnt.mx, evnt.my, root->x_pos - 24, root->y_pos, 24, 23))
-				popup_delete( popup.win);
+				popup_delete( popup.win, buff);
 		}		
 		else if( !IS_IN( evnt.mx, evnt.my, popup.entry->x_pos, popup.entry->y_pos, app_width, 23))
-			popup_delete( popup.win);
+			popup_delete( popup.win, buff);
 	}
 
 	current_t = clock();

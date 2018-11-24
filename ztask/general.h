@@ -26,7 +26,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#ifdef USE_WINDOM2
 #include <windom.h>
+#else
+#include <windom1.h>
+#endif
 #include <ldg.h>
 #include <scancode.h>
 #include "types2b.h"
@@ -109,12 +113,10 @@ typedef struct _process
 } process;
 
 
-extern void 	zdebug( const char *format, ...);
-extern OBJECT	*get_tree( int16 obj_index); 
-extern char		*get_string( int16 str_index);
-extern void 	shutdown_dialog( void);
-extern void 	quit_dialog( void);
-extern void 	pref_dialog( void);
-
-
-
+void 	zdebug( const char *format, ...);
+OBJECT	*get_tree( int16 obj_index); 
+char		*get_string( int16 str_index);
+void 	shutdown_dialog( void);
+void 	quit_dialog( void);
+void 	pref_dialog( void);
+void vdi_color_selector( int16 xw, int16 yw, int16 color_selected, int16 parent_object);

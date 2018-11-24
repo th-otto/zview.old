@@ -30,7 +30,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#ifdef USE_WINDOM2
 #include <windom.h>
+#else
+#include <windom1.h>
+#endif
 #include <scancode.h>
 #include <ldg.h>
 #include <libxml/parser.h>

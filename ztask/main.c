@@ -4,9 +4,8 @@
 #include "cpu.h"
 #include "process.h"
 #include <mint/cookie.h>
+#include "win.h"
 
-extern int16 cpu_history[100];
-extern void main_win( void);
 
 OBJECT *get_tree( int16 obj_index) 
 {
@@ -24,7 +23,7 @@ char *get_string( int16 str_index)
 }
 
 
-void applexit( WINDOW *w, short buff[8]) 
+static void applexit( WINDOW *w, short buff[8]) 
 {
 	WINDOW *last_closed = NULL;
 	

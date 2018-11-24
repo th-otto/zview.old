@@ -1,12 +1,13 @@
 #include "general.h"
 #include "gmem.h"
 #include "string.h"
+#include "app.h"
 
 app_data *root = NULL, *selected = NULL, *old_selected = NULL;
 int16 app_nbr = 0;
 
 
-int16 find_top_app_by_window( void)
+static int16 find_top_app_by_window( void)
 {
 	int16 win_handle, next_win_handle, aes_id, dum;
 
@@ -32,7 +33,7 @@ int16 find_top_app_by_window( void)
  *      TRUE if all is ok else FALSE												*
  *==================================================================================*/
 
-int16 app_data_attach( char *name, char *name_shown, int16 id, int16 pid, int16 name_shown_width) 
+static int16 app_data_attach( char *name, char *name_shown, int16 id, int16 pid, int16 name_shown_width) 
 {
 	app_data *new = ( app_data *)gmalloc( sizeof(app_data));
 
@@ -65,7 +66,7 @@ int16 app_data_attach( char *name, char *name_shown, int16 id, int16 pid, int16 
  * returns: 																		*
  *      the parent entry else the root entry.										*
  *==================================================================================*/
-app_data *app_data_find_parent( app_data *child) 
+static app_data *app_data_find_parent( app_data *child) 
 {
 	app_data *scan = root;
 	
@@ -160,7 +161,7 @@ app_data *app_data_find( int16 id)
  * returns: 																		*
  *      1 if TRUE else 0.															*
  *==================================================================================*/
-int16 app_have_wind( int16 id) 
+static int16 app_have_wind( int16 id) 
 {
 	int16 result = 0, dum, aes_win, next = -1, status, aes_id;
 

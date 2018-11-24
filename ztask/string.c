@@ -1,5 +1,6 @@
 #include "general.h"
 #include "font_8.h"
+#include "string.h"
 
 void trim_start( char *name)
 {

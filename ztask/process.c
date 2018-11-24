@@ -11,6 +11,8 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
+#include "process.h"
+
 
 process *process_root = NULL;
 int process_nbr = 0;
@@ -27,7 +29,7 @@ int process_nbr = 0;
  *      the processe created or NULL												*
  *==================================================================================*/
 
-process *process_attach( int pid) 
+static process *process_attach( int pid) 
 {
 	process *new = ( process *)gmalloc( sizeof(process));
 
@@ -56,7 +58,7 @@ process *process_attach( int pid)
  * returns: 																		*
  *      the parent entry else the root entry.										*
  *==================================================================================*/
-process *process_find_parent( process *child) 
+static process *process_find_parent( process *child) 
 {
 	process *scan = process_root;
 	
@@ -121,7 +123,7 @@ void process_delete( int pid)
  * returns: 																		*
  *      the entry or NULL if not found.												*
  *==================================================================================*/
-process *process_find( int pid) 
+static process *process_find( int pid) 
 {
 	process *scan = process_root, *result = NULL;
 	

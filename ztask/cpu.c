@@ -1,4 +1,5 @@
 #include "general.h"
+#include "cpu.h"
 
 char buf[2048];
 

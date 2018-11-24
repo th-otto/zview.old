@@ -5,6 +5,8 @@
 #include "string.h"
 #include <math.h>
 #include <signal.h>
+#include "taskman.h"
+
 
 WINDOW 	*taskman_win = NULL;
 static void *thumb = NULL;
@@ -31,7 +33,7 @@ float slider_pos = 0.0, slider_step = 0.0;
  * returns: 																		*	
  *		'0' if error or the memory size allocated.									*
  *==================================================================================*/
-uint32 init_mfdb( MFDB *bm, int16 width, int16 height, int16 planes)
+static uint32 init_mfdb( MFDB *bm, int16 width, int16 height, int16 planes)
 {
 	uint32 length;
 
@@ -96,7 +98,7 @@ static void CDECL taskman_win_mouse_event( WINDOW *win, int16 buff[8])
 }
 
 
-void CDECL draw_process_list( WINDOW *win, PARMBLK *pblk, void *data)
+static void CDECL draw_process_list( WINDOW *win, PARMBLK *pblk, void *data)
 {
 	memset( process_list_buffer.fd_addr, 0, process_list_buffer_lenght);
 

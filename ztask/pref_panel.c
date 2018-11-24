@@ -17,7 +17,6 @@ tmp_x_pos, tmp_y_pos, tmp_w_pos, tmp_geek_area_x, text_width, x;
 static OBJECT *dial = NULL;
 WINDOW *pref_dialog_win = NULL;
 
-extern void vdi_color_selector( int16 xw, int16 yw, int16 color_selected, int16 parent_object);
 
 
 static void CDECL pref_dialog_cancel_event( WINDOW *win, int obj, int mode, void *data)

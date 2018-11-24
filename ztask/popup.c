@@ -4,12 +4,12 @@
 #include "win.h"
 #include "taskman.h"
 #include <signal.h>
+#include "popup.h"
 
 popup_data popup;
-extern WINDOW *app_bar;
 
 
-void CDECL popup_delete( WINDOW *win, int16 buff[8])
+void CDECL popup_delete( WINDOW *win, int16 *buff )
 {	
 	WindDelete( win);
 	popup.win = NULL;
@@ -22,7 +22,7 @@ void CDECL popup_delete( WINDOW *win, int16 buff[8])
 }
 
 
-void process_popup_item( WINDOW *win, int16 buff[8])
+static void process_popup_item( WINDOW *win, int16 *buff )
 {	
 	if( popup.selected < 0)
 		return;
@@ -59,7 +59,7 @@ void process_popup_item( WINDOW *win, int16 buff[8])
 			break;		
 	}
 
-	popup_delete( win, buff);		
+	popup_delete( win, buff );
 }
 
 

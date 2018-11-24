@@ -1,3 +1,4 @@
+USE_WINDOM2=0
 include ../configvars
 
 DEBUG_LIB			= # -lwout

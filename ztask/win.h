@@ -12,9 +12,10 @@ extern int16 x_pos, w_pos, y_pos, h_pos;
 extern WINDOW  *app_bar;
 extern OBJECT *icons;
 extern int16 x_space, menu_enabled;
-extern int16 cpu_history[100];
+extern int16 cpu_history[];
 
-extern void set_component_position( void);
+void main_win( void);
+void set_component_position( void);
 
 
 
