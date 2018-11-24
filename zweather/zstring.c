@@ -1,6 +1,6 @@
+#define _GNU_SOURCE
 #include "general.h"
 
-extern int vasprintf( int8 **strp, const int8 *fmt, va_list ap);
 
 
 char *zstrncpy( char *dst, const char *src, size_t n)
@@ -20,7 +20,7 @@ char *zstrncpy( char *dst, const char *src, size_t n)
 	return dst;
 }
 
-int8 *stpcpy( int8 *dest, const int8 *src)
+static int8 *my_stpcpy( int8 *dest, const int8 *src)
 {
 	register int8 *d = dest;
 	register const int8 *s = src;
@@ -75,7 +75,7 @@ int8 *strstr_len( const int8 *haystack, int32 haystack_len, const int8 *needle)
 
 int8 *strdup_printf( const int8 *format, ...)
 {
-	int8	*buffer;
+	char	*buffer;
 	int		len;
 	va_list	args;
 
@@ -88,7 +88,7 @@ int8 *strdup_printf( const int8 *format, ...)
 
 	va_end( args);
 
-	return buffer;
+	return (int8 *)buffer;
 }
 
 
@@ -115,17 +115,16 @@ int8* strconcat( const int8 *string1, ...)
 	concat = malloc( sizeof( int8) * l);
 	ptr = concat;
 
-	ptr = stpcpy ( ptr, string1);
+	ptr = my_stpcpy ( ptr, string1);
 	va_start (args, string1);
 	s = va_arg (args, int8*);
 
 	while (s)
 	{
-		ptr = stpcpy( ptr, s);
+		ptr = my_stpcpy( ptr, s);
 		s = va_arg (args, int8*);
     }
 	va_end (args);
 
 	return concat;
 }
-

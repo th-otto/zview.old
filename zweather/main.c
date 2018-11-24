@@ -11,7 +11,6 @@ static clock_t chrono_value;
 struct xml_weather *zweatherdata = NULL;
 int	use_sting = 0;
 
-extern int8	icon_temp[8];
 
 
 struct xml_weather *update_weatherdata( int8 *location)
