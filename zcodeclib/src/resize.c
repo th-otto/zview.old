@@ -4,6 +4,7 @@
 #include "zvdi/raresize.h"
 #include "zvdi/vdi.h"
 #include "zvdi/p2c.h"
+#include "resize.h"
 
 
 void  ( *resize)( DECDATA, void *dst);

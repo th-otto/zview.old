@@ -1,8 +1,8 @@
-IMAGE *logo;
-IMAGE *weather_icons;
-MFDB boussole;
-MFDB *forecast_icon[6];
-MFDB icons[48];
-MFDB *main_icon;
-extern int16 register_icons( void);
-extern void unregister_icons( void);
+extern IMAGE *logo;
+extern MFDB boussole;
+extern MFDB *forecast_icon[];
+extern MFDB icons[];
+extern MFDB *main_icon;
+
+int16 register_icons( void);
+void unregister_icons( void);

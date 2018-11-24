@@ -157,7 +157,7 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 
 
 
-void quit_img( IMGINFO info, DECDATA data)
+static void quit_img( IMGINFO info, DECDATA data)
 {
 	if( decoder_init_done == TRUE)
 		decoder_quit( info);
@@ -175,7 +175,7 @@ void quit_img( IMGINFO info, DECDATA data)
 }
 
 
-boolean get_pic_info( const char *file, IMGINFO info)
+static boolean get_pic_info( const char *file, IMGINFO info)
 {
 	int16 	i, j, c = 0;
 	char 	extention[3+1], plugin[3];

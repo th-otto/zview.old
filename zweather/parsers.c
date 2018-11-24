@@ -106,7 +106,7 @@ struct xml_lnks *parse_lnks(xmlNode *cur_node)
 	return ret;
 }
 
-struct xml_uv *parse_uv (xmlNode *cur_node)
+static struct xml_uv *parse_uv (xmlNode *cur_node)
 {
 	struct xml_uv *ret;
         
@@ -126,7 +126,7 @@ struct xml_uv *parse_uv (xmlNode *cur_node)
 	return ret;
 }
 
-struct xml_bar *parse_bar (xmlNode *cur_node)
+static struct xml_bar *parse_bar (xmlNode *cur_node)
 {
 	struct xml_bar *ret;
         
@@ -146,7 +146,7 @@ struct xml_bar *parse_bar (xmlNode *cur_node)
 	return ret;
 }
 
-struct xml_wind *parse_wind (xmlNode *cur_node)
+static struct xml_wind *parse_wind (xmlNode *cur_node)
 {
 	struct xml_wind *ret;
         
@@ -210,7 +210,7 @@ struct xml_cc *parse_cc(xmlNode *cur_node)
 	return ret;
 }
 
-struct xml_part *parse_part(xmlNode *cur_node)
+static struct xml_part *parse_part(xmlNode *cur_node)
 {
 	struct xml_part *ret;
         
@@ -276,13 +276,13 @@ struct xml_dayf *parse_dayf(xmlNode *cur_node)
 
 #define CHK_FREE(this) if (this) free(this);
 
-void xml_uv_free(struct xml_uv *data)
+static void xml_uv_free(struct xml_uv *data)
 {
 	CHK_FREE(data->i);
 	CHK_FREE(data->t);
 }
 
-void xml_wind_free(struct xml_wind *data)
+static void xml_wind_free(struct xml_wind *data)
 {
 	CHK_FREE(data->s);
 	CHK_FREE(data->gust);
@@ -290,13 +290,13 @@ void xml_wind_free(struct xml_wind *data)
 	CHK_FREE(data->t);
 }
 
-void xml_bar_free(struct xml_bar *data)
+static void xml_bar_free(struct xml_bar *data)
 {
 	CHK_FREE(data->r);
 	CHK_FREE(data->d);
 }
 
-void xml_cc_free(struct xml_cc *data)
+static void xml_cc_free(struct xml_cc *data)
 {
 	CHK_FREE(data->obst);
 	CHK_FREE(data->lsup);
@@ -318,14 +318,14 @@ void xml_cc_free(struct xml_cc *data)
 		xml_bar_free(data->bar);
 }
 
-void xml_loc_free(struct xml_loc *data)
+static void xml_loc_free(struct xml_loc *data)
 {
 	CHK_FREE(data->dnam);
 	CHK_FREE(data->sunr);
 	CHK_FREE(data->suns);
 }
 
-void xml_part_free(struct xml_part *data)
+static void xml_part_free(struct xml_part *data)
 {
 	if( !data)
 		return;
@@ -339,7 +339,7 @@ void xml_part_free(struct xml_part *data)
 		xml_wind_free(data->wind);
 }
 
-void xml_dayf_free(struct xml_dayf *data)
+static void xml_dayf_free(struct xml_dayf *data)
 {
 	if (!data)
 		return;

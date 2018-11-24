@@ -1,11 +1,9 @@
 #include "general.h"
 #include "ztext.h"
 #include "zvdi/vdi.h"
+#include "codecs.h"
+#include "zcodec.h"
 
-
-/* Prototype */
-int16 plugins_init( void);
-void plugins_quit( void);
 
 /* LDG function */
 void CDECL( *codec_init)( void) = NULL;
@@ -18,7 +16,7 @@ LDG 	*codecs[100];
 
 
 /*==================================================================================*
- * void plugins_quit:																*
+ * void codecs_quit:																*
  *		unload all the codec from memory.											*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -39,7 +37,7 @@ void codecs_quit( void)
 
 
 /*==================================================================================*
- * void plugins_init:																*
+ * void codecs_init:																*
  *		load codec(s) to memory.													*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -49,7 +47,7 @@ void codecs_quit( void)
  * returns: 																		*
  *      0 if error.																	*
  *==================================================================================*/
-int16 codecs_init( char *codec_name)
+int16 codecs_init( const char *codec_name)
 {
 	char 			*env_ldg, current_dir[1024], plugin_dir[1024];
 	DIR	 			*dir;
@@ -69,7 +67,7 @@ int16 codecs_init( char *codec_name)
 
 	len = ( int16)strlen( plugin_dir);
 		
-	if( plugin_dir[len-1] != '\\')
+	if( plugin_dir[len-1] != '\\' )
 		strcat( plugin_dir, "\\"); 
 
 	strcat( plugin_dir, "codecs");
@@ -96,10 +94,13 @@ int16 codecs_init( char *codec_name)
 				if (( strcmp( de->d_name, ".") == 0) || ( strcmp( de->d_name, "..") == 0))
 					continue;
 	
-				strcpy ( extention, de->d_name + strlen( de->d_name) - 3);
+	            len = ( int16)strlen(de->d_name);
+	            if (len <= 4)
+	                continue;
+				strcpy ( extention, de->d_name + len - 3);
 				str2lower( extention);
 
-				if( strcmp ( extention, "ldg") == 0)
+				if( strcmp ( extention, ".ldg") == 0)
 				{
 					if ( ( codecs[plugins_nbr] = ldg_open( de->d_name, ldg_global)))
 					{

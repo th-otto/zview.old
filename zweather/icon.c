@@ -1,6 +1,7 @@
 #include "general.h"
+#include "icon.h"
 
-IMAGE *weather_icons = { NULL };
+static IMAGE *weather_icons = { NULL };
 MFDB *main_icon = NULL;
 MFDB boussole;
 IMAGE *logo = NULL;

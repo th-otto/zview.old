@@ -1,6 +1,7 @@
 #include "general.h"
 #include "mfdb.h"
 #include "load_img.h"
+#include "img.h"
 
 IMAGE *init_img( int16 page, int16 w, int16 h, int16 planes)
 {

@@ -1,3 +1,6 @@
+extern int8	wind_direction[8];
+extern struct xml_weather *zweatherdata;
+
 extern OBJECT *get_tree( int16 obj_index);
 extern int8 *get_string( int16 str_index);
 extern void errshow( const char *name, int16 error);

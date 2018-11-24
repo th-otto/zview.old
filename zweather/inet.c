@@ -1,5 +1,6 @@
 #include "general.h"
 #include "transprt.h"
+#include "inet.h"
 
 static boolean timeout = FALSE;
 TPL *tpl = NULL;
@@ -21,7 +22,7 @@ void init_stik (void)
 			long cktag;
 			long ckvalue;
 		}  * jar = (void*)Setexc (0x5A0 /4, (void (*)())-1);
-		long tag = 'STiK';
+		long tag = 0x5354694bL; /* 'STiK' */
 	
 		while (jar->cktag) {
 			if (jar->cktag == tag) {
@@ -103,7 +104,7 @@ long inet_connect (long addr, long port, long tout_sec)
 		struct sockaddr_in s_in;
 		s_in.sin_family = AF_INET;
 		s_in.sin_port   = htons ((short)port);
-		s_in.sin_addr   = *(struct in_addr *)&addr;
+		memcpy(&s_in.sin_addr, &addr, 4);
 		if ((fh = socket( PF_INET, SOCK_STREAM, 0)) < 0) {
 			fh = -errno;
 		} else {

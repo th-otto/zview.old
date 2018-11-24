@@ -1,10 +1,8 @@
 #include "general.h"
 #include "icon.h"
 #include "parsers.h"
+#include "dialog.h"
 
-extern struct xml_weather *zweatherdata;
-extern int8	wind_direction[8];
-extern void init_stik (void);
 
 WINDOW *windialog = NULL;
 int8	icon_temp[8] = "";

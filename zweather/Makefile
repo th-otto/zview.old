@@ -1,13 +1,25 @@
-LIBXML2_INC		= $$HOME/gnu-tools/m68k-atari-mint/include/libxml2
+USE_WINDOM2=1
+include ../configvars
+
+LIBXML2_INC		= /usr/m68k-atari-mint/sys-root/usr/include/libxml2
+
+ZCODECLIB               = ../zcodeclib/lib/$(CPU_SUBDIR)libzcodec.a
 
 STACKSIZE		= 64k
-OPTIMISATION		= -O2 -fomit-frame-pointer -finline-functions
-CPU			= -m68020-60
-LIB			= -lwindom -lzcodec -lldg -lgem -lxml2 -lm -lz
-CFLAGS			= $(CPU) $(OPTIMISATION) -Wall -Wshadow -I$(LIBXML2_INC) -I../common
+LIB			= $(WINDOM_LIBS) $(ZCODECLIB) -lldg -lgem -lxml2 -liconv -lm -lz
+CFLAGS			+= -I$(LIBXML2_INC) -I../common -I../zcodeclib/include
 OBJ 			= inet.o http_client.o parsers.o get_data.o \
 			  debug.o zstring.o dialog.o prefs.o zaes.o icon.o main.o
 
 PROGRAM 		= zweather.app
 
-include ../common.mak
+all:: $(PROGRAM)
+
+$(PROGRAM): $(OBJ) $(ZCODECLIB)
+	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
+	: cp $(PROGRAM) _dist/$(PROGRAM)
+	$(COMPRESS) $(PROGRAM)
+
+
+clean::
+	rm -f $(OBJ) $(PROGRAM)

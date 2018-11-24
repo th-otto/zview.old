@@ -1,10 +1,10 @@
 #include "general.h"
 #include "get_data.h"
 
-int8 dummy[2] = "0";
+static int8 dummy[2] = "0";
 
 
-int8 *get_data_uv(struct xml_uv *data, enum datas_uv type)
+static int8 *get_data_uv(struct xml_uv *data, enum datas_uv type)
 {
 	int8 *str = dummy;
 
@@ -22,7 +22,7 @@ int8 *get_data_uv(struct xml_uv *data, enum datas_uv type)
 }
  
 
-int8 *get_data_bar(struct xml_bar *data, enum datas_bar type)
+static int8 *get_data_bar(struct xml_bar *data, enum datas_bar type)
 {
 	int8 *str = dummy;
 
@@ -39,7 +39,7 @@ int8 *get_data_bar(struct xml_bar *data, enum datas_bar type)
 	return str;
 }
 
-int8 *get_data_wind(struct xml_wind *data, enum datas_wind type)
+static int8 *get_data_wind(struct xml_wind *data, enum datas_wind type)
 {
 	int8 *str = dummy;
 
@@ -58,7 +58,7 @@ int8 *get_data_wind(struct xml_wind *data, enum datas_wind type)
 	return str;
 }
 
-int8 *get_data_cc( struct xml_cc *data, enum datas type)
+static int8 *get_data_cc( struct xml_cc *data, enum datas type)
 { 
 	int8 *str = dummy;
 
@@ -89,7 +89,7 @@ int8 *get_data_cc( struct xml_cc *data, enum datas type)
 	return str;
 }
 
-int8 *get_data_loc(struct xml_loc *data, enum datas_loc type)
+static int8 *get_data_loc(struct xml_loc *data, enum datas_loc type)
 { 
 	int8 *str = dummy;
 
@@ -124,7 +124,7 @@ const int8 *get_data(struct xml_weather *data, enum datas type)
 	return str;
 }
 
-int8 *get_data_part(struct xml_part *data, enum forecast type)
+static int8 *get_data_part(struct xml_part *data, enum forecast type)
 {
 	int8 *str = dummy;
 

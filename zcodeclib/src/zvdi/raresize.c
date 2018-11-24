@@ -7,6 +7,7 @@
 #endif
 #include "dither.h"
 #include "raster.h"
+#include "raresize.h"
 
 inline void resize_mono ( DECDATA info, void * _dst)
 {

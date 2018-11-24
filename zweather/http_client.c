@@ -1,7 +1,8 @@
 #include "general.h"
 #include "inet.h"
+#include "http_client.h"
 
-long http_recv( int32 fd, int8 **buffer)
+static long http_recv( int32 fd, int8 **buffer)
 {
 	long n = 0L; /* 1 = good, 0 = conn terminated, -1 = error */
 	int8 thisbuffer[1024]; 
@@ -42,7 +43,7 @@ long http_recv( int32 fd, int8 **buffer)
 }
 
 
-boolean http_get_header( int32 fd, int8 **buffer)
+static boolean http_get_header( int32 fd, int8 **buffer)
 {
 	int8 lastchar = 0, *thisbuffer;
 	int32 l;

@@ -3,6 +3,7 @@
 #else
 #include "../general.h"
 #endif
+#include "p2c.h"
 
 
 void ( *planar_to_chunky)( uint8 *in, uint8 *out, int16 width);

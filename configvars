@@ -9,10 +9,18 @@ COMPRESS			= : upx -9
 
 #CPU				= -mcpu=5475
 CPU				= -m68020-60
+ifeq ($(CPU),-m68020-60)
+CPU_SUBDIR                      = m68020-60/
+endif
+ifeq ($(CPU),-mcpu=5475)
+CPU_SUBDIR                      = m5475/
+endif
 OPTIMISATION			= -g -O2 -fomit-frame-pointer
 DEBUG				= # -DDEBUG
 
+ifeq ($(USE_WINDOM2),)
 USE_WINDOM2=0
+endif
 ifeq ($(USE_WINDOM2),1)
 WINDOM_LIBS=-lwindom
 WINDOM_CFLAGS=-DUSE_WINDOM2

@@ -1,13 +1,13 @@
 #include "general.h"
 #include "icon.h"
 #include "get_data.h"
+#include "zaes.h"
 
 /* the variable need to be global because this function is done by */
 /* the AES in supervisor mode.. it's safe. */
 static int16 xy[8];
 static MFDB  screen = {0};
 int8	wind_direction[8] = "";
-extern struct xml_weather *zweatherdata;
 
 OBJECT *get_tree( int16 obj_index)
 {

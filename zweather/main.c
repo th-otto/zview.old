@@ -4,14 +4,13 @@
 #include "icon.h"
 #include "get_data.h"
 #include <mint/cookie.h>
+#include "dialog.h"
+#include "inet.h"
 
 static clock_t chrono_value;
 struct xml_weather *zweatherdata = NULL;
 int	use_sting = 0;
 
-extern void init_stik (void);
-extern void weather_dialog( void);
-extern int8	wind_direction[8];
 extern int8	icon_temp[8];
 
 
@@ -179,7 +178,7 @@ void timer_function( WINDOW *win, short buff[8])
 		snd_rdw( windialog);
 }
 
-void applexit( WINDOW *w, short buff[8])
+static void applexit( WINDOW *w, short buff[8])
 {
 	WINDOW *last_closed = NULL;
 
