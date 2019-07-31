@@ -8,8 +8,8 @@
 
 static clock_t chrono_value, update_time = ( clock_t)( 100L);
 int16 cpu_usage 				= 0;
-int32 total_stram				= 0;
-int32 total_ttram				= 0;
+uint32 total_stram;
+uint32 total_ttram;
 uint32 stram					= 0;
 uint32 ttram					= 0;
 int16 stram_percent				= 0;

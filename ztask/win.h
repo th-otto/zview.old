@@ -1,6 +1,6 @@
 extern int16 cpu_usage;
-extern int32 total_stram;
-extern int32 total_ttram;
+extern uint32 total_stram;
+extern uint32 total_ttram;
 extern uint32 stram;
 extern uint32 ttram;
 extern int16 bar_width;

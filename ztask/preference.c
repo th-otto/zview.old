@@ -1,14 +1,7 @@
 #include "general.h"
 #include "win.h"
 #include "string.h"
-
-int tmp_button_off_background, tmp_button_off_light_color, tmp_button_off_dark_color, 
-tmp_button_off_text_color, tmp_button_off_text_shadow_color, tmp_button_on_background,
-tmp_button_on_light_color, tmp_button_on_dark_color, tmp_button_on_text_color,
-tmp_button_on_text_shadow_color, tmp_geek_area_color, tmp_geek_area_dark_line, 
-tmp_geek_area_light_line, tmp_app_width, tmp_cpu_bar_color, 
-tmp_tt_bar_color, tmp_st_bar_color, tmp_show_clock, tmp_clock_us, 
-tmp_show_system_info, tmp_show_acc;
+#include "preference.h"
 
 int *tmp;
 static int16 xy[10], tmp_cpu_x, tmp_tt_x, tmp_st_x, tmp_clock_x, tmp_geek_area_width, tmp_y_text_pos,
@@ -355,7 +348,7 @@ void pref_dialog( void)
 	tmp_show_system_info				= show_system_info;
 	tmp_show_acc						= show_acc;	
 	
-				
+	
 	if( ( win = FormCreate( dial, NAME|MOVER, NULL, "Preferences", NULL, TRUE, FALSE)) == NULL)
 		return;
 		
@@ -363,30 +356,30 @@ void pref_dialog( void)
 	
 	FormThumb( win, frms, buts, 2);	
 
-	RsrcUserDraw( OC_FORM, win, PREFS_ON_BACK,  draw_color_case, &tmp_button_on_background);	
-	RsrcUserDraw( OC_FORM, win, PREFS_ON_LINE1, draw_color_case, &tmp_button_on_light_color);		
-	RsrcUserDraw( OC_FORM, win, PREFS_ON_LINE2, draw_color_case, &tmp_button_on_dark_color);	
-	RsrcUserDraw( OC_FORM, win, PREFS_ON_TEXT1, draw_color_case, &tmp_button_on_text_color);	
-	RsrcUserDraw( OC_FORM, win, PREFS_ON_TEXT2, draw_color_case, &tmp_button_on_text_shadow_color);	
-	RsrcUserDraw( OC_FORM, win, PREFS_OFF_BACK, draw_color_case, &tmp_button_off_background);	
-	RsrcUserDraw( OC_FORM, win, PREFS_OFF_LINE1, draw_color_case, &tmp_button_off_light_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_OFF_LINE2, draw_color_case, &tmp_button_off_dark_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_OFF_TEXT1, draw_color_case, &tmp_button_off_text_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_OFF_TEXT2, draw_color_case, &tmp_button_off_text_shadow_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_BACK, draw_color_case, &tmp_geek_area_color);	
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_LINE1, draw_color_case, &tmp_geek_area_light_line);	
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_LINE2, draw_color_case, &tmp_geek_area_dark_line);
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_RAM1, draw_color_case, &tmp_st_bar_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_RAM2, draw_color_case, &tmp_tt_bar_color);
-	RsrcUserDraw( OC_FORM, win, PREFS_GEEK_CPU, draw_color_case, &tmp_cpu_bar_color);	
-	RsrcUserDraw( OC_FORM, win, PREFS_PREVIEW, draw_preview, NULL);							
-	
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_ON_BACK,  draw_color_case, &tmp_button_on_background);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_ON_LINE1, draw_color_case, &tmp_button_on_light_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_ON_LINE2, draw_color_case, &tmp_button_on_dark_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_ON_TEXT1, draw_color_case, &tmp_button_on_text_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_ON_TEXT2, draw_color_case, &tmp_button_on_text_shadow_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_OFF_BACK, draw_color_case, &tmp_button_off_background);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_OFF_LINE1, draw_color_case, &tmp_button_off_light_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_OFF_LINE2, draw_color_case, &tmp_button_off_dark_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_OFF_TEXT1, draw_color_case, &tmp_button_off_text_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_OFF_TEXT2, draw_color_case, &tmp_button_off_text_shadow_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_BACK, draw_color_case, &tmp_geek_area_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_LINE1, draw_color_case, &tmp_geek_area_light_line);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_LINE2, draw_color_case, &tmp_geek_area_dark_line);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_RAM1, draw_color_case, &tmp_st_bar_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_RAM2, draw_color_case, &tmp_tt_bar_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_CPU, draw_color_case, &tmp_cpu_bar_color);
+	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_PREVIEW, draw_preview, NULL);
+
 	WindSet( win, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
 	ObjcAttachFormFunc( win, PREFS_OK, pref_dialog_ok_event, NULL);
 	ObjcAttachFormFunc( win, PREFS_CANCEL, pref_dialog_cancel_event, NULL);
-	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_US_CLOCK, &tmp_clock_us, 1);	
-	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_ACC, &tmp_show_acc, 1);	
-	ObjcAttachVar( OC_FORM, win, PREFS_SYSTEM_INFO, &tmp_show_system_info, 1);		
-	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_CLOCK, &tmp_show_clock, 1);			
+	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_US_CLOCK, &tmp_clock_us, 1);
+	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_ACC, &tmp_show_acc, 1);
+	ObjcAttachVar( OC_FORM, win, PREFS_SYSTEM_INFO, &tmp_show_system_info, 1);
+	ObjcAttachVar( OC_FORM, win, PREFS_SHOW_CLOCK, &tmp_show_clock, 1);
 }
 

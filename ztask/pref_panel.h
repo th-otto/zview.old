@@ -1,0 +1,9 @@
+extern WINDOW *pref_dialog_win;
+
+extern int tmp_button_off_background, tmp_button_off_light_color, tmp_button_off_dark_color, 
+tmp_button_off_text_color, tmp_button_off_text_shadow_color, tmp_button_on_background,
+tmp_button_on_light_color, tmp_button_on_dark_color, tmp_button_on_text_color,
+tmp_button_on_text_shadow_color, tmp_geek_area_color, tmp_geek_area_dark_line, 
+tmp_geek_area_light_line, tmp_app_width, tmp_cpu_bar_color, 
+tmp_tt_bar_color, tmp_st_bar_color, tmp_show_clock, tmp_clock_us, 
+tmp_show_system_info, tmp_show_acc, tmp_geek_area_text_color;

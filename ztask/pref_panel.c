@@ -2,6 +2,7 @@
 #include "win.h"
 #include "string.h"
 #include "app.h"
+#include "pref_panel.h"
 
 int tmp_button_off_background, tmp_button_off_light_color, tmp_button_off_dark_color, 
 tmp_button_off_text_color, tmp_button_off_text_shadow_color, tmp_button_on_background,
@@ -10,6 +11,7 @@ tmp_button_on_text_shadow_color, tmp_geek_area_color, tmp_geek_area_dark_line,
 tmp_geek_area_light_line, tmp_app_width, tmp_cpu_bar_color, 
 tmp_tt_bar_color, tmp_st_bar_color, tmp_show_clock, tmp_clock_us, 
 tmp_show_system_info, tmp_show_acc, tmp_geek_area_text_color;
+
 static void *thumb = NULL;
 int *tmp;
 static int16 xy[10], tmp_cpu_x, tmp_tt_x, tmp_st_x, tmp_clock_x, tmp_geek_area_width, tmp_y_text_pos,
@@ -525,7 +527,7 @@ static void CDECL draw_color_case( WINDOW *win, PARMBLK *pblk, void *data)
 
 
 void pref_dialog( void)
-{	
+{
 	int	frms[] = { PREFS_PANEL1, PREFS_PANEL2};
 	int	buts[] = { PREFS_COLOR, PREFS_MISC};
 
@@ -557,7 +559,7 @@ void pref_dialog( void)
 	tmp_show_system_info				= show_system_info;
 	tmp_show_acc						= show_acc;	
 	
-					
+	
 	if( ( pref_dialog_win = FormCreate( dial, NAME|MOVER, NULL, "Preferences", NULL, TRUE, FALSE)) == NULL)
 		return;
 		
@@ -583,7 +585,7 @@ void pref_dialog( void)
 	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_CPU, draw_color_case, &tmp_cpu_bar_color);
 	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_GEEK_TEXT, draw_color_case, &tmp_geek_area_text_color);
 	RsrcUserDraw( OC_FORM, pref_dialog_win, PREFS_PREVIEW, draw_preview, NULL);
-	
+
 	ObjcAttachFormFunc( pref_dialog_win, PREFS_OK, pref_dialog_ok_event, NULL);
 	ObjcAttachFormFunc( pref_dialog_win, PREFS_CANCEL, pref_dialog_cancel_event, NULL);
 	ObjcAttachFormFunc( pref_dialog_win, PREFS_DEFAULT, pref_dialog_default_event, NULL);

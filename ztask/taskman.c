@@ -542,10 +542,10 @@ void taskman_dialog( void)
 			
 	dial = get_tree( TASK);	
 
-	sprintf( ObjcString( dial, TASK_ST_TOTAL, NULL), "%ld", total_stram);
-	sprintf( ObjcString( dial, TASK_TT_TOTAL, NULL), "%ld", total_ttram);
-	sprintf( ObjcString( dial, TASK_ST_FREE, NULL), "%ld", stram);
-	sprintf( ObjcString( dial, TASK_TT_FREE, NULL), "%ld", ttram);
+	sprintf( ObjcString( dial, TASK_ST_TOTAL, NULL), "%lu", total_stram);
+	sprintf( ObjcString( dial, TASK_TT_TOTAL, NULL), "%lu", total_ttram);
+	sprintf( ObjcString( dial, TASK_ST_FREE, NULL), "%lu", stram);
+	sprintf( ObjcString( dial, TASK_TT_FREE, NULL), "%lu", ttram);
 
 	old_stram = stram;
 	old_ttram = ttram;

@@ -1,10 +1,8 @@
 #include "general.h"
 #include "cpu.h"
+#include "win.h"
 
 char buf[2048];
-
-extern uint32 total_stram;
-extern uint32 total_ttram;
 
 
 
@@ -66,14 +64,14 @@ void get_total_ram( void)
     if( match == NULL)
     	return;
     
-    sscanf( match, "FastTotal: %ld", &total_ttram);
+    sscanf( match, "FastTotal: %lu", &total_ttram);
 
     match = strstr( buf, "CoreTotal");
     
     if( match == NULL)
     	return;
     
-    sscanf( match, "CoreTotal: %ld", &total_stram);
+    sscanf( match, "CoreTotal: %lu", &total_stram);
 }
 
 
