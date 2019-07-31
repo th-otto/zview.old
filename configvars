@@ -28,7 +28,11 @@ else
 WINDOM_LIBS=-lwindom1
 endif
 
-CFLAGS   = $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
-CXXFLAGS = $(DEBUG) $(CPU) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror
+CFLAGS   = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
+CXXFLAGS = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror
 LDFLAGS  = -s
 ARFLAGS  = rcs
+
+LDSHARED = $(CC) -s -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k
+LDSHAREDLIBC = -nostdlib -lgcc
+SFLAGS =

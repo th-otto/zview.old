@@ -27,8 +27,11 @@
 #include <mint/cookie.h>
 #include <setjmp.h>
 #include <mt_gem.h>
+#ifndef PLUGIN_SLB
 #include <ldg.h>
 #include "../libshare/libshare.h"
+#endif
+
 
 #ifndef TRUE
 #define TRUE		1
@@ -49,6 +52,9 @@
 #define DSP_ERROR			1
 #define PROGRESSIVE_JPG		2
 #define ALL_OK				3
+
+typedef int zv_int_t;
+typedef unsigned int zv_uint_t;
 
 typedef struct _img_data
 {

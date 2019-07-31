@@ -1,17 +1,22 @@
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
 LIB			= ../libshare/libshare.a -lldg
 
-CFLAGS			+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common
+SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvbmp.slb\"
 
-OBJ 			= bmpldg.o
+all:: bmp.ldg zvbmp.slb
 
-PROGRAM 		= bmp.ldg
+include $(top_srcdir)/rules
 
-all:: $(PROGRAM)
+bmp.ldg: bmpldg.o bmp.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,1k $(LIB)
 
-$(PROGRAM): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+zvbmp.slb: header.lo bmpslb.lo bmp.lo
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+
+header.lo bmpslb.lo bmp.lo: ../common/plugin.h ../common/zview.h
 
 clean:
-	rm -f *.o *.a *.ldg
+	rm -f *.o *.lo *.a *.ldg *.slb

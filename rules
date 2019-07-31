@@ -1,0 +1,11 @@
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.S
+	$(CC) $(CFLAGS) $(ASFLAGS) -c $< -o $@
+
+%.lo: %.c
+	$(CC) $(CFLAGS) $(SFLAGS) -c $< -o $@
+
+%.lo: %.S
+	$(CC) $(CFLAGS) $(ASFLAGS) $(SFLAGS) -c $< -o $@
