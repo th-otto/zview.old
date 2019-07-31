@@ -58,7 +58,7 @@ int __sbrk_has_been_called = 0;
 
 /* provided for compilers with sizeof(int) == 2 */
 void *
-sbrk (size_t n)
+sbrk (intptr_t n)
 {
 	void *rval;
 	
