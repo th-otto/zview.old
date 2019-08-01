@@ -7,12 +7,13 @@
 	.text
 
 #include "symbols.h"
+#include "plugin_version.h"
 
 #define WITH_FUNCNAMES 1
 
 	.dc.l	0x70004afc	                    /* magic value (clr.l d0, illegal) */
 	.dc.l	_slbname	                    /* pointer to library's (file)name */
-	.dc.l	0x0200							/* version number */
+	.dc.l	PLUGIN_VERSION					/* version number */
 	.dc.l	0	                            /* flags, currently 0L */
 	.dc.l	C_SYMBOL_NAME(slb_init)			/* called when the library's been loaded */
 	.dc.l	C_SYMBOL_NAME(slb_exit)			/* called before the library is removed */

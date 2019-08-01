@@ -32,6 +32,7 @@ build
 *.srec
 *.log
 *.trs
+*.god
 lt-*.c
 stamp-*
 .stamp.*

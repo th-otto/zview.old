@@ -21,10 +21,7 @@ void 		  ( *raster_cmap) 			( DECDATA, void *);
 void 		  ( *raster_true) 			( DECDATA, void *);
 void 		  ( *cnvpal_color)			( IMGINFO, DECDATA);
 void 		  ( *raster_gray) 			( DECDATA, void *);
-void 	CDECL ( *decoder_quit)			( IMGINFO);
-boolean	CDECL ( *decoder_init)			( const char *, IMGINFO);
-boolean	CDECL ( *decoder_read)			( IMGINFO, uint8 *);
-void	CDECL ( *decoder_get_txt)		( IMGINFO, txt_data *);
+struct _ldg_funcs ldg_funcs;
 
 
 
@@ -77,7 +74,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		if( !init_txt_data( img, info->num_comments, info->max_comments_length))
 			return ( 0);
 		
-		decoder_get_txt( info, img->comments);
+		ldg_funcs.decoder_get_txt( info, img->comments);
 	}
 	else
 		img->comments = NULL;
@@ -167,7 +164,7 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 
 		for( y = 1; y <= img_h; y++)
 		{
-			if( !decoder_read( info, buf))
+			if( !ldg_funcs.decoder_read( info, buf))
 				return;		
 
 			while(( scale >> 16) < y) 
@@ -203,7 +200,7 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 void quit_img( IMGINFO info, DECDATA data)
 {
 	if( decoder_init_done == TRUE)
-		decoder_quit( info);
+		ldg_funcs.decoder_quit( info);
 
 	if( data->DthBuf != NULL) 
 	   	gfree( data->DthBuf);
@@ -221,36 +218,44 @@ void quit_img( IMGINFO info, DECDATA data)
 boolean get_pic_info( const char *file, char *extention, IMGINFO info)
 {
 	int16 	i, j, c = 0;
-	char 	plugin[3];
+	char 	plugin[4];
+	LDG *ldg;
 
+	plugin[3] = '\0';
 	/* We check if a plug-ins can do the job */
 	for( i = 0; i < plugins_nbr; i++, c = 0)
 	{
-		for( j = 0; j < codecs[i]->user_ext; j++)
+		switch (codecs[i].type)
 		{
-			plugin[0] = codecs[i]->infos[c++];
-			plugin[1] = codecs[i]->infos[c++];
-			plugin[2] = codecs[i]->infos[c++];
-
-			if( strncmp( extention, plugin, 3) == 0)
+		case CODEC_LDG:
+			ldg = codecs[i].c.ldg;
+			for( j = 0; j < codecs[i].num_extensions; j++)
 			{
-				if ( !( decoder_init 	= ldg_find( "reader_init", codecs[i]))
-				  || !( decoder_read 	= ldg_find( "reader_read", codecs[i])) 
-				  || !( decoder_quit 	= ldg_find( "reader_quit", codecs[i]))
-				  || !( decoder_get_txt = ldg_find( "reader_get_txt", codecs[i])))
+				plugin[0] = codecs[i].extensions[c++];
+				plugin[1] = codecs[i].extensions[c++];
+				plugin[2] = codecs[i].extensions[c++];
+	
+				if( strcmp( extention, plugin) == 0)
 				{
-					errshow( codecs[i]->infos, ldg_error());
-					return FALSE;
-				}				
-
-				// decoder_get_page_size = ldg_find( "reader_get_page_size", codecs[i]);
-
-				return decoder_init( file, info);
+					if ( !( ldg_funcs.decoder_init 	= ldg_find( "reader_init", ldg))
+					  || !( ldg_funcs.decoder_read 	= ldg_find( "reader_read", ldg)) 
+					  || !( ldg_funcs.decoder_quit 	= ldg_find( "reader_quit", ldg))
+					  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
+					{
+						errshow( codecs[i].extensions, ldg_error());
+						return FALSE;
+					}				
+	
+					// decoder_get_page_size = ldg_find( "reader_get_page_size", ldg);
+	
+					return ldg_funcs.decoder_init( file, info);
+				}
 			}
+			break;
 		}
 	}
 	
-	/* I wish that it will never append ! */
+	/* I wish that it will never happen ! */
 	return FALSE;
 }
 

@@ -9,7 +9,7 @@ void CDECL( *codec_init)( void) = NULL;
 
 /* Global variable */
 int16 	plugins_nbr = 0;
-LDG 	*codecs[100];
+CODEC codecs[MAX_CODECS];
 
 
 /*==================================================================================*
@@ -27,8 +27,16 @@ void plugins_quit( void)
 	int16 i;
 
 	for( i = 0; i < plugins_nbr; i++)
-		ldg_close( codecs[i], ldg_global);
-
+	{
+		switch (codecs[i].type)
+		{
+		case CODEC_LDG:
+			ldg_close( codecs[i].c.ldg, ldg_global);
+			break;
+		}
+ 		codecs[i].type = CODEC_NONE;
+	}
+	plugins_nbr = 0;
 }
 
 
@@ -83,7 +91,7 @@ int16 plugins_init( void)
 
 	if (( dir = opendir( ".")) != NULL)
 	{
-		while(( de = readdir( dir)) != NULL)
+		while(( de = readdir( dir)) != NULL && plugins_nbr < MAX_CODECS)
 		{
 			if (( strcmp( de->d_name, ".") == 0) || ( strcmp( de->d_name, "..") == 0))
 				continue;
@@ -93,17 +101,20 @@ int16 plugins_init( void)
 
 			if( strcmp ( extention, "ldg") == 0)
 			{
-				if ( ( codecs[plugins_nbr] = ldg_open( de->d_name, ldg_global)) != NULL)
+				if ( ( codecs[plugins_nbr].c.ldg = ldg_open( de->d_name, ldg_global)) != NULL)
 				{
-					if ( ( codec_init = ldg_find( "plugin_init", codecs[plugins_nbr])) != NULL)
+					if ( ( codec_init = ldg_find( "plugin_init", codecs[plugins_nbr].c.ldg)) != NULL)
 					{
+						codecs[plugins_nbr].type = CODEC_LDG;
+						codecs[plugins_nbr].extensions = codecs[plugins_nbr].c.ldg->infos;
+						codecs[plugins_nbr].num_extensions = codecs[plugins_nbr].c.ldg->user_ext;
 						codec_init();
 						plugins_nbr++;
 					}
 					else
 					{
 						errshow( de->d_name, ldg_error());
-						ldg_close( codecs[plugins_nbr], ldg_global);
+						ldg_close( codecs[plugins_nbr].c.ldg, ldg_global);
 					}
 				}
 				else

@@ -15,6 +15,7 @@
 #include <string.h>
 #include "zview.h"
 #include "plugin.h"
+#include "plugin_version.h"
 
 #if defined(__MSHORT__) || defined(__PUREC__) || defined(__AHCC__)
 # error "the slb must not be compiled with -mshort"
@@ -150,6 +151,8 @@ static long set_imports(struct _zview_plugin_funcs *funcs)
 		return -ESRCH;
 	if (funcs->struct_size != sizeof(*funcs))
 		return -EINVAL;
+	if (funcs->plugin_version > PLUGIN_VERSION)
+		return -EBADARG;
 	if (funcs->int_size != sizeof(int))
 		return -ERANGE;
 	proc->funcs = funcs;

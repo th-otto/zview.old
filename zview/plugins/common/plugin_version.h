@@ -1,0 +1,1 @@
+#define PLUGIN_VERSION 0x0200

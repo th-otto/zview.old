@@ -3,6 +3,7 @@
 #include "ztext.h"
 #include "pic_load.h"
 #include "catalog/catalog.h"
+#include "plugins.h"
 
 OBJECT 	*jpg_option_content;
 static 	int16 quality = 90;
@@ -12,8 +13,6 @@ static	boolean progressive = FALSE;
 static 	boolean show_preview = FALSE;
 #endif
 void 	*jpg_option_slider = NULL;
-
-extern void CDECL ( *set_jpg_option)( int16 set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive);
 
 
 static void __CDECL jpg_option_close( WINDOW *win EVNT_BUFF_PARAM)
@@ -53,7 +52,7 @@ static void jpg_option_show_preview( WINDOW *win, int obj_index, int mode, void 
 
 static void jpg_option_ok_event( WINDOW *win, int obj_index, int mode, void *data)
 {
-	set_jpg_option( quality, color_space, progressive);
+	ldg_funcs.set_jpg_option( quality, color_space, progressive);
 
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
 	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);

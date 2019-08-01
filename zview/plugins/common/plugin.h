@@ -34,7 +34,7 @@ struct _zview_plugin_funcs {
 	 * As for now, should match the version that was
 	 * used to compile the library.
 	 */
-	long zlib_vernum;
+	long plugin_version;
 	
 	void *_CDECL (*p_memset)(void *, zv_int_t, size_t);
 	void *_CDECL (*p_memcpy)(void *, const void *, size_t);

@@ -9,13 +9,6 @@
 #include "progress.h"
 #include "pic_save.h"
 
-extern void 	CDECL ( *decoder_quit)	( IMGINFO);
-extern boolean	CDECL ( *decoder_read)	( IMGINFO, uint8 *);
-extern boolean	CDECL ( *decoder_init)	( const char *, IMGINFO);
-extern void 	CDECL ( *encoder_quit)	( IMGINFO);
-extern boolean	CDECL ( *encoder_write)	( IMGINFO, uint8 *);
-extern boolean	CDECL ( *encoder_init)	( const char *, IMGINFO);
-
 static boolean encoder_init_done = FALSE;
 
 
@@ -99,11 +92,11 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	{	
 		for( y = 0; y < img_h; y++)
 		{
-			decoder_read( in_info, data->RowBuf);
+			ldg_funcs.decoder_read( in_info, data->RowBuf);
 
 			( *raster)( data, dst);
 	
-			encoder_write( out_info, dst);
+			ldg_funcs.encoder_write( out_info, dst);
 
 			if( show_write_progress_bar)
 				win_progress(( int16)((( int32)y * 150L) / img_h));
@@ -117,7 +110,7 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		/* First pass, we decode the entire image */
 		for( y = 0; y < img_h; y++)
 		{
-			decoder_read( in_info, data->RowBuf);
+			ldg_funcs.decoder_read( in_info, data->RowBuf);
 
 			( *raster)( data, dst);
 	
@@ -132,7 +125,7 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		/* second pass, we encode it */
 		for( ; y < h; y++)
 		{
-			encoder_write( out_info, dst);
+			ldg_funcs.encoder_write( out_info, dst);
 
 			dst += data->LnSize;
 
@@ -156,10 +149,10 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		gfree( data->RowBuf);
 
 	if( encoder_init_done)
-		encoder_quit( out_info);	
+		ldg_funcs.encoder_quit( out_info);	
 
 	if( decoder_init_done)
-		decoder_quit( in_info);	
+		ldg_funcs.decoder_quit( in_info);	
 
 	gfree( data);
 	gfree( out_info);
@@ -238,7 +231,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 	/* copy information from input's information to output's information struct */
 	memcpy( out_info, in_info, sizeof( img_info)); 
 
-	if (( encoder_init_done = encoder_init( out_file, out_info)) == FALSE)
+	if (( encoder_init_done = ldg_funcs.encoder_init( out_file, out_info)) == FALSE)
 	{
 		errshow( NULL, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);

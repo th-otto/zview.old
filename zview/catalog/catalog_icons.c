@@ -270,34 +270,34 @@ void set_entry_icon( Entry *entry)
 	}
 
 
-	if(( strncmp ( extention, "TTP", 3) == 0) 
-	|| ( strncmp ( extention, "TOS", 3) == 0) 
-	|| ( strncmp ( extention, "GTP", 3) == 0) 
-	|| ( strncmp ( extention, "PRG", 3) == 0) 
-	|| ( strncmp ( extention, "APP", 3) == 0))
+	if(( strcmp ( extention, "TTP") == 0) 
+	|| ( strcmp ( extention, "TOS") == 0) 
+	|| ( strcmp ( extention, "GTP") == 0) 
+	|| ( strcmp ( extention, "PRG") == 0) 
+	|| ( strcmp ( extention, "APP") == 0))
 	{
 		entry->type 	= ET_PRG;
 		entry->icon		= &icon_prg.image[0];
 		return;
 	}		
 
-	if( strncmp ( extention, "PDF", 3) == 0)	
+	if( strcmp ( extention, "PDF") == 0)	
 	{
 		entry->type 	= ET_PDF;
 		entry->icon		= &icon_pdf.image[0];
 		return;
 	}		
 
-
+	plugin[3] = '\0';
 	for( i = 0; i < plugins_nbr; i++, c = 0)
 	{
-		for( j = 0; j < codecs[i]->user_ext; j++)
+		for( j = 0; j < codecs[i].num_extensions; j++)
 		{
-			plugin[0] = codecs[i]->infos[c++];
-			plugin[1] = codecs[i]->infos[c++];
-			plugin[2] = codecs[i]->infos[c++];
+			plugin[0] = codecs[i].extensions[c++];
+			plugin[1] = codecs[i].extensions[c++];
+			plugin[2] = codecs[i].extensions[c++];
 
-			if( strncmp ( extention, plugin, 3) == 0)
+			if( strcmp ( extention, plugin) == 0)
 			{
 				entry->type	= ET_IMAGE;
 				entry->icon	= &icon_image.image[0];				

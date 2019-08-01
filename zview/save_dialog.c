@@ -10,14 +10,8 @@
 #include "menu.h"
 
 
-void 	CDECL ( *encoder_quit)	 ( IMGINFO);
-boolean	CDECL ( *encoder_write)	 ( IMGINFO, uint8 *);
-boolean	CDECL ( *encoder_init)	 ( const char *, IMGINFO);
-void 	CDECL ( *set_jpg_option) ( int16 set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive) = NULL;
-void 	CDECL ( *set_tiff_option)( int16 set_quality, uint16 set_encode_compression) = NULL;
-
-int16 encoder_plugins_nbr = 0;
-LDG *encoder[100];
+static int16 encoder_plugins_nbr = 0;
+static CODEC encoder[MAX_CODECS];
 
 
 /* local variable */
@@ -29,29 +23,39 @@ char source_file[MAXNAMLEN];
 
 static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 {
-	encoder_init 		= ldg_find( "encoder_init", encoder[encoder_selected]);
-	encoder_write 		= ldg_find( "encoder_write", encoder[encoder_selected]);
-	encoder_quit 		= ldg_find( "encoder_quit", encoder[encoder_selected]);
+	LDG *ldg;
 
-	if ( !encoder_init || !encoder_write || !encoder_quit)
+	switch (encoder[encoder_selected].type)
 	{
-		errshow( encoder[encoder_selected]->infos, ldg_error());
+	case CODEC_LDG:
+		ldg = encoder[encoder_selected].c.ldg;
+		ldg_funcs.encoder_init 		= ldg_find( "encoder_init", ldg);
+		ldg_funcs.encoder_write 		= ldg_find( "encoder_write", ldg);
+		ldg_funcs.encoder_quit 		= ldg_find( "encoder_quit", ldg);
+	
+		if ( !ldg_funcs.encoder_init || !ldg_funcs.encoder_write || !ldg_funcs.encoder_quit)
+		{
+			errshow( encoder[encoder_selected].extensions, ldg_error());
+			return FALSE;
+		}
+		break;
+	default:
 		return FALSE;
 	}
 
-	set_jpg_option 	= NULL;	
-	set_tiff_option = NULL;
+	ldg_funcs.set_jpg_option 	= NULL;	
+	ldg_funcs.set_tiff_option = NULL;
 	
-	if( strncmp( encoder[encoder_selected]->infos, "JPG", 3) == 0)
-		set_jpg_option 	= ldg_find( "set_jpg_option", encoder[encoder_selected]); 
-	else if( strncmp( encoder[encoder_selected]->infos, "TIF", 3) == 0)
-		set_tiff_option = ldg_find( "set_tiff_option", encoder[encoder_selected]); 
+	if( strncmp( encoder[encoder_selected].extensions, "JPG", 3) == 0)
+		ldg_funcs.set_jpg_option 	= ldg_find( "set_jpg_option", ldg);
+	else if( strncmp( encoder[encoder_selected].extensions, "TIF", 3) == 0)
+		ldg_funcs.set_tiff_option = ldg_find( "set_tiff_option", ldg);
 	else 
 		ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, DISABLED, 0);
 		
-	zstrncpy( save_dialog_content[SAVE_DIAL_FORMAT].ob_spec.free_string, encoder[encoder_selected]->infos, 4);
+	zstrncpy( save_dialog_content[SAVE_DIAL_FORMAT].ob_spec.free_string, encoder[encoder_selected].extensions, 4);
 
-	if( set_jpg_option != NULL || set_tiff_option != NULL)
+	if( ldg_funcs.set_jpg_option != NULL || ldg_funcs.set_tiff_option != NULL)
 		ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, NORMAL, 0);
 
    	ObjcDraw( OC_FORM, win, SAVE_DIAL_FORMAT, 1);
@@ -70,7 +74,7 @@ static void format_popup( WINDOW *win, int obj_index)
 
 	for( i = 0; i < encoder_plugins_nbr; i++)
 	{	
-		zstrncpy( items[i], encoder[i]->infos, 4);
+		zstrncpy( items[i], encoder[i].extensions, 4);
 		items_ptr[i] = items[i];
 	}
 
@@ -110,12 +114,12 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 			break;
 
 		case SAVE_DIAL_OPTIONS:
-			if( strncmp( encoder[last_choice-1]->infos, "JPG", 3) == 0)
+			if( strncmp( encoder[last_choice-1].extensions, "JPG", 3) == 0)
 			{
 				ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
 				jpg_option_dialog( source_file);
 			}
-			else if( strncmp( encoder[last_choice-1]->infos, "TIF", 3) == 0)
+			else if( strncmp( encoder[last_choice-1].extensions, "TIF", 3) == 0)
 			{
 				ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
 				tiff_option_dialog();
@@ -144,7 +148,7 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 			target_file_name[i] = '\0';
 
 			/* copy the source's name in the target's name with the new extention for exemple ( "toto.gif" to "toto.jpg") */
-			zstrncpy( extention, encoder[last_choice - 1]->infos, 4);
+			zstrncpy( extention, encoder[last_choice - 1].extensions, 4);
 			str2lower( extention);
 			strcpy ( target_file_name + strlen( target_file_name) - 3, extention);
 				
@@ -238,10 +242,15 @@ void save_dialog( const char *fullfilename)
 
 		for( i = 0; i < plugins_nbr; i++)
 		{
-			if( ldg_find( "encoder_init", codecs[i]))
+			switch (codecs[i].type)
 			{
-				encoder[encoder_plugins_nbr] = codecs[i];
-				encoder_plugins_nbr++;
+			case CODEC_LDG:
+				if( ldg_find( "encoder_init", codecs[i].c.ldg))
+				{
+					encoder[encoder_plugins_nbr] = codecs[i];
+					encoder_plugins_nbr++;
+				}
+				break;
 			}
 		}
 		

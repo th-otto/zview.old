@@ -3,6 +3,7 @@
 #include "ztext.h"
 #include "pic_load.h"
 #include "catalog/catalog.h"
+#include "plugins.h"
 
 #define	    COMPRESSION_NONE		1		/* dump mode */
 #define	    COMPRESSION_PACKBITS	32773	/* Macintosh RLE */
@@ -17,8 +18,6 @@ static 	int16 	quality 			= 75;
 static	uint16 	compression 		= COMPRESSION_NONE;
 static  int		compression_button 	= 0;
 
-
-extern void CDECL ( *set_tiff_option)( int16 set_quality, uint16 set_encode_compression);
 
 
 static void __CDECL tiff_option_close( WINDOW *win EVNT_BUFF_PARAM)
@@ -48,7 +47,7 @@ static void __CDECL tiff_option_ok_event( WINDOW *win, int obj_index, int mode, 
 			break;		
 	}
 
-	set_tiff_option( quality, compression);
+	ldg_funcs.set_tiff_option( quality, compression);
 
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
 	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
