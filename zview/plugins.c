@@ -123,12 +123,12 @@ int16 plugins_init( void)
 						plugins_nbr++;
 					} else
 					{
-						errshow( de->d_name, ldg_error());
+						errshow(de->d_name, LDG_ERR_BASE + ldg_error());
 						ldg_close( codecs[plugins_nbr].c.ldg, ldg_global);
 					}
 				} else
 				{
-					errshow(de->d_name, ldg_error());
+					errshow(de->d_name, LDG_ERR_BASE + ldg_error());
 				}
 			} else if (strcmp(extension, "slb") == 0)
 			{
@@ -144,7 +144,7 @@ int16 plugins_init( void)
 					plugins_nbr++;
 				} else
 				{
-					errshow(de->d_name, -err);
+					errshow(de->d_name, err);
 				}
 			}
 		}

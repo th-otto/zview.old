@@ -99,7 +99,7 @@ void tiff_option_dialog( void)
 
 	if( ( win = FormCreate( tiff_option_content, NAME|MOVER, NULL, get_string( TIFF_OPTION_TITLE), NULL, TRUE, FALSE)) == NULL)
 	{
-		errshow( "", ALERT_WINDOW);	
+		errshow( NULL, ALERT_WINDOW);	
 		return;
 	}
 
@@ -108,7 +108,7 @@ void tiff_option_dialog( void)
 	if( ( tiff_option_slider = SlidCreate( 1, 100, 1, 10, quality, SLD_HORI, SLD_IMME)) == NULL)
 	{
 		WindClose( win);
-		errshow( "", ENOMEM);
+		errshow( NULL, -ENOMEM);
 		return;	
 	}	
 

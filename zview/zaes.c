@@ -521,108 +521,91 @@ void errshow( const char *name, int16 error)
 {
   	switch( error)
   	{
-		case ALERT_WINDOW:
-			( void)FormAlert( 1 , get_string( ALERT_WINDOW));
-			break;
-		case ENAMETOOLONG:
+		case -ENAMETOOLONG:
 			( void)FormAlert( 1 , get_string( NAMETOOLONG));
 			break;
-		case ENOENT:
+		case -ENOENT:
 			( void)FormAlert( 1 , get_string( NOENT), name);
 			break;				
-		case EACCES:
+		case -EACCES:
 			( void)FormAlert( 1 , get_string( ACCES));
 			break;		
-		case ELOOP:
+		case -ELOOP:
 			( void)FormAlert( 1 , get_string( LOOP));
 			break;		
-		case ENOTDIR:
+		case -ENOTDIR:
 			( void)FormAlert( 1 , get_string( NOTDIR));
 			break;								
-		case EXDEV:
+		case -EXDEV:
 			( void)FormAlert( 1 , get_string( XDEV));
 			break;		
-		case ENOSPC:
+		case -ENOSPC:
 			( void)FormAlert( 1 , get_string( NOSPC));
 			break;					
-		case EIO:
+		case -EIO:
 			( void)FormAlert( 1 , get_string( IO));
 			break;		
-		case EROFS:
+		case -EROFS:
 			( void)FormAlert( 1 , get_string( ROFS));
 			break;		
-		case EFAULT:
+		case -EFAULT:
 			( void)FormAlert( 1 , get_string( FAULT));
 			break;		
-		case EINVAL:
+		case -EINVAL:
 			( void)FormAlert( 1 , get_string( INVAL));
 			break;		
-		case EBADF:
+		case -EBADF:
 			( void)FormAlert( 1 , get_string( BADF));
 			break;
-		case ENOMEM:
+		case -ENOMEM:
 			( void)FormAlert( 1 , get_string( NOMEM));
 			break;
+		case -EEXIST:
+			( void)FormAlert( 1 , get_string( NAMEALREADYUSED));
+			break;		
+
+		case LDG_ERR_BASE + LDG_LIB_FULLED:
+ 			( void)FormAlert( 1 , get_string( LDG_LIB_FULLED), name);
+              		break;
+		case LDG_ERR_BASE + LDG_APP_FULLED:
+ 			( void)FormAlert( 1 , get_string( APP_FULLED), name);
+              		break;
+		case LDG_ERR_BASE + LDG_ERR_EXEC:
+ 			( void)FormAlert( 1 , get_string( ERR_EXEC), name);
+              		break;
+		case LDG_ERR_BASE + LDG_BAD_FORMAT:
+ 			( void)FormAlert( 1 , get_string( BAD_LFORMAT), name);
+              		break;
+		case LDG_ERR_BASE + LDG_LIB_LOCKED:
+ 			( void)FormAlert( 1 , get_string( LIB_LOCKED), name);
+              		break;
+		case LDG_ERR_BASE + LDG_NOT_FOUND:
+ 			( void)FormAlert( 1 , get_string( NOT_FOUND), name);
+              		break;
+		case LDG_ERR_BASE + LDG_NO_MEMORY:
+ 			( void)FormAlert( 1 , get_string( NO_MEMORY), name);
+              		break;
+		case LDG_ERR_BASE + LDG_NO_FUNC:
+ 			( void)FormAlert( 1 , get_string( NOFUNC), name);
+              		break;
+
 		case E_RSC:
  			( void)FormAlert( 1 , "[3][zview.rsc not found!][Quit]");
  			break;
-		case NO_EDDI:
- 			( void)FormAlert( 1 , "[3][zView needs a VDI|with EdDI standard.][Quit]");
-              		break;
-        /*
-         * FIXME: these conflict with GEMDOS errors...
-         */
-		case NAMEALREADYUSED:
-			( void)FormAlert( 1 , get_string( NAMEALREADYUSED));
-			break;		
-		case LDG_LIB_FULLED:
- 			( void)FormAlert( 1 , get_string( LDG_LIB_FULLED), name);
-              		break;
-		case LDG_APP_FULLED:
- 			( void)FormAlert( 1 , get_string( APP_FULLED), name);
-              		break;
-		case LDG_ERR_EXEC:
- 			( void)FormAlert( 1 , get_string( ERR_EXEC), name);
-              		break;
-		case LDG_BAD_FORMAT:
- 			( void)FormAlert( 1 , get_string( BAD_LFORMAT), name);
-              		break;
-		case LDG_LIB_LOCKED:
- 			( void)FormAlert( 1 , get_string( LIB_LOCKED), name);
-              		break;
-		case LDG_NOT_FOUND:
- 			( void)FormAlert( 1 , get_string( NOT_FOUND), name);
-              		break;
-		case LDG_NO_MEMORY:
- 			( void)FormAlert( 1 , get_string( NO_MEMORY), name);
-              		break;
-		case LDG_NO_FUNC:
- 			( void)FormAlert( 1 , get_string( NOFUNC), name);
-              		break;
+
+		case ALERT_WINDOW:
 		case PLUGIN_DECODER_ABSENT: 
- 			( void)FormAlert( 1 , get_string( PLUGIN_DECODER_ABSENT));
-              		break;	
 		case PLUGIN_ENCODER_ABSENT: 
- 			( void)FormAlert( 1 , get_string( PLUGIN_ENCODER_ABSENT));
-              		break;			
 		case CANT_LOAD_IMG:
- 			( void)FormAlert( 1 , get_string( CANT_LOAD_IMG), name);
-              		break;
 		case CANT_SAVE_IMG:
- 			( void)FormAlert( 1 , get_string( CANT_SAVE_IMG));
-              		break;
 		case IMG_NO_VALID:
- 			( void)FormAlert( 1 , get_string( IMG_NO_VALID));
-              		break;	
 		case SOURCE_TARGET_SAME:
- 			( void)FormAlert( 1 , get_string( SOURCE_TARGET_SAME));
-              		break;	
 		case NOZCODECS:
- 			( void)FormAlert( 1 , get_string( NOZCODECS));
-              		break;	
 		case NOICONS:
- 			( void)FormAlert( 1 , get_string( NOICONS));
-              		break;	      		
+		case NO_EDDI:
+			( void)FormAlert( 1 , get_string(error), name);
+			break;
+
 		default:
 			( void)FormAlert( 1 , get_string( GENERIC));
 			break;				

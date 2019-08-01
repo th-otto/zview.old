@@ -1365,7 +1365,7 @@ WINDOW *WindPdf( char *filename)
 	if ( ( windata = ( WINDATA*) gmalloc( sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return NULL;
 	}
 
@@ -1393,7 +1393,7 @@ WINDOW *WindPdf( char *filename)
 	if ( ( winview	= WindCreate( WAT_NOINFO, app.x, app.y, app.w, app.h)) == NULL)
 	{
 		gfree( windata);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
@@ -1406,7 +1406,7 @@ WINDOW *WindPdf( char *filename)
 	{
 		WindDelete( winview);
 		gfree( windata);
-		// errshow( "", IMG_NO_VALID);
+		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
@@ -1485,7 +1485,7 @@ WINDOW *WindPdf( char *filename)
 	if ( !( WindOpen( winview, app.x, app.y, app.w, app.h)))
 	{
 		WindPdfClose( winview EVNT_BUFF_NULL);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}

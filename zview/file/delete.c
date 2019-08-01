@@ -178,7 +178,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 			if( !count_files( wicones, &file))
 			{
 				ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
-				errshow( "", errno);
+				errshow("", -errno);
 				return;
 			}
 
@@ -197,7 +197,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 				{		
 					if ( !delete_dir( win, wicones->first_selected->name))
 					{   
-				  		errshow( wicones->first_selected->name, errno);
+				  		errshow( wicones->first_selected->name, -errno);
 						break;
 					}
 					else
@@ -236,7 +236,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 				{   							
 					if ( !delete_file( wicones->first_selected->name, &wicones->first_selected->stat))
 					{
-						errshow( wicones->first_selected->name, errno);
+						errshow( wicones->first_selected->name, -errno);
 						break;
 					}
 					else	

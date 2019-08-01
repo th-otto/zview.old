@@ -99,23 +99,22 @@ static void applinit( void)
 {		
 	ApplInit();
 	
-	if( !vdi_init())
-	{
-		errshow( "", NO_EDDI);
-		ApplExit();
-		exit( 1);
-	}
-
-
 /*	is it unusefull ? */
 	if( _AESnumapps == -1)
 		menu_register( _AESapid, "  zView   ");
 
 	if( !RsrcLoad( "zview.rsc")) 
 	{
-		errshow( "", E_RSC);
+		errshow(NULL, E_RSC);
 		ApplExit();
-		exit( 1);
+		exit(1);
+	}
+
+	if( !vdi_init())
+	{
+		errshow(NULL, NO_EDDI);
+		ApplExit();
+		exit(1);
 	}
 
 	magic_os = vq_magx();
@@ -155,7 +154,7 @@ static void applinit( void)
 	
 	if( plugins_init() == 0)
 	{
-		errshow( "", NOZCODECS);
+		errshow(NULL, NOZCODECS);
 		applexit();
 	}
 

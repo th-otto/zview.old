@@ -43,7 +43,7 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 		
 			if ( !ldg_funcs.encoder_init || !ldg_funcs.encoder_write || !ldg_funcs.encoder_quit)
 			{
-				errshow( encoder[encoder_selected]->extensions, ldg_error());
+				errshow( encoder[encoder_selected]->extensions, LDG_ERR_BASE + ldg_error());
 				return FALSE;
 			}
 			if( strncmp( encoder[encoder_selected]->extensions, "JPG", 3) == 0)
@@ -63,7 +63,7 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 			err = plugin_get_option(slb, OPTION_CAPABILITIES);
 			if (err < 0 || !(err & CAN_ENCODE))
 			{
-				errshow( encoder[encoder_selected]->extensions, -err);
+				errshow( encoder[encoder_selected]->extensions, err);
 				return FALSE;
 			}
 			err = plugin_get_option(slb, OPTION_QUALITY);

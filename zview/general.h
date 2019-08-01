@@ -84,8 +84,8 @@ typedef int boolean;
 #define WD_WIMG		0x57494D47L
 
 /* Custom error code */
-#define E_RSC		10002
-#define NO_EDDI		10003
+#define E_RSC		 10002
+#define LDG_ERR_BASE 20000
 
 /* custom def */
 #define preview_mode	1

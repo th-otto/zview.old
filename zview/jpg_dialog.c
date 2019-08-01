@@ -108,7 +108,7 @@ void jpg_option_dialog( char *source_file)
 	if( ( win = FormCreate( jpg_option_content, NAME|MOVER, NULL, get_string( JPG_OPTION_TITLE), NULL, TRUE, FALSE)) == NULL)
 	{
 		WindClose( win);
-		errshow( "", ALERT_WINDOW);	
+		errshow(NULL, ALERT_WINDOW);	
 		return;
 	}
 
@@ -122,7 +122,7 @@ void jpg_option_dialog( char *source_file)
 	if( ( jpg_option_slider = SlidCreate( 1, 100, 1, 10, quality, SLD_HORI, SLD_IMME)) == NULL)
 	{
 		frm_cls( win);
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return;	
 	}	
 	

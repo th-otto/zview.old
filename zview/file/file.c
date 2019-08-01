@@ -128,7 +128,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		
 	if (( dir = opendir( ".")) == NULL)
 	{
-		errshow( "dir", errno);
+		errshow(".", -errno);
 		goto abort;
 	}
 
@@ -150,7 +150,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 			{ /* alloc for the first time */
 				if (( dirfile->entry = ( Entry *)gmalloc( ALLOC_NDIRENTRIES * sizeof( Entry))) == NULL)
 				{
-					errshow( "", ENOMEM);
+					errshow(NULL, -ENOMEM);
 					goto abort;
 				}
 			}
@@ -158,7 +158,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 			{ /* expand allocated memory */
 				if (( entry = ( Entry *)grealloc( dirfile->entry, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Entry))) == NULL)
 				{
-					errshow( "", ENOMEM);
+					errshow(NULL, -ENOMEM);
 					goto abort;
 				}
 				dirfile->entry = entry;
@@ -279,7 +279,7 @@ abort:
 	if ( dirlist->nbr_child > 0)
 		gfree( dirlist->root);
 		
-	errshow( "", ENOMEM);
+	errshow(NULL, -ENOMEM);
 	
 	return FALSE;
 }

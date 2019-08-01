@@ -300,7 +300,7 @@ boolean get_codec( const char *file)
 				  || !( ldg_funcs.decoder_quit 	= ldg_find( "reader_quit", ldg))
 				  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
 				{
-					errshow( codecs[i].extensions, ldg_error());
+					errshow(codecs[i].extensions, LDG_ERR_BASE + ldg_error());
 					return FALSE;
 				}				
 
@@ -361,7 +361,7 @@ boolean pic_load( const char *file, IMAGE *img)
 	
 	if ( !info)
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return FALSE;
 	}
 
@@ -369,7 +369,7 @@ boolean pic_load( const char *file, IMAGE *img)
 
 	if ( !data)
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		gfree( info);
 		return FALSE;
 	}
@@ -395,7 +395,7 @@ boolean pic_load( const char *file, IMAGE *img)
 
 	if( !setup ( img, info, data))
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		quit_img( info, data);
 		delete_mfdb( img->image, img->page);
 		win_progress_end();

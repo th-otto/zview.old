@@ -238,7 +238,7 @@ void infobox( void)
 
 			if( !count_files( wicones, &file))
 			{
-				errshow( "", errno);
+				errshow("", -errno);
 				return;
 			}
 

@@ -222,7 +222,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 			gfree( in_info);
 
 		graf_mouse( ARROW, NULL);			
-		errshow( "", ENOMEM);		
+		errshow(NULL, -ENOMEM);		
 		return( 0);
 	}
 
@@ -236,7 +236,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 
 	if(( decoder_init_done = get_pic_info( in_file, in_info)) == FALSE)
 	{
-		errshow( in_file, CANT_SAVE_IMG);
+		errshow(in_file, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);
 		graf_mouse( ARROW, NULL);
 		return ( 0);
@@ -254,7 +254,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 		encoder_init_done = ldg_funcs.encoder_init(out_file, out_info);
 	if (encoder_init_done == FALSE)
 	{
-		errshow( NULL, CANT_SAVE_IMG);
+		errshow(out_file, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);
 		win_progress_end();
 		graf_mouse( ARROW, NULL);
@@ -264,7 +264,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 
 	if( !setup_encoder( in_info, out_info, data))
 	{
-		errshow( NULL, ENOMEM);	
+		errshow(NULL, -ENOMEM);	
 		exit_pic_save( in_info, out_info, data);
 		win_progress_end();
 		graf_mouse( ARROW, NULL);

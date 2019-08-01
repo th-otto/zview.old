@@ -151,20 +151,20 @@ int WinCatalog( void)
 
 	if ( !icons_init())
 	{
-		errshow( "", NOICONS);
+		errshow(NULL, NOICONS);
 		applexit();
 	}
 
 	if ( ( wicones = ( WINDICON *) gmalloc( sizeof( WINDICON))) == NULL)
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return( 0);
 	}
 
 	if ( ( win_catalog	= WindCreate( WINATTRIB, app.x, app.y, app.w, app.h)) == NULL)
 	{
 		gfree( wicones);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		return( 0);
 	}
 
@@ -261,7 +261,7 @@ int WinCatalog( void)
 	if( !WindOpen( win_catalog, browser_x, browser_y, browser_w, browser_h))
 	{
 		WinCatalog_Close( win_catalog EVNT_BUFF_NULL);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		return( 0);
 	}
 

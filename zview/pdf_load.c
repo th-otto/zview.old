@@ -38,7 +38,7 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 
 	if ( !data)
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return ( 0);
 	}
 
@@ -60,7 +60,7 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 		if( data->DthBuf == NULL) 
 		{
 			gfree( data);
-			errshow( "", ENOMEM);
+			errshow(NULL, -ENOMEM);
 			return ( 0);
 		}
 			
@@ -76,7 +76,7 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	   		gfree( data->DthBuf);
 	   	
 		gfree( data);
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return ( 0);
 	}	
 

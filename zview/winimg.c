@@ -165,7 +165,7 @@ static void WindViewZoom( WINDOW *win)
 
 	if( !pic_resize( &img->image[windata->page_to_show], &windata->zoom_picture))
 	{
-		errshow( "", ENOMEM);
+		errshow(NULL, ENOMEM);
 		windata->zoom_level = 100;
 	}
 
@@ -953,7 +953,7 @@ WINDOW *WindView( char *filename)
 	if ( !icons_init())
 	{
 		graf_mouse( ARROW, NULL);
-		errshow( "", NOICONS);
+		errshow(NULL, NOICONS);
 		applexit();
 	}
 
@@ -966,7 +966,7 @@ WINDOW *WindView( char *filename)
 	if ( ( windata = ( WINDATA*) gmalloc( sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
-		errshow( "", ENOMEM);
+		errshow(NULL, -ENOMEM);
 		return NULL;
 	}
 
@@ -992,7 +992,7 @@ WINDOW *WindView( char *filename)
 	if ( !pic_load( filename, img))
 	{
 		gfree( windata);
-		// errshow( "", IMG_NO_VALID);
+		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
@@ -1004,7 +1004,7 @@ WINDOW *WindView( char *filename)
 	{
 		delete_mfdb( img->image, img->page);
 		gfree( windata);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
@@ -1059,7 +1059,7 @@ WINDOW *WindView( char *filename)
 	if ( !( WindOpen( winview, -1, -1, w, h)))
 	{
 		WindViewClose( winview EVNT_BUFF_NULL);
-		errshow( "", ALERT_WINDOW);
+		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}

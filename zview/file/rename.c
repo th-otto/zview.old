@@ -27,21 +27,21 @@ boolean rename_entry( WINDOW *win, const char *new_name)
 
 	if( strchr( new_name, '/') || strchr( new_name, '\\'))			/* disallow attempts to use rename to move files */
 	{	
-		errshow( wicones->first_selected->name, INVAL);
+		errshow( wicones->first_selected->name, -EINVAL);
 		return FALSE;
 	}
 
 	for ( i = 0 ; i < wicones->nbr_icons ; i++)					
 		if ( !strcmp( wicones->entry[i].name, new_name))
 		{	
-			errshow( "", NAMEALREADYUSED);
+			errshow(new_name, -EEXIST);
 			return FALSE;
 		}
 
 	
 	if ( rename( wicones->first_selected->name, new_name) != 0)
 	{
-		errshow( wicones->first_selected->name, errno);
+		errshow( wicones->first_selected->name, -errno);
 		return FALSE;
 	}
 

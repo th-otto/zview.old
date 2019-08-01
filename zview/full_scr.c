@@ -83,7 +83,7 @@ void show_fullscreen( WINDATA *windata)
 	{
 		if( pic_resize( &img->image[windata->page_to_show], &resized_out) == 0)
 		{
-			errshow( "", ENOMEM);
+			errshow(NULL, -ENOMEM);
 			full_screen = FALSE;
 			return;
 		}
