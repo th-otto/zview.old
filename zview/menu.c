@@ -71,9 +71,19 @@ static void __CDECL Menu_about(WINDOW *win, int item, int title, void *data)
  *==================================================================================*/
 void __CDECL Menu_open_image(WINDOW *win, int item, int title, void *data)
 {
-	static char path[MAX_PATH]	= "C:\\"; /* Fist usage : current directory */
+	static char path[MAX_PATH]; /* Fist usage : current directory */
     char 		name[MAXNAMLEN]	= ""; 
-        
+    
+    if (path[0] == '\0')
+    {
+    	int drv = Dgetdrv();
+    	Dgetcwd(path, drv, sizeof(path));
+    	if (path[0] == '/' && path[2] == '/')
+    	{
+    		path[0] = path[1];
+    		path[1] = ':';
+    	}
+    }
 	if( FselInput( path, name, "*.*", get_string( LOAD_TITLE), NULL, NULL)) 
 	{
 		/* if a file is not selected, return */
