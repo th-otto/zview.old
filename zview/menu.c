@@ -76,13 +76,7 @@ void __CDECL Menu_open_image(WINDOW *win, int item, int title, void *data)
     
     if (path[0] == '\0')
     {
-    	int drv = Dgetdrv();
-    	Dgetcwd(path, drv, sizeof(path));
-    	if (path[0] == '/' && path[2] == '/')
-    	{
-    		path[0] = path[1];
-    		path[1] = ':';
-    	}
+    	strcpy(path, startup_path);
     }
 	if( FselInput( path, name, "*.*", get_string( LOAD_TITLE), NULL, NULL)) 
 	{

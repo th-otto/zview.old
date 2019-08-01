@@ -352,7 +352,7 @@ boolean get_pic_info( const char *file, IMGINFO info)
  * returns: 	'0' if error or picture not supported								*
  *==================================================================================*/
 
-int16 pic_load( const char *file, IMAGE *img)
+boolean pic_load( const char *file, IMAGE *img)
 {
 	IMGINFO info;
 	DECDATA data;
@@ -362,7 +362,7 @@ int16 pic_load( const char *file, IMAGE *img)
 	if ( !info)
 	{
 		errshow( "", ENOMEM);
-		return( 0);
+		return FALSE;
 	}
 
 	data = ( dec_data *) gmalloc( sizeof( dec_data));
@@ -371,7 +371,7 @@ int16 pic_load( const char *file, IMAGE *img)
 	{
 		errshow( "", ENOMEM);
 		gfree( info);
-		return ( 0);
+		return FALSE;
 	}
 
 
@@ -390,7 +390,7 @@ int16 pic_load( const char *file, IMAGE *img)
 		gfree( data);
 		gfree( info);
 		win_progress_end();
-		return ( 0);
+		return FALSE;
 	}
 
 	if( !setup ( img, info, data))
@@ -399,7 +399,7 @@ int16 pic_load( const char *file, IMAGE *img)
 		quit_img( info, data);
 		delete_mfdb( img->image, img->page);
 		win_progress_end();
-		return ( 0);
+		return FALSE;
 	}
 
 	read_img ( img, info, data);
@@ -434,5 +434,5 @@ int16 pic_load( const char *file, IMAGE *img)
 
 	chrono_off( img->working_time);
 		
-	return ( 1);
+	return TRUE;
 }

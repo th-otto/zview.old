@@ -5,6 +5,7 @@
 #include "../plugins.h"
 #include "catalog_icons.h"
 #include "catalog.h"
+#include "../pic_load.h"
 
 /* Global variable */
 MFDB mini_big			= { NULL, 16, 16, 1, 0, 1, 0, 0, 0};
@@ -88,7 +89,14 @@ void icons_exit(void)
  *		0 if error else 1.															*
  *==================================================================================*/
 
-int16 icons_init( void)
+static boolean icon_load( const char *file, IMAGE *img)
+{
+	char path[MAX_PATH];
+	boolean ret = pic_load(strcat(strcpy(path, zview_path), file), img);
+	return ret;
+}
+
+boolean icons_init( void)
 {
 	uint16 *small_icon_buffer_addr;
 	uint32 small_icon_buffer_size;
@@ -114,12 +122,12 @@ int16 icons_init( void)
 		small_icon.progress_bar 	= 0;
 
 		
-		if ( !pic_load( "icons\\folder.god", &icon_folder)	||
-			 !pic_load( "icons\\image.god", &icon_image)		||		
-			 !pic_load( "icons\\file.god", &icon_file)		||	
-			 !pic_load( "icons\\prg.god", &icon_prg)		||
-			 !pic_load( "icons\\pdf.god", &icon_pdf)		||			 
-			 !pic_load( "icons\\small.god",	&small_icon))
+		if ( !icon_load( "icons\\folder.god", &icon_folder)	||
+			 !icon_load( "icons\\image.god", &icon_image)		||		
+			 !icon_load( "icons\\file.god", &icon_file)		||	
+			 !icon_load( "icons\\prg.god", &icon_prg)		||
+			 !icon_load( "icons\\pdf.god", &icon_pdf)		||			 
+			 !icon_load( "icons\\small.god",	&small_icon))
 			{
 				icons_exit();
 				return FALSE;

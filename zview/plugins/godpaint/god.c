@@ -21,7 +21,7 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE | CAN_ENCODE;
 	case OPTION_EXTENSIONS:
-		return (long)("BMP\0");
+		return (long)("GOD\0");
 	}
 	return -ENOSYS;
 }

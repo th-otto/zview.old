@@ -99,15 +99,17 @@ int16 plugins_init( void)
 	{
 		while ((de = readdir(dir)) != NULL && plugins_nbr < MAX_CODECS)
 		{
-			len = (int16)strlen( de->d_name);
+			len = (int16)strlen(de->d_name);
 			if (len < 3)
 				continue;
+			strcpy(name, de->d_name);
+			str2lower(de->d_name);
+			if (strcmp(de->d_name, "xpdf.slb") == 0)
+				continue;
 			strcpy(extension, de->d_name + len - 3);
-			str2lower( extension);
 
 			if (strcmp(extension, "ldg") == 0)
 			{
-				strcpy(name, de->d_name);
 				if ((codecs[plugins_nbr].c.ldg = ldg_open(plugin_dir, ldg_global)) != NULL)
 				{
 					void CDECL(*codec_init)(void);

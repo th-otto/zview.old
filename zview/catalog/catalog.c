@@ -20,6 +20,7 @@
 #include "catalog_other_event.h"
 #include "catalog.h"
 #include "../menu.h"
+#include "../pic_load.h"
 
 /* Global variable */
 int16	border_size 			= 5;

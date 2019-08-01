@@ -15,13 +15,18 @@ typedef struct _dec_data
 	uint32    	Pixel[256];
 } dec_data;
 
+
+extern boolean decoder_init_done;
+
 extern void ( *raster)	  	( DECDATA, void *dst);
 extern void ( *raster_cmap) ( DECDATA, void *);
 extern void ( *raster_true) ( DECDATA, void *);
 extern void ( *rasterize_32) ( DECDATA, void *);
 extern void ( *cnvpal_color)( IMGINFO, DECDATA);
 extern void ( *raster_gray) ( DECDATA, void *);
-extern boolean get_codec( const char *file);
-extern boolean get_pic_info( const char *file, IMGINFO info);
-extern void quit_img( IMGINFO info, DECDATA data);
-extern boolean decoder_init_done;
+
+boolean get_codec( const char *file);
+boolean get_pic_info( const char *file, IMGINFO info);
+void quit_img( IMGINFO info, DECDATA data);
+
+boolean pic_load( const char *file, IMAGE *img);

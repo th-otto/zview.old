@@ -1,4 +1,4 @@
-extern int16 icons_init( void);
+extern boolean icons_init( void);
 extern void icons_exit(void);
 extern void set_entry_icon( Entry *entry);
 extern void redraw_icon( WINDOW *wind, Entry *entry);

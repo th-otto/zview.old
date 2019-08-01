@@ -22,6 +22,7 @@ int 	vq_mint		( void);
 WINDOW *win_catalog = NULL;
 
 char 	zview_path[MAX_PATH];
+char 	startup_path[MAX_PATH];
 int16	mint_os = 0, magic_os = 0;
 
 /*==================================================================================*
@@ -64,9 +65,9 @@ void applexit( void)
 	RsrcFree();
 	AvExit();
 	ApplExit();
-	#ifdef DEBUG
+#ifdef DEBUG
 	gMemReport();
-	#endif
+#endif
 
 	exit( 0);
 }
@@ -131,9 +132,18 @@ static void applinit( void)
     	EvntAttach( NULL, VA_START, va_start);
 
 	/* Get the current path for the different file loading like icon, etc... */
-	zview_path[0] = 'A' + Dgetdrv();
-	zview_path[1] = ':';
-	Dgetpath( zview_path + 2, 0);
+	{
+		size_t len;
+		
+		startup_path[0] = 'A' + Dgetdrv();
+		startup_path[1] = ':';
+		Dgetpath(startup_path + 2, 0);
+		len = strlen(startup_path);
+		if (len > 0 && startup_path[len - 1] != '\\' && startup_path[len - 1] != '/')
+			strcat(startup_path, "\\");
+		if (zview_path[0] == '\0')
+			strcpy(zview_path, startup_path);
+	}
 
 	prefs_read();
 
@@ -189,6 +199,19 @@ int CallStGuide(char *path)
 
 int main( int argc, char *argv[])
 {
+	if (argc > 0 && argv[0] && argv[0][0])
+	{
+		char *p1, *p2;
+		strcpy(zview_path, argv[0]);
+		p1 = strrchr(zview_path, '/');
+		p2 = strrchr(zview_path, '\\');
+		if (p1 == NULL || p2 > p1)
+			p1 = p2;
+		if (p1)
+			*++p1 = '\0';
+		else
+			zview_path[0] = '\0';
+	}
 	applinit();
 
  	if ( argc > 1)
