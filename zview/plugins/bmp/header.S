@@ -65,13 +65,16 @@ _slh_names:
 /*
  * create the entry points
  */
+#define FETCH_NARGS_2 movem.l 16(%a7),%d0-%d1
+#define MOVE_NARGS_2  movem.l %d0-%d1,4(%a7)
+#define FETCH_NARGS_1 move.l 16(%a7),%d0
+#define MOVE_NARGS_1  move.l %d0,4(%a7)
+
 #define LIBFUNC(fn, name, nargs) \
 _wrap_ ## name : \
-	move.l (%a7)+,%d0; /* get return pc */ \
-	move.l (%a7)+,%a0; /* get callers basepage */ \
-	addq.l #4,%a7;     /* skip function number */ \
-	move.l %d0,(%a7);  /* put return pc, overwriting #arguments */ \
-	jbra C_SYMBOL_NAME(name)
+	FETCH_NARGS_ ## nargs;  /* get 1st&2nd argument */ \
+	MOVE_NARGS_ ## nargs;   /* move them down */ \
+	jbra C_SYMBOL_NAME(name)  /* go for it */
 #define NOFUNC
 #include "exports.h"
 

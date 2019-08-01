@@ -6,8 +6,8 @@
 
 boolean __CDECL plugin_reader_init(SLB *slb, const char *name, IMGINFO info);
 boolean __CDECL plugin_reader_read(SLB *slb, IMGINFO info, uint8 *buffer);
-void    __CDECL plugin_reader_get_txt(SLB *slb, IMGINFO info, txt_data *txtdata);
-void    __CDECL plugin_reader_quit(SLB *slb, IMGINFO info);
+void __CDECL plugin_reader_get_txt(SLB *slb, IMGINFO info, txt_data *txtdata);
+void __CDECL plugin_reader_quit(SLB *slb, IMGINFO info);
 boolean __CDECL plugin_encoder_init(SLB *slb, const char *name, IMGINFO info);
 boolean __CDECL plugin_encoder_write(SLB *slb, IMGINFO info, uint8 *buffer);
 void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);

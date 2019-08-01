@@ -6,5 +6,5 @@
 	/*   5 */ LIBFUNC(5, plugin_encoder_init, 2)
 	/*   6 */ LIBFUNC(6, plugin_encoder_write, 2)
 	/*   7 */ LIBFUNC(7, plugin_encoder_quit, 1)
-	/*   8 */ LIBFUNC(7, plugin_set_option, 2)
-	/*   9 */ LIBFUNC(7, plugin_get_option, 1)
+	/*   8 */ LIBFUNC(8, plugin_get_option, 1)
+	/*   9 */ LIBFUNC(9, plugin_set_option, 2)

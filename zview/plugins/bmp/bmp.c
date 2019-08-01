@@ -12,7 +12,7 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
-		return (long)("BMP" "\0");
+		return (long)("BMP\0");
 	}
 	return -ENOSYS;
 }
@@ -297,8 +297,10 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
+void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 {
+	(void)info;
+	(void)txtdata;
 }
 
 
