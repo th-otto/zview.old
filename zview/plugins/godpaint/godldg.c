@@ -37,7 +37,7 @@ static PROC GODFunc[] =
 
 static LDGLIB godpaint_plugin =
 {
-	0x0200, 			/* Plugin version */
+	PLUGIN_VERSION, 			/* Plugin version */
 	sizeof(GODFunc) / sizeof(GODFunc[0]),					/* Number of plugin's functions */
 	GODFunc,			/* List of functions */
 	"GOD\0",			/* File's type Handled */
