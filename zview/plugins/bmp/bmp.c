@@ -54,7 +54,7 @@ static uint16 ToS( uint8 *puffer)
 
 
 /*==================================================================================*
- * boolean CDECL reader_init:														*
+ * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
  *		things needed by the decoder.												*
  *----------------------------------------------------------------------------------*
@@ -181,7 +181,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 
 /*==================================================================================*
- * boolean CDECL reader_read:														*
+ * boolean __CDECL reader_read:														*
  *		This function fits the buffer with image data								*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -286,8 +286,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 
 
 /*==================================================================================*
- * boolean CDECL reader_get_txt														*
- *		This function , like other CDECL function must be always present.			*
+ * boolean __CDECL reader_get_txt													*
+ *		This function , like other function must be always present.					*
  *		It fills txtdata struct. with the text present in the picture ( if any).	*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -305,7 +305,7 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 
 
 /*==================================================================================*
- * boolean CDECL reader_quit:														*
+ * boolean __CDECL reader_quit:														*
  *		This function makes the last job like close the file handler and free the	*
  *		allocated memory.															*
  *----------------------------------------------------------------------------------*

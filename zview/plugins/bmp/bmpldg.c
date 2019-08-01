@@ -4,7 +4,7 @@
 #include "plugin_version.h"
 
 /*==================================================================================*
- * boolean CDECL init:																*
+ * boolean __CDECL init:															*
  *		First function called from zview, in this one, you can make some internal	*
  *		initialisation.																*
  *----------------------------------------------------------------------------------*
@@ -14,7 +14,7 @@
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static void CDECL init( void)
+static void __CDECL init( void)
 {
 	libshare_init();
 }
