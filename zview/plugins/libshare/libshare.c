@@ -26,7 +26,7 @@ libshare_dummy( void)
 	(void)realloc(0,0);
 	(void)calloc(0,0);
 	(void)sbrk(0);
-	(void)chdir(0);
+	(void)chdir("");
 }
 
 /* libshare_init:

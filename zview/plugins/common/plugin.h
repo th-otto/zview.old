@@ -12,6 +12,7 @@
 
 #include <stdarg.h>
 #include <mint/slb.h>
+#include <unistd.h>
 #include "imginfo.h"
 
 #ifndef _CDECL
@@ -81,7 +82,6 @@ struct _zview_plugin_funcs {
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #ifdef PLUGIN_SLB
