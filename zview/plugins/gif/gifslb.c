@@ -309,3 +309,6 @@ int open(const char *filename, int flags, ...)
 	}
 	return get_slb_funcs()->p_open(filename, flags, mode);
 }
+
+#undef errno
+int errno;

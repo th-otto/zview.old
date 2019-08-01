@@ -1,5 +1,5 @@
 /*
- * imgslb.c - initialization code for the shared library
+ * neoslb.c - initialization code for the shared library
  *
  * Copyright (C) 2019 Thorsten Otto
  *
