@@ -1,17 +1,23 @@
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
-LIB			= ../libshare/libshare.a -lldg
+LIB       = ../libshare/libshare.a -lldg
+STACKSIZE = 64k
 
-CFLAGS			+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common
+SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvtga.slb\"
 
-OBJ 			= tgaldg.o
+all:: tga.ldg zvtga.slb
 
-PROGRAM 		= tga.ldg
+include $(top_srcdir)/rules
 
-all:: $(PROGRAM)
+tga.ldg: tgaldg.o tga.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
-$(PROGRAM): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+zvtga.slb: header.lo tgaslb.lo tga.lo
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+
+header.lo tgaslb.lo tga.lo: ../common/plugin.h ../common/zview.h
 
 clean:
-	rm -f *.o *.a *.ldg
+	rm -f *.o *.lo *.a *.ldg *.slb
