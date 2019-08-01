@@ -1,5 +1,7 @@
 #include "zview.h"
+#include "imginfo.h"
 #include "zvbmp.h"
+#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean CDECL init:																*
@@ -30,15 +32,15 @@ static PROC BMPFunc[] =
 
 static LDGLIB bmp_plugin =
 {
-	0x0200, 			/* Plugin version */
-	5,					/* Number of plugin's functions */
+	PLUGIN_VERSION, 	/* Plugin version */
+	sizeof(BMPFunc) / sizeof(BMPFunc[0]),					/* Number of plugin's functions */
 	BMPFunc,			/* List of functions */
-	"BMP",				/* File's type Handled */
+	"BMP\0",			/* File's type Handled */
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
 					   	   and are shareable, we must use this flags because we don't know if the 
 					   	   user has ldg.prg deamon installed on his computer */
 	libshare_exit,		/* Function called when the plugin is unloaded */
-	1L					/* Howmany file type are supported by this plugin */
+	0					/* Howmany file type are supported by this plugin */
 };
 
 
@@ -52,8 +54,8 @@ static LDGLIB bmp_plugin =
  * return:	 																		*
  *      0																			*
  *==================================================================================*/
-int main( void)
+int main(void)
 {
-	ldg_init( &bmp_plugin);
-	return( 0);
+	ldg_init(&bmp_plugin);
+	return 0;
 }

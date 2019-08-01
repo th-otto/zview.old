@@ -12,8 +12,9 @@
 #include "zvdi/vdi.h"
 #include <math.h>
 #include "resample.h"
+#include "plugins/common/zvplugin.h"
 
-boolean decoder_init_done = FALSE;
+boolean decoder_init_done;
 
 
 void 		  ( *raster)	  			( DECDATA, void *dst);
@@ -22,6 +23,8 @@ void 		  ( *raster_true) 			( DECDATA, void *);
 void 		  ( *cnvpal_color)			( IMGINFO, DECDATA);
 void 		  ( *raster_gray) 			( DECDATA, void *);
 struct _ldg_funcs ldg_funcs;
+SLB *curr_input_plugin;
+SLB *curr_output_plugin;
 
 
 
@@ -74,13 +77,19 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		if( !init_txt_data( img, info->num_comments, info->max_comments_length))
 			return ( 0);
 		
-		ldg_funcs.decoder_get_txt( info, img->comments);
-	}
-	else
+		if (curr_input_plugin)
+			plugin_reader_get_txt(curr_input_plugin, info, img->comments);
+		else
+			ldg_funcs.decoder_get_txt(info, img->comments);
+	} else
+	{
 		img->comments = NULL;
+	}
 
-//	we assume that the pixel size is minimum 8 bits because some GNU libraries return 1 and 4 bits format like 8 bits ones.
-//	We add also a little more memory for avoid buffer overflow for plugin badly coded.
+	/*
+	 * we assume that the pixel size is minimum 8 bits because some GNU libraries return 1 and 4 bits format like 8 bits ones.
+	 * We add also a little more memory for avoid buffer overflow for plugin badly coded.
+	 */
 	src_line_size = ( info->width + 64) * info->components;
 
 	data->RowBuf = ( uint8*)gmalloc( src_line_size);	
@@ -164,8 +173,15 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 
 		for( y = 1; y <= img_h; y++)
 		{
-			if( !ldg_funcs.decoder_read( info, buf))
-				return;		
+			if (curr_input_plugin)
+			{
+				if (!plugin_reader_read(curr_input_plugin, info, buf))
+					return;		
+			} else
+			{
+				if( !ldg_funcs.decoder_read( info, buf))
+					return;		
+			}
 
 			while(( scale >> 16) < y) 
 			{
@@ -199,9 +215,14 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 
 void quit_img( IMGINFO info, DECDATA data)
 {
-	if( decoder_init_done == TRUE)
-		ldg_funcs.decoder_quit( info);
-
+	if (decoder_init_done)
+	{
+		if (curr_input_plugin)
+			plugin_reader_quit(curr_input_plugin, info);
+		else
+			ldg_funcs.decoder_quit(info);
+	}
+	
 	if( data->DthBuf != NULL) 
 	   	gfree( data->DthBuf);
 
@@ -215,13 +236,24 @@ void quit_img( IMGINFO info, DECDATA data)
 }
 
 
-boolean get_pic_info( const char *file, char *extention, IMGINFO info)
+boolean get_codec( const char *file)
 {
 	int16 	i, j, c = 0;
 	char 	plugin[4];
 	LDG *ldg;
+	const char *p;
+	int match;
+	const char *dot;
+	char extension[MAXNAMLEN];
 
+	dot = strrchr(file, '.');
+	if (dot == NULL)
+		return FALSE;
+	strcpy(extension, dot + 1);
+	str2upper(extension);
 	plugin[3] = '\0';
+
+	curr_input_plugin = NULL;
 	/* We check if a plug-ins can do the job */
 	for( i = 0; i < plugins_nbr; i++, c = 0)
 	{
@@ -229,33 +261,83 @@ boolean get_pic_info( const char *file, char *extention, IMGINFO info)
 		{
 		case CODEC_LDG:
 			ldg = codecs[i].c.ldg;
-			for( j = 0; j < codecs[i].num_extensions; j++)
+			match = FALSE;
+			if (codecs[i].num_extensions == 0)
 			{
-				plugin[0] = codecs[i].extensions[c++];
-				plugin[1] = codecs[i].extensions[c++];
-				plugin[2] = codecs[i].extensions[c++];
-	
-				if( strcmp( extention, plugin) == 0)
+				/*
+				 * newer plugin, with 0-terminated list
+				 */
+				p = codecs[i].extensions;
+				while (*p)
 				{
-					if ( !( ldg_funcs.decoder_init 	= ldg_find( "reader_init", ldg))
-					  || !( ldg_funcs.decoder_read 	= ldg_find( "reader_read", ldg)) 
-					  || !( ldg_funcs.decoder_quit 	= ldg_find( "reader_quit", ldg))
-					  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
+					if (strcmp(extension, p) == 0)
 					{
-						errshow( codecs[i].extensions, ldg_error());
-						return FALSE;
-					}				
-	
-					// decoder_get_page_size = ldg_find( "reader_get_page_size", ldg);
-	
-					return ldg_funcs.decoder_init( file, info);
+						match = TRUE;
+						break;
+					}
+					p += strlen(p) + 1;
 				}
+			} else
+			{
+				/* old version, with exactly 3 chars per extension */
+				for( j = 0; j < codecs[i].num_extensions; j++)
+				{
+					plugin[0] = codecs[i].extensions[c++];
+					plugin[1] = codecs[i].extensions[c++];
+					plugin[2] = codecs[i].extensions[c++];
+		
+					if (strcmp(extension, plugin) == 0)
+					{
+						match = TRUE;
+						break;
+					}
+				}
+			}
+			if (match)
+			{
+				if ( !( ldg_funcs.decoder_init 	= ldg_find( "reader_init", ldg))
+				  || !( ldg_funcs.decoder_read 	= ldg_find( "reader_read", ldg)) 
+				  || !( ldg_funcs.decoder_quit 	= ldg_find( "reader_quit", ldg))
+				  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
+				{
+					errshow( codecs[i].extensions, ldg_error());
+					return FALSE;
+				}				
+
+				/* decoder_get_page_size = ldg_find( "reader_get_page_size", ldg); */
+
+				return TRUE;
+			}
+			break;
+		case CODEC_SLB:
+			match = FALSE;
+			p = codecs[i].extensions;
+			while (*p)
+			{
+				if (strcmp(extension, p) == 0)
+				{
+					curr_input_plugin = &codecs[i].c.slb;
+					return TRUE;
+				}
+				p += strlen(p) + 1;
 			}
 			break;
 		}
 	}
 	
 	/* I wish that it will never happen ! */
+	return FALSE;
+}
+
+
+boolean get_pic_info( const char *file, IMGINFO info)
+{
+	if (get_codec(file))
+	{
+		if (curr_input_plugin)
+			return plugin_reader_init(curr_input_plugin, file, info);
+		return ldg_funcs.decoder_init(file, info);
+	}
 	return FALSE;
 }
 
@@ -270,7 +352,7 @@ boolean get_pic_info( const char *file, char *extention, IMGINFO info)
  * returns: 	'0' if error or picture not supported								*
  *==================================================================================*/
 
-int16 pic_load( const char *file, char *extention, IMAGE *img)
+int16 pic_load( const char *file, IMAGE *img)
 {
 	IMGINFO info;
 	DECDATA data;
@@ -303,7 +385,7 @@ int16 pic_load( const char *file, char *extention, IMAGE *img)
 
 	chrono_on(); 
 	
-	if(( decoder_init_done = get_pic_info( file, extention, info)) == FALSE)
+	if(( decoder_init_done = get_pic_info( file, info)) == FALSE)
 	{
 		gfree( data);
 		gfree( info);

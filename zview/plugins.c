@@ -1,11 +1,11 @@
 #include "general.h"
 #include "ztext.h"
 #include "plugins.h"
+#include "pic_load.h"
+#include "plugins/common/zvplugin.h"
+#include "plugins/common/plugin_version.h"
 
 
-
-/* LDG function */
-void CDECL( *codec_init)( void) = NULL;
 
 /* Global variable */
 int16 	plugins_nbr = 0;
@@ -31,7 +31,10 @@ void plugins_quit( void)
 		switch (codecs[i].type)
 		{
 		case CODEC_LDG:
-			ldg_close( codecs[i].c.ldg, ldg_global);
+			ldg_close(codecs[i].c.ldg, ldg_global);
+			break;
+		case CODEC_SLB:
+			plugin_close(&codecs[i].c.slb);
 			break;
 		}
  		codecs[i].type = CODEC_NONE;
@@ -52,18 +55,21 @@ void plugins_quit( void)
  *==================================================================================*/
 int16 plugins_init( void)
 {
-	char 			*env_ldg, plugin_dir[MAX_PATH];
+	char 			*env_ldg;
+	char plugin_dir[MAX_PATH];
 	DIR	 			*dir;
 	LDG_INFOS 		*cook;
 	struct dirent	*de;
 	int16			len;
-	char  			extention[4];
-
+	char  			extension[4];
+	char *name;
+	
 	strcpy( plugin_dir, zview_path);
-	strcat( plugin_dir, "\\codecs");
-
+	strcat( plugin_dir, "\\codecs\\");
+	name = plugin_dir + strlen(plugin_dir);
+	
 	/* We try to find the zcodecs folder in zview directory... 	*/
-	if ( chdir( plugin_dir) != 0)
+	if ((dir = opendir(plugin_dir)) == NULL)
 	{
 		shel_envrn( &env_ldg, "LDGPATH=");
 
@@ -83,50 +89,65 @@ int16 plugins_init( void)
 		if( plugin_dir[len-1] != '\\')
 			strcat( plugin_dir, "\\"); 
 
-		strcat( plugin_dir, "codecs");
+		strcat( plugin_dir, "codecs\\");
+		name = plugin_dir + strlen(plugin_dir);
 
-		if ( chdir( plugin_dir) != 0)
-			return( 0);
+		dir = opendir(plugin_dir);
 	}
 
-	if (( dir = opendir( ".")) != NULL)
+	if (dir != NULL)
 	{
-		while(( de = readdir( dir)) != NULL && plugins_nbr < MAX_CODECS)
+		while ((de = readdir(dir)) != NULL && plugins_nbr < MAX_CODECS)
 		{
-			if (( strcmp( de->d_name, ".") == 0) || ( strcmp( de->d_name, "..") == 0))
+			len = (int16)strlen( de->d_name);
+			if (len < 3)
 				continue;
+			strcpy(extension, de->d_name + len - 3);
+			str2lower( extension);
 
-			strcpy ( extention, de->d_name + strlen( de->d_name) - 3);
-			str2lower( extention);
-
-			if( strcmp ( extention, "ldg") == 0)
+			if (strcmp(extension, "ldg") == 0)
 			{
-				if ( ( codecs[plugins_nbr].c.ldg = ldg_open( de->d_name, ldg_global)) != NULL)
+				strcpy(name, de->d_name);
+				if ((codecs[plugins_nbr].c.ldg = ldg_open(plugin_dir, ldg_global)) != NULL)
 				{
-					if ( ( codec_init = ldg_find( "plugin_init", codecs[plugins_nbr].c.ldg)) != NULL)
+					void CDECL(*codec_init)(void);
+
+					if ((codec_init = ldg_find("plugin_init", codecs[plugins_nbr].c.ldg)) != NULL)
 					{
 						codecs[plugins_nbr].type = CODEC_LDG;
 						codecs[plugins_nbr].extensions = codecs[plugins_nbr].c.ldg->infos;
 						codecs[plugins_nbr].num_extensions = codecs[plugins_nbr].c.ldg->user_ext;
 						codec_init();
 						plugins_nbr++;
-					}
-					else
+					} else
 					{
 						errshow( de->d_name, ldg_error());
 						ldg_close( codecs[plugins_nbr].c.ldg, ldg_global);
 					}
-				}
-				else
+				} else
 				{
-					errshow( de->d_name, ldg_error());
+					errshow(de->d_name, ldg_error());
+				}
+			} else if (strcmp(extension, "slb") == 0)
+			{
+				SLB *slb = &codecs[plugins_nbr].c.slb;
+				long err;
+				
+				*name = '\0';
+				if ((err = plugin_open(de->d_name, plugin_dir, slb)) >= 0)
+				{
+					codecs[plugins_nbr].type = CODEC_SLB;
+					codecs[plugins_nbr].extensions = (const char *)plugin_get_option(slb, OPTION_EXTENSIONS);
+					codecs[plugins_nbr].num_extensions = 0;
+					plugins_nbr++;
+				} else
+				{
+					errshow(de->d_name, -err);
 				}
 			}
 		}
-		closedir( dir);
+		closedir(dir);
 	}
-
-	chdir( zview_path);
 
 	return plugins_nbr;
 }

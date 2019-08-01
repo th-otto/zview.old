@@ -18,6 +18,11 @@
 	/*   2 */ LIBFUNC(2, reader_read, 2)
 	/*   3 */ LIBFUNC(3, reader_get_txt, 2)
 	/*   4 */ LIBFUNC(4, reader_quit, 1)
+	/*   5 */ NOFUNC
+	/*   6 */ NOFUNC
+	/*   7 */ NOFUNC
+	/*   8 */ NOFUNC
+	/*   9 */ LIBFUNC(7, get_option, 1)
 
 #undef LIBFUNC
 #undef LIBFUNC2

@@ -1,4 +1,5 @@
 #include "zview.h"
+#include "imginfo.h"
 #include "libtarga.h"
 
 #define alpha_composite( composite, fg, alpha) {						\

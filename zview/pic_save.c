@@ -8,6 +8,7 @@
 #include "plugins.h"
 #include "progress.h"
 #include "pic_save.h"
+#include "plugins/common/zvplugin.h"
 
 static boolean encoder_init_done = FALSE;
 
@@ -92,11 +93,17 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	{	
 		for( y = 0; y < img_h; y++)
 		{
-			ldg_funcs.decoder_read( in_info, data->RowBuf);
-
+			if (curr_input_plugin)
+				plugin_reader_read(curr_input_plugin, in_info, data->RowBuf);
+			else
+				ldg_funcs.decoder_read(in_info, data->RowBuf);
+				
 			( *raster)( data, dst);
 	
-			ldg_funcs.encoder_write( out_info, dst);
+			if (curr_output_plugin)
+				plugin_encoder_write(curr_output_plugin, out_info, dst);
+			else
+				ldg_funcs.encoder_write(out_info, dst);
 
 			if( show_write_progress_bar)
 				win_progress(( int16)((( int32)y * 150L) / img_h));
@@ -110,7 +117,10 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		/* First pass, we decode the entire image */
 		for( y = 0; y < img_h; y++)
 		{
-			ldg_funcs.decoder_read( in_info, data->RowBuf);
+			if (curr_input_plugin)
+				plugin_reader_read(curr_input_plugin, in_info, data->RowBuf);
+			else
+				ldg_funcs.decoder_read(in_info, data->RowBuf);
 
 			( *raster)( data, dst);
 	
@@ -125,7 +135,10 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		/* second pass, we encode it */
 		for( ; y < h; y++)
 		{
-			ldg_funcs.encoder_write( out_info, dst);
+			if (curr_output_plugin)
+				plugin_encoder_write(curr_output_plugin, out_info, dst);
+			else
+				ldg_funcs.encoder_write(out_info, dst);
 
 			dst += data->LnSize;
 
@@ -148,12 +161,22 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	if( data->RowBuf) 
 		gfree( data->RowBuf);
 
-	if( encoder_init_done)
-		ldg_funcs.encoder_quit( out_info);	
-
-	if( decoder_init_done)
-		ldg_funcs.decoder_quit( in_info);	
-
+	if (encoder_init_done)
+	{
+		if (curr_output_plugin)
+			plugin_encoder_quit(curr_output_plugin, out_info);
+		else
+			ldg_funcs.encoder_quit(out_info);
+	}
+	
+	if (decoder_init_done)
+	{
+		if (curr_input_plugin)
+			plugin_reader_quit(curr_input_plugin, in_info);
+		else
+			ldg_funcs.decoder_quit( in_info);
+	}
+	
 	gfree( data);
 	gfree( out_info);
 	gfree( in_info);
@@ -177,9 +200,9 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
   
 int16 pic_save( const char *in_file, const char *out_file)
 {
-	char 		extention[4];
-	IMGINFO in_info = NULL, out_info = NULL;
-	DECDATA data = NULL;
+	IMGINFO in_info;
+	IMGINFO out_info;
+	DECDATA data;
 
     graf_mouse( BUSYBEE, NULL);	
 
@@ -207,31 +230,29 @@ int16 pic_save( const char *in_file, const char *out_file)
 	data->DstBuf = NULL; 
 	data->RowBuf = NULL;
 
-	if( show_write_progress_bar)
-		win_progress_begin( get_string( SAVE_TITLE));
-
 	/* We initialise some variables needed by the codecs */
 	in_info->background_color	= 0xFFFFFF;
 	in_info->thumbnail			= FALSE;
 
-	/* get the file extention */
-	strcpy ( extention, in_file + strlen( in_file) - 3);
-	str2upper( extention);
-
-	if(( decoder_init_done = get_pic_info( in_file, extention, in_info)) == FALSE)
+	if(( decoder_init_done = get_pic_info( in_file, in_info)) == FALSE)
 	{
-		errshow( in_file, CANT_LOAD_IMG);
+		errshow( in_file, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);
-		win_progress_end();
 		graf_mouse( ARROW, NULL);
 		return ( 0);
 	}
 
+	if( show_write_progress_bar)
+		win_progress_begin( get_string( SAVE_TITLE));
 
 	/* copy information from input's information to output's information struct */
-	memcpy( out_info, in_info, sizeof( img_info)); 
+	*out_info = *in_info;
 
-	if (( encoder_init_done = ldg_funcs.encoder_init( out_file, out_info)) == FALSE)
+	if (curr_output_plugin)
+		encoder_init_done = plugin_encoder_init(curr_output_plugin, out_file, out_info);
+	else
+		encoder_init_done = ldg_funcs.encoder_init(out_file, out_info);
+	if (encoder_init_done == FALSE)
 	{
 		errshow( NULL, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);

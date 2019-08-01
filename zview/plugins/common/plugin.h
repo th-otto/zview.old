@@ -12,6 +12,7 @@
 
 #include <stdarg.h>
 #include <mint/slb.h>
+#include "imginfo.h"
 
 #ifndef _CDECL
 #define _CDECL
@@ -82,6 +83,8 @@ struct _zview_plugin_funcs {
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+#ifdef PLUGIN_SLB
 
 #undef memset
 #undef memcpy
@@ -168,5 +171,7 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #define rand get_slb_funcs()->p_rand
 #define srand get_slb_funcs()->p_srand
+
+#endif /* PLUGIN_SLB */
 
 #endif

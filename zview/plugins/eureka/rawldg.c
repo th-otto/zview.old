@@ -1,4 +1,5 @@
 #include "zview.h"
+#include "imginfo.h"
 #include "colormap.h"
 
 boolean CDECL reader_init( const char *name, IMGINFO info);

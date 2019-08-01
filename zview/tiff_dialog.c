@@ -4,6 +4,7 @@
 #include "pic_load.h"
 #include "catalog/catalog.h"
 #include "plugins.h"
+#include "plugins/common/zvplugin.h"
 
 #define	    COMPRESSION_NONE		1		/* dump mode */
 #define	    COMPRESSION_PACKBITS	32773	/* Macintosh RLE */
@@ -47,7 +48,14 @@ static void __CDECL tiff_option_ok_event( WINDOW *win, int obj_index, int mode, 
 			break;		
 	}
 
-	ldg_funcs.set_tiff_option( quality, compression);
+	if (curr_output_plugin)
+	{
+		plugin_set_option(curr_output_plugin, OPTION_QUALITY, quality);
+		plugin_set_option(curr_output_plugin, OPTION_COMPRESSION, compression);
+	} else
+	{
+		ldg_funcs.set_tiff_option( quality, compression);
+	}
 
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
 	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);

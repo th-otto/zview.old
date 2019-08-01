@@ -1,6 +1,7 @@
 #include <tiffio.h>
 #define HAVE_INTS_DEFINED
 #include "zview.h"
+#include "imginfo.h"
 
 #define alpha_composite( composite, fg, alpha) {						\
     uint16 temp = (( uint16)( fg) * ( uint16)( alpha) + ( uint16)128);	\

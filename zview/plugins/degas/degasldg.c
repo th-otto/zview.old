@@ -1,4 +1,5 @@
 #include "zview.h"
+#include "imginfo.h"
 
 boolean CDECL reader_init( const char *name, IMGINFO info);
 boolean CDECL reader_read( IMGINFO info, uint8 *buffer);

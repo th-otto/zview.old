@@ -3,6 +3,7 @@
 #include <jpeglib.h>
 #define HAVE_BOOLEAN
 #include "zview.h"
+#include "imginfo.h"
 #include "jpgdh.h"
 #include <libexif/exif-data.h>
 #include <libexif/exif-utils.h>

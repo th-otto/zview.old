@@ -1,7 +1,8 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LIB			= ../libshare/libshare.a -lldg
+LIB       = ../libshare/libshare.a -lldg
+STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common
 SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvbmp.slb\"
@@ -11,7 +12,7 @@ all:: bmp.ldg zvbmp.slb
 include $(top_srcdir)/rules
 
 bmp.ldg: bmpldg.o bmp.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,1k $(LIB)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvbmp.slb: header.lo bmpslb.lo bmp.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)

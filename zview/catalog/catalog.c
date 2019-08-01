@@ -91,7 +91,6 @@ int WindMakePreview_needed( WINDOW *win)
 void WindMakePreview( WINDOW *win)
 {
 	int16 	i, h;
-	char 	extention[4];
 	WINDICON *wicones = ( WINDICON *)DataSearch( win, WD_ICON);
 
 	draw_frame_slider = 0;
@@ -113,11 +112,7 @@ void WindMakePreview( WINDOW *win)
 
 			// MenuDisable();
 
-			/* get the file extention */
-			strcpy ( extention, wicones->entry[i].name + strlen( wicones->entry[i].name) - 3);
-			str2upper( extention);
-
-			if( pic_load( wicones->entry[i].name, extention, &wicones->entry[i].preview))
+			if( pic_load( wicones->entry[i].name, &wicones->entry[i].preview))
 				redraw_icon( win, &wicones->entry[i]);
 			else
 				wicones->entry[i].type = ET_FILE;

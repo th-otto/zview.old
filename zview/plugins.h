@@ -18,6 +18,8 @@ struct _ldg_funcs {
 };
 
 extern struct _ldg_funcs ldg_funcs;
+extern SLB *curr_input_plugin;
+extern SLB *curr_output_plugin;
 
 typedef struct {
 	int type;

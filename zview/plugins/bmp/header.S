@@ -4,13 +4,17 @@
  * Copyright (C) 2018 Thorsten Otto
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
-	.text
 
 #include "symbols.h"
 #include "plugin_version.h"
 
+	.globl C_SYMBOL_NAME(slb_header)
+
+	.text
+
 #define WITH_FUNCNAMES 1
 
+C_SYMBOL_NAME(slb_header):
 	.dc.l	0x70004afc	                    /* magic value (clr.l d0, illegal) */
 	.dc.l	_slbname	                    /* pointer to library's (file)name */
 	.dc.l	PLUGIN_VERSION					/* version number */

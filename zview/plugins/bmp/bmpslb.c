@@ -21,10 +21,8 @@
 # error "the slb must not be compiled with -mshort"
 #endif
 
-#ifndef NO_DUMMY_DECL
-struct internal_state      {int dummy;}; /* for buggy compilers */
-#endif
-
+extern char const slb_header[];
+static const BASEPAGE *my_base;
 
 /*
  * referenced from header.S
@@ -94,6 +92,15 @@ struct _zview_plugin_funcs *get_slb_funcs(void)
  */
 long slb_init(void)
 {
+	const BASEPAGE *bp;
+	const long *exec_longs;
+
+	bp = (BASEPAGE *)(slb_header - 256);
+	exec_longs = (const long *)((const char *)bp + 28);
+	if ((exec_longs[0] == 0x283a001aL && exec_longs[1] == 0x4efb48faL) ||
+		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))
+		bp = (const BASEPAGE *)((const char *)bp - 228);
+	my_base = bp;
 	return 0;
 }
 
@@ -183,30 +190,12 @@ long _CDECL slb_control(long fn, void *arg)
 		return slb_compile_flags();
 	case 1:
 		return set_imports(arg);
+	case 2:
+		return (long)my_base;
+	case 3:
+		return (long)slb_header;
+	case 4:
+		return (long)my_base->p_cmdlin;
 	}
 	return -ENOSYS;
-}
-
-
-/*
- * just redefining memcpy is not enough;
- * the compiler will also generate references to it
- */
-void *(memcpy)(void *dest, const void *src, size_t len)
-{
-	return memcpy(dest, src, len);
-}
-
-
-/* same for strlen */
-size_t (strlen)(const char *str)
-{
-	return strlen(str);
-}
-
-
-/* same for memset */
-void *(memset)(void *dest, int c, size_t len)
-{
-	return memset(dest, c, len);
 }

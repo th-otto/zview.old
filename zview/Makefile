@@ -1,5 +1,6 @@
 USE_WINDOM2=0
-include ../configvars
+top_srcdir=..
+include $(top_srcdir)/configvars
 
 DEBUG_LIB			= # -lwout
 
@@ -20,12 +21,14 @@ CATALOG_OBJ			= catalog/catalog_slider.o catalog/catalog_size.o catalog/catalog_
 OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
-				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o main.o
+				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o main.o \
+				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
 
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
 
 all:: $(PROGRAM)
+	$(MAKE) -C plugins
 
 $(PROGRAM): $(PDF_LIB) $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,512k -L. -lpdf $(XPDF_LIBS) $(LIB)
@@ -63,9 +66,12 @@ $(PDF_LIB): xpdf-${XPDF_VERSION} $(PDF_OBJ)
 
 ##############################################################################
 
+include $(top_srcdir)/rules
+
 clean_zview:
 	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o
-	
+	$(MAKE) -C plugins clean
+
 clean_pdf:
 	rm -rf xpdf-${XPDF_VERSION} $(PDF_LIB)
 

@@ -83,34 +83,6 @@ boolean dir_cd( const char *new_dir, char *old_dir, int16 bufflen)
 
 
 /*==================================================================================*
- * check_write_perm:																*
- *		Do complex WRITE permission check.								 			*
- *----------------------------------------------------------------------------------*
- * 	returns: TRUE = ok, FALSE = no													*
- *----------------------------------------------------------------------------------*
- * 	stat:	Entry Stat.			 	 												*
- *==================================================================================*/
-
-boolean check_write_perm( const struct stat *file_stat) 
-{
-	uid_t uid = geteuid();
-	gid_t gid = getegid();
-
-
-/*	if ( uid == 0)
-		return TRUE;
-*/		
-	if ( file_stat->st_uid == uid)
-		return ( file_stat->st_mode & S_IWUSR) ? TRUE : FALSE;	    
-
-	if ( file_stat->st_gid == gid)
-		return ( file_stat->st_mode & S_IWGRP) ? TRUE : FALSE;
-		
-	return ( file_stat->st_mode & S_IWOTH) ? TRUE : FALSE;		  
-}
-
-
-/*==================================================================================*
  * scan_dir:																		*
  *		scan the 'dirpath' directory and fit somes entries in 'dirfile'.			*
  *----------------------------------------------------------------------------------*

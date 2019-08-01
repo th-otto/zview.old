@@ -946,7 +946,7 @@ WINDOW *WindView( char *filename)
 	WINDATA		*windata;
 	IMAGE 		*img;
 	int16		w, h;
-	char 		extention[4];
+	const char *dot;
 
     graf_mouse( BUSYBEE, NULL);
 
@@ -957,11 +957,10 @@ WINDOW *WindView( char *filename)
 		applexit();
 	}
 
-	/* get the file extention */
-	strcpy ( extention, filename + strlen( filename) - 3);
-	str2upper( extention);
+	/* get the file extension */
+	dot = strrchr(filename, '.');
 
-	if( strncmp( "PDF", extention, 3) == 0)
+	if (dot != NULL && (strcmp(dot + 1, "pdf") == 0 || strcmp(dot + 1, "PDF") == 0))
 		return WindPdf( filename);
 
 	if ( ( windata = ( WINDATA*) gmalloc( sizeof( WINDATA))) == NULL)
@@ -990,7 +989,7 @@ WINDOW *WindView( char *filename)
 
 	strcpy( windata->name, filename);
 
-	if ( !pic_load( filename, extention, img))
+	if ( !pic_load( filename, img))
 	{
 		gfree( windata);
 		// errshow( "", IMG_NO_VALID);

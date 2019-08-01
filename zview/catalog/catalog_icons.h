@@ -5,14 +5,8 @@ extern void redraw_icon( WINDOW *wind, Entry *entry);
 extern void draw_icon( int16 handle, Entry *entry, boolean selected, RECT16 *dst_rect);
 extern boolean icon_is_visible( Entry *entry, int16 window_height);
 
-extern IMAGE icon_image;
-extern IMAGE icon_file;
-extern IMAGE icon_folder;
-extern IMAGE icon_tos;
-extern IMAGE icon_pdf;
-
 extern MFDB mini_hdd;
-extern MFDB mini_folder;
+extern MFDB mini_folder;		
 extern MFDB mini_big;
 extern MFDB mini_big_on;		
 extern MFDB mini_small;
@@ -39,5 +33,6 @@ extern MFDB mini_open;
 extern MFDB mini_open_on;	
 extern MFDB mini_save;
 extern MFDB mini_save_on;
+
 
 

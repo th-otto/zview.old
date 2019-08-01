@@ -1,4 +1,5 @@
 #include "zview.h"
+#include "imginfo.h"
 #include "img.h"
 
 extern int32 plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, COLOR_MAP *palette); 

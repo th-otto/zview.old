@@ -4,6 +4,7 @@
 #include "pic_load.h"
 #include "catalog/catalog.h"
 #include "plugins.h"
+#include "plugins/common/zvplugin.h"
 
 OBJECT 	*jpg_option_content;
 static 	int16 quality = 90;
@@ -52,8 +53,15 @@ static void jpg_option_show_preview( WINDOW *win, int obj_index, int mode, void 
 
 static void jpg_option_ok_event( WINDOW *win, int obj_index, int mode, void *data)
 {
-	ldg_funcs.set_jpg_option( quality, color_space, progressive);
-
+	if (curr_output_plugin)
+	{
+		plugin_set_option(curr_output_plugin, OPTION_QUALITY, quality);
+		plugin_set_option(curr_output_plugin, OPTION_COLOR_SPACE, color_space);
+		plugin_set_option(curr_output_plugin, OPTION_PROGRESSIVE, progressive);
+	} else
+	{
+		ldg_funcs.set_jpg_option( quality, color_space, progressive);
+	}
 	ObjcChange( OC_FORM, win, obj_index, NORMAL, TRUE);
 	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
 }

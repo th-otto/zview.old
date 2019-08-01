@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <gif_lib.h>
 #include "zview.h"
+#include "imginfo.h"
 
 /* Prototypes */
 boolean CDECL reader_init( const char *name, IMGINFO info);

@@ -17,54 +17,6 @@ static WINDATA	*windata;
 static WINDICON *wicones;
 
 
-/*  *** workaround for TOS and its small supervisor stack ****
- *
- *  gemlib function that are stack hungry are replaced by the following
- *  function. These replacement are not safe thread but we don't care
- *  because this is for the non-shareable version of the LDG (for monoTOS)
- */
-
-#ifndef VDI_INTINMAX
-#define VDI_CNTRLMAX     16		/* max size of vdi_control[] ; actually 15; use 16 to make it long aligned */
-#define VDI_INTINMAX   1024		/**< max size of vdi_intin[] */
-#define VDI_INTOUTMAX   256		/**< max size of vdi_intout[] */
-#define VDI_PTSINMAX    256		/**< max size of vdi_ptsin[] */
-#define VDI_PTSOUTMAX   256		/**< max size of vdi_ptsout[] */
-#endif
-
-static short vdi_intin[VDI_INTINMAX];
-static short vdi_intout[VDI_INTOUTMAX];
-static short vdi_ptsin[VDI_PTSINMAX];
-static short vdi_ptsout[VDI_PTSOUTMAX];
-static short vdi_control[VDI_CNTRLMAX];
-
-static VDIPB vdi_params = {
-        &vdi_control[0],
-        &vdi_intin[0],
-        &vdi_ptsin[0],
-        &vdi_intout[0],
-        &vdi_ptsout[0] 
-};
-
-
-
-static int my_vsl_color (short handle, short idx) {
-	vdi_intin[0] = idx;
-
-	vdi_control[0] = 17;
-	vdi_control[1] = vdi_control[5] = 0;
-	vdi_control[3] = 1;
-	vdi_control[6] = handle;
-
-	vdi (&vdi_params);
-
-	return ((int)vdi_intout[0]);
-}
-
-#define vsl_color my_vsl_color
-
-/* *** end of the workaround for TOS *** */
-
 void __CDECL generic_form_event( WINDOW *win EVNT_BUFF_PARAM)
 {
 	ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, FALSE);
@@ -617,6 +569,9 @@ void errshow( const char *name, int16 error)
 		case NO_EDDI:
  			( void)FormAlert( 1 , "[3][zView needs a VDI|with EdDI standard.][Quit]");
               		break;
+        /*
+         * FIXME: these conflict with GEMDOS errors...
+         */
 		case NAMEALREADYUSED:
 			( void)FormAlert( 1 , get_string( NAMEALREADYUSED));
 			break;		

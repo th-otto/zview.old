@@ -29,5 +29,5 @@ dist:
 	$(STRIP) -s ../_dist/codecs/*.ldg
 
 clean:
-	rm -f *~ */*.ldg
+	rm -f */*.ldg */*.slb */*.o */*.a */*.lo
 	$(MAKE) -C libshare clean

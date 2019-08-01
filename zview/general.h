@@ -132,13 +132,15 @@ typedef enum
 	ET_PRG
 } EntryType;
 
-
+#ifndef __txt_data_defined
+#define __txt_data_defined 1
 typedef struct _txt_data
 {
 	int16		lines;					/* Number of lines in the text 						*/
 	int16		max_lines_length;		/* The length of the greater line ( in nbr char)	*/
 	int8    	*txt[256];
 } txt_data;
+#endif
 
 
 typedef struct
@@ -244,7 +246,7 @@ typedef struct
 } WINDICON;
 
 
-extern int16 	pic_load( const char *file, char *extention, IMAGE *img);
+extern int16 	pic_load( const char *file, IMAGE *img);
 extern void 	zdebug( const char *format, ...);
 extern void 	applexit( void);
 

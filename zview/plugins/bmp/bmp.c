@@ -1,10 +1,25 @@
 #include "zview.h"
+#include "imginfo.h"
 #include "zvbmp.h"
+
 #ifdef PLUGIN_SLB
 #include "plugin.h"
+
+long __CDECL get_option(zv_int_t which)
+{
+	switch (which)
+	{
+	case OPTION_CAPABILITIES:
+		return CAN_DECODE;
+	case OPTION_EXTENSIONS:
+		return (long)("BMP" "\0");
+	}
+	return -ENOSYS;
+}
 #endif
 
 #define fill4B(a)	( ( 4 - ( (a) % 4 ) ) & 0x03)
+
 
 /*==================================================================================*
  * uint32 ToL:																		*
