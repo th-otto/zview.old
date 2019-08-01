@@ -374,8 +374,6 @@ boolean pic_load( const char *file, IMAGE *img)
 		return FALSE;
 	}
 
-
-
 	if( img->progress_bar)
 		win_progress_begin( "Please Wait...");
 

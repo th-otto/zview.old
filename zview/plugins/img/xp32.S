@@ -1,13 +1,15 @@
+#include "symbols.h"
+
 	.text
 
-	.globl	_plane2packed24
+	.globl	C_SYMBOL_NAME(plane2packed24)
 
-| int32	plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, CTAB_REF src_ctab );
-|                       d0              d1                  d2               a0         a1         4(sp)
+/* int32 plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, CTAB_REF src_ctab ); */
+/*                       d0              d1                  d2               a0         a1         4(sp) */
 
-| 11x4 + 4 + 5x4
+/* 11x4 + 4 + 5x4 */
 
-_plane2packed24:
+C_SYMBOL_NAME(plane2packed24):
 	movem.l		d2-d7/a2-a6,-(sp)
 
 	move.l		11*4+4(sp),d0
@@ -16,7 +18,7 @@ _plane2packed24:
 	movea.l		11*4+16(sp),a0
 	movea.l		11*4+20(sp),a1
 	
-	movea.l		11*4+24(sp),a6						|source of the color table
+	movea.l		11*4+24(sp),a6						/* source of the color table */
 
 	move.l		d0,d4
 	subq.l		#1,d4
@@ -24,7 +26,7 @@ _plane2packed24:
 	add.l		d6,d6
 	add.l		d6,d6
 
-	movea.l		a1,a4									|destination's adress to A4
+	movea.l		a1,a4									/* destination's adress to A4 */
 	lea			(a0,d1.l),a1
 	lea			(a1,d1.l),a2
 	lea			(a2,d1.l),a3
@@ -46,14 +48,14 @@ plane2packed24_transform:
 
 plane2packed24_table:
 	DC.w		not_supported-plane2packed24_table
-	DC.w		pp_1_to_8-plane2packed24_table						|1 Bit
+	DC.w		pp_1_to_8-plane2packed24_table						/* 1 Bit */
 	DC.w		not_supported-plane2packed24_table
 	DC.w		not_supported-plane2packed24_table
-	DC.w		pp_4_to_24-plane2packed24_table						|4 Bit
+	DC.w		pp_4_to_24-plane2packed24_table						/* 4 Bit */
 	DC.w		not_supported-plane2packed24_table
 	DC.w		not_supported-plane2packed24_table
 	DC.w		not_supported-plane2packed24_table
-	DC.w		pp_8_to_24-plane2packed24_table						|8 Bit
+	DC.w		pp_8_to_24-plane2packed24_table						/* 8 Bit */
 
 
 not_supported:
@@ -100,9 +102,9 @@ pp_4_to_24_exp:			moveq		#0,d6
 						lsl.w		#2,d6
 
 						lea			(a6,d6.w),a5
-						move.b		(a5),(a4)+						|R
-						move.b		1(a5),(a4)+						|G
-						move.b		2(a5),(a4)+						|B
+						move.b		(a5),(a4)+						/* R */
+						move.b		1(a5),(a4)+						/* G */
+						move.b		2(a5),(a4)+						/* B */
 
 pp_4_to_24_next:		dbra		d5,pp_4_to_24_exp
 
@@ -151,9 +153,9 @@ pp_8_to_24_exp:			swap		d5
 						lsl.w		#2,d0
 
 						lea			(a6,d0.w),a5
-						move.b		(a5),(a4)+						|R
-						move.b		1(a5),(a4)+						|G
-						move.b		2(a5),(a4)+						|B
+						move.b		(a5),(a4)+						/* R */
+						move.b		1(a5),(a4)+						/* G */
+						move.b		2(a5),(a4)+						/* B */
 
 						swap		d5
 						dbra		d5,pp_8_to_24_exp

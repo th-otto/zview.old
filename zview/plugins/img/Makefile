@@ -1,17 +1,23 @@
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
-LIB			= ../libshare/libshare.a -lldg
+LIB       = ../libshare/libshare.a -lldg
+STACKSIZE = 64k
 
-CFLAGS			+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common
+SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvimg.slb\"
 
-OBJ 			= imgldg.o xp32.o
+all:: img.ldg zvimg.slb
 
-PROGRAM 		= img.ldg
+include $(top_srcdir)/rules
 
-all:: $(PROGRAM)
+img.ldg: imgldg.o img.o xp32.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
-$(PROGRAM): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+zvimg.slb: header.lo imgslb.lo img.lo xp32.lo
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+
+header.lo imgslb.lo img.lo: ../common/plugin.h ../common/zview.h
 
 clean:
-	rm -f *.o *.a *.ldg
+	rm -f *.o *.lo *.a *.ldg *.slb
