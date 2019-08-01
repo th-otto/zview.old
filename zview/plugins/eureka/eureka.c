@@ -1,36 +1,24 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "colormap.h"
-
-boolean CDECL reader_init( const char *name, IMGINFO info);
-boolean CDECL reader_read( IMGINFO info, uint8 *buffer);
-void    CDECL reader_get_txt( IMGINFO info, txt_data *txtdata);
-void    CDECL reader_quit( IMGINFO info);
-void	CDECL init( void);
+#include "zveureka.h"
 
 
-PROC RAWFunc[] = 
+#ifdef PLUGIN_SLB
+#include "plugin.h"
+
+long __CDECL get_option(zv_int_t which)
 {
-	{ "plugin_init", 	"", init},
-	{ "reader_init", 	"", reader_init},
-	{ "reader_get_txt", "", reader_get_txt},
-	{ "reader_read", 	"", reader_read},
-	{ "reader_quit", 	"", reader_quit}
-};
-
-
-LDGLIB raw_plugin =
-{
-	0x0200, 			/* Plugin version */
-	5,					/* Number of plugin's functions */
-	RAWFunc,			/* List of functions */
-	"RAW",				/* File's type Handled */
-	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
-					   	   and are shareable, we must use this flags because we don't know if the 
-					   	   user has ldg.prg deamon installed on his computer */
-	libshare_exit,				/* Function called when the plugin is unloaded */
-	1L					/* Howmany file type are supported by this plugin */
-};
+	switch (which)
+	{
+	case OPTION_CAPABILITIES:
+		return CAN_DECODE;
+	case OPTION_EXTENSIONS:
+		return (long)("RAW\0");
+	}
+	return -ENOSYS;
+}
+#endif
 
 
 static void swap( uint8 *a, uint8 *b)
@@ -45,7 +33,7 @@ static void swap( uint8 *a, uint8 *b)
 }
 
 /*==================================================================================*
- * boolean CDECL reader_init:														*
+ * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
  *		things needed by the decoder.												*
  *----------------------------------------------------------------------------------*
@@ -56,7 +44,7 @@ static void swap( uint8 *a, uint8 *b)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean CDECL reader_init( const char *name, IMGINFO info)
+boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
 	int16 		handle;
 	int32		file_size, palette[768];
@@ -170,7 +158,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
 
 
 /*==================================================================================*
- * boolean CDECL reader_read:														*
+ * boolean __CDECL reader_read:														*
  *		This function fits the buffer with image data								*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -180,7 +168,7 @@ boolean CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 {
 	memcpy( buffer, ( uint8*)info->_priv_ptr_more, info->width);
 	info->_priv_ptr_more = ( uint8*)info->_priv_ptr_more + info->width;
@@ -190,8 +178,8 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
 
 
 /*==================================================================================*
- * boolean CDECL reader_get_txt														*
- *		This function , like other CDECL function must be always present.			*
+ * boolean __CDECL reader_get_txt													*
+ *		This function , like other function must be always present.					*
  *		It fills txtdata struct. with the text present in the picture ( if any).	*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -201,14 +189,13 @@ boolean CDECL reader_read( IMGINFO info, uint8 *buffer)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
+void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
-	return;
 }
 
 
 /*==================================================================================*
- * boolean CDECL reader_quit:														*
+ * boolean __CDECL reader_quit:														*
  *		This function makes the last job like close the file handler and free the	*
  *		allocated memory.															*
  *----------------------------------------------------------------------------------*
@@ -218,42 +205,8 @@ void CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void CDECL reader_quit( IMGINFO info)
+void __CDECL reader_quit( IMGINFO info)
 {
 	free( ( uint8*)info->_priv_ptr);
 	Fclose( ( int16)info->_priv_var);
-}
-
-
-/*==================================================================================*
- * boolean CDECL init:																*
- *		First function called from zview, in this one, you can make some internal	*
- *		initialisation.																*
- *----------------------------------------------------------------------------------*
- * input:																			*
- *		--																			*
- *----------------------------------------------------------------------------------*
- * return:	 																		*
- *      --																			*
- *==================================================================================*/
-void CDECL init( void)
-{
-	libshare_init();
-}
-
-
-/*==================================================================================*
- * int main:																		*
- *		Main function, his job is to call ldg_init function.						*
- *----------------------------------------------------------------------------------*
- * input:																			*
- *		--																			*
- *----------------------------------------------------------------------------------*
- * return:	 																		*
- *      0																			*
- *==================================================================================*/
-int main( void)
-{
-	ldg_init( &raw_plugin);
-	return( 0);
 }

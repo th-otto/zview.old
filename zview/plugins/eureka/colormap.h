@@ -1,4 +1,4 @@
-int16 red[]={ 996,0
+static int16 const red[]={ 996,0
 ,992
 ,0
 ,0
@@ -255,7 +255,7 @@ int16 red[]={ 996,0
 ,996
 };
 
-int16 green[]={996,0
+static int16 const green[]={996,0
 ,0
 ,992
 ,0
@@ -512,7 +512,7 @@ int16 green[]={996,0
 ,988
 };
 
-int16 blue[]={996,0
+static int16 const blue[]={996,0
 ,0
 ,0
 ,992

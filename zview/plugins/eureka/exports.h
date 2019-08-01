@@ -1,5 +1,5 @@
 /*
- * gif/exports.h - internal header with definitions of all exported functions
+ * eureka/exports.h - internal header with definitions of all exported functions
  *
  * Copyright (C) 2019 Thorsten Otto
  *
