@@ -120,11 +120,15 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(memset);
 	S(memcpy);
 	S(memchr);
+	S(memcmp);
 	S(strlen);
 	S(strcpy);
 	S(strcat);
 	S(strcmp);
+	S(strncmp);
 	S(malloc);
+	S(calloc);
+	S(realloc);
 	S(free);
 	S(get_errno);
 	S(strerror);
@@ -134,6 +138,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(write);
 	S(lseek);
 	S(fopen);
+	S(fdopen);
 	S(fclose);
 	S(fseek);
 	S(fseeko);

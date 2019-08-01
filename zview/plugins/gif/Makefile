@@ -1,19 +1,24 @@
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
-LIB			= ../libshare/libshare.a -lldg
+GIFLIB = -lgif
+LIB       = ../libshare/libshare.a -lldg $(GIFLIB)
+STACKSIZE = 64k
 
-CFLAGS			+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common
+SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvgif.slb\"
 
-OBJ 			= gifldg.o
+all:: gif.ldg zvgif.slb
 
-LIB			+= -lgif
+include $(top_srcdir)/rules
 
-PROGRAM 		= gif.ldg
+gif.ldg: gifldg.o gif.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
-all:: $(PROGRAM)
+zvgif.slb: header.lo gifslb.lo gif.lo
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(GIFLIB) $(LDFLAGS) $(LDSHAREDLIBC)
 
-$(PROGRAM): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+header.lo gifslb.lo gif.lo: ../common/plugin.h ../common/zview.h
 
 clean:
-	rm -f *.o *.a *.ldg
+	rm -f *.o *.lo *.a *.ldg *.slb

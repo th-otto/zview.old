@@ -41,13 +41,17 @@ struct _zview_plugin_funcs {
 	void *_CDECL (*p_memset)(void *, zv_int_t, size_t);
 	void *_CDECL (*p_memcpy)(void *, const void *, size_t);
 	void *_CDECL (*p_memchr)(const void *, zv_int_t, size_t);
+	zv_int_t _CDECL (*p_memcmp)(const void *, const void *, size_t);
 
 	size_t _CDECL (*p_strlen)(const char *);
 	char *_CDECL (*p_strcpy)(char *, const char *);
 	char *_CDECL (*p_strcat)(char *, const char *);
 	zv_int_t _CDECL (*p_strcmp)(const char *, const char *);
+	zv_int_t _CDECL (*p_strncmp)(const char *, const char *, size_t);
 
 	void *_CDECL (*p_malloc)(size_t);
+	void *_CDECL (*p_calloc)(size_t, size_t);
+	void *_CDECL (*p_realloc)(void *ptr, size_t size);
 	void _CDECL (*p_free)(void *);
 
 	zv_int_t _CDECL (*p_get_errno)(void);
@@ -60,6 +64,7 @@ struct _zview_plugin_funcs {
 	off_t _CDECL (*p_lseek)(zv_int_t, off_t, zv_int_t);
 
 	FILE *_CDECL (*p_fopen)(const char *, const char *);
+	FILE *_CDECL (*p_fdopen)(zv_int_t, const char *);
 	zv_int_t _CDECL (*p_fclose)(FILE *);
 	zv_int_t _CDECL (*p_fseek)(FILE *, long, zv_int_t);
 	zv_int_t _CDECL (*p_fseeko)(FILE *, __off_t, zv_int_t);
@@ -89,13 +94,17 @@ struct _zview_plugin_funcs {
 #undef memset
 #undef memcpy
 #undef memchr
+#undef memcmp
 
 #undef strlen
 #undef strcpy
 #undef strcat
 #undef strcmp
+#undef strncmp
 
 #undef malloc
+#undef calloc
+#undef realloc
 #undef free
 
 #undef errno
@@ -108,6 +117,7 @@ struct _zview_plugin_funcs {
 #undef lseek
 
 #undef fopen
+#undef fdopen
 #undef fclose
 #undef fseek
 #undef fseeko
@@ -126,14 +136,18 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 #define memset(d, c, l) get_slb_funcs()->p_memset(d, c, l)
 #define memcpy(d, s, l) get_slb_funcs()->p_memcpy(d, s, l)
 #define memchr(d, c, l) get_slb_funcs()->p_memchr(d, c, l)
+#define memcmp(d, s, l) get_slb_funcs()->p_memcmp(d, s, l)
 
 #define strlen(s) get_slb_funcs()->p_strlen(s)
 #define strcpy get_slb_funcs()->p_strcpy
 #define strcat get_slb_funcs()->p_strcat
 #define strcmp get_slb_funcs()->p_strcmp
+#define strncmp get_slb_funcs()->p_strncmp
 
-#define malloc get_slb_funcs()->p_malloc
-#define free get_slb_funcs()->p_free
+#define malloc(s) get_slb_funcs()->p_malloc(s)
+#define calloc(n, s) get_slb_funcs()->p_calloc(n, s)
+#define realloc(p, s) get_slb_funcs()->p_realloc(p, s)
+#define free(p) get_slb_funcs()->p_free(p)
 
 #undef errno
 #define errno (get_slb_funcs()->p_get_errno())
@@ -149,6 +163,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
  * only referenced by ioapi.c
  */
 #define fopen get_slb_funcs()->p_fopen
+#define fdopen get_slb_funcs()->p_fdopen
 #define fclose get_slb_funcs()->p_fclose
 #define fseek get_slb_funcs()->p_fseek
 #define fseeko get_slb_funcs()->p_fseeko
