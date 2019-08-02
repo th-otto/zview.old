@@ -262,6 +262,6 @@ extern void snd_rdw( WINDOW *win);
 extern void snd_msg( WINDOW *win, int msg, int par1, int par2, int par3, int par4);
 extern void draw_page( WINDOW *win, int x, int y, int w, int h);
 
-void jpg_option_dialog( char *source_file);
+void jpg_option_dialog( const char *source_file);
 void tiff_option_dialog( void);
 int CallStGuide ( char *);

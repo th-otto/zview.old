@@ -91,17 +91,26 @@ static void __CDECL jpg_option_slider_event( WINDOW *win, int mode,
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-void jpg_option_dialog( char *source_file)
+void jpg_option_dialog( const char *source_file)
 {
-//	struct stat	file_stat;
 	WINDOW 		*win;
 
 	jpg_option_content = get_tree( JPGPREF);
 
-//	stat( source_file, &file_stat);
-
 //	size_to_text( ObjcString( jpg_option_content, JPGPREF_ORIGINAL_SIZE, NULL), ( float)file_stat.st_size);
 //	sprintf( ObjcString( jpg_option_content, JPGPREF_PERCENT, NULL), "%d", quality);
+
+	if (curr_output_plugin)
+	{
+		long value;
+		
+		if ((value = plugin_get_option(curr_output_plugin, OPTION_QUALITY)) >= 0)
+			quality = value;
+		if ((value = plugin_get_option(curr_output_plugin, OPTION_COLOR_SPACE)) >= 0)
+			color_space = value;
+		if ((value = plugin_get_option(curr_output_plugin, OPTION_PROGRESSIVE)) >= 0)
+			progressive = value;
+	}
 
 	jpg_option_content[JPGPREF_SL].ob_x = quality;
 

@@ -19,36 +19,37 @@ static CODEC *encoder[MAX_CODECS];
 static int last_choice = -1;
 static OBJECT *save_dialog_content = NULL;
 
-char source_file[MAXNAMLEN];
+static const char *source_file;
 
 
-static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
+static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const char *name)
 {
 	boolean have_options = FALSE;
-
+	CODEC *codec = encoder[encoder_selected];
+	
 	curr_output_plugin = NULL;
 	ldg_funcs.set_jpg_option = NULL;	
 	ldg_funcs.set_tiff_option = NULL;
 
-	switch (encoder[encoder_selected]->type)
+	switch (codec->type)
 	{
 	case CODEC_LDG:
 		{
 			LDG *ldg;
 
-			ldg = encoder[encoder_selected]->c.ldg;
+			ldg = codec->c.ldg;
 			ldg_funcs.encoder_init 		= ldg_find( "encoder_init", ldg);
 			ldg_funcs.encoder_write 		= ldg_find( "encoder_write", ldg);
 			ldg_funcs.encoder_quit 		= ldg_find( "encoder_quit", ldg);
 		
 			if ( !ldg_funcs.encoder_init || !ldg_funcs.encoder_write || !ldg_funcs.encoder_quit)
 			{
-				errshow( encoder[encoder_selected]->extensions, LDG_ERR_BASE + ldg_error());
+				errshow(codec->extensions, LDG_ERR_BASE + ldg_error());
 				return FALSE;
 			}
-			if( strncmp( encoder[encoder_selected]->extensions, "JPG", 3) == 0)
+			if( strncmp(codec->extensions, "JPG", 3) == 0)
 				ldg_funcs.set_jpg_option = ldg_find( "set_jpg_option", ldg);
-			else if( strncmp( encoder[encoder_selected]->extensions, "TIF", 3) == 0)
+			else if(strncmp(codec->extensions, "TIF", 3) == 0)
 				ldg_funcs.set_tiff_option = ldg_find( "set_tiff_option", ldg);
 				
 			have_options = ldg_funcs.set_jpg_option != NULL || ldg_funcs.set_tiff_option != NULL;
@@ -59,15 +60,16 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 			SLB *slb;
 			long err;
 			
-			slb = &encoder[encoder_selected]->c.slb;
+			slb = &codec->c.slb;
 			err = plugin_get_option(slb, OPTION_CAPABILITIES);
 			if (err < 0 || !(err & CAN_ENCODE))
 			{
-				errshow( encoder[encoder_selected]->extensions, err);
+				errshow(codec->extensions, err);
 				return FALSE;
 			}
 			err = plugin_get_option(slb, OPTION_QUALITY);
 			have_options = err >= 0;
+			curr_output_plugin = slb;
 		}
 		break;
 	default:
@@ -79,7 +81,7 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 	else
 		ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, DISABLED, 0);
 
-	zstrncpy( save_dialog_content[SAVE_DIAL_FORMAT].ob_spec.free_string, encoder[encoder_selected]->extensions, 4);
+	strcpy( save_dialog_content[SAVE_DIAL_FORMAT].ob_spec.free_string, name);
 
    	ObjcDraw( OC_FORM, win, SAVE_DIAL_FORMAT, 1);
    	ObjcDraw( OC_FORM, win, SAVE_DIAL_OPTIONS, 1);
@@ -90,34 +92,45 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected)
 
 static void format_popup( WINDOW *win, int obj_index) 
 {
-	char items[MAX_CODECS][4];
+	char items[MAX_CODECS][10];
 	char *items_ptr[MAX_CODECS];
 	int16 i, x, y;
 	int choice;
-
+	int len;
+	
 	for( i = 0; i < encoder_plugins_nbr; i++)
-	{	
-		zstrncpy( items[i], encoder[i]->extensions, 4);
-		items[i][3] = '\0';
+	{
+		if (encoder[i]->num_extensions == 0)
+		{
+			/* limited by array above, and button width in resource file */
+			len = strlen(encoder[i]->extensions);
+		} else
+		{
+			/* limited by 3-chars per extension in list */
+			len = 3; /* strnlen(encoder[i]->extensions, 3); */
+		}
+		memset(items[i], ' ', 9);
+		memcpy(items[i], encoder[i]->extensions, len);
+		items[i][9] = '\0';
 		items_ptr[i] = items[i];
 	}
 
 	objc_offset( FORM(win), obj_index, &x, &y);
 
-	choice = MenuPopUp ( items_ptr, x, y, encoder_plugins_nbr, -1, last_choice, P_LIST + P_WNDW + P_CHCK);
+	choice = MenuPopUp ( items_ptr, x, y, encoder_plugins_nbr, -1, last_choice, P_LIST | P_WNDW | P_CHCK);
 
-	if( choice < 1)
-		choice = 1;
-
-	if( last_choice != choice)
-		encoder_plugin_setup( win, choice - 1);
-
-	last_choice = choice;
-
-	if( last_choice)
-		ObjcChange( OC_FORM, win, SAVE_DIAL_SAVE, NORMAL, TRUE);
-	else		
-		ObjcChange( OC_FORM, win, SAVE_DIAL_SAVE, DISABLED, TRUE);	
+	if (choice > 0)
+	{
+		if(last_choice != choice)
+			encoder_plugin_setup( win, choice - 1, items_ptr[choice - 1]);
+	
+		last_choice = choice;
+	
+		if( last_choice)
+			ObjcChange( OC_FORM, win, SAVE_DIAL_SAVE, NORMAL, TRUE);
+		else		
+			ObjcChange( OC_FORM, win, SAVE_DIAL_SAVE, DISABLED, TRUE);	
+	}
 }
 
 
@@ -273,8 +286,11 @@ void save_dialog( const char *fullfilename)
 			return;
 	}
 
-	strcpy( source_file, fullfilename);
+	source_file = fullfilename;
 
+	/*
+	 * TODO: preselect format popup according to filetype
+	 */
 	save_dialog_content = get_tree( SAVE_DIAL);
 
 	win_save_dialog = FormCreate( save_dialog_content, NAME|MOVER, save_dialog_event, get_string( SAVE_TITLE), NULL, TRUE, FALSE);

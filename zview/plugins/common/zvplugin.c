@@ -121,22 +121,29 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(memcpy);
 	S(memchr);
 	S(memcmp);
+
 	S(strlen);
 	S(strcpy);
+	S(strncpy);
 	S(strcat);
+	S(strncat);
 	S(strcmp);
 	S(strncmp);
+
 	S(malloc);
 	S(calloc);
 	S(realloc);
 	S(free);
+
 	S(get_errno);
 	S(strerror);
+
 	S(open);
 	S(close);
 	S(read);
 	S(write);
 	S(lseek);
+
 	S(fopen);
 	S(fdopen);
 	S(fclose);
@@ -149,8 +156,19 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(fread);
 	S(fwrite);
 	S(ferror);
+	S(fflush);
+
 	S(rand);
 	S(srand);
+
+	S(qsort);
+	S(bsearch);
+
+	S(time);
+	S(localtime);
+
+	S(sigsetjmp);
+	S(longjmp);
 #undef S
 	
 	ret = slb_load(name, path, PLUGIN_VERSION, &slb->handle, &slb->exec);

@@ -13,6 +13,8 @@
 #include <stdarg.h>
 #include <mint/slb.h>
 #include <unistd.h>
+#include <setjmp.h>
+#include <time.h>
 #include "imginfo.h"
 
 #ifndef _CDECL
@@ -45,7 +47,9 @@ struct _zview_plugin_funcs {
 
 	size_t _CDECL (*p_strlen)(const char *);
 	char *_CDECL (*p_strcpy)(char *, const char *);
+	char *_CDECL (*p_strncpy)(char *, const char *, size_t);
 	char *_CDECL (*p_strcat)(char *, const char *);
+	char *_CDECL (*p_strncat)(char *, const char *, size_t);
 	zv_int_t _CDECL (*p_strcmp)(const char *, const char *);
 	zv_int_t _CDECL (*p_strncmp)(const char *, const char *, size_t);
 
@@ -75,10 +79,20 @@ struct _zview_plugin_funcs {
 	size_t _CDECL (*p_fread)(void *, size_t, size_t, FILE *);
 	size_t _CDECL (*p_fwrite)(const void *, size_t, size_t, FILE *);
 	zv_int_t _CDECL (*p_ferror)(FILE *);
+	zv_int_t _CDECL (*p_fflush)(FILE *);
 
 	zv_int_t _CDECL (*p_rand)(void);
 	void _CDECL (*p_srand)(zv_uint_t seed);
 
+	void _CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
+	void *_CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
+                     
+	time_t _CDECL (*p_time)(time_t *tloc);
+	struct tm *_CDECL (*p_localtime)(const time_t *timep);
+	
+	zv_int_t _CDECL (*p_sigsetjmp)(jmp_buf, zv_int_t);
+	__attribute__((__noreturn__)) void _CDECL (*p_longjmp)(jmp_buf, zv_int_t);
+	
 	/* room for later extensions */
 	void *unused[32];
 };
@@ -98,7 +112,9 @@ struct _zview_plugin_funcs {
 
 #undef strlen
 #undef strcpy
+#undef strncpy
 #undef strcat
+#undef strncat
 #undef strcmp
 #undef strncmp
 
@@ -128,8 +144,16 @@ struct _zview_plugin_funcs {
 #undef fread
 #undef fwrite
 #undef ferror
+#undef fflush
 
 #undef rand
+#undef srand
+
+#undef qsort
+#undef bsearch
+
+#undef time
+#undef localtime
 
 struct _zview_plugin_funcs *get_slb_funcs(void);
 
@@ -140,7 +164,9 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 
 #define strlen(s) get_slb_funcs()->p_strlen(s)
 #define strcpy get_slb_funcs()->p_strcpy
+#define strncpy get_slb_funcs()->p_strncpy
 #define strcat get_slb_funcs()->p_strcat
+#define strncat get_slb_funcs()->p_strncat
 #define strcmp get_slb_funcs()->p_strcmp
 #define strncmp get_slb_funcs()->p_strncmp
 
@@ -172,6 +198,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 #define fread get_slb_funcs()->p_fread
 #define fwrite get_slb_funcs()->p_fwrite
 #define ferror get_slb_funcs()->p_ferror
+#define fflush get_slb_funcs()->p_fflush
 
 #define sprintf get_slb_funcs()->p_sprintf
 #define vsnprintf get_slb_funcs()->p_vsnprintf
@@ -186,6 +213,15 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #define rand get_slb_funcs()->p_rand
 #define srand get_slb_funcs()->p_srand
+
+#define qsort get_slb_funcs()->p_qsort
+#define bsearch get_slb_funcs()->p_bsearch
+
+#define time get_slb_funcs()->p_time
+#define localtime get_slb_funcs()->p_localtime
+
+#define sigsetjmp get_slb_funcs()->p_sigsetjmp
+#define longjmp get_slb_funcs()->p_longjmp
 
 #endif /* PLUGIN_SLB */
 

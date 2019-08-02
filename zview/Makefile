@@ -32,7 +32,6 @@ all:: $(PROGRAM)
 
 $(PROGRAM): $(PDF_LIB) $(OBJ)
 	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,512k -L. -lpdf $(XPDF_LIBS) $(LIB)
-	cp $(PROGRAM) _dist/zview.app
 	$(COMPRESS) $(PROGRAM)
 
 ##############################################################################
