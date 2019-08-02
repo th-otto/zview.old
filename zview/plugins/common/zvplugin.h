@@ -32,6 +32,7 @@ long __CDECL plugin_slb_control(SLB *slb, long fn, void *arg);
 #define plugin_get_basepage(slb) ((BASEPAGE *)plugin_slb_control(slb, 2, 0))
 #define plugin_get_header(slb) plugin_slb_control(slb, 3, 0)
 #define plugin_get_libpath(slb) ((const char *)plugin_slb_control(slb, 4, 0))
+#define plugin_required_libs(slb) ((const char *)plugin_slb_control(slb, 5, 0))
 
 long plugin_open(const char *name, const char *path, SLB *slb);
 void plugin_close(SLB *slb);

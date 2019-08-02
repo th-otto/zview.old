@@ -60,6 +60,10 @@ struct _zview_plugin_funcs {
 
 	zv_int_t _CDECL (*p_get_errno)(void);
 	char *_CDECL (*p_strerror)(zv_int_t);
+	__attribute__((__noreturn__)) void _CDECL (*p_abort)(void);
+	FILE *stderr_location;
+
+	zv_int_t _CDECL (*p_remove)(const char *);
 
 	zv_int_t _CDECL (*p_open)(const char *, zv_int_t, ...);
 	zv_int_t _CDECL (*p_close)(zv_int_t);
@@ -71,11 +75,12 @@ struct _zview_plugin_funcs {
 	FILE *_CDECL (*p_fdopen)(zv_int_t, const char *);
 	zv_int_t _CDECL (*p_fclose)(FILE *);
 	zv_int_t _CDECL (*p_fseek)(FILE *, long, zv_int_t);
-	zv_int_t _CDECL (*p_fseeko)(FILE *, __off_t, zv_int_t);
+	zv_int_t _CDECL (*p_fseeko)(FILE *, off_t, zv_int_t);
 	long _CDECL (*p_ftell)(FILE *);
 	off_t _CDECL (*p_ftello)(FILE *);
 	zv_int_t _CDECL (*p_sprintf)(char *, const char *, ...);
 	zv_int_t _CDECL (*p_vsnprintf)(char *, size_t, const char *, va_list);
+	zv_int_t _CDECL (*p_vfprintf)(FILE *, const char *, va_list);
 	size_t _CDECL (*p_fread)(void *, size_t, size_t, FILE *);
 	size_t _CDECL (*p_fwrite)(const void *, size_t, size_t, FILE *);
 	zv_int_t _CDECL (*p_ferror)(FILE *);
@@ -89,10 +94,17 @@ struct _zview_plugin_funcs {
                      
 	time_t _CDECL (*p_time)(time_t *tloc);
 	struct tm *_CDECL (*p_localtime)(const time_t *timep);
-	
+	struct tm *_CDECL (*p_gmtime)(const time_t *);
+
 	zv_int_t _CDECL (*p_sigsetjmp)(jmp_buf, zv_int_t);
 	__attribute__((__noreturn__)) void _CDECL (*p_longjmp)(jmp_buf, zv_int_t);
 	
+	double _CDECL (*p_pow)(double, double);
+	double _CDECL (*p_floor)(double);
+	double _CDECL (*p_frexp)(double, zv_int_t *);
+	double _CDECL (*p_modf)(double, double *);
+	double _CDECL (*p_atof)(const char *);
+
 	/* room for later extensions */
 	void *unused[32];
 };
@@ -125,6 +137,10 @@ struct _zview_plugin_funcs {
 
 #undef errno
 #undef strerror
+#undef abort
+#undef stderr
+
+#undef remove
 
 #undef open
 #undef close
@@ -141,6 +157,7 @@ struct _zview_plugin_funcs {
 #undef ftello
 #undef sprintf
 #undef vsnprintf
+#undef vfprintf
 #undef fread
 #undef fwrite
 #undef ferror
@@ -154,6 +171,16 @@ struct _zview_plugin_funcs {
 
 #undef time
 #undef localtime
+#undef gmtime
+
+#undef sigsetjmp
+#undef longjmp
+
+#undef pow
+#undef floor
+#undef frexp
+#undef modf
+#undef atof
 
 struct _zview_plugin_funcs *get_slb_funcs(void);
 
@@ -175,9 +202,12 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 #define realloc(p, s) get_slb_funcs()->p_realloc(p, s)
 #define free(p) get_slb_funcs()->p_free(p)
 
-#undef errno
 #define errno (get_slb_funcs()->p_get_errno())
 #define strerror get_slb_funcs()->p_strerror
+#define abort get_slb_funcs()->p_abort
+#define stderr (get_slb_funcs()->stderr_location)
+
+#define remove get_slb_funcs()->p_remove
 
 #define open get_slb_funcs()->p_open
 #define close get_slb_funcs()->p_close
@@ -185,9 +215,6 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 #define write get_slb_funcs()->p_write
 #define lseek get_slb_funcs()->p_lseek
 
-/*
- * only referenced by ioapi.c
- */
 #define fopen get_slb_funcs()->p_fopen
 #define fdopen get_slb_funcs()->p_fdopen
 #define fclose get_slb_funcs()->p_fclose
@@ -202,9 +229,9 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 
 #define sprintf get_slb_funcs()->p_sprintf
 #define vsnprintf get_slb_funcs()->p_vsnprintf
+#define vfprintf get_slb_funcs()->p_vfprintf
 
-#define DEBUG 0
-#if DEBUG
+#if 0
 #undef vsnprintf
 #define vsnprintf my_vsnprintf
 int vsnprintf(char *str, size_t size, const char *fmt, va_list va);
@@ -219,9 +246,16 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #define time get_slb_funcs()->p_time
 #define localtime get_slb_funcs()->p_localtime
+#define gmtime get_slb_funcs()->p_gmtime
 
 #define sigsetjmp get_slb_funcs()->p_sigsetjmp
 #define longjmp get_slb_funcs()->p_longjmp
+
+#define pow(x, y) get_slb_funcs()->p_pow(x, y)
+#define floor(x) get_slb_funcs()->p_floor(x)
+#define frexp(x, y) get_slb_funcs()->p_frexp(x, y)
+#define modf(x, y) get_slb_funcs()->p_modf(x, y)
+#define atof(x) get_slb_funcs()->p_atof(x)
 
 #endif /* PLUGIN_SLB */
 

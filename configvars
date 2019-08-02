@@ -8,6 +8,7 @@ STRIP				= $(CROSS_PREFIX)strip
 COMPRESS			= : upx -9
 
 #CPU				= -mcpu=5475
+#CPU				= -m68000
 CPU				= -m68020-60
 ifeq ($(CPU),-m68020-60)
 CPU_SUBDIR                      = m68020-60/

@@ -137,6 +137,10 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 
 	S(get_errno);
 	S(strerror);
+	S(abort);
+	zview_plugin_funcs.stderr_location = stderr;
+	
+	S(remove);
 
 	S(open);
 	S(close);
@@ -153,6 +157,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(ftello);
 	S(sprintf);
 	S(vsnprintf);
+	S(vfprintf);
 	S(fread);
 	S(fwrite);
 	S(ferror);
@@ -166,11 +171,18 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 
 	S(time);
 	S(localtime);
+	S(gmtime);
 
 	S(sigsetjmp);
 	S(longjmp);
+
+	S(pow);
+	S(floor);
+	S(frexp);
+	S(modf);
+	S(atof);
 #undef S
-	
+
 	ret = slb_load(name, path, PLUGIN_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)
 		return ret;
