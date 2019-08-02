@@ -1,4 +1,5 @@
 #include "plugins/common/imginfo.h"
+#include "plugins.h"
 
 typedef struct _dec_data *DECDATA;
 
@@ -25,7 +26,7 @@ extern void ( *rasterize_32) ( DECDATA, void *);
 extern void ( *cnvpal_color)( IMGINFO, DECDATA);
 extern void ( *raster_gray) ( DECDATA, void *);
 
-boolean get_codec( const char *file);
+CODEC *get_codec( const char *file);
 boolean get_pic_info( const char *file, IMGINFO info);
 void quit_img( IMGINFO info, DECDATA data);
 

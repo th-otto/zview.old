@@ -1,3 +1,6 @@
+#ifndef __ZVIEW_PLUGINS_H__
+#define __ZVIEW_PLUGINS_H__
+
 #include <mint/slb.h>
 
 extern int16 	plugins_init( void);
@@ -37,3 +40,5 @@ typedef struct {
 
 extern CODEC codecs[MAX_CODECS];
 extern int16 plugins_nbr;
+
+#endif /* __ZVIEW_PLUGINS_H__ */

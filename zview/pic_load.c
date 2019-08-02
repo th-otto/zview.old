@@ -236,7 +236,7 @@ void quit_img( IMGINFO info, DECDATA data)
 }
 
 
-boolean get_codec( const char *file)
+CODEC *get_codec( const char *file)
 {
 	int16 	i, j, c = 0;
 	char 	plugin[4];
@@ -301,12 +301,12 @@ boolean get_codec( const char *file)
 				  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
 				{
 					errshow(codecs[i].extensions, LDG_ERR_BASE + ldg_error());
-					return FALSE;
+					return NULL;
 				}				
 
 				/* decoder_get_page_size = ldg_find( "reader_get_page_size", ldg); */
 
-				return TRUE;
+				return &codecs[i];
 			}
 			break;
 		case CODEC_SLB:
@@ -317,7 +317,7 @@ boolean get_codec( const char *file)
 				if (strcmp(extension, p) == 0)
 				{
 					curr_input_plugin = &codecs[i].c.slb;
-					return TRUE;
+					return &codecs[i];
 				}
 				p += strlen(p) + 1;
 			}
@@ -326,7 +326,7 @@ boolean get_codec( const char *file)
 	}
 	
 	/* I wish that it will never happen ! */
-	return FALSE;
+	return NULL;
 }
 
 

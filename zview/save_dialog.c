@@ -17,15 +17,16 @@ static CODEC *encoder[MAX_CODECS];
 
 /* local variable */
 static int last_choice = -1;
-static OBJECT *save_dialog_content = NULL;
-
 static const char *source_file;
+
+#define MAX_TYPENAME_LEN 10
 
 
 static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const char *name)
 {
 	boolean have_options = FALSE;
 	CODEC *codec = encoder[encoder_selected];
+	OBJECT *tree = get_tree( SAVE_DIAL);
 	
 	curr_output_plugin = NULL;
 	ldg_funcs.set_jpg_option = NULL;	
@@ -76,42 +77,59 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
 		return FALSE;
 	}
 
-	if (have_options)
-		ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, NORMAL, 0);
-	else
-		ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, DISABLED, 0);
+	strcpy( tree[SAVE_DIAL_FORMAT].ob_spec.free_string, name);
 
-	strcpy( save_dialog_content[SAVE_DIAL_FORMAT].ob_spec.free_string, name);
-
-   	ObjcDraw( OC_FORM, win, SAVE_DIAL_FORMAT, 1);
-   	ObjcDraw( OC_FORM, win, SAVE_DIAL_OPTIONS, 1);
+	if (win)
+	{
+		if (have_options)
+			ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, NORMAL, 0);
+		else
+			ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, DISABLED, 0);
+	   	ObjcDraw( OC_FORM, win, SAVE_DIAL_FORMAT, 1);
+   		ObjcDraw( OC_FORM, win, SAVE_DIAL_OPTIONS, 1);
+	} else	
+	{
+		if (have_options)
+			tree[SAVE_DIAL_OPTIONS].ob_state &= ~OS_DISABLED;
+		else
+			tree[SAVE_DIAL_OPTIONS].ob_state |= OS_DISABLED;
+	}
 
 	return TRUE;
 }
 
 
+static void format_type(CODEC *codec, char *str)
+{
+	int len;
+
+	if (codec->num_extensions == 0)
+	{
+		/* limited by array, and button width in resource file */
+		len = strlen(codec->extensions);
+	} else
+	{
+		/* limited by 3-chars per extension in list */
+		len = 3; /* strnlen(codec->extensions, 3); */
+	}
+	memset(str, ' ', MAX_TYPENAME_LEN - 1);
+	if (len >= MAX_TYPENAME_LEN)
+		len = MAX_TYPENAME_LEN - 1;
+	memcpy(str, codec->extensions, len);
+	str[MAX_TYPENAME_LEN - 1] = '\0';
+}
+
+
 static void format_popup( WINDOW *win, int obj_index) 
 {
-	char items[MAX_CODECS][10];
+	char items[MAX_CODECS][MAX_TYPENAME_LEN];
 	char *items_ptr[MAX_CODECS];
 	int16 i, x, y;
 	int choice;
-	int len;
 	
 	for( i = 0; i < encoder_plugins_nbr; i++)
 	{
-		if (encoder[i]->num_extensions == 0)
-		{
-			/* limited by array above, and button width in resource file */
-			len = strlen(encoder[i]->extensions);
-		} else
-		{
-			/* limited by 3-chars per extension in list */
-			len = 3; /* strnlen(encoder[i]->extensions, 3); */
-		}
-		memset(items[i], ' ', 9);
-		memcpy(items[i], encoder[i]->extensions, len);
-		items[i][9] = '\0';
+		format_type(encoder[i], items[i]);
 		items_ptr[i] = items[i];
 	}
 
@@ -252,11 +270,12 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 void save_dialog( const char *fullfilename)
 {
 	WINDOW 		*win_save_dialog;
+	OBJECT *tree;
+	int16 i;
+	CODEC *input;
 
 	if( !encoder_plugins_nbr)
 	{ 
-		int16 i;
-
 		for( i = 0; i < plugins_nbr; i++)
 		{
 			switch (codecs[i].type)
@@ -288,12 +307,22 @@ void save_dialog( const char *fullfilename)
 
 	source_file = fullfilename;
 
-	/*
-	 * TODO: preselect format popup according to filetype
-	 */
-	save_dialog_content = get_tree( SAVE_DIAL);
+	tree = get_tree( SAVE_DIAL);
 
-	win_save_dialog = FormCreate( save_dialog_content, NAME|MOVER, save_dialog_event, get_string( SAVE_TITLE), NULL, TRUE, FALSE);
+	if (last_choice <= 0 && (input = get_codec(source_file)) != NULL)
+	{
+		for (i = 0; i < encoder_plugins_nbr; i++)
+			if (input == encoder[i])
+			{
+				char name[MAX_TYPENAME_LEN];
+				format_type(input, name);
+				encoder_plugin_setup(NULL, i, name);
+				last_choice = i + 1;
+				break;
+			}
+	}
+
+	win_save_dialog = FormCreate( tree, NAME|MOVER, save_dialog_event, get_string( SAVE_TITLE), NULL, TRUE, FALSE);
 
 	/* Make this window modal */
 	WindSet( win_save_dialog, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
