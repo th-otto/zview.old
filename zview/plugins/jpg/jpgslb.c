@@ -10,6 +10,7 @@
 #include <mint/basepage.h>
 #include <mint/mintbind.h>
 #include <mint/slb.h>
+#include <slb/jpeg.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -269,18 +270,6 @@ void free(void *p)
 }
 
 
-#undef snprintf
-int snprintf(char *str, size_t size, const char *format, ...)
-{
-	va_list args;
-	int ret;
-	va_start(args, format);
-	ret = get_slb_funcs()->p_vsnprintf(str, size, format, args);
-	va_end(args);
-	return ret;
-}
-
-
 #undef fflush
 int fflush(FILE *stream)
 {
@@ -301,6 +290,24 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	return get_slb_funcs()->p_fwrite(ptr, size, nmemb, stream);
 }
 
+#endif
+
+#ifndef EXIF_SLB
+
+#undef snprintf
+int snprintf(char *str, size_t size, const char *format, ...)
+{
+	va_list args;
+	int ret;
+	va_start(args, format);
+	ret = get_slb_funcs()->p_vsnprintf(str, size, format, args);
+	va_end(args);
+	return ret;
+}
+
+#endif
+
+#if !defined(JPEG_SLB)
 
 #undef errno
 /* referenced from pow() */

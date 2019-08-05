@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#undef errno
 #include <math.h>
 
 #if defined(PLUGIN_SLB) || defined(EXIT_SLB)

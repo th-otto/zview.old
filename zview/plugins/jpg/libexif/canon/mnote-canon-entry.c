@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#undef errno
 #include <math.h>
 
 #include "../exif-format.h"

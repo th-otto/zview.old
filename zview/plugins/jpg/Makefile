@@ -6,7 +6,7 @@ STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common
 CPPFLAGS += -DNO_GETENV -DJPEG_LIB_VERSION=80
-SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvjpg.slb\"
+SFLAGS += -DPLUGIN_SLB -DJPEG_SLB -DSHAREDLIB=\"zvjpg.slb\"
 
 libexif_OBJS = \
 	libexif/exif-byte-order.o	\
@@ -37,21 +37,6 @@ libexif_OBJS = \
 
 libexif_SOBJS = $(libexif_OBJS:.o=.lo)
 
-JPEG = jpeg-8d
-jpeg_OBJS = \
-	$(JPEG)/jcapimin.o $(JPEG)/jcapistd.o $(JPEG)/jccoefct.o $(JPEG)/jccolor.o $(JPEG)/jcdctmgr.o $(JPEG)/jchuff.o \
-	$(JPEG)/jcinit.o $(JPEG)/jcmainct.o $(JPEG)/jcmarker.o $(JPEG)/jcmaster.o $(JPEG)/jcomapi.o $(JPEG)/jcparam.o \
-	$(JPEG)/jcprepct.o $(JPEG)/jcsample.o $(JPEG)/jctrans.o $(JPEG)/jdapimin.o $(JPEG)/jdapistd.o \
-	$(JPEG)/jdatadst.o $(JPEG)/jdatasrc.o $(JPEG)/jdcoefct.o $(JPEG)/jdcolor.o $(JPEG)/jddctmgr.o $(JPEG)/jdhuff.o \
-	$(JPEG)/jdinput.o $(JPEG)/jdmainct.o $(JPEG)/jdmarker.o $(JPEG)/jdmaster.o $(JPEG)/jdmerge.o \
-	$(JPEG)/jdpostct.o $(JPEG)/jdsample.o $(JPEG)/jdtrans.o $(JPEG)/jerror.o $(JPEG)/jfdctflt.o $(JPEG)/jfdctfst.o \
-	$(JPEG)/jfdctint.o $(JPEG)/jidctflt.o $(JPEG)/jidctfst.o $(JPEG)/jidctint.o $(JPEG)/jquant1.o \
-	$(JPEG)/jquant2.o $(JPEG)/jutils.o $(JPEG)/jmemmgr.o $(JPEG)/jmemnobs.o $(JPEG)/jcicc.o $(JPEG)/jdicc.o \
-	$(JPEG)/jaricom.o $(JPEG)/jcarith.o $(JPEG)/jdarith.o \
-	$(empty)
-
-jpeg_SOBJS = $(jpeg_OBJS:.o=.lo)
-
 all:: jpg.ldg zvjpg.slb
 
 include $(top_srcdir)/rules
@@ -60,7 +45,7 @@ jpg.ldg: jpgldg.o jpg.o jpgdsp.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvjpg.slb: header.lo jpgslb.lo jpg.lo jpgdsp.lo $(jpeg_SOBJS) $(libexif_SOBJS)
-	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lm $(LDSHAREDLIBC)
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ljpeg8d.slb -lm $(LDSHAREDLIBC)
 
 header.lo jpgslb.lo jpg.lo: ../common/plugin.h ../common/zview.h
 
