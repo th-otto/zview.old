@@ -10,6 +10,8 @@
 #include <mint/basepage.h>
 #include <mint/mintbind.h>
 #include <mint/slb.h>
+#include <slb/png.h>
+#include <slb/zlib.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -164,11 +166,12 @@ static long set_imports(struct _zview_plugin_funcs *funcs)
 		return -ERANGE;
 	proc->funcs = funcs;
 
-#ifndef PNGLIB_SLB
-#undef stderr
-	stderr = funcs->stderr_location;
-#endif
-	
+	{
+		long ret;
+		if ((ret = funcs->p_slb_open(LIB_PNG)) < 0)
+			return ret;
+	}
+
 	return 0;
 }
 
@@ -202,7 +205,7 @@ long _CDECL slb_control(long fn, void *arg)
 	case 4:
 		return (long)my_base->p_cmdlin;
 	case 5:
-		return (long)("zlib.slb\0");
+		return (long)(ZLIB_SHAREDLIB_NAME "\0");
 	}
 	return -ENOSYS;
 }
@@ -221,157 +224,7 @@ void *(memcpy)(void *dest, const void *src, size_t len)
 void *(memmove)(void *dest, const void *src, size_t len) __attribute__((alias("memcpy")));
 
 
-/*
- * satisfy references from libpng & zlib
- * if it is linked statically
- */
-#ifndef PNGLIB_SLB
-
-/* same for memset */
-void *(memset)(void *dest, int c, size_t len)
+SLB *slb_pnglib_get(void)
 {
-	return memset(dest, c, len);
+	return get_slb_funcs()->p_slb_get(LIB_PNG);
 }
-
-
-#undef memcmp
-int memcmp(const void *d, const void *s, size_t len)
-{
-	return get_slb_funcs()->p_memcmp(d, s, len);
-}
-
-
-#undef strlen
-size_t strlen(const char *s)
-{
-	return get_slb_funcs()->p_strlen(s);
-}
-
-
-#undef malloc
-void *malloc(size_t s)
-{
-	return get_slb_funcs()->p_malloc(s);
-}
-
-
-#undef free
-void free(void *p)
-{
-	get_slb_funcs()->p_free(p);
-}
-
-
-#undef sigsetjmp
-int sigsetjmp(jmp_buf buf, int savesigs)
-{
-	return get_slb_funcs()->p_sigsetjmp(buf, savesigs);
-}
-
-
-#undef longjmp
-void longjmp(jmp_buf buf, int code)
-{
-	get_slb_funcs()->p_longjmp(buf, code);
-}
-
-
-#undef fopen
-FILE *fopen(const char *filename, const char *mode)
-{
-	return get_slb_funcs()->p_fopen(filename, mode);
-}
-
-
-#undef fclose
-int fclose(FILE *stream)
-{
-	return get_slb_funcs()->p_fclose(stream);
-}
-
-
-#undef fread
-size_t fread(void *buf, size_t size, size_t n, FILE *fp)
-{
-	return get_slb_funcs()->p_fread(buf, size, n, fp);
-}
-
-
-#undef fwrite
-size_t fwrite(const void *buf, size_t size, size_t n, FILE *fp)
-{
-	return get_slb_funcs()->p_fwrite(buf, size, n, fp);
-}
-
-
-#undef fflush
-int fflush(FILE *fp)
-{
-	return get_slb_funcs()->p_fflush(fp);
-}
-
-
-#undef abort
-void abort(void)
-{
-	get_slb_funcs()->p_abort();
-}
-
-
-#undef strerror
-char *strerror(int errnum)
-{
-	return get_slb_funcs()->p_strerror(errnum);
-}
-
-
-#undef remove
-int remove(const char *f)
-{
-	return get_slb_funcs()->p_remove(f);
-}
-
-
-#undef gmtime
-struct tm *gmtime(const time_t *t)
-{
-	return get_slb_funcs()->p_gmtime(t);
-}
-
-
-#undef fprintf
-int _CDECL fprintf(FILE *fp, const char *format, ...)
-{
-	va_list args;
-	int ret;
-	
-	va_start(args, format);
-	ret = get_slb_funcs()->p_vfprintf(fp, format, args);
-	va_end(args);
-	return ret;
-}
-
-
-#undef fputc
-int fputc(int c, FILE *stream)
-{
-	unsigned char ch = c;
-	if (fwrite(&ch, 1, 1, stream) != 1)
-		return EOF;
-	return c;
-}
-
-
-#undef atof
-double atof(const char *nptr)
-{
-	return get_slb_funcs()->p_atof(nptr);
-}
-
-
-#undef errno
-int errno;
-
-FILE *stderr;
-
-#endif
