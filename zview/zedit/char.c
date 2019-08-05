@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "gmem.h"
 
 /* d‚calage vers la droite du buffer */
 
@@ -71,7 +70,7 @@ void char_put( EDIT *edit, int16 c)
 		if( ++line->len >= line->size) 
 		{
 			line->size += SIZE_REALLOC;
-			line->buf = ( char*)grealloc(line->buf,line->size);
+			line->buf = ( char*)realloc(line->buf,line->size);
 		}
 
 		char_shift_right( line->buf + pos);
@@ -112,7 +111,7 @@ int16 char_del( EDIT *edit)
 			if( line -> prev -> size < line -> prev -> len + line -> len) 
 			{
 				line -> prev -> size = line -> prev -> len + line -> len + 1;
-				line -> prev -> buf = (char *) grealloc( line -> prev -> buf, line -> size);
+				line -> prev -> buf = (char *) realloc( line -> prev -> buf, line -> size);
 			}
 			
 			strcat( line -> prev -> buf, line -> buf);

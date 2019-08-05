@@ -12,11 +12,11 @@
 #define _ULONG		unsigned long
 #else
 /* otherwise in emulator */
-#define	VOID_PTR	uint32
-#define	UCHAR_PTR	uint32
-#define FUNC_PTR(x,y)	uint32 x
-#define _LONG		int32
-#define _ULONG		uint32
+#define	VOID_PTR	uint32_t
+#define	UCHAR_PTR	uint32_t
+#define FUNC_PTR(x,y)	uint32_t x
+#define _LONG		int32_t
+#define _ULONG		uint32_t
 #endif
 
 typedef struct _JPGD_STRUCT JPGD_STRUCT;

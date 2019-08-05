@@ -138,7 +138,7 @@ void show_fullscreen( WINDATA *windata)
 	evnt_keybd();
 
 	if( resized_out.fd_addr != NULL)
-		gfree( resized_out.fd_addr);
+		free( resized_out.fd_addr);
 
 	restore_screen();
 	wind_update( END_UPDATE);

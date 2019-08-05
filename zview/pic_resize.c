@@ -31,7 +31,7 @@ static int16 resize_setup( MFDB *in,  MFDB *out, DECDATA data)
 
 	if( planar)	
 	{
-		data->DstBuf = gmalloc((( uint32)in->fd_wdwidth << 4 ) + 256uL);
+		data->DstBuf = malloc((( uint32)in->fd_wdwidth << 4 ) + 256uL);
 
 		if( data->DstBuf == NULL)
 		{
@@ -116,7 +116,7 @@ int16 pic_resize( MFDB *in, MFDB *out)
 	if( in->fd_nplanes == 2)
 		return ( 0);
 
-	data = ( dec_data *)gmalloc( sizeof( dec_data));
+	data = ( dec_data *)malloc( sizeof( dec_data));
 
 	if( !data)
 		return ( 0);
@@ -130,9 +130,9 @@ int16 pic_resize( MFDB *in, MFDB *out)
 	resize_img ( in, out, data);
 
 	if( data->DstBuf)
-		gfree( data->DstBuf);
+		free( data->DstBuf);
 
-	gfree( data);
+	free( data);
 
 	return ( 1);
 }

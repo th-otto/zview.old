@@ -109,7 +109,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 
 		dirfile->nbr_icons = 0;
 		
-		gfree( dirfile->entry);
+		free( dirfile->entry);
 	}
 
 	dirfile->first_selected = NULL;
@@ -148,7 +148,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		{ /* allocate new entries */
 			if ( dirfile->nbr_icons == 0)
 			{ /* alloc for the first time */
-				if (( dirfile->entry = ( Entry *)gmalloc( ALLOC_NDIRENTRIES * sizeof( Entry))) == NULL)
+				if (( dirfile->entry = ( Entry *)malloc( ALLOC_NDIRENTRIES * sizeof( Entry))) == NULL)
 				{
 					errshow(NULL, -ENOMEM);
 					goto abort;
@@ -156,7 +156,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 			}
 			else
 			{ /* expand allocated memory */
-				if (( entry = ( Entry *)grealloc( dirfile->entry, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Entry))) == NULL)
+				if (( entry = ( Entry *)realloc( dirfile->entry, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Entry))) == NULL)
 				{
 					errshow(NULL, -ENOMEM);
 					goto abort;
@@ -202,7 +202,7 @@ abort:
 	closedir( dir);
 
 	if ( dirfile->nbr_icons > 0)
-		gfree( dirfile->entry);
+		free( dirfile->entry);
 	return FALSE;
 }
 
@@ -244,12 +244,12 @@ boolean scan_mini_drv( WINDOW *win)
 			{
 				if ( dirlist->nbr_child == 0)
 				{
-					if (( dirlist->root = ( Mini_Entry *)gmalloc( ALLOC_NDIRENTRIES * sizeof( Mini_Entry))) == NULL)
+					if (( dirlist->root = ( Mini_Entry *)malloc( ALLOC_NDIRENTRIES * sizeof( Mini_Entry))) == NULL)
 						goto abort;
 				}
 				else
 				{
-					if (( entry = ( Mini_Entry *)grealloc( dirlist->root, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Mini_Entry))) == NULL)
+					if (( entry = ( Mini_Entry *)realloc( dirlist->root, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Mini_Entry))) == NULL)
 						goto abort;
 
 					dirlist->root = entry;
@@ -277,7 +277,7 @@ boolean scan_mini_drv( WINDOW *win)
 
 abort:
 	if ( dirlist->nbr_child > 0)
-		gfree( dirlist->root);
+		free( dirlist->root);
 		
 	errshow(NULL, -ENOMEM);
 	
@@ -355,12 +355,12 @@ boolean scan_mini_dir( WINDOW *win, Mini_Entry *parent)
 				{
 					if ( parent->nbr_child == 0)
 					{
-						if (( parent->child = ( Mini_Entry *)gmalloc( ALLOC_NDIRENTRIES * sizeof( Mini_Entry))) == NULL)
+						if (( parent->child = ( Mini_Entry *)malloc( ALLOC_NDIRENTRIES * sizeof( Mini_Entry))) == NULL)
 							goto abort;
 					}
 					else
 					{
-						if (( entry = ( Mini_Entry *)grealloc( parent->child, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Mini_Entry))) == NULL)
+						if (( entry = ( Mini_Entry *)realloc( parent->child, ( allocated_entries + ALLOC_NDIRENTRIES) * sizeof( Mini_Entry))) == NULL)
 							goto abort;
 			
 						parent->child = entry;
@@ -396,7 +396,7 @@ boolean scan_mini_dir( WINDOW *win, Mini_Entry *parent)
 abort:
 	closedir( dir);
 	if ( parent->nbr_child > 0)
-		gfree( parent->child);
+		free( parent->child);
 	
 	parent->nbr_child = 0;		
 

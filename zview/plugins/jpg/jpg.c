@@ -83,7 +83,7 @@ long __CDECL set_option(zv_int_t which, zv_int_t value)
 typedef struct
 {
 	struct	jpeg_source_mgr pub;   /* public fields */
-	uint8	*buffer;
+	uint8_t	*buffer;
 	int		size;
 	JOCTET	terminal[2];
 } my_source_mgr;
@@ -176,7 +176,7 @@ static void term_source (j_decompress_ptr cinfo)
 }
 
 
-static boolean decompress_thumbnail_image( void *source, uint32 size, IMGINFO info)
+static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO info)
 {
 	int 		header = 0;
 	jmp_buf 	escape;
@@ -286,12 +286,12 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	txt_data				*comment;
 	jmp_buf 				escape;
 	FILE* 					jpeg_file;
-	int16 					header = 0;
+	int16_t 				header = 0;
 	
 	/* If Brainstorm cookie is used, we try to decode with it*/
 	if( jpgdrv)
 	{
-		int16 dsp_result = reader_dsp_init( name, info);
+		int16_t dsp_result = reader_dsp_init( name, info);
 
 		switch( dsp_result)
 		{
@@ -344,7 +344,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 		if ( comment)
 		{	
-			register int16 i;			
+			register int16_t i;			
 
 			for ( i = 0; i < comment->lines; i++) 
 			{
@@ -419,13 +419,13 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 			if (!mark->data || !mark->data_length)
 	               continue;
 		
-			comment->txt[comment->lines] = ( int8*)malloc( mark->data_length + 1);
+			comment->txt[comment->lines] = ( int8_t*)malloc( mark->data_length + 1);
 
 			if( comment->txt[comment->lines] == NULL)
 				continue;
 
 			memcpy( comment->txt[comment->lines], mark->data, mark->data_length);
-			comment->max_lines_length = MAX( comment->max_lines_length, ( int16)mark->data_length + 1);
+			comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)mark->data_length + 1);
 			comment->lines++;
 		}
 		else if( mark->marker == M_EXIF)
@@ -458,21 +458,21 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 					lenght = strlen( value);
 					
-					comment->txt[comment->lines] = ( int8*)malloc( lenght + 1);
+					comment->txt[comment->lines] = ( int8_t*)malloc( lenght + 1);
 
 					if( comment->txt[comment->lines] == NULL)
 						break;
 
 					strcpy( comment->txt[comment->lines], value);
 
-					comment->max_lines_length = MAX( comment->max_lines_length, ( int16)lenght);					
+					comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)lenght);					
 					comment->lines++;
 				}
 			}
 
 			if(( exifData->data) && ( exifData->size > 0) && info->thumbnail)
 			{
-				int32 size = exifData->size;
+				int32_t size = exifData->size;
 
 				info->__priv_ptr_more = malloc( size + 1);
 				memcpy( info->__priv_ptr_more, exifData->data, size);
@@ -525,7 +525,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->_priv_ptr				= ( void*)jpeg;			
 	info->_priv_ptr_more		= ( void*)comment;
 	info->__priv_ptr_more		= NULL;
-	info->_priv_var				= (int32)jpeg_file;		
+	info->_priv_var				= (int32_t)jpeg_file;		
 	info->_priv_var_more		= 0; /* 1 for exif thumbnail */
 
 	jpeg->client_data = NULL;
@@ -548,7 +548,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
-	register int16 	i;
+	register int16_t 	i;
 	txt_data 		*comment;
 
 	if( dsp_decoding)
@@ -572,11 +572,11 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	if( dsp_decoding)
 	{	
-		const void *source = ( uint8*)info->_priv_ptr + info->_priv_var_more;
+		const void *source = ( uint8_t*)info->_priv_ptr + info->_priv_var_more;
 	
 		memcpy( ( void*)buffer, source, info->_priv_var);
 		info->_priv_var_more += info->_priv_var;
@@ -625,7 +625,7 @@ void __CDECL reader_quit( IMGINFO info)
 
 	if( comment)
 	{
-		register int16 i;
+		register int16_t i;
 
 		for ( i = 0; i < comment->lines; i++)
 		{
@@ -671,7 +671,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	JPEG_ENC 	jpeg = NULL;		   
 	FILE* 		jpeg_file;
 	jmp_buf 	escape;
-	int16 		header = 0;
+	int16_t 		header = 0;
 
 	if ( ( jpeg_file = fopen( name, "wb")) == NULL)
 		return FALSE;
@@ -740,7 +740,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	info->_priv_ptr	 		= ( void*)jpeg;
 	info->_priv_ptr_more	= NULL;				
 	info->__priv_ptr_more	= NULL;	
-	info->_priv_var	 		= (int32)jpeg_file;
+	info->_priv_var	 		= (int32_t)jpeg_file;
 	info->_priv_var_more	= 0;
 
 	jpeg->client_data  		= NULL;
@@ -760,7 +760,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL encoder_write( IMGINFO info, uint8 *buffer)
+boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 {
 	( void)jpeg_write_scanlines( ( JPEG_ENC)info->_priv_ptr, ( JSAMPROW*)&buffer, 1);
 	return TRUE;

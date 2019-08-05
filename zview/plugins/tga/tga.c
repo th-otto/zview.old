@@ -20,8 +20,8 @@ long __CDECL get_option(zv_int_t which)
 #endif
 
 #define alpha_composite( composite, fg, alpha) {						\
-    uint16 temp = (( uint16)( fg) * ( uint16)( alpha) + ( uint16)128);	\
-    ( composite) = ( uint8)(( temp + ( temp >> 8)) >> 8);				\
+    uint16_t temp = (( uint16_t)( fg) * ( uint16_t)( alpha) + ( uint16_t)128);	\
+    ( composite) = ( uint8_t)(( temp + ( temp >> 8)) >> 8);				\
 }
 
 
@@ -40,9 +40,9 @@ long __CDECL get_option(zv_int_t which)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static inline void tga_write_pixel_to_mem( uint8 *dst, uint8 orientation, uint16 pixel_position, uint16 width, uint8 *rgb) 
+static inline void tga_write_pixel_to_mem( uint8_t *dst, uint8_t orientation, uint16_t pixel_position, uint16_t width, uint8_t *rgb) 
 {
-    register uint16 x, addy;
+    register uint16_t x, addy;
 
     switch( orientation) 
 	{
@@ -67,7 +67,7 @@ static inline void tga_write_pixel_to_mem( uint8 *dst, uint8 orientation, uint16
 
 
 /*==================================================================================*
- * uint32 tga_convert_color:														*
+ * uint32_t tga_convert_color:														*
  *		Write the pixel to the data regarding how the header says the data 			*
  *		is ordered.																	*
  *----------------------------------------------------------------------------------*
@@ -79,9 +79,9 @@ static inline void tga_write_pixel_to_mem( uint8 *dst, uint8 orientation, uint16
  * return:	 																		*
  *      the converted pixel.														*
  *==================================================================================*/
-static inline void tga_convert_color( uint8 *bgra, uint8 *rgb, uint8 bpp_in, uint8 alphabits)
+static inline void tga_convert_color( uint8_t *bgra, uint8_t *rgb, uint8_t bpp_in, uint8_t alphabits)
 {
-    uint8 r = 0, g = 0, b = 0, a = 0;
+    uint8_t r = 0, g = 0, b = 0, a = 0;
 
     switch( bpp_in) 
 	{
@@ -107,7 +107,7 @@ static inline void tga_convert_color( uint8 *bgra, uint8 *rgb, uint8 bpp_in, uin
 		case 15:
 			{
 		        /* 16-bit to 32-bit; (force alpha to full) */
-				register uint16 src16 = (( ( uint16)bgra[1] << 8) | bgra[0]);
+				register uint16_t src16 = (( ( uint16_t)bgra[1] << 8) | bgra[0]);
 		        b = (( src16) 		& 0x001F) << 3;
 		        g = (( src16 >> 5)  & 0x001F) << 3;
 		        r = (( src16 >> 10) & 0x001F) << 3; 
@@ -135,12 +135,12 @@ static inline void tga_convert_color( uint8 *bgra, uint8 *rgb, uint8 bpp_in, uin
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-    uint32		num_pixels, file_length;
-	int16		handle, format = TGA_TRUECOLOR_24;
-	uint8		header_buf[HDR_LENGTH];
+    uint32_t		num_pixels, file_length;
+	int16_t		handle, format = TGA_TRUECOLOR_24;
+	uint8_t		header_buf[HDR_LENGTH];
     tga_pic		*tga_struct;
 
-	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
 
 	if( Fread( handle, HDR_LENGTH, &header_buf) != HDR_LENGTH)
@@ -161,13 +161,13 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	tga_struct->tga.idlen				= header_buf[0];
 	tga_struct->tga.cmap_type			= header_buf[1];
 	tga_struct->tga.image_type			= header_buf[2];
-    tga_struct->tga.cmap_first			= (uint16)header_buf[3]  + ((uint16)header_buf[4] << 8);
-    tga_struct->tga.cmap_length			= (uint16)header_buf[5]  + ((uint16)header_buf[6] << 8);
+    tga_struct->tga.cmap_first			= (uint16_t)header_buf[3]  + ((uint16_t)header_buf[4] << 8);
+    tga_struct->tga.cmap_length			= (uint16_t)header_buf[5]  + ((uint16_t)header_buf[6] << 8);
 	tga_struct->tga.cmap_entry_size		= header_buf[7];
-    tga_struct->tga.img_spec_xorig		= (uint16)header_buf[8]  + ((uint16)header_buf[9]  << 8);
-    tga_struct->tga.img_spec_yorig		= (uint16)header_buf[10] + ((uint16)header_buf[11] << 8);
-    tga_struct->tga.img_spec_width		= (uint16)header_buf[12] + ((uint16)header_buf[13] << 8);
-    tga_struct->tga.img_spec_height		= (uint16)header_buf[14] + ((uint16)header_buf[15] << 8);
+    tga_struct->tga.img_spec_xorig		= (uint16_t)header_buf[8]  + ((uint16_t)header_buf[9]  << 8);
+    tga_struct->tga.img_spec_yorig		= (uint16_t)header_buf[10] + ((uint16_t)header_buf[11] << 8);
+    tga_struct->tga.img_spec_width		= (uint16_t)header_buf[12] + ((uint16_t)header_buf[13] << 8);
+    tga_struct->tga.img_spec_height		= (uint16_t)header_buf[14] + ((uint16_t)header_buf[15] << 8);
 	tga_struct->tga.img_spec_pix_depth	= header_buf[16];
 	tga_struct->tga.img_spec_img_desc	= header_buf[17];
 
@@ -214,7 +214,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
     tga_struct->line_size = tga_struct->tga.img_spec_width * tga_struct->bytes_per_pix;
 	tga_struct->img_buf_len = tga_struct->line_size << 1;
 
-	tga_struct->img_buf  = ( uint8 *)malloc( tga_struct->img_buf_len + 256L);
+	tga_struct->img_buf  = ( uint8_t *)malloc( tga_struct->img_buf_len + 256L);
 
 	if( tga_struct->img_buf == NULL)
 	{
@@ -240,7 +240,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->memory_alloc 			= TT_RAM;	
 	info->components			= format;
 	info->planes   				= tga_struct->tga.img_spec_pix_depth;
-	info->colors  				= 1L << ( uint32)info->planes;
+	info->colors  				= 1L << ( uint32_t)info->planes;
 	info->page	 				= 1;
 	info->delay					= 0;
 	info->num_comments			= 0;
@@ -273,7 +273,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 
 /*==================================================================================*
- * int16 fill_img_buf:																*
+ * int16_t fill_img_buf:															*
  *		fill the buffer "tga_struct->img_buf" with a line from file.	 			*
  *		the buffer can contain 2 lines, this function search also where write the	*
  *		new line from the file.														*
@@ -285,7 +285,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      Always 1 ( need to code something more secure)								*
  *==================================================================================*/
-static int16 fill_img_buf( tga_pic *tga_struct, int32 nread)
+static int16_t fill_img_buf( tga_pic *tga_struct, int32_t nread)
 {	
 	tga_struct->img_buf_used -= nread;									
 	tga_struct->img_buf_offset += nread;								
@@ -312,7 +312,7 @@ static int16 fill_img_buf( tga_pic *tga_struct, int32 nread)
 
 
 /*==================================================================================*
- * uint8 *unpack_line1:																*
+ * uint8_t *unpack_line1:															*
  *		depack ( for RLE image) and copy data from source to destination. 			*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -324,10 +324,10 @@ static int16 fill_img_buf( tga_pic *tga_struct, int32 nread)
  * return:	 																		*
  *      Howmany source buffer position after that the job is done.					*
  *==================================================================================*/
-static uint8 *unpack_line1( tga_pic *tga_struct, uint8 *src, uint8 *dst, uint16 line_width)
+static uint8_t *unpack_line1( tga_pic *tga_struct, uint8_t *src, uint8_t *dst, uint16_t line_width)
 {
-	register uint16 i, j, bytes_per_pix = ( int16)tga_struct->bytes_per_pix;
-	uint8	bgra[4], rgb[3], packet_header, repcount;
+	register uint16_t i, j, bytes_per_pix = ( int16_t)tga_struct->bytes_per_pix;
+	uint8_t	bgra[4], rgb[3], packet_header, repcount;
 
     if( tga_struct->tga.image_type == TGA_IMG_UNC_TRUECOLOR) 
 	{
@@ -342,7 +342,7 @@ static uint8 *unpack_line1( tga_pic *tga_struct, uint8 *src, uint8 *dst, uint16 
 	}
 	else
 	{
-		register uint16 l;
+		register uint16_t l;
 
         for( i = 0; i < line_width; ) 
 		{
@@ -388,7 +388,7 @@ static uint8 *unpack_line1( tga_pic *tga_struct, uint8 *src, uint8 *dst, uint16 
 
 
 /*==================================================================================*
- * int16 unpack_line:																*
+ * int16_t unpack_line:																*
  *		Call the "source's buffer to destination's buffer" and						* 
  *		"image to source's buffer" functions. 										*
  *----------------------------------------------------------------------------------*
@@ -399,14 +399,14 @@ static uint8 *unpack_line1( tga_pic *tga_struct, uint8 *src, uint8 *dst, uint16 
  * return:	 																		*
  *      1 if ok else 0.																*
  *==================================================================================*/
-static int16 unpack_line( tga_pic *tga_struct, uint8 *dst)
+static int16_t unpack_line( tga_pic *tga_struct, uint8_t *dst)
 {
-	uint8		*line_begin;
-	int32		nread;
+	uint8_t		*line_begin;
+	int32_t		nread;
 
 	line_begin = tga_struct->img_buf + tga_struct->img_buf_offset;
 
-	nread = ( int32)( unpack_line1( tga_struct, line_begin, dst, ( uint16)tga_struct->tga.img_spec_width) - line_begin);
+	nread = ( int32_t)( unpack_line1( tga_struct, line_begin, dst, ( uint16_t)tga_struct->tga.img_spec_width) - line_begin);
 
 	if( fill_img_buf( tga_struct, nread))
 		return ( 1);
@@ -426,7 +426,7 @@ static int16 unpack_line( tga_pic *tga_struct, uint8 *dst)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	tga_pic *tga_struct = ( tga_pic*)info->_priv_ptr;
 

@@ -265,7 +265,7 @@ static int16 find_bookmark_child_on_mouse( WINDOW *win, WINDATA *windata, Bookma
 
 			if( windata->img.image[windata->page_to_show].fd_addr != NULL)
 			{
-				gfree( windata->img.image[windata->page_to_show].fd_addr);
+				free( windata->img.image[windata->page_to_show].fd_addr);
 				windata->img.image[windata->page_to_show].fd_addr = NULL;
 			}
 
@@ -573,7 +573,7 @@ static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 
 					if( windata->img.image[windata->page_to_show].fd_addr != NULL)
 					{
-						gfree( windata->img.image[windata->page_to_show].fd_addr);
+						free( windata->img.image[windata->page_to_show].fd_addr);
 						windata->img.image[windata->page_to_show].fd_addr = NULL;
 					}
 
@@ -712,7 +712,7 @@ static void __CDECL WindPdfTool( WINDOW *win EVNT_BUFF_PARAM)
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
 			{
-				gfree( img->image[windata->page_to_show].fd_addr);
+				free( img->image[windata->page_to_show].fd_addr);
 				img->image[windata->page_to_show].fd_addr = NULL;
 			}
 
@@ -762,7 +762,7 @@ static void __CDECL WindPdfTool( WINDOW *win EVNT_BUFF_PARAM)
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
 			{
-				gfree( img->image[windata->page_to_show].fd_addr);
+				free( img->image[windata->page_to_show].fd_addr);
 				img->image[windata->page_to_show].fd_addr = NULL;
 			}
 
@@ -799,7 +799,7 @@ static void __CDECL WindPdfTool( WINDOW *win EVNT_BUFF_PARAM)
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
 			{
-				gfree( img->image[windata->page_to_show].fd_addr);
+				free( img->image[windata->page_to_show].fd_addr);
 				img->image[windata->page_to_show].fd_addr = NULL;
 			}
 
@@ -854,7 +854,7 @@ static void __CDECL WindPdfTool( WINDOW *win EVNT_BUFF_PARAM)
 
 			if( img->image[windata->page_to_show].fd_addr != NULL)
 			{
-				gfree( img->image[windata->page_to_show].fd_addr);
+				free( img->image[windata->page_to_show].fd_addr);
 				img->image[windata->page_to_show].fd_addr = NULL;
 			}
 
@@ -1309,10 +1309,10 @@ static void __CDECL WindPdfClose( WINDOW *win EVNT_BUFF_PARAM)
 	delete_mfdb( img->image, img->page);
 
 	if( windata->icon.fd_addr != NULL)
-		gfree( windata->icon.fd_addr);
+		free( windata->icon.fd_addr);
 
 //	if( windata->zoom_picture.fd_addr != NULL)
-//		gfree( windata->zoom_picture.fd_addr);
+//		free( windata->zoom_picture.fd_addr);
 
 	pdf_quit( img);
 
@@ -1326,13 +1326,13 @@ static void __CDECL WindPdfClose( WINDOW *win EVNT_BUFF_PARAM)
 				delete_bookmark_child( &windata->root[i]);
 		}
 
-		gfree( windata->root);
+		free( windata->root);
 	}
 
 	if( windata->frame_slider)
 		ObjcFree( windata->frame_slider);
 
-	gfree( windata);
+	free( windata);
 
 	DataDelete( win, WD_DATA);
 	WindDelete( win);
@@ -1362,7 +1362,7 @@ WINDOW *WindPdf( char *filename)
 	int16		w, h;
 	char		temp[10];
 
-	if ( ( windata = ( WINDATA*) gmalloc( sizeof( WINDATA))) == NULL)
+	if ( ( windata = ( WINDATA*) malloc( sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);
@@ -1392,7 +1392,7 @@ WINDOW *WindPdf( char *filename)
 
 	if ( ( winview	= WindCreate( WAT_NOINFO, app.x, app.y, app.w, app.h)) == NULL)
 	{
-		gfree( windata);
+		free( windata);
 		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;
@@ -1405,7 +1405,7 @@ WINDOW *WindPdf( char *filename)
 	if( !pdf_load( filename, img, w - 225, h - 20))
 	{
 		WindDelete( winview);
-		gfree( windata);
+		free( windata);
 		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;

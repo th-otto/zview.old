@@ -19,17 +19,17 @@ long __CDECL get_option(zv_int_t which)
 }
 #endif
 
-extern int32 plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, COLOR_MAP *palette); 
+extern int32_t plane2packed24( int32_t no_words, int32_t plane_length, int16_t no_planes, void *src, void *dst, COLOR_MAP *palette); 
 
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
 	IMG_REF 	*pic		= NULL;
 	IMGHDR		*head		= NULL;
 	XIMG_DATA	*imginfo	= NULL;
-	int16		handle, line_width;
-	int8		identify[6];
+	int16_t		handle, line_width;
+	int8_t		identify[6];
 	
-	if ( ( handle = ( int16) Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t) Fopen( name, 0)) < 0)
 		return FALSE;
 
 	pic  					= ( IMG_REF*)malloc( sizeof( IMG_REF));
@@ -66,7 +66,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	imginfo->line_len 		= ( head->w + 7) >> 3;
 	imginfo->file_length	= Fseek( 0L, handle, 2);
 	imginfo->img_buf_len	= MAX( 8192, line_width << 1);
-	imginfo->img_buf 		= ( uint8*)malloc( imginfo->img_buf_len + 256L);	
+	imginfo->img_buf 		= ( uint8_t*)malloc( imginfo->img_buf_len + 256L);	
 
 	if ( imginfo->img_buf == NULL)		
 	{
@@ -77,7 +77,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	/* Normally, here, it's the size of the line that we allocate but we prevent buffer
 	   Overflow with some picture saved with french application	*/
-	imginfo->line_buffer	= ( uint8*)malloc( imginfo->img_buf_len + 256L);
+	imginfo->line_buffer	= ( uint8_t*)malloc( imginfo->img_buf_len + 256L);
 	imginfo->img_buf_valid  = 0;
 
 	if ( imginfo->line_buffer == NULL)		
@@ -93,7 +93,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->components				= ( pic->planes == 1 ? 1 : 3);
 	info->planes   					= pic->planes;
 	info->orientation				= UP_TO_DOWN;
-	info->colors	  				= 1L << ( uint32)pic->planes;
+	info->colors	  				= 1L << ( uint32_t)pic->planes;
 	info->indexed_color 			= FALSE; /* ( (( pic->planes == 1) || ( pic->planes > 8)) ? 0 : 1); */
 	info->memory_alloc 				= TT_RAM;
 	info->page	 					= 1;
@@ -124,8 +124,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	else
 	{
 		RGB1000			palette[256];
-		register int32	pal_len;
-		register int16	i;
+		register int32_t	pal_len;
+		register int16_t	i;
 
 		pal_len = MIN ((( head->length << 1) - 6 - sizeof( IMGHDR)), ( sizeof( RGB1000) << 8));
 
@@ -133,12 +133,12 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 		for ( i = 0; i < info->colors; i++)
 		{
-			register int32 intensity = ( int32)palette[i].blue;
-			info->palette[i].blue  = ( uint8) (((( intensity  << 8) - intensity)  + 500) / 1000L);
-			intensity =  ( int32)palette[i].green;
-			info->palette[i].green = ( uint8) (((( intensity  << 8) - intensity)  + 500) / 1000L);
-			intensity =  ( int32)palette[i].red;
-			info->palette[i].red   = ( uint8) (((( intensity  << 8) - intensity)  + 500) / 1000L);
+			register int32_t intensity = ( int32_t)palette[i].blue;
+			info->palette[i].blue  = ( uint8_t) (((( intensity  << 8) - intensity)  + 500) / 1000L);
+			intensity =  ( int32_t)palette[i].green;
+			info->palette[i].green = ( uint8_t) (((( intensity  << 8) - intensity)  + 500) / 1000L);
+			intensity =  ( int32_t)palette[i].red;
+			info->palette[i].red   = ( uint8_t) (((( intensity  << 8) - intensity)  + 500) / 1000L);
 		}
 	}
 	return TRUE;
@@ -148,7 +148,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 static void fill_img_buf( IMG_REF *pic)
 {
 	XIMG_DATA	*info = &pic->info;
-	int32		nread  = info->img_buf_len;							
+	int32_t		nread  = info->img_buf_len;							
 
 	if ( nread > info->rest_length)						
 		nread = info->rest_length;	
@@ -159,7 +159,7 @@ static void fill_img_buf( IMG_REF *pic)
 }
 
 
-static void	refill_img_buf( IMG_REF *pic, int32 nread)
+static void	refill_img_buf( IMG_REF *pic, int32_t nread)
 {	
 	XIMG_DATA	*info = &pic->info;
 
@@ -186,13 +186,13 @@ static void	refill_img_buf( IMG_REF *pic, int32 nread)
 
 
 
-static uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
+static uint8_t *unpack_line2( uint8_t *img, uint8_t *des, int16_t pat_len, int16_t len)
 {
-	register int16	i, cnt;
+	register int16_t	i, cnt;
 
 	while ( len > 0)												
 	{
-		register uint8	tag = *img++;
+		register uint8_t	tag = *img++;
 		
 		if ( tag == 0)												
 		{
@@ -200,7 +200,7 @@ static uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 
 			for ( i = 0; i < cnt; i++)
 			{
-				register int16	j;
+				register int16_t	j;
 				for ( j = 0; j < pat_len; j++)
 					*des++ = img[j];
 			}
@@ -235,7 +235,7 @@ static uint8 *unpack_line2( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 }
 
 
-static uint8 *unpack_line1( uint8 *img, uint8 *des, int16 pat_len, int16 len)
+static uint8_t *unpack_line1( uint8_t *img, uint8_t *des, int16_t pat_len, int16_t len)
 {
 	if (( img[0] == 0 ) && ( img[1] == 0 ) && ( img[2] == 0xff))	
 	{
@@ -253,23 +253,23 @@ static uint8 *unpack_line1( uint8 *img, uint8 *des, int16 pat_len, int16 len)
 }
 
 
-static void unpack_line( IMG_REF *pic, uint8 *des)
+static void unpack_line( IMG_REF *pic, uint8_t *des)
 {
 	XIMG_DATA	*info = &pic->info;
-	uint8		*img_line;
-	int32		nread;
+	uint8_t		*img_line;
+	int32_t		nread;
 
 	img_line = info->img_buf + info->img_buf_offset;
 
-	nread = ( int32) ( unpack_line1( img_line, des, info->pat_len, info->line_len * pic->planes ) - img_line );
+	nread = ( int32_t) ( unpack_line1( img_line, des, info->pat_len, info->line_len * pic->planes ) - img_line );
 
 	refill_img_buf( pic, nread);							
 }
 
 
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
-	int16		even_len;
+	int16_t		even_len;
 	IMG_REF 	*pic 		= ( IMG_REF *)info->_priv_ptr;
 	XIMG_DATA	*ximg_info	= &pic->info;
 	IMGHDR		*head		= &pic->img;
@@ -295,8 +295,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 
 	if ( ximg_info->line_len & 1)								
 	{
-		uint8	*odd, *even;
-		int16	i;
+		uint8_t	*odd, *even;
+		int16_t	i;
 
 		odd = ximg_info->line_buffer + ( ximg_info->line_len * head->planes);	
 		even = odd + head->planes;							

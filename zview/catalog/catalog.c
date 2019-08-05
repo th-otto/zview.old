@@ -155,7 +155,7 @@ int WinCatalog( void)
 		applexit();
 	}
 
-	if ( ( wicones = ( WINDICON *) gmalloc( sizeof( WINDICON))) == NULL)
+	if ( ( wicones = ( WINDICON *) malloc( sizeof( WINDICON))) == NULL)
 	{
 		errshow(NULL, -ENOMEM);
 		return( 0);
@@ -163,7 +163,7 @@ int WinCatalog( void)
 
 	if ( ( win_catalog	= WindCreate( WINATTRIB, app.x, app.y, app.w, app.h)) == NULL)
 	{
-		gfree( wicones);
+		free( wicones);
 		errshow(NULL, ALERT_WINDOW);
 		return( 0);
 	}
@@ -187,7 +187,7 @@ int WinCatalog( void)
 	if ( !scan_mini_drv( win_catalog))
 	{
 		zdebug( "can't scan the drive");
-		gfree( wicones);
+		free( wicones);
 		DataDelete( win_catalog, WD_ICON);
 		WindDelete( win_catalog);
 		return( 0);
@@ -329,7 +329,7 @@ static void __CDECL WinCatalog_Close( WINDOW *win EVNT_BUFF_PARAM)
 
 	/* free allocated data structures */
 	if ( wicones->nbr_icons > 0)
-		gfree( wicones->entry);
+		free( wicones->entry);
 
 	if( wicones->root)
 	{
@@ -339,10 +339,10 @@ static void __CDECL WinCatalog_Close( WINDOW *win EVNT_BUFF_PARAM)
 				delete_mini_entry_child( &wicones->root[i]);
 		}
 
-		gfree( wicones->root);
+		free( wicones->root);
 	}
 
-	gfree( wicones);
+	free( wicones);
 
 	DataDelete( win, WD_ICON);
 

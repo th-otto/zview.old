@@ -24,6 +24,13 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o main.o \
 				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
 
+#
+# These are currently needed because we cannot link to zlib.slb.a etc,
+# because that would pull in the import functions for the shared library,
+# and would also be used by the pdf library, which is not yet prepared for that
+#
+OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o
+
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
 

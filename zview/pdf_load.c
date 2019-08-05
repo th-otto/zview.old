@@ -34,7 +34,7 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	uint32			src_line_size;
 	uint16  		x, y;
 
-	data = ( dec_data *) gmalloc( sizeof( dec_data));
+	data = ( dec_data *) malloc( sizeof( dec_data));
 
 	if ( !data)
 	{
@@ -55,11 +55,11 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	{
 		size_t size = ( img->img_w + 15) * 3;
 		
-		data->DthBuf = gmalloc( size);
+		data->DthBuf = malloc( size);
 		
 		if( data->DthBuf == NULL) 
 		{
-			gfree( data);
+			free( data);
 			errshow(NULL, -ENOMEM);
 			return ( 0);
 		}
@@ -73,9 +73,9 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	if ( !init_mfdb( &img->image[page - 1], img->img_w, img->img_h, app.nplanes))
 	{
 		if( data->DthBuf) 
-	   		gfree( data->DthBuf);
+	   		free( data->DthBuf);
 	   	
-		gfree( data);
+		free( data);
 		errshow(NULL, -ENOMEM);
 		return ( 0);
 	}	
@@ -118,9 +118,9 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	}
 			
 	if( data->DthBuf) 
-   		gfree( data->DthBuf);
+   		free( data->DthBuf);
 	   	
-	gfree( data);	
+	free( data);	
 
 	chrono_off( ( char*)img->working_time);
 
@@ -155,6 +155,7 @@ double get_scale_value( IMAGE *img, int16 page, uint16 target_width, uint16 targ
 			
 		default:	
 			scale = 1;
+			break;
 	}
 
 	return scale;
@@ -184,7 +185,7 @@ int16 pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 	if( lib_pdf_load( file, img) == FALSE)
 		return( 0);
 
-	if( ( img->image = ( MFDB *)gmalloc( sizeof( MFDB) *  img->page)) == NULL)
+	if( ( img->image = ( MFDB *)malloc( sizeof( MFDB) *  img->page)) == NULL)
 	{
 		pdf_quit( img);
 		return ( 0);

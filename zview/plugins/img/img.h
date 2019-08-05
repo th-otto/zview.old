@@ -9,14 +9,14 @@
 
 typedef struct
 {
-	int16		version;
-	int16		length;
-	int16		planes;
-	int16		pattern_length;
-	int16		pix_width;
-	int16		pix_height;
-	int16		w;
-	int16		h;
+	int16_t		version;
+	int16_t		length;
+	int16_t		planes;
+	int16_t		pattern_length;
+	int16_t		pix_width;
+	int16_t		pix_height;
+	int16_t		w;
+	int16_t		h;
 } IMGHDR;
 
 #endif
@@ -24,16 +24,16 @@ typedef struct
 
 typedef struct
 {
-	uint8 		*img_buf;	
-	int32		img_buf_len;	
-	int32		img_buf_offset;		
-	int32		img_buf_used;	
-	uint8		*line_buffer;	
-	int16		pat_len;		
-	int16		line_len;		
-	int32		rest_length;	
-	int32		file_length;
-	int16		img_buf_valid;
+	uint8_t 	*img_buf;	
+	int32_t		img_buf_len;	
+	int32_t		img_buf_offset;		
+	int32_t		img_buf_used;	
+	uint8_t		*line_buffer;	
+	int16_t		pat_len;		
+	int16_t		line_len;		
+	int32_t		rest_length;	
+	int32_t		file_length;
+	int16_t		img_buf_valid;
 } XIMG_DATA;
 
 #ifndef	__PIC_STRUCT__
@@ -41,15 +41,15 @@ typedef struct
 
 typedef struct
 {
-	uint8 red, green, blue;
+	uint8_t red, green, blue;
 }RGB;
 
 typedef struct _picture
 {
-	int16		file_handle;
-	int16		width;	
-	int16		height;	
-	int16		planes;	
+	int16_t		file_handle;
+	int16_t		width;	
+	int16_t		height;	
+	int16_t		planes;	
 	IMGHDR		img;
 	XIMG_DATA	info;
 } IMG_REF;

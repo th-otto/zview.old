@@ -37,7 +37,7 @@ void delete_mini_entry_child( Mini_Entry *entry)
 	}
 
 	/* Free the memory and put the counter to zero */
-	gfree( entry->child);
+	free( entry->child);
 	entry->child 		= NULL;
 	entry->nbr_child 	= 0;
 }

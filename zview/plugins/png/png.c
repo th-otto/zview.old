@@ -20,14 +20,14 @@ long __CDECL get_option(zv_int_t which)
 #endif
 
 #define alpha_composite( composite, fg, alpha, bg) {									\
-    uint16 register temp = (( uint16)( fg) * ( uint16)( alpha) +						\
-                   ( uint16)( bg) * ( uint16)(255 - ( uint16)( alpha)) + ( uint16)128);	\
-    ( composite) = ( uint8)(( temp + ( temp >> 8)) >> 8);								\
+    uint16_t register temp = (( uint16_t)( fg) * ( uint16_t)( alpha) +						\
+                   ( uint16_t)( bg) * ( uint16_t)(255 - ( uint16_t)( alpha)) + ( uint16_t)128);	\
+    ( composite) = ( uint8_t)(( temp + ( temp >> 8)) >> 8);								\
 }
 
 static boolean		first_pass;
-static uint8 		*line_buffer, *png_image1, *png_image_ptr;
-static int16		number_passes;
+static uint8_t 		*line_buffer, *png_image1, *png_image_ptr;
+static int16_t		number_passes;
 
 
 /*==================================================================================*
@@ -137,7 +137,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( png_get_channels( png_ptr, info_ptr) == 4)
 	{
-		line_buffer = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) + 64);
+		line_buffer = ( uint8_t*)malloc( png_get_rowbytes( png_ptr, info_ptr) + 64);
 
 		if( line_buffer == NULL)
 		{
@@ -148,7 +148,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( num_text)
 	{
-		register int16 i;
+		register int16_t i;
 
 		for ( i = 0; i < num_text; i++)
 			info->max_comments_length = MAX( info->max_comments_length,  ( strlen(png_text_ptr[i].key) + strlen(png_text_ptr[i].text) + 3));
@@ -172,7 +172,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
-	register int16 i;
+	register int16_t i;
 	png_infop   info_ptr = ( png_infop)info->_priv_ptr_more;
 	png_structp png_ptr  = ( png_structp)info->_priv_ptr;
 	png_textp	png_text_ptr;
@@ -195,12 +195,12 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	png_structp 	png_ptr  = ( png_structp)info->_priv_ptr;
 	png_infop   	info_ptr = ( png_infop)info->_priv_ptr_more;
-	uint8 			*buf;
-	int16			i;
+	uint8_t 			*buf;
+	int16_t			i;
 
 	if( png_get_channels( png_ptr, info_ptr) == 4)
 		buf = line_buffer;
@@ -215,9 +215,9 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 		/* We make the first pass here and not before to avoid memory fragmentation */
 		if( first_pass == TRUE)
 		{
-			int16  	pass;
+			int16_t  	pass;
 
-			png_image1  = ( uint8*)malloc( png_get_rowbytes( png_ptr, info_ptr) * ( info->height + 1));
+			png_image1  = ( uint8_t*)malloc( png_get_rowbytes( png_ptr, info_ptr) * ( info->height + 1));
 
 			png_image_ptr = png_image1;
 
@@ -242,8 +242,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 
 	if( png_get_channels( png_ptr, info_ptr) == 4)
 	{
-		uint8	red, green, blue, r, g, b, a;
-		uint8	*dest = buffer, *buf_ptr = buf;
+		uint8_t	red, green, blue, r, g, b, a;
+		uint8_t	*dest = buffer, *buf_ptr = buf;
 
 		for ( i = info->width;  i > 0;  --i)
 		{
@@ -266,7 +266,7 @@ boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
 			}
 			else
 			{
-				register uint32 transparent_color = info->background_color;
+				register uint32_t transparent_color = info->background_color;
 
 				alpha_composite( red,   r, a, ( transparent_color >> 16) & 0xFF);
 				alpha_composite( green, g, a, ( transparent_color >> 8) & 0xFF);

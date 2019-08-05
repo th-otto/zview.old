@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types2b.h"
+#include <stdint.h>
 #include <osbind.h>
 #include <mintbind.h>
 #include <mint/falcon.h>

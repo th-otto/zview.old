@@ -278,7 +278,7 @@ int16 smooth_resize( MFDB *source_image, MFDB *resized_image, int resize_algo)
 	if( support < algo_support)
     	support = algo_support;
  	
-	contribution = ( ContributionInfo *)gmalloc( ( size_t)( 2.0 * MAX( support, 0.5) + 3) * sizeof( *contribution));
+	contribution = ( ContributionInfo *)malloc( ( size_t)( 2.0 * MAX( support, 0.5) + 3) * sizeof( *contribution));
 
 	if( contribution == NULL)
 		return 0;
@@ -288,7 +288,7 @@ int16 smooth_resize( MFDB *source_image, MFDB *resized_image, int resize_algo)
     {
 		if( !init_mfdb( &tmp_img, resized_image->fd_w, source_image->fd_h, app.nplanes))
         {
-        	gfree(contribution);
+        	free(contribution);
         	return 0;
         }
           
@@ -299,7 +299,7 @@ int16 smooth_resize( MFDB *source_image, MFDB *resized_image, int resize_algo)
     {
 		if( !init_mfdb( &tmp_img, source_image->fd_w, resized_image->fd_h, app.nplanes))
         {
-        	gfree(contribution);
+        	free(contribution);
         	return 0;
         }
 
@@ -307,8 +307,8 @@ int16 smooth_resize( MFDB *source_image, MFDB *resized_image, int resize_algo)
       	HorizontalFilter( &tmp_img, resized_image, x_factor, contribution);
     }
 
-	gfree( contribution);
-	gfree( tmp_img.fd_addr);
+	free( contribution);
+	free( tmp_img.fd_addr);
 
     return 1;
 }

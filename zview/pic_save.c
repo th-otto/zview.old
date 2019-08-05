@@ -23,7 +23,7 @@ static int16 setup_encoder ( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	src_line_size   = ( in_info->width  + 15) * in_info->components;
 	dst_line_size   = ( out_info->width + 15) * out_info->components;
 	
-	data->RowBuf = ( uint8*)gmalloc( src_line_size);
+	data->RowBuf = ( uint8*)malloc( src_line_size);
 		
 	if( data->RowBuf == NULL)
 		return( 0);
@@ -34,10 +34,10 @@ static int16 setup_encoder ( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	   the entire picture before to save it */
 	if( in_info->orientation == DOWN_TO_UP)
 	{	
-		data->DstBuf = ( uint8*)gmalloc( dst_line_size * ( out_info->height + 1));
+		data->DstBuf = ( uint8*)malloc( dst_line_size * ( out_info->height + 1));
 	}
 	else 
-		data->DstBuf = ( uint8*)gmalloc( dst_line_size);	
+		data->DstBuf = ( uint8*)malloc( dst_line_size);	
 
 	if( data->DstBuf == NULL)
 		return( 0);
@@ -153,13 +153,13 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 {
 	if( data->DthBuf) 
-		gfree( data->DthBuf);
+		free( data->DthBuf);
 
 	if( data->DstBuf) 
-		gfree( data->DstBuf);
+		free( data->DstBuf);
 
 	if( data->RowBuf) 
-		gfree( data->RowBuf);
+		free( data->RowBuf);
 
 	if (encoder_init_done)
 	{
@@ -177,9 +177,9 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 			ldg_funcs.decoder_quit( in_info);
 	}
 	
-	gfree( data);
-	gfree( out_info);
-	gfree( in_info);
+	free( data);
+	free( out_info);
+	free( in_info);
 	
 	graf_mouse( ARROW, NULL);	
 
@@ -206,20 +206,20 @@ int16 pic_save( const char *in_file, const char *out_file)
 
     graf_mouse( BUSYBEE, NULL);	
 
-	in_info 	= ( img_info *) gmalloc( sizeof( img_info));
-	out_info 	= ( img_info *) gmalloc( sizeof( img_info));	
-	data 		= ( dec_data *) gmalloc( sizeof( dec_data));
+	in_info 	= ( img_info *) malloc( sizeof( img_info));
+	out_info 	= ( img_info *) malloc( sizeof( img_info));	
+	data 		= ( dec_data *) malloc( sizeof( dec_data));
 	
 	if ( !in_info || !out_info || !data)
 	{
 		if ( data)
-			gfree( data);
+			free( data);
 
 		if ( out_info)
-			gfree( out_info);
+			free( out_info);
 
 		if ( in_info)
-			gfree( in_info);
+			free( in_info);
 
 		graf_mouse( ARROW, NULL);			
 		errshow(NULL, -ENOMEM);		

@@ -4,7 +4,7 @@ include $(top_srcdir)/configvars
 LIB       = ../libshare/libshare.a -lldg
 STACKSIZE = 64k
 
-CPPFLAGS		+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common -I../..
 SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvtga.slb\"
 
 all:: tga.ldg zvtga.slb

@@ -117,7 +117,7 @@ static void WindViewZoom( WINDOW *win)
 
 	if( windata->zoom_picture.fd_addr != NULL)
 	{
-		gfree( windata->zoom_picture.fd_addr);
+		free( windata->zoom_picture.fd_addr);
 		windata->zoom_picture.fd_addr = NULL;
 	}
 
@@ -552,12 +552,12 @@ static void __CDECL WindViewClose( WINDOW *win EVNT_BUFF_PARAM)
 	delete_mfdb( img->image, img->page);
 
 	if( windata->icon.fd_addr != NULL)
-		gfree( windata->icon.fd_addr);
+		free( windata->icon.fd_addr);
 
 	if( windata->zoom_picture.fd_addr != NULL)
-		gfree( windata->zoom_picture.fd_addr);
+		free( windata->zoom_picture.fd_addr);
 
-	gfree( windata);
+	free( windata);
 
 	DataDelete( win, WD_DATA);
 	WindDelete( win);
@@ -963,7 +963,7 @@ WINDOW *WindView( char *filename)
 	if (dot != NULL && (strcmp(dot + 1, "pdf") == 0 || strcmp(dot + 1, "PDF") == 0))
 		return WindPdf( filename);
 
-	if ( ( windata = ( WINDATA*) gmalloc( sizeof( WINDATA))) == NULL)
+	if ( ( windata = ( WINDATA*) malloc( sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);
@@ -991,7 +991,7 @@ WINDOW *WindView( char *filename)
 
 	if ( !pic_load( filename, img))
 	{
-		gfree( windata);
+		free( windata);
 		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;
@@ -1003,7 +1003,7 @@ WINDOW *WindView( char *filename)
 	if ( ( winview	= WindCreate( WAT_ALL, app.x, app.y, app.w, app.h)) == NULL)
 	{
 		delete_mfdb( img->image, img->page);
-		gfree( windata);
+		free( windata);
 		errshow(NULL, ALERT_WINDOW);
 		graf_mouse( ARROW, NULL);
 		return NULL;

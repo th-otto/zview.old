@@ -22,10 +22,10 @@ long __CDECL get_option(zv_int_t which)
 
 typedef struct 
 {
-	uint16 compression  : 1;
-	uint16 reserved0	: 13;
-	uint16 resolution	: 2;
-	uint16 palette[16];
+	uint16_t compression  : 1;
+	uint16_t reserved0	: 13;
+	uint16_t resolution	: 2;
+	uint16_t palette[16];
 } DEGASHDR;
 
 
@@ -44,11 +44,11 @@ typedef struct
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	int16 		handle;
-	int32		position, file_size;
+	int16_t		handle;
+	int32_t		position, file_size;
 	DEGASHDR	*degas;
 
-	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
 
 	file_size = Fseek( 0L, handle, 2);
@@ -128,7 +128,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( degas->compression)
 	{	
-		uint8 *compress_buffer	= malloc( 320L);
+		uint8_t *compress_buffer	= malloc( 320L);
 		
 		if( compress_buffer == NULL)
 		{
@@ -149,7 +149,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( info->indexed_color)
 	{
-		register int16 i;
+		register int16_t i;
 
 		for ( i = 0; i < info->colors; i++)
 		{
@@ -163,10 +163,10 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 }
 
 
-static int16 read_line( int16 bpl, uint8 *src, uint8 *compress_buffer)
+static int16_t read_line( int16_t bpl, uint8_t *src, uint8_t *compress_buffer)
 {
-    int16	x, n, c;
-	int16	count = 0;
+    int16_t	x, n, c;
+	int16_t	count = 0;
 
     /* decompress the line */
     for( x = 0; x < bpl;)
@@ -216,13 +216,13 @@ static int16 read_line( int16 bpl, uint8 *src, uint8 *compress_buffer)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	DEGASHDR	*degas	= ( DEGASHDR*)info->_priv_ptr;
-	uint8 		*l, *s = ( uint8*)degas + info->_priv_var_more;
-	uint8		*compress_buffer = ( uint8*)info->_priv_ptr_more;
-	uint16		x, c, p0, p1, p2, p3;
-	int16		count;
+	uint8_t 		*l, *s = ( uint8_t*)degas + info->_priv_var_more;
+	uint8_t		*compress_buffer = ( uint8_t*)info->_priv_ptr_more;
+	uint16_t		x, c, p0, p1, p2, p3;
+	int16_t		count;
 
 	if( degas->compression)
 	{	
@@ -374,7 +374,7 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 void __CDECL reader_quit( IMGINFO info)
 {
 	DEGASHDR	*degas			 = ( DEGASHDR*)info->_priv_ptr;
-	uint8		*compress_buffer = ( uint8*)info->_priv_ptr_more;
+	uint8_t		*compress_buffer = ( uint8_t*)info->_priv_ptr_more;
 
 	free( degas);
 

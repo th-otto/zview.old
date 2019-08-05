@@ -61,7 +61,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		img->page = info->page;
 
 
-	if( ( img->image = ( MFDB *)gmalloc( sizeof( MFDB) *  img->page)) == NULL)
+	if( ( img->image = ( MFDB *)malloc( sizeof( MFDB) *  img->page)) == NULL)
 		return( 0);
 
 
@@ -92,7 +92,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 	 */
 	src_line_size = ( info->width + 64) * info->components;
 
-	data->RowBuf = ( uint8*)gmalloc( src_line_size);	
+	data->RowBuf = ( uint8*)malloc( src_line_size);	
 
 	if( !data->RowBuf)
 		return ( 0);
@@ -103,7 +103,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 	{
 		size_t size = ( display_w + 15) * 3;
 		
-		if( ( data->DthBuf = gmalloc( size)) == NULL) 
+		if( ( data->DthBuf = malloc( size)) == NULL) 
 			return ( 0);
 			
 		memset( data->DthBuf, 0, size);
@@ -224,13 +224,13 @@ void quit_img( IMGINFO info, DECDATA data)
 	}
 	
 	if( data->DthBuf != NULL) 
-	   	gfree( data->DthBuf);
+	   	free( data->DthBuf);
 
 	if( data->RowBuf != NULL) 
-	   gfree( data->RowBuf);
+	   free( data->RowBuf);
 
-	gfree( data);
-	gfree( info); 
+	free( data);
+	free( info); 
 
 	decoder_init_done = FALSE;
 }
@@ -357,7 +357,7 @@ boolean pic_load( const char *file, IMAGE *img)
 	IMGINFO info;
 	DECDATA data;
 
-	info = ( img_info *) gmalloc( sizeof( img_info));
+	info = ( img_info *) malloc( sizeof( img_info));
 	
 	if ( !info)
 	{
@@ -365,12 +365,12 @@ boolean pic_load( const char *file, IMAGE *img)
 		return FALSE;
 	}
 
-	data = ( dec_data *) gmalloc( sizeof( dec_data));
+	data = ( dec_data *) malloc( sizeof( dec_data));
 
 	if ( !data)
 	{
 		errshow(NULL, -ENOMEM);
-		gfree( info);
+		free( info);
 		return FALSE;
 	}
 
@@ -385,8 +385,8 @@ boolean pic_load( const char *file, IMAGE *img)
 	
 	if(( decoder_init_done = get_pic_info( file, info)) == FALSE)
 	{
-		gfree( data);
-		gfree( info);
+		free( data);
+		free( info);
 		win_progress_end();
 		return FALSE;
 	}
@@ -422,7 +422,7 @@ boolean pic_load( const char *file, IMAGE *img)
 
 		smooth_resize( &img->image[0], &resized_image, smooth_thumbnail);
 
-		gfree( img->image[0].fd_addr);
+		free( img->image[0].fd_addr);
 
 		img->image[0].fd_addr 		= resized_image.fd_addr;
 		img->image[0].fd_w 			= resized_image.fd_w;

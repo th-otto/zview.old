@@ -33,12 +33,14 @@
 #endif
 #include <ldg.h>
 
+#ifndef _TIFF_
 typedef signed char int8;
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef short int16;
 typedef long int32;
 typedef unsigned long uint32;
+#endif
 typedef int boolean;
 
 #undef _AESapid
@@ -73,7 +75,6 @@ typedef int boolean;
 
 #include "zaes.h"
 #include "zedit/libtedit.h"
-#include "gmem.h"
 #include "zview.h"
 
 /* Window's Attrib. */

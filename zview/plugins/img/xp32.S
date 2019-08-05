@@ -4,8 +4,8 @@
 
 	.globl	C_SYMBOL_NAME(plane2packed24)
 
-/* int32 plane2packed24( int32 no_words, int32 plane_length, int16 no_planes, void *src, void *dst, CTAB_REF src_ctab ); */
-/*                       d0              d1                  d2               a0         a1         4(sp) */
+/* int32_t plane2packed24( int32_t no_words, int32_t plane_length, int16_t no_planes, void *src, void *dst, CTAB_REF src_ctab ); */
+/*                         d0                d1                    d2                 a0         a1         4(sp) */
 
 /* 11x4 + 4 + 5x4 */
 

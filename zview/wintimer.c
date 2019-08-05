@@ -22,7 +22,7 @@ void TimerInit( int32 slice_timer)
 }
 int16 TimerAttach( WINDOW *win, void *func) 
 {
-	XTIMER *new = ( XTIMER *)gmalloc( sizeof(XTIMER));
+	XTIMER *new = ( XTIMER *)malloc( sizeof(XTIMER));
 	if( !new) 
 		return FALSE;
 	new -> win = win;
@@ -64,7 +64,7 @@ void TimerDelete( WINDOW *win)
 			root = scan->next;
 		else		
 			parent->next = scan->next;
-		gfree( scan); 
+		free( scan); 
 		break;		
 	}	
 }

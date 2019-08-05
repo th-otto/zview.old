@@ -22,7 +22,7 @@ long __CDECL get_option(zv_int_t which)
 
 
 /*==================================================================================*
- * uint32 ToL:																		*
+ * uint32_t ToL:																	*
  *		Transform a unsigned long from little to big endian.						*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -31,14 +31,14 @@ long __CDECL get_option(zv_int_t which)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static uint32 ToL( uint8 * puffer)
+static uint32_t ToL( uint8_t * puffer)
 {
   return ( puffer[0] | ( puffer[1] << 8) | ( puffer[2] << 16) | ( puffer[3] << 24));
 }
 
 
 /*==================================================================================*
- * uint16 ToS:																		*
+ * uint16_t ToS:																	*
  *		Transform a unsigned word from little to big endian.						*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -47,7 +47,7 @@ static uint32 ToL( uint8 * puffer)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static uint16 ToS( uint8 *puffer)
+static uint16_t ToS( uint8_t *puffer)
 {
   return ( puffer[0] | ( puffer[1] << 8));
 }
@@ -67,11 +67,11 @@ static uint16 ToS( uint8 *puffer)
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	uint8		buff[4], header_buffer[50], *line_buffer;
-	int16		handle, compressed;
-	uint32		bisize, line_size, skip;
+	uint8_t		buff[4], header_buffer[50], *line_buffer;
+	int16_t		handle, compressed;
+	uint32_t		bisize, line_size, skip;
 
-	if ( ( handle = ( int16) Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t) Fopen( name, 0)) < 0)
 		return FALSE;
 
 	if ( Fread( handle, 2, buff) != 2)
@@ -104,10 +104,10 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	{
 		/* Window */
 		Fread( handle, 36L, header_buffer);
-		info->width  	= (uint16)ToL (&header_buffer[0x00]);
-		info->height 	= (uint16)ToL (&header_buffer[0x04]);
+		info->width  	= (uint16_t)ToL (&header_buffer[0x00]);
+		info->height 	= (uint16_t)ToL (&header_buffer[0x04]);
 		info->planes 	= ToS (&header_buffer[0x0A]);	
-		compressed		= (int16)ToL (&header_buffer[0x0C]);
+		compressed		= (int16_t)ToL (&header_buffer[0x0C]);
 	}
 
 	if( compressed)
@@ -155,17 +155,17 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->orientation			= DOWN_TO_UP;
 	info->num_comments			= 0;
 	info->max_comments_length 	= 0;
-	info->colors  				= 1uL << (uint32)info->planes;
+	info->colors  				= 1uL << (uint32_t)info->planes;
 	info->_priv_ptr 			= ( void*)line_buffer;
-	info->_priv_var 			= ( int32)handle;
-	info->_priv_var_more		= ( int32)line_size;
+	info->_priv_var 			= ( int32_t)handle;
+	info->_priv_var_more		= ( int32_t)line_size;
 
 	strcpy( info->info, 		"Window BitMaP");
 	strcpy( info->compression, 	"None");	
 
 	if( info->planes <= 8)
 	{
-		register int16 i;
+		register int16_t i;
 
 		for ( i = 0; i < info->colors; i++)
 		{
@@ -191,11 +191,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
-	int16 width, j, k, i, handle = ( int16)info->_priv_var;
-	uint8 buff[2], *line_buffer = ( uint8*)info->_priv_ptr;
-	uint32 line_size = info->_priv_var_more;
+	int16_t width, j, k, i, handle = ( int16_t)info->_priv_var;
+	uint8_t buff[2], *line_buffer = ( uint8_t*)info->_priv_ptr;
+	uint32_t line_size = info->_priv_var_more;
 
 	if( Fread( handle, line_size, line_buffer) != line_size)
 		return FALSE;
@@ -318,5 +318,5 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 void __CDECL reader_quit( IMGINFO info)
 {
 	free( info->_priv_ptr);
-	Fclose( ( int16)info->_priv_var);
+	Fclose( ( int16_t)info->_priv_var);
 }

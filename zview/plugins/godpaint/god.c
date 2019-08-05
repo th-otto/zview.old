@@ -4,9 +4,9 @@
 
 typedef struct 
 {
-	int16 header;
-	int16 width;
-	int16 height;
+	int16_t header;
+	int16_t width;
+	int16_t height;
 } GODHDR;
 
 
@@ -42,11 +42,11 @@ long __CDECL get_option(zv_int_t which)
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	int16 		handle;
-	int32		file_size;
+	int16_t 		handle;
+	int32_t		file_size;
 	GODHDR		*god;
 
-	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
 
 	file_size = Fseek( 0L, handle, 2);
@@ -111,15 +111,15 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	GODHDR		*god	= ( GODHDR*)info->_priv_ptr;
-	uint16 		*source = ( uint16*)god + info->_priv_var_more;
-	int16		i, ii;
+	uint16_t 		*source = ( uint16_t*)god + info->_priv_var_more;
+	int16_t		i, ii;
 
 	for( i = 0, ii = 0; i < info->width; i++)
 	{
-		register uint16 src16 = source[i];
+		register uint16_t src16 = source[i];
 
 		buffer[ii++] = (( src16 >> 11) & 0x001F) << 3; 
         buffer[ii++] = (( src16 >> 5)  & 0x003F) << 2;
@@ -181,14 +181,14 @@ void __CDECL reader_quit( IMGINFO info)
  *==================================================================================*/
 boolean __CDECL encoder_init( const char *name, IMGINFO info)
 {	
-	uint16 		*line_buffer = NULL;		   
-	int8		header_id[2] = "G4";
-	int32 		file;
+	uint16_t 		*line_buffer = NULL;		   
+	int8_t		header_id[2] = "G4";
+	int32_t 		file;
 
 	if ( ( file = Fcreate( name, 0)) < 0)
 		return FALSE;
 
-	line_buffer	= ( uint16*) malloc( ( info->width + 1) << 1);
+	line_buffer	= ( uint16_t*) malloc( ( info->width + 1) << 1);
 
 	if ( line_buffer == NULL) 
 	{
@@ -235,20 +235,20 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL encoder_write( IMGINFO info, uint8 *buffer)
+boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 {
-	uint16 *source = ( uint16*)info->_priv_ptr;
-	int32  byte_to_write = info->width << 1;
-	uint16  ii, i;
+	uint16_t *source = ( uint16_t*)info->_priv_ptr;
+	int32_t  byte_to_write = info->width << 1;
+	uint16_t  ii, i;
 
 	for( ii = i = 0; i < info->width; i++, ii += 3)
 	{
-		register uint8 *rgb = &buffer[ii];
+		register uint8_t *rgb = &buffer[ii];
 
-		source[i] = (((uint16)rgb[0] & 0xF8) << 8) | (((uint16)rgb[1] & 0xFC) << 3) | ( rgb[2] >> 3);
+		source[i] = (((uint16_t)rgb[0] & 0xF8) << 8) | (((uint16_t)rgb[1] & 0xFC) << 3) | ( rgb[2] >> 3);
 	}
 
-	if( Fwrite( info->_priv_var, byte_to_write, ( uint8*)source) != byte_to_write)
+	if( Fwrite( info->_priv_var, byte_to_write, ( uint8_t*)source) != byte_to_write)
 		return FALSE;
 
 	return TRUE;
@@ -269,7 +269,7 @@ boolean __CDECL encoder_write( IMGINFO info, uint8 *buffer)
  *==================================================================================*/
 void __CDECL encoder_quit( IMGINFO info)
 {
-	uint8 *buffer = ( uint8*)info->_priv_ptr;
+	uint8_t *buffer = ( uint8_t*)info->_priv_ptr;
 
 	free( buffer);
 	Fclose( info->_priv_var);

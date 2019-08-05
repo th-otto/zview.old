@@ -15,11 +15,18 @@
 #include <unistd.h>
 #include <setjmp.h>
 #include <time.h>
+#include <sys/stat.h>
 #include "imginfo.h"
 
 #ifndef _CDECL
 #define _CDECL
 #endif
+
+#define LIB_PNG   0
+#define LIB_Z     1
+#define LIB_JPEG  2
+#define LIB_TIFF  3
+#define LIB_LZMA  4
 
 struct _zview_plugin_funcs {
 	/*
@@ -39,6 +46,10 @@ struct _zview_plugin_funcs {
 	 * used to compile the library.
 	 */
 	long plugin_version;
+
+	long _CDECL (*p_slb_open)(zv_int_t lib);
+	void _CDECL (*p_slb_close)(zv_int_t lib);
+	SLB *_CDECL (*p_slb_get)(zv_int_t lib);
 	
 	void *_CDECL (*p_memset)(void *, zv_int_t, size_t);
 	void *_CDECL (*p_memcpy)(void *, const void *, size_t);
@@ -96,13 +107,11 @@ struct _zview_plugin_funcs {
 	struct tm *_CDECL (*p_localtime)(const time_t *timep);
 	struct tm *_CDECL (*p_gmtime)(const time_t *);
 
+	zv_int_t _CDECL (*p_fstat)(zv_int_t fd, struct stat *s);
+	
 	zv_int_t _CDECL (*p_sigsetjmp)(jmp_buf, zv_int_t);
 	__attribute__((__noreturn__)) void _CDECL (*p_longjmp)(jmp_buf, zv_int_t);
 	
-	double _CDECL (*p_pow)(double, double);
-	double _CDECL (*p_floor)(double);
-	double _CDECL (*p_frexp)(double, zv_int_t *);
-	double _CDECL (*p_modf)(double, double *);
 	double _CDECL (*p_atof)(const char *);
 
 	/* room for later extensions */
@@ -173,13 +182,11 @@ struct _zview_plugin_funcs {
 #undef localtime
 #undef gmtime
 
+#undef fstat
+
 #undef sigsetjmp
 #undef longjmp
 
-#undef pow
-#undef floor
-#undef frexp
-#undef modf
 #undef atof
 
 struct _zview_plugin_funcs *get_slb_funcs(void);
@@ -248,13 +255,11 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define localtime get_slb_funcs()->p_localtime
 #define gmtime get_slb_funcs()->p_gmtime
 
+#define fstat(fd, s) get_slb_funcs()->p_fstat(fd, s)
+
 #define sigsetjmp get_slb_funcs()->p_sigsetjmp
 #define longjmp get_slb_funcs()->p_longjmp
 
-#define pow(x, y) get_slb_funcs()->p_pow(x, y)
-#define floor(x) get_slb_funcs()->p_floor(x)
-#define frexp(x, y) get_slb_funcs()->p_frexp(x, y)
-#define modf(x, y) get_slb_funcs()->p_modf(x, y)
 #define atof(x) get_slb_funcs()->p_atof(x)
 
 #endif /* PLUGIN_SLB */

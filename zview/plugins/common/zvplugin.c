@@ -3,6 +3,11 @@
 #include <mint/mintbind.h>
 #include <errno.h>
 #include "symbols.h"
+#include <slb/png.h>
+#include <slb/zlib.h>
+#include <slb/jpeg.h>
+#include <slb/tiff.h>
+#include <slb/lzma.h>
 #include "zvplugin.h"
 #include "plugin.h"
 #include "plugin_version.h"
@@ -50,7 +55,7 @@ boolean __CDECL plugin_reader_init(SLB *slb, const char *name, IMGINFO info)
 }
 
 
-boolean __CDECL plugin_reader_read(SLB *slb, IMGINFO info, uint8 *buffer)
+boolean __CDECL plugin_reader_read(SLB *slb, IMGINFO info, uint8_t *buffer)
 {
 	return slb->exec(slb->handle, 2, SLB_NARGS(2), info, buffer) > 0;
 }
@@ -74,7 +79,7 @@ boolean __CDECL plugin_encoder_init(SLB *slb, const char *name, IMGINFO info)
 }
 
 
-boolean __CDECL plugin_encoder_write(SLB *slb, IMGINFO info, uint8 *buffer)
+boolean __CDECL plugin_encoder_write(SLB *slb, IMGINFO info, uint8_t *buffer)
 {
 	return slb->exec(slb->handle, 6, SLB_NARGS(2), info, buffer) > 0;
 }
@@ -98,6 +103,189 @@ long __CDECL plugin_set_option(SLB *slb, zv_int_t which, zv_int_t value)
 }
 
 
+static long _CDECL slb_not_loaded(SLB_HANDLE slb, long fn, short nwords, ...)
+{
+	(void)slb;
+	(void)fn;
+	(void)nwords;
+	(void) Cconws("a shared lib was not loaded\r\n");
+	Pterm(1);
+	return -32;
+}
+
+
+static long _CDECL slb_unloaded(SLB_HANDLE slb, long fn, short nwords, ...)
+{
+	(void)slb;
+	(void)fn;
+	(void)nwords;
+	(void) Cconws("a shared lib was already unloaded\r\n");
+	Pterm(1);
+	return -32;
+}
+
+
+static SLB zlib_slb = { 0, slb_not_loaded };
+
+SLB *slb_zlib_get(void)
+{
+	return &zlib_slb;
+}
+
+
+void slb_zlib_close(void)
+{
+	SLB *zlib = slb_zlib_get();
+
+	if (!zlib->handle)
+		return;
+	slb_unload(zlib->handle);
+	zlib->handle = 0;
+	zlib->exec = slb_unloaded;
+}
+
+
+static SLB pnglib_slb = { 0, slb_not_loaded };
+
+SLB *slb_pnglib_get(void)
+{
+	return &pnglib_slb;
+}
+
+
+void slb_pnglib_close(void)
+{
+	SLB *pnglib = slb_pnglib_get();
+
+	if (!pnglib->handle)
+		return;
+	slb_unload(pnglib->handle);
+	pnglib->handle = 0;
+	pnglib->exec = slb_unloaded;
+}
+
+
+static SLB jpeglib_slb = { 0, slb_not_loaded };
+
+SLB *slb_jpeglib_get(void)
+{
+	return &jpeglib_slb;
+}
+
+
+void slb_jpeglib_close(void)
+{
+	SLB *jpeglib = slb_jpeglib_get();
+
+	if (!jpeglib->handle)
+		return;
+	slb_unload(jpeglib->handle);
+	jpeglib->handle = 0;
+	jpeglib->exec = slb_unloaded;
+}
+
+
+static SLB tiff_slb = { 0, slb_not_loaded };
+
+SLB *slb_tiff_get(void)
+{
+	return &tiff_slb;
+}
+
+
+void slb_tiff_close(void)
+{
+	SLB *tiff = slb_tiff_get();
+
+	if (!tiff->handle)
+		return;
+	slb_unload(tiff->handle);
+	tiff->handle = 0;
+	tiff->exec = slb_unloaded;
+}
+
+
+static SLB lzma_slb = { 0, slb_not_loaded };
+
+SLB *slb_lzma_get(void)
+{
+	return &lzma_slb;
+}
+
+
+void slb_lzma_close(void)
+{
+	SLB *lzma = slb_lzma_get();
+
+	if (!lzma->handle)
+		return;
+	slb_unload(lzma->handle);
+	lzma->handle = 0;
+	lzma->exec = slb_unloaded;
+}
+
+
+static long _CDECL slb_open(zv_int_t lib)
+{
+	switch (lib)
+	{
+	case LIB_PNG:
+		return slb_pnglib_open(NULL);
+	case LIB_Z:
+		return slb_zlib_open(NULL);
+	case LIB_JPEG:
+		return slb_jpeglib_open(NULL);
+	case LIB_TIFF:
+		return slb_tiff_open(NULL);
+	case LIB_LZMA:
+		return slb_lzma_open(NULL);
+	}
+	return -ENOENT;
+}
+
+
+static void _CDECL slb_close(zv_int_t lib)
+{
+	switch (lib)
+	{
+	case LIB_PNG:
+		slb_pnglib_close();
+		break;
+	case LIB_Z:
+		slb_zlib_close();
+		break;
+	case LIB_JPEG:
+		slb_jpeglib_close();
+		break;
+	case LIB_TIFF:
+		slb_tiff_close();
+		break;
+	case LIB_LZMA:
+		slb_lzma_close();
+		break;
+	}
+}
+
+
+static SLB *_CDECL slb_get(zv_int_t lib)
+{
+	switch (lib)
+	{
+	case LIB_PNG:
+		return slb_pnglib_get();
+	case LIB_Z:
+		return slb_zlib_get();
+	case LIB_JPEG:
+		return slb_jpeglib_get();
+	case LIB_TIFF:
+		return slb_tiff_get();
+	case LIB_LZMA:
+		return slb_lzma_get();
+	}
+	return NULL;
+}
+
+
 long plugin_open(const char *name, const char *path, SLB *slb)
 {
 	long ret;
@@ -114,6 +302,9 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	if (zview_plugin_funcs.int_size != sizeof(long))
 		return -EINVAL;
 	zview_plugin_funcs.plugin_version = PLUGIN_VERSION;
+	zview_plugin_funcs.p_slb_open = slb_open;
+	zview_plugin_funcs.p_slb_close = slb_close;
+	zview_plugin_funcs.p_slb_get = slb_get;
 
 #define S(x) zview_plugin_funcs.p_##x = x
 
@@ -173,13 +364,11 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(localtime);
 	S(gmtime);
 
+	S(fstat);
+
 	S(sigsetjmp);
 	S(longjmp);
 
-	S(pow);
-	S(floor);
-	S(frexp);
-	S(modf);
 	S(atof);
 #undef S
 

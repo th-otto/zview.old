@@ -19,7 +19,7 @@
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL set_jpg_option( int16 set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive)
+static void __CDECL set_jpg_option( int16_t set_quality, J_COLOR_SPACE set_color_space, boolean set_progressive)
 {
 	quality = set_quality;
 	color_space = set_color_space;

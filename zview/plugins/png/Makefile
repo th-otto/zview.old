@@ -4,7 +4,7 @@ include $(top_srcdir)/configvars
 LIB       = ../libshare/libshare.a -lldg -lpng -lz -lm
 STACKSIZE = 64k
 
-CPPFLAGS		+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common -I../..
 SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvpng.slb\"
 
 LIBPNG_OBJS = libpng/png.o libpng/pngerror.o \

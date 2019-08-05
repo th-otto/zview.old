@@ -20,10 +20,10 @@ void delete_txt_data( IMAGE *img)
 	for ( i = 0; i < img->comments->lines; i++) 
 	{
 		if( img->comments->txt[i])
-			gfree( img->comments->txt[i]);
+			free( img->comments->txt[i]);
 	}
 
-	gfree( img->comments);
+	free( img->comments);
 	img->comments = NULL;
 }
 
@@ -45,7 +45,7 @@ int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 	int16 	i;
 	size_t	line_size = max_lines_length * sizeof( int8); 
 
-	img->comments = gmalloc( sizeof( txt_data));
+	img->comments = malloc( sizeof( txt_data));
 
 	if( !img->comments)
 		return( 0);
@@ -59,7 +59,7 @@ int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 
 	for ( i = 0; i < img->comments->lines; i++) 
 	{
-		img->comments->txt[i] = gmalloc( line_size);
+		img->comments->txt[i] = malloc( line_size);
 
 		if( !img->comments->txt[i])
 		{

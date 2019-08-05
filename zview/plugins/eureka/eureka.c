@@ -21,9 +21,9 @@ long __CDECL get_option(zv_int_t which)
 #endif
 
 
-static void swap( uint8 *a, uint8 *b)
+static void swap( uint8_t *a, uint8_t *b)
 {
-	uint8 temp;
+	uint8_t temp;
 
 	temp = *a;
 
@@ -46,12 +46,12 @@ static void swap( uint8 *a, uint8 *b)
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	int16 		handle;
-	int32		file_size, palette[768];
-	uint8     	header[4], *img_buffer;
-	uint16 *p;
+	int16_t 		handle;
+	int32_t		file_size, palette[768];
+	uint8_t     	header[4], *img_buffer;
+	uint16_t *p;
 	
-	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
 
 	file_size = Fseek( 0L, handle, 2) - 4L;
@@ -65,7 +65,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}
 
 	info->planes 				= 8;
-	p = (uint16 *)&header[0];
+	p = (uint16_t *)&header[0];
 	info->width 				= p[0];
 	info->height 				= p[1];
 	info->colors  				= 256;
@@ -78,7 +78,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->orientation			= UP_TO_DOWN;
 	info->num_comments			= 0;
 	info->max_comments_length 	= 0;
-	info->_priv_var				= ( uint32)handle;
+	info->_priv_var				= ( uint32_t)handle;
 
 	if( ( info->width * info->height) == file_size)
 	{
@@ -103,32 +103,32 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( info->indexed_color	== TRUE)
 	{
-		register int16 i;
+		register int16_t i;
 
 		Fread( handle, 3072, palette);
 
 		for ( i = 0; i < info->colors; i++)
 		{
-			info->palette[i].red   = ( uint8)(( palette[i] >> 24) & 0xffL);
-			info->palette[i].green = ( uint8)(( palette[i] >> 16) & 0xffL);
-			info->palette[i].blue  = ( uint8)(( palette[i] >> 8 ) & 0xffL);
+			info->palette[i].red   = ( uint8_t)(( palette[i] >> 24) & 0xffL);
+			info->palette[i].green = ( uint8_t)(( palette[i] >> 16) & 0xffL);
+			info->palette[i].blue  = ( uint8_t)(( palette[i] >> 8 ) & 0xffL);
 		}
 	}
 	else
 	{
-		register int16 i;
+		register int16_t i;
 
 		info->indexed_color	= TRUE;
 
 		for ( i = 0; i < info->colors; i++)
 		{
-			info->palette[i].red   = ( uint8)((( uint32)red[i] * 255L) / 1000L);
-			info->palette[i].green = ( uint8)((( uint32)red[i] * 255L) / 1000L);
-			info->palette[i].blue  = ( uint8)((( uint32)red[i] * 255L) / 1000L);
+			info->palette[i].red   = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
+			info->palette[i].green = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
+			info->palette[i].blue  = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
 		}
 	}
 
-	img_buffer 				= ( uint8*)malloc( file_size);
+	img_buffer 				= ( uint8_t*)malloc( file_size);
 	info->_priv_ptr			= ( void*)img_buffer;
 	info->_priv_ptr_more	= ( void*)img_buffer;
 
@@ -146,11 +146,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}		
 	else
 	{
-		register uint16 i, j, w = info->width >> 1;
+		register uint16_t i, j, w = info->width >> 1;
 
 		for( i = 0; i < info->height; i++)
 			for( j = 0; j < w; j++)
-				swap( &img_buffer[(uint32)info->width * (uint32)i + (uint32)j], &img_buffer[(uint32)info->width * (uint32)i + (uint32)info->width - 1L - (uint32)j]);
+				swap( &img_buffer[(uint32_t)info->width * (uint32_t)i + (uint32_t)j], &img_buffer[(uint32_t)info->width * (uint32_t)i + (uint32_t)info->width - 1L - (uint32_t)j]);
 	}
 
 	return TRUE;
@@ -168,10 +168,10 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
-	memcpy( buffer, ( uint8*)info->_priv_ptr_more, info->width);
-	info->_priv_ptr_more = ( uint8*)info->_priv_ptr_more + info->width;
+	memcpy( buffer, ( uint8_t*)info->_priv_ptr_more, info->width);
+	info->_priv_ptr_more = ( uint8_t*)info->_priv_ptr_more + info->width;
 
 	return TRUE;
 }
@@ -207,6 +207,6 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  *==================================================================================*/
 void __CDECL reader_quit( IMGINFO info)
 {
-	free( ( uint8*)info->_priv_ptr);
-	Fclose( ( int16)info->_priv_var);
+	free( ( uint8_t*)info->_priv_ptr);
+	Fclose( ( int16_t)info->_priv_var);
 }

@@ -2,15 +2,15 @@
 #include "imginfo.h"
 #include "jpgdh.h"
 
-int16 dsp_ram = 0;
+int16_t dsp_ram = 0;
 
-int16 reader_dsp_init( const char *name, IMGINFO info);
+int16_t reader_dsp_init( const char *name, IMGINFO info);
 
 JPGDDRV_PTR jpgdrv = NULL;
 
 static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
-	register int32 retv __asm__("d0");
+	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDOpenDriver;
 	__asm__ volatile(
 	"	movl	%1,a0\n"
@@ -25,7 +25,7 @@ static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 
 static JPGD_ENUM JPGDCloseDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
-	register int32 retv __asm__("d0");
+	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDCloseDriver;
 	__asm__ volatile(
 	"	movl	%1,a0\n"
@@ -40,7 +40,7 @@ static JPGD_ENUM JPGDCloseDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 
 static JPGD_ENUM JPGDGetImageInfo(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
-	register int32 retv __asm__("d0");
+	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageInfo;
 	__asm__ volatile(
 	"	movl	%1,a0\n"
@@ -55,7 +55,7 @@ static JPGD_ENUM JPGDGetImageInfo(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 
 static JPGD_ENUM JPGDGetImageSize(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
-	register int32 retv __asm__("d0");
+	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageSize;
 	__asm__ volatile(
 	"	movl	%1,a0\n"
@@ -70,7 +70,7 @@ static JPGD_ENUM JPGDGetImageSize(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 
 static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
-	register int32 retv __asm__("d0");
+	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDDecodeImage;
 	__asm__ volatile(
 	"	movl	%1,a0\n"
@@ -95,15 +95,15 @@ static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-int16 reader_dsp_init( const char *name, IMGINFO info)
+int16_t reader_dsp_init( const char *name, IMGINFO info)
 {
 	char		pad[] = { -1, -1, -1, -1, -1, -1, -1, -1, 0, 0 };
 	void		*src, *dst;
-	int16		jpeg_file;
-	int32		jpgdsize, jpeg_file_size;
+	int16_t		jpeg_file;
+	int32_t		jpgdsize, jpeg_file_size;
 	JPGD_PTR 	jpgd;
 
-	if ( ( jpeg_file = ( int16)Fopen( name, 0)) < 0)
+	if ( ( jpeg_file = ( int16_t)Fopen( name, 0)) < 0)
 		return GOLBAL_ERROR;
 
 	jpeg_file_size = Fseek( 0L, jpeg_file, 2);
@@ -125,7 +125,7 @@ int16 reader_dsp_init( const char *name, IMGINFO info)
 
 	Fclose( jpeg_file);
 
-	memcpy( ( uint8 *)src + jpeg_file_size, pad, sizeof( pad));
+	memcpy( ( uint8_t *)src + jpeg_file_size, pad, sizeof( pad));
 
 	jpgdsize = jpgdrv->JPGDGetStructSize();
 

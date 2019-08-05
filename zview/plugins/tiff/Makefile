@@ -1,17 +1,23 @@
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
-LIB			= ../libshare/libshare.a -ltiff -ljpeg -lldg -lz -llzma -lm
+LIB       = ../libshare/libshare.a -lldg -ltiff -ljpeg -llzma -lz
+STACKSIZE = 64k
 
-CFLAGS			+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common -I../..
+SFLAGS += -DPLUGIN_SLB -DTIFF_SLB -DJPEG_SLB -DLZMA_SLB -DZLIB_SLB -DSHAREDLIB=\"zvtiff.slb\"
 
-OBJ			= tiffldg.o
+all:: tiff.ldg zvtiff.slb
 
-PROGRAM 		= tiff.ldg
+include $(top_srcdir)/rules
 
-all:: $(PROGRAM)
+tiff.ldg: tiffldg.o tiff.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
-$(PROGRAM): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,64k $(LIB)
+zvtiff.slb: header.lo tiffslb.lo tiff.lo
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ltiff.slb -ljpeg.slb -llzma.slb -lz.slb $(LDSHAREDLIBC)
+
+header.lo tiffslb.lo tiff.lo: ../common/plugin.h ../common/zview.h
 
 clean:
-	rm -f *.o *.a *.ldg
+	rm -f *.o *.lo *.a *.ldg *.slb

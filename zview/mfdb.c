@@ -29,7 +29,7 @@ int16 init_mfdb( MFDB *bm, int16 width, int16 height, int16 planes)
 	bm->fd_r3	  	= 0;
 
 	length			= (( (( uint32)bm->fd_wdwidth << 1 ) * ( uint32)bm->fd_nplanes) * ( uint32)bm->fd_h) + 256L;
-	bm->fd_addr 	= gmalloc( length);
+	bm->fd_addr 	= malloc( length);
 
 	if( bm->fd_addr)
 		return( 1);
@@ -63,8 +63,8 @@ void delete_mfdb( MFDB *bm, int16 nbr)
 		if ( bm[i].fd_addr == NULL)
 			continue;
 		
-		gfree( bm[i].fd_addr); 
+		free( bm[i].fd_addr); 
 	}
 
-	gfree( bm);
+	free( bm);
 }

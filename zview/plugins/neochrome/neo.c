@@ -23,18 +23,18 @@ long __CDECL get_option(zv_int_t which)
 
 typedef struct 
 {
-	int16 	flags;				/* Always 0										*/
-	int16 	resolution;			/* 0 = low, 1 = medium, 3 = high 				*/
-	uint16 	palette[16];		/* Picture palette in Atari ST hardware format 	*/
-	int8   	filename[12];		/* The original file name						*/
-	int16	color_anim_limit;	/* color animation limit						*/
-	int16	color_anim_speed;	/* color animation speed and direction			*/
-	int16	color_steps;		/* numbre of color step							*/
-	int16	x_offset;			/* image offset									*/
-	int16	y_offset;			/* "											*/
-	int16	width;				
-	int16	height;				
-	int16	reserverd[33];		
+	int16_t 	flags;				/* Always 0										*/
+	int16_t 	resolution;			/* 0 = low, 1 = medium, 3 = high 				*/
+	uint16_t 	palette[16];		/* Picture palette in Atari ST hardware format 	*/
+	int8_t   	filename[12];		/* The original file name						*/
+	int16_t	color_anim_limit;	/* color animation limit						*/
+	int16_t	color_anim_speed;	/* color animation speed and direction			*/
+	int16_t	color_steps;		/* numbre of color step							*/
+	int16_t	x_offset;			/* image offset									*/
+	int16_t	y_offset;			/* "											*/
+	int16_t	width;				
+	int16_t	height;				
+	int16_t	reserverd[33];		
 } NEOHDR;
 
 
@@ -52,11 +52,11 @@ typedef struct
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	int32 		position;
-	int16		handle;
+	int32_t 	position;
+	int16_t		handle;
 	NEOHDR		*neo;
 
-	if ( ( handle = ( int16)Fopen( name, 0)) < 0)
+	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
 
 	if( Fseek( 0L, handle, 2) != 32128L)
@@ -136,7 +136,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if( info->indexed_color)
 	{
-		register int16 i;
+		register int16_t i;
 
 		for ( i = 0; i < info->colors; i++)
 		{
@@ -161,11 +161,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	NEOHDR		*neo	= ( NEOHDR*)info->_priv_ptr;
-	uint8 		*l, *s = ( uint8*)neo + info->_priv_var_more;
-	uint16		x, c, p0, p1, p2, p3;
+	uint8_t 		*l, *s = ( uint8_t*)neo + info->_priv_var_more;
+	uint16_t		x, c, p0, p1, p2, p3;
 
 	switch( info->planes)
 	{	

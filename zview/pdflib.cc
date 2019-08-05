@@ -3,7 +3,6 @@
 #include "winimg.h"
 #include "aconf.h"
 #include "custom_font.h"
-#include "goo/gmem.h"
 #include "goo/GString.h"
 #include "goo/GList.h"
 #include "xpdf/GlobalParams.h"
@@ -144,12 +143,12 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 		if( item->hasKids() && ( kids = item->getKids()) && kids->getLength() > 0)
 	    {
 			book[i].nbr_child	= kids->getLength();
-			book[i].child		= ( Bookmark*)gmalloc( sizeof( Bookmark) * kids->getLength());
+			book[i].child		= ( Bookmark*)malloc( sizeof( Bookmark) * kids->getLength());
       		book[i].state 		= item->isOpen();
 
       		if( !setupOutlineItems(win, doc, kids, uMap, book[i].child, book))
 			{
-				gfree( book[i].child);
+				free( book[i].child);
 				book[i].child 		= NULL;
 				book[i].nbr_child	= 0;
 				return( 0);
@@ -179,7 +178,7 @@ void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
 
 	if ( items->getLength() > 0)
 	{
-		windata->root = ( Bookmark*)gmalloc( sizeof( Bookmark) * items->getLength());
+		windata->root = ( Bookmark*)malloc( sizeof( Bookmark) * items->getLength());
 
 		if( windata->root == NULL)
 			return;
@@ -198,7 +197,7 @@ void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
 					delete_bookmark_child( &windata->root[i]);
 			}
 
-			gfree( windata->root);
+			free( windata->root);
 			windata->root 			= NULL;
 			windata->nbr_bookmark	= 0;
 		}

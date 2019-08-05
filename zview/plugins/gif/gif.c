@@ -33,10 +33,10 @@ long __CDECL get_option(zv_int_t which)
  * return:	 																		*
  *     --																			*
  *==================================================================================*/
-static inline void decodecolormap( uint8 *src, uint8 *dst, GifColorType *cm, uint16 width, int16 trans_index, uint32 transparent_color, int16 draw_trans)
+static inline void decodecolormap( uint8_t *src, uint8_t *dst, GifColorType *cm, uint16_t width, int16_t trans_index, uint32_t transparent_color, int16_t draw_trans)
 {
 	GifColorType *cmentry;
-	register uint16 i;
+	register uint16_t i;
 
 	for( i = 0; i < width; i++)
 	{
@@ -77,9 +77,9 @@ static inline void decodecolormap( uint8 *src, uint8 *dst, GifColorType *cm, uin
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	static int16 	InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 };  
-	int16			i, j, error = 0, transpar = -1, interlace = FALSE, draw_trans = TRUE;
-	uint16			delaycount	= 0;
+	static int16_t 	InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 };  
+	int16_t			i, j, error = 0, transpar = -1, interlace = FALSE, draw_trans = TRUE;
+	uint16_t			delaycount	= 0;
 	GifFileType		*gif		= NULL;
 	GifRecordType 	rec;
 	txt_data		comment		= { 0,};
@@ -110,8 +110,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				GifImageDesc *dsc	= &gif->Image;
 				ColorMapObject *map	= ( dsc->ColorMap ? dsc->ColorMap : gif->SColorMap);
 				int Row, Col, Width, Height;
-				int32 line_size;
-				uint8 *line_buffer	= NULL, *img_buffer;
+				int32_t line_size;
+				uint8_t *line_buffer	= NULL, *img_buffer;
 
 				if( map == NULL)
 				{
@@ -133,14 +133,14 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				info->components	= ( map->BitsPerPixel == 1 ? 1 : 3);
 				info->planes   		= map->BitsPerPixel;
 				info->colors  		= map->ColorCount;
-				info->width 		= ( uint16)gif->SWidth;
-				info->height 		= ( uint16)gif->SHeight;
-				line_size			= ( int32)gif->SWidth * ( int32)info->components;
+				info->width 		= ( uint16_t)gif->SWidth;
+				info->height 		= ( uint16_t)gif->SHeight;
+				line_size			= ( int32_t)gif->SWidth * ( int32_t)info->components;
 
 				if( dsc->Interlace) 
 					interlace = TRUE;
 					
-				img.image_buf[img.imagecount] = ( uint8*)malloc( line_size * ( gif->SHeight + 2));
+				img.image_buf[img.imagecount] = ( uint8_t*)malloc( line_size * ( gif->SHeight + 2));
 				img_buffer	= img.image_buf[img.imagecount];
 					
 				if( img_buffer == NULL)
@@ -151,7 +151,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 				if( map->BitsPerPixel != 1)
 				{
-					line_buffer	= ( uint8*)malloc( line_size + 128); 
+					line_buffer	= ( uint8_t*)malloc( line_size + 128); 
 
 					if( line_buffer == NULL)
 					{
@@ -253,19 +253,19 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				   			break;
 				   	
 						block[block[0]+1] = '\000';   /* Convert gif's pascal-like string */
-						comment.txt[comment.lines] = ( int8*)malloc( block[0] + 1);
+						comment.txt[comment.lines] = ( int8_t*)malloc( block[0] + 1);
 
 						if( comment.txt[comment.lines] == NULL)
 							break;
 
 						strcpy( comment.txt[comment.lines], (char*)block + 1);
-						comment.max_lines_length = MAX( comment.max_lines_length, ( int16)strlen( comment.txt[comment.lines]) + 1);
+						comment.max_lines_length = MAX( comment.max_lines_length, ( int16_t)strlen( comment.txt[comment.lines]) + 1);
 						comment.lines++;
 		    			break; 
 
 				   	case GRAPHICS_EXT_FUNC_CODE: 
 						if( block[1] & 1)
-							transpar = ( uint16)block[4];
+							transpar = ( uint16_t)block[4];
 						else
 				   			transpar = -1;
 					   							   	
@@ -376,7 +376,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
-	register int16 i;
+	register int16_t i;
 	txt_data *comment	= ( txt_data *)info->_priv_ptr;
 
 	for ( i = 0; i < txtdata->lines; i++) 
@@ -395,15 +395,15 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8 *buffer)
+boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	img_data	*img		= ( img_data*)info->_priv_ptr_more;
-	int32		line_size	= ( int32)info->width * ( int32)info->components;
-	uint8		*line_src;
+	int32_t		line_size	= ( int32_t)info->width * ( int32_t)info->components;
+	uint8_t		*line_src;
 
-	if( ( int32)info->page_wanted != info->_priv_var_more)
+	if( ( int32_t)info->page_wanted != info->_priv_var_more)
 	{
-		info->_priv_var_more 	= ( int32)info->page_wanted;
+		info->_priv_var_more 	= ( int32_t)info->page_wanted;
 		info->_priv_var 		= 0L;
 	}
 
@@ -434,7 +434,7 @@ void __CDECL reader_quit( IMGINFO info)
 {	
 	txt_data 	*comment	= ( txt_data *)info->_priv_ptr;
 	img_data	*img		= ( img_data *)info->_priv_ptr_more;	
-	register int16 i;
+	register int16_t i;
 
 	for ( i = 0; i < comment->lines; i++) 
 	{

@@ -8,19 +8,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gmem.h"
 
 /* NewLine: cr‚‚ une nouvelle ligne */
 
 EDLINE *line_new( char *buf) 
 {
-	EDLINE *line = (EDLINE*)gmalloc(sizeof(EDLINE));
+	EDLINE *line = (EDLINE*)malloc(sizeof(EDLINE));
 	
 	if( line == NULL) return NULL;
 
 	if( buf) 
 	{
-		line -> buf = copyString( buf);
+		line -> buf = strdup( buf);
 
 		if( line -> buf) 
 		{
@@ -33,7 +32,7 @@ EDLINE *line_new( char *buf)
 	} 
 	else 
 	{
-		line -> buf = gmalloc( sizeof(char)*SIZE_REALLOC);
+		line -> buf = malloc( sizeof(char)*SIZE_REALLOC);
 
 		if( line -> buf) 
 		{
@@ -44,7 +43,7 @@ EDLINE *line_new( char *buf)
 			return line;
 		}
 	}
-	gfree( line);
+	free( line);
 	
 	return NULL;
 }
@@ -140,8 +139,8 @@ void line_rem( EDIT *edit)
 		edit -> cur.row = 0;
 	}
 	
-	gfree( line -> buf);
-	gfree( line);
+	free( line -> buf);
+	free( line);
 }
 
 
@@ -151,7 +150,7 @@ void line_rem( EDIT *edit)
 
 EDIT* edit_new( void) 
 {
-	EDIT *edit = ( EDIT *)gmalloc( sizeof( EDIT));
+	EDIT *edit = ( EDIT *)malloc( sizeof( EDIT));
 
 	if( edit == NULL) 
 		return NULL;
@@ -173,12 +172,12 @@ void edit_free( EDIT *edit) {
 	while( scan) 
 	{
 		next = scan -> next;
-		gfree( scan->buf);
-		gfree( scan);
+		free( scan->buf);
+		free( scan);
 		scan = next;
 	}
 	
-	gfree( edit);
+	free( edit);
 }
 
 int16 diff_line( EDLINE *up, EDLINE *dn) 
