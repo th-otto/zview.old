@@ -29,7 +29,7 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 # because that would pull in the import functions for the shared library,
 # and would also be used by the pdf library, which is not yet prepared for that
 #
-OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o
+OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o plugins/slb/exif_open.o
 
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a

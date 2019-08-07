@@ -2,17 +2,15 @@
 #include <stdio.h>
 #include "zview.h"
 
-#if defined(PLUGIN_SLB) && !defined(JPEG_SLB)
-#include "jpeg-8d/jpeglib.h"
+#if defined(PLUGIN_SLB) && defined(JPEG_SLB)
+#include <slb/jpeg.h>
 #else
 #include <jpeglib.h>
 #endif
-#if defined(PLUGIN_SLB) && !defined(EXIF_SLB)
-#include "libexif/exif-data.h"
-#include "libexif/exif-utils.h"
+#if defined(PLUGIN_SLB) && defined(EXIF_SLB)
+#include <slb/exif.h>
 #else
 #include <libexif/exif-data.h>
-#include <libexif/exif-utils.h>
 #endif
 
 #include "imginfo.h"
@@ -430,42 +428,55 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		}
 		else if( mark->marker == M_EXIF)
 		{
-			int i, l, lenght;
+			int i, l, length;
 			char value[1024+256];
 			ExifData *exifData = exif_data_new_from_data(( char*)mark->data, mark->data_length);
 
 		    if( !exifData)
 				continue;
 
+#ifdef EXIF_SLB
+			if (get_slb_funcs()->p_slb_open(LIB_EXIF) < 0)
+			{
+				exif_data_unref( exifData);
+				continue;
+			}
+#endif
 			for( i = 0; i < EXIF_IFD_COUNT; i++)
 			{
 				ExifContent* content = exifData->ifd[i];
 
 				for ( l = 0; l < content->count; l++)
 				{
+					const char *tag;
+					
 					if( comment->lines > 253)
 						break;
 
 					ExifEntry *e = content->entries[l];
 
-					sprintf( value, "%s", exif_tag_get_name (e->tag));
+					tag = exif_tag_get_name (e->tag);
+					if (tag)
+						strcpy( value, tag);
+					else
+						sprintf(value, "0x%x", e->tag);
 
 					strcat( value, ": ");
 
-					lenght = strlen( value);
+					length = strlen( value);
 
-					exif_entry_get_value( e, &value[lenght], sizeof(value) - lenght);
+					exif_entry_get_value( e, &value[length], sizeof(value) - length);
 
-					lenght = strlen( value);
+					length = strlen( value);
 					
-					comment->txt[comment->lines] = ( int8_t*)malloc( lenght + 1);
+					comment->txt[comment->lines] = ( int8_t*)malloc( length + 1);
 
 					if( comment->txt[comment->lines] == NULL)
 						break;
 
 					strcpy( comment->txt[comment->lines], value);
 
-					comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)lenght);					
+					comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)length);					
 					comment->lines++;
 				}
 			}
@@ -491,12 +502,14 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 					info->max_comments_length	= comment->max_lines_length;
 					info->_priv_ptr_more		= ( void*)comment;
 					
+#ifdef EXIF_SLB
+					get_slb_funcs()->p_slb_close(LIB_EXIF);
+#endif
 					return TRUE;
 				}
 				else /* We can't extract the thumbnail :/ */
 				{
 					free( info->__priv_ptr_more);
-					exif_data_unref( exifData);
 
 					if ( comment)
 					{
@@ -510,11 +523,17 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 						comment	= NULL;
 					}
 					
+#ifdef EXIF_SLB
+					get_slb_funcs()->p_slb_close(LIB_EXIF);
+#endif
 					return FALSE;
 				}
 			}
 
 			exif_data_unref( exifData);
+#ifdef EXIF_SLB
+			get_slb_funcs()->p_slb_close(LIB_EXIF);
+#endif
 		}
     }
 

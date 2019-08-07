@@ -11,6 +11,7 @@
 #include <mint/mintbind.h>
 #include <mint/slb.h>
 #include <slb/jpeg.h>
+#include <slb/exif.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -165,6 +166,12 @@ static long set_imports(struct _zview_plugin_funcs *funcs)
 		return -ERANGE;
 	proc->funcs = funcs;
 
+	{
+		long ret;
+		if ((ret = funcs->p_slb_open(LIB_JPEG)) < 0)
+			return ret;
+	}
+
 	return 0;
 }
 
@@ -197,6 +204,8 @@ long _CDECL slb_control(long fn, void *arg)
 		return (long)slb_header;
 	case 4:
 		return (long)my_base->p_cmdlin;
+	case 5:
+		return (long)(JPEG_SHAREDLIB_NAME "\0" EXIF_SHAREDLIB_NAME "\0");
 	}
 	return -ENOSYS;
 }
@@ -220,6 +229,22 @@ void *(memset)(void *dest, int c, size_t len)
 {
 	return memset(dest, c, len);
 }
+
+
+#ifdef JPEG_SLB
+SLB *slb_jpeglib_get(void)
+{
+	return get_slb_funcs()->p_slb_get(LIB_JPEG);
+}
+#endif
+
+
+#ifdef EXIF_SLB
+SLB *slb_exif_get(void)
+{
+	return get_slb_funcs()->p_slb_get(LIB_EXIF);
+}
+#endif
 
 
 /*

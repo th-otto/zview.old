@@ -8,6 +8,7 @@
 #include <slb/jpeg.h>
 #include <slb/tiff.h>
 #include <slb/lzma.h>
+#include <slb/exif.h>
 #include "zvplugin.h"
 #include "plugin.h"
 #include "plugin_version.h"
@@ -185,6 +186,26 @@ void slb_jpeglib_close(void)
 }
 
 
+static SLB exif_slb = { 0, slb_not_loaded };
+
+SLB *slb_exif_get(void)
+{
+	return &exif_slb;
+}
+
+
+void slb_exif_close(void)
+{
+	SLB *exif = slb_exif_get();
+
+	if (!exif->handle)
+		return;
+	slb_unload(exif->handle);
+	exif->handle = 0;
+	exif->exec = slb_unloaded;
+}
+
+
 static SLB tiff_slb = { 0, slb_not_loaded };
 
 SLB *slb_tiff_get(void)
@@ -239,6 +260,8 @@ static long _CDECL slb_open(zv_int_t lib)
 		return slb_tiff_open(NULL);
 	case LIB_LZMA:
 		return slb_lzma_open(NULL);
+	case LIB_EXIF:
+		return slb_exif_open(NULL);
 	}
 	return -ENOENT;
 }
@@ -263,6 +286,9 @@ static void _CDECL slb_close(zv_int_t lib)
 	case LIB_LZMA:
 		slb_lzma_close();
 		break;
+	case LIB_EXIF:
+		slb_exif_close();
+		break;
 	}
 }
 
@@ -281,6 +307,8 @@ static SLB *_CDECL slb_get(zv_int_t lib)
 		return slb_tiff_get();
 	case LIB_LZMA:
 		return slb_lzma_get();
+	case LIB_EXIF:
+		return slb_exif_get();
 	}
 	return NULL;
 }
@@ -346,6 +374,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(fseeko);
 	S(ftell);
 	S(ftello);
+	S(printf);
 	S(sprintf);
 	S(vsnprintf);
 	S(vfprintf);

@@ -205,7 +205,7 @@ long _CDECL slb_control(long fn, void *arg)
 	case 4:
 		return (long)my_base->p_cmdlin;
 	case 5:
-		return (long)(ZLIB_SHAREDLIB_NAME "\0");
+		return (long)(PNG_SHAREDLIB_NAME "\0" ZLIB_SHAREDLIB_NAME "\0");
 	}
 	return -ENOSYS;
 }

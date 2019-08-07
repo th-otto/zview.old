@@ -27,6 +27,7 @@
 #define LIB_JPEG  2
 #define LIB_TIFF  3
 #define LIB_LZMA  4
+#define LIB_EXIF  5
 
 struct _zview_plugin_funcs {
 	/*
@@ -89,6 +90,7 @@ struct _zview_plugin_funcs {
 	zv_int_t _CDECL (*p_fseeko)(FILE *, off_t, zv_int_t);
 	long _CDECL (*p_ftell)(FILE *);
 	off_t _CDECL (*p_ftello)(FILE *);
+	zv_int_t _CDECL (*p_printf)(const char *, ...);
 	zv_int_t _CDECL (*p_sprintf)(char *, const char *, ...);
 	zv_int_t _CDECL (*p_vsnprintf)(char *, size_t, const char *, va_list);
 	zv_int_t _CDECL (*p_vfprintf)(FILE *, const char *, va_list);
@@ -115,7 +117,7 @@ struct _zview_plugin_funcs {
 	double _CDECL (*p_atof)(const char *);
 
 	/* room for later extensions */
-	void *unused[32];
+	void *unused[31];
 };
 
 #include <stdio.h>
@@ -164,6 +166,7 @@ struct _zview_plugin_funcs {
 #undef fseeko
 #undef ftell
 #undef ftello
+#undef printf
 #undef sprintf
 #undef vsnprintf
 #undef vfprintf
@@ -234,6 +237,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void);
 #define ferror get_slb_funcs()->p_ferror
 #define fflush get_slb_funcs()->p_fflush
 
+#define printf get_slb_funcs()->p_printf
 #define sprintf get_slb_funcs()->p_sprintf
 #define vsnprintf get_slb_funcs()->p_vsnprintf
 #define vfprintf get_slb_funcs()->p_vfprintf
