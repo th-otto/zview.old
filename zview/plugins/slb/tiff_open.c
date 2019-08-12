@@ -79,7 +79,7 @@ static void __CDECL set_errno(int e)
 #define S(x) tiff_funcs.p_##x = x
 
 
-static long __CDECL tiff_zlib_open(const char *slbpath)
+static long __CDECL tiff_zlib_open(void)
 {
 	SLB *tiff = slb_tiff_get();
 	SLB *zlib;
@@ -94,7 +94,7 @@ static long __CDECL tiff_zlib_open(const char *slbpath)
 		return -EBADF;
 	if (zlib->handle == 0)
 	{
-		ret = slb_zlib_open(slbpath);
+		ret = slb_zlib_open(tiff_funcs.slbpath);
 		if (ret != 0)
 			return ret;
 		tiff_funcs.zlib_opened_here = 1;
@@ -104,7 +104,7 @@ static long __CDECL tiff_zlib_open(const char *slbpath)
 }
 
 
-static long __CDECL tiff_jpeg_open(const char *slbpath)
+static long __CDECL tiff_jpeg_open(void)
 {
 	SLB *tiff = slb_tiff_get();
 	SLB *jpeg;
@@ -117,7 +117,7 @@ static long __CDECL tiff_jpeg_open(const char *slbpath)
 	jpeg = slb_jpeglib_get();
 	if (jpeg->handle == 0)
 	{
-		ret = slb_jpeglib_open(slbpath);
+		ret = slb_jpeglib_open(tiff_funcs.slbpath);
 		if (ret != 0)
 			return ret;
 		tiff_funcs.jpeg_opened_here = 1;
@@ -127,7 +127,7 @@ static long __CDECL tiff_jpeg_open(const char *slbpath)
 }
 
 
-static long __CDECL tiff_lzma_open(const char *slbpath)
+static long __CDECL tiff_lzma_open(void)
 {
 	SLB *tiff = slb_tiff_get();
 	SLB *lzma;
@@ -140,7 +140,7 @@ static long __CDECL tiff_lzma_open(const char *slbpath)
 	lzma = slb_lzma_get();
 	if (lzma->handle == 0)
 	{
-		ret = slb_lzma_open(slbpath);
+		ret = slb_lzma_open(tiff_funcs.slbpath);
 		if (ret != 0)
 			return ret;
 		tiff_funcs.lzma_opened_here = 1;
@@ -224,6 +224,7 @@ long slb_tiff_open(const char *slbpath)
 
 #undef S
 
+	tiff_funcs.slbpath = slbpath;
 	tiff_funcs.zlib_opened_here = 0;
 	tiff_funcs.zlib = 0;
 	tiff_funcs.p_slb_tiff_zlib_open = tiff_zlib_open;

@@ -52,12 +52,13 @@ struct _tiff_funcs {
 	short webp_opened_here;
 	short zstd_opened_here;
 	
-	long __CDECL (*p_slb_tiff_zlib_open)(const char *slbpath);
-	long __CDECL (*p_slb_tiff_jpeg_open)(const char *slbpath);
-	long __CDECL (*p_slb_tiff_lzma_open)(const char *slbpath);
-	long __CDECL (*p_slb_tiff_jbig_open)(const char *slbpath);
-	long __CDECL (*p_slb_tiff_webp_open)(const char *slbpath);
-	long __CDECL (*p_slb_tiff_zstd_open)(const char *slbpath);
+	const char *slbpath;
+	long __CDECL (*p_slb_tiff_zlib_open)(void);
+	long __CDECL (*p_slb_tiff_jpeg_open)(void);
+	long __CDECL (*p_slb_tiff_lzma_open)(void);
+	long __CDECL (*p_slb_tiff_jbig_open)(void);
+	long __CDECL (*p_slb_tiff_webp_open)(void);
+	long __CDECL (*p_slb_tiff_zstd_open)(void);
 	
 	tiff_int_t __CDECL (*p_get_errno)(void);
 	void __CDECL (*p_set_errno)(tiff_int_t e);
@@ -97,8 +98,8 @@ struct _tiff_funcs {
 	
 	tiff_int_t __CDECL (*p_rand)(void);
 	void __CDECL (*p_srand)(tiff_uint_t seed);
-	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, tiff_int_t (*compar)(const void *, const void *));
-	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, tiff_int_t (*compar)(const void *, const void *));
+	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, tiff_int_t __CDECL (*compar)(const void *, const void *));
+	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, tiff_int_t __CDECL (*compar)(const void *, const void *));
 	char *__CDECL (*p_getenv)(const char *name);
                      
 	tiff_int_t __CDECL (*p_fstat)(tiff_int_t fd, struct stat *s);
@@ -108,11 +109,11 @@ struct _tiff_funcs {
 
 #if 0
 	/* functions forwarded to jpeglib */
-	char *___CDECL (*p_strncpy)(char *, const char *, size_t);
-	size_t ___CDECL (*p_fread)(void *, size_t, size_t, FILE *);
-	tiff_int_t ___CDECL (*p_fflush)(FILE *);
-	tiff_int_t ___CDECL (*p_ferror)(FILE *);
-	void ___CDECL (*p_exit)(tiff_int_t);
+	char *__CDECL (*p_strncpy)(char *, const char *, size_t);
+	size_t __CDECL (*p_fread)(void *, size_t, size_t, FILE *);
+	tiff_int_t __CDECL (*p_fflush)(FILE *);
+	tiff_int_t __CDECL (*p_ferror)(FILE *);
+	void __CDECL (*p_exit)(tiff_int_t);
 #endif
 
 	TIFFErrorHandler _TIFFwarningHandler;
