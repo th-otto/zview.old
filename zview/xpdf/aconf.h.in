@@ -1,0 +1,233 @@
+/* aconf.h.in.  Generated from configure.ac by autoheader.  */
+
+
+#ifndef ACONF_H
+#define ACONF_H
+
+
+
+/* use A4 (instead of Letter) paper size by default for PostScript output */
+#undef A4_PAPER
+
+/* directory name for application defaults */
+#undef APPDEFDIR
+
+/* Defined when building the closed source XpdfReader binary. */
+#undef BUILDING_XPDFREADER
+
+/* include support for CMYK rasterization */
+#undef CMYK
+
+/* Enable support for DeviceN output. */
+#undef DEVICEN
+
+/* Defined for evaluation mode. */
+#undef EVAL_MODE
+
+/* use C++ exceptions */
+#undef EXCEPTIONS
+
+/* use fixed point (instead of floating point) arithmetic */
+#undef FIXEDPOINT
+
+/* Define to 1 if you have the <argz.h> header file. */
+#undef HAVE_ARGZ_H
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <endian.h> header file. */
+#undef HAVE_ENDIAN_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* This is defined if using FreeType 2. */
+#undef HAVE_FREETYPE
+
+/* Define to 1 if you have the `fseek64' function. */
+#undef HAVE_FSEEK64
+
+/* Define to 1 if you have the `fseeko' function. */
+#undef HAVE_FSEEKO
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <io.h> header file. */
+#undef HAVE_IO_H
+
+/* Defined if using lcms2. */
+#undef HAVE_LCMS
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if you have the `paper' library (-lpaper). */
+#undef HAVE_LIBPAPER
+
+/* Define this if the Portable Network Graphics library is installed. It is
+   basically required, but many things will more-or-less limp along without
+   it. */
+#undef HAVE_LIBPNG
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
+
+/* Define to 1 if you have the `mkstemps' function. */
+#undef HAVE_MKSTEMPS
+
+/* Define to 1 if you have the `mktemp' function. */
+#undef HAVE_MKTEMP
+
+/* Define to 1 if you have the <nl_types.h> header file. */
+#undef HAVE_NL_TYPES_H
+
+/* Define to 1 if you have the <paper.h> header file. */
+#undef HAVE_PAPER_H
+
+/* Define to 1 if you have the `popen' function. */
+#undef HAVE_POPEN
+
+/* Define to 1 if you have the <process.h> header file. */
+#undef HAVE_PROCESS_H
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if you have the <pwd.h> header file. */
+#undef HAVE_PWD_H
+
+/* Defined if the Splash library is avaiable. */
+#undef HAVE_SPLASH
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* define if you have std::sort */
+#undef HAVE_STD_SORT
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <wchar.h> header file. */
+#undef HAVE_WCHAR_H
+
+/* Define to 1 if you have the `_fseeki64' function. */
+#undef HAVE__FSEEKI64
+
+/* Enable support for highlighted regions. */
+#undef HIGHLIGHTED_REGIONS
+
+/* include support for multithreading */
+#undef MULTITHREADED
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
+
+/* do not allow text selection */
+#undef NO_TEXT_SELECT
+
+/* include support for OPI comments */
+#undef OPI
+
+/* include support for OPI comments */
+#undef OPI_SUPPORT
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* include support for CMYK rasterization */
+#undef SPLASH_CMYK
+
+/* Enable support for DeviceN output. */
+#undef SPLASH_DEVICEN
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* directory for system wide xpdfrc */
+#undef SYSTEM_XPDFRC
+
+/* use C++ exceptions */
+#undef USE_EXCEPTIONS
+
+/* use fixed point (instead of floating point) arithmetic */
+#undef USE_FIXEDPOINT
+
+/* Version number of package */
+#undef VERSION
+
+/* include printing support in XpdfWidget */
+#undef XPDFWIDGET_PRINTING
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+
+/*
+ * This gets included by aconf.h, and contains miscellaneous global
+ * settings not directly controlled by autoconf.  This is a separate
+ * file because otherwise the configure script will munge any
+ * #define/#undef constructs.
+ *
+ * Copyright 2002-2003 Glyph & Cog, LLC
+ */
+
+#endif /* ACONF_H */
+

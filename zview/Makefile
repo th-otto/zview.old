@@ -5,7 +5,7 @@ include $(top_srcdir)/configvars
 DEBUG_LIB			= # -lwout
 
 XPDF_LIBS			= 
-XPDF_INCS			= -Ixpdf-${XPDF_VERSION} -Ixpdf-${XPDF_VERSION}/fofi -Ixpdf-${XPDF_VERSION}/goo -Ixpdf-${XPDF_VERSION}/splash -DUSE_PRIVATE_FONTDIR
+XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash -DUSE_PRIVATE_FONTDIR
 LIB				= -lfreetype $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lpng -lz
 CFLAGS				+= $(XPDF_INCS) -I../common
 CXXFLAGS			+= $(XPDF_INCS) -I../common
@@ -45,47 +45,46 @@ $(PROGRAM): $(PDF_LIB) $(OBJ)
 
 XPDF_VERSION			= 4.01.01
 
-PDF_OBJ				= xpdf-${XPDF_VERSION}/xpdf/Annot.o xpdf-${XPDF_VERSION}/xpdf/Array.o xpdf-${XPDF_VERSION}/xpdf/BuiltinFont.o xpdf-${XPDF_VERSION}/xpdf/BuiltinFontTables.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/Catalog.o xpdf-${XPDF_VERSION}/xpdf/CharCodeToUnicode.o xpdf-${XPDF_VERSION}/xpdf/CMap.o xpdf-${XPDF_VERSION}/xpdf/Decrypt.o xpdf-${XPDF_VERSION}/xpdf/Dict.o xpdf-${XPDF_VERSION}/xpdf/Error.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/FontEncodingTables.o xpdf-${XPDF_VERSION}/xpdf/Function.o xpdf-${XPDF_VERSION}/xpdf/Gfx.o xpdf-${XPDF_VERSION}/xpdf/GfxFont.o xpdf-${XPDF_VERSION}/xpdf/GfxState.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/GlobalParams.o xpdf-${XPDF_VERSION}/xpdf/JArithmeticDecoder.o xpdf-${XPDF_VERSION}/xpdf/JBIG2Stream.o xpdf-${XPDF_VERSION}/xpdf/JPXStream.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/Lexer.o xpdf-${XPDF_VERSION}/xpdf/Link.o xpdf-${XPDF_VERSION}/xpdf/NameToCharCode.o xpdf-${XPDF_VERSION}/xpdf/Object.o xpdf-${XPDF_VERSION}/xpdf/Outline.o xpdf-${XPDF_VERSION}/xpdf/OutputDev.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/Page.o xpdf-${XPDF_VERSION}/xpdf/Parser.o xpdf-${XPDF_VERSION}/xpdf/SecurityHandler.o xpdf-${XPDF_VERSION}/xpdf/PDFDoc.o xpdf-${XPDF_VERSION}/xpdf/PDFDocEncoding.o xpdf-${XPDF_VERSION}/xpdf/PSTokenizer.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/SplashOutputDev.o xpdf-${XPDF_VERSION}/xpdf/Stream.o xpdf-${XPDF_VERSION}/xpdf/TextOutputDev.o xpdf-${XPDF_VERSION}/xpdf/TextString.o xpdf-${XPDF_VERSION}/xpdf/UnicodeMap.o \
-                                  xpdf-${XPDF_VERSION}/xpdf/UnicodeTypeTable.o xpdf-${XPDF_VERSION}/xpdf/XRef.o xpdf-${XPDF_VERSION}/xpdf/OptionalContent.o \
-				  xpdf-${XPDF_VERSION}/fofi/FoFiBase.o xpdf-${XPDF_VERSION}/fofi/FoFiEncodings.o xpdf-${XPDF_VERSION}/fofi/FoFiIdentifier.o \
-				  xpdf-${XPDF_VERSION}/fofi/FoFiTrueType.o xpdf-${XPDF_VERSION}/fofi/FoFiType1.o xpdf-${XPDF_VERSION}/fofi/FoFiType1C.o \
-				  xpdf-${XPDF_VERSION}/goo/FixedPoint.o xpdf-${XPDF_VERSION}/goo/GHash.o xpdf-${XPDF_VERSION}/goo/GList.o xpdf-${XPDF_VERSION}/goo/GString.o \
-				  xpdf-${XPDF_VERSION}/goo/gfile.o xpdf-${XPDF_VERSION}/goo/gmem.o xpdf-${XPDF_VERSION}/goo/gmempp.o xpdf-${XPDF_VERSION}/goo/parseargs.o \
-				  xpdf-${XPDF_VERSION}/splash/Splash.o xpdf-${XPDF_VERSION}/splash/SplashBitmap.o xpdf-${XPDF_VERSION}/splash/SplashClip.o \
-				  xpdf-${XPDF_VERSION}/splash/SplashFTFont.o xpdf-${XPDF_VERSION}/splash/SplashFTFontEngine.o xpdf-${XPDF_VERSION}/splash/SplashFTFontFile.o \
-				  xpdf-${XPDF_VERSION}/splash/SplashFont.o xpdf-${XPDF_VERSION}/splash/SplashFontEngine.o xpdf-${XPDF_VERSION}/splash/SplashFontFile.o \
-				  xpdf-${XPDF_VERSION}/splash/SplashFontFileID.o xpdf-${XPDF_VERSION}/splash/SplashPath.o xpdf-${XPDF_VERSION}/splash/SplashPattern.o \
-				  xpdf-${XPDF_VERSION}/splash/SplashScreen.o xpdf-${XPDF_VERSION}/splash/SplashState.o xpdf-${XPDF_VERSION}/splash/SplashXPath.o xpdf-${XPDF_VERSION}/splash/SplashXPathScanner.o \
+PDF_OBJ				= xpdf/xpdf/Annot.o xpdf/xpdf/Array.o xpdf/xpdf/BuiltinFont.o xpdf/xpdf/BuiltinFontTables.o \
+                                  xpdf/xpdf/Catalog.o xpdf/xpdf/CharCodeToUnicode.o xpdf/xpdf/CMap.o xpdf/xpdf/Decrypt.o xpdf/xpdf/Dict.o xpdf/xpdf/Error.o \
+                                  xpdf/xpdf/FontEncodingTables.o xpdf/xpdf/Function.o xpdf/xpdf/Gfx.o xpdf/xpdf/GfxFont.o xpdf/xpdf/GfxState.o \
+                                  xpdf/xpdf/GlobalParams.o xpdf/xpdf/JArithmeticDecoder.o xpdf/xpdf/JBIG2Stream.o xpdf/xpdf/JPXStream.o \
+                                  xpdf/xpdf/Lexer.o xpdf/xpdf/Link.o xpdf/xpdf/NameToCharCode.o xpdf/xpdf/Object.o xpdf/xpdf/Outline.o xpdf/xpdf/OutputDev.o \
+                                  xpdf/xpdf/Page.o xpdf/xpdf/Parser.o xpdf/xpdf/SecurityHandler.o xpdf/xpdf/PDFDoc.o xpdf/xpdf/PDFDocEncoding.o xpdf/xpdf/PSTokenizer.o \
+                                  xpdf/xpdf/SplashOutputDev.o xpdf/xpdf/Stream.o xpdf/xpdf/TextOutputDev.o xpdf/xpdf/TextString.o xpdf/xpdf/UnicodeMap.o \
+                                  xpdf/xpdf/UnicodeTypeTable.o xpdf/xpdf/XRef.o xpdf/xpdf/OptionalContent.o \
+				  xpdf/fofi/FoFiBase.o xpdf/fofi/FoFiEncodings.o xpdf/fofi/FoFiIdentifier.o \
+				  xpdf/fofi/FoFiTrueType.o xpdf/fofi/FoFiType1.o xpdf/fofi/FoFiType1C.o \
+				  xpdf/goo/FixedPoint.o xpdf/goo/GHash.o xpdf/goo/GList.o xpdf/goo/GString.o \
+				  xpdf/goo/gfile.o xpdf/goo/gmem.o xpdf/goo/gmempp.o xpdf/goo/parseargs.o \
+				  xpdf/splash/Splash.o xpdf/splash/SplashBitmap.o xpdf/splash/SplashClip.o \
+				  xpdf/splash/SplashFTFont.o xpdf/splash/SplashFTFontEngine.o xpdf/splash/SplashFTFontFile.o \
+				  xpdf/splash/SplashFont.o xpdf/splash/SplashFontEngine.o xpdf/splash/SplashFontFile.o \
+				  xpdf/splash/SplashFontFileID.o xpdf/splash/SplashPath.o xpdf/splash/SplashPattern.o \
+				  xpdf/splash/SplashScreen.o xpdf/splash/SplashState.o xpdf/splash/SplashXPath.o xpdf/splash/SplashXPathScanner.o \
                                   pdflib.o
 
 ifeq ($(firstword $(subst ., ,$(XPDF_VERSION))),4)
-PDF_OBJ				+= xpdf-${XPDF_VERSION}/xpdf/PDF417Barcode.o
-PDF_OBJ				+= xpdf-${XPDF_VERSION}/xpdf/UTF8.o
-PDF_OBJ				+= xpdf-${XPDF_VERSION}/xpdf/UnicodeRemapping.o
+PDF_OBJ				+= xpdf/xpdf/PDF417Barcode.o
+PDF_OBJ				+= xpdf/xpdf/UTF8.o
+PDF_OBJ				+= xpdf/xpdf/UnicodeRemapping.o
 endif
 
 xpdf-${XPDF_VERSION}.tar.gz:
 	: wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
 	wget https://xpdfreader-dl.s3.amazonaws.com/old/xpdf-${XPDF_VERSION}.tar.gz
 
-$(PDF_OBJ): xpdf-${XPDF_VERSION}/config.status
+$(PDF_OBJ): xpdf/config.status
 
-xpdf-${XPDF_VERSION}/config.status:
-	test -d xpdf-${XPDF_VERSION} || tar xzf xpdf-${XPDF_VERSION}.tar.gz && \
-	cd xpdf-${XPDF_VERSION} && \
-	cat ../howto_build/xpdf-${XPDF_VERSION}-zview.patch | patch -p1 && \
+xpdf/config.status:
+	test -d xpdf || exit 1 && \
+	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkg-config && \
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkg-config && \
 	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --without-x --host=m68k-atari-mint && \
 	$(MAKE)
 	
-$(PDF_LIB): xpdf-${XPDF_VERSION} $(PDF_OBJ)
+$(PDF_LIB): $(PDF_OBJ)
 	rm -f $@
 	$(AR) cru $@ $(PDF_OBJ)
 
@@ -94,10 +93,10 @@ $(PDF_LIB): xpdf-${XPDF_VERSION} $(PDF_OBJ)
 include $(top_srcdir)/rules
 
 clean_zview:
-	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o xpdf-*/*/*.o
+	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o $(PDF_LIB) xpdf*/*/*.o
 	$(MAKE) -C plugins clean
 
 clean_pdf:
-	rm -rf xpdf-${XPDF_VERSION} $(PDF_LIB)
+	rm -f $(PDF_LIB) $(PDF_OBJ)
 
 clean: clean_zview
