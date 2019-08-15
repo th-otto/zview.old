@@ -28,7 +28,7 @@ static struct _zview_plugin_funcs zview_plugin_funcs;
 
 #undef errno
 
-static zv_int_t _CDECL get_errno(void)
+static zv_int_t __CDECL get_errno(void)
 {
 	return errno;
 }
@@ -106,7 +106,7 @@ long __CDECL plugin_set_option(SLB *slb, zv_int_t which, zv_int_t value)
 }
 
 
-static long _CDECL slb_not_loaded(SLB_HANDLE slb, long fn, short nwords, ...)
+static long __CDECL slb_not_loaded(SLB_HANDLE slb, long fn, short nwords, ...)
 {
 	(void)slb;
 	(void)fn;
@@ -117,7 +117,7 @@ static long _CDECL slb_not_loaded(SLB_HANDLE slb, long fn, short nwords, ...)
 }
 
 
-static long _CDECL slb_unloaded(SLB_HANDLE slb, long fn, short nwords, ...)
+static long __CDECL slb_unloaded(SLB_HANDLE slb, long fn, short nwords, ...)
 {
 	(void)slb;
 	(void)fn;
@@ -288,7 +288,7 @@ void slb_freetype_close(void)
 }
 
 
-static long _CDECL slb_open(zv_int_t lib)
+long __CDECL plugin_slb_open(zv_int_t lib)
 {
 	switch (lib)
 	{
@@ -313,7 +313,7 @@ static long _CDECL slb_open(zv_int_t lib)
 }
 
 
-static void _CDECL slb_close(zv_int_t lib)
+void __CDECL plugin_slb_close(zv_int_t lib)
 {
 	switch (lib)
 	{
@@ -345,7 +345,7 @@ static void _CDECL slb_close(zv_int_t lib)
 }
 
 
-static SLB *_CDECL slb_get(zv_int_t lib)
+SLB *__CDECL plugin_slb_get(zv_int_t lib)
 {
 	switch (lib)
 	{
@@ -386,9 +386,9 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	if (zview_plugin_funcs.int_size != sizeof(long))
 		return -EINVAL;
 	zview_plugin_funcs.plugin_version = PLUGIN_VERSION;
-	zview_plugin_funcs.p_slb_open = slb_open;
-	zview_plugin_funcs.p_slb_close = slb_close;
-	zview_plugin_funcs.p_slb_get = slb_get;
+	zview_plugin_funcs.p_slb_open = plugin_slb_open;
+	zview_plugin_funcs.p_slb_close = plugin_slb_close;
+	zview_plugin_funcs.p_slb_get = plugin_slb_get;
 
 #define S(x) zview_plugin_funcs.p_##x = x
 

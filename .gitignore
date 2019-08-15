@@ -33,6 +33,7 @@ build
 *.log
 *.trs
 *.god
+*.map
 lt-*.c
 stamp-*
 .stamp.*

@@ -65,7 +65,7 @@ int16 plugins_init( void)
 	char *name;
 	
 	strcpy( plugin_dir, zview_path);
-	strcat( plugin_dir, "\\codecs\\");
+	strcat( plugin_dir, "codecs\\");
 	name = plugin_dir + strlen(plugin_dir);
 	
 	/* We try to find the zcodecs folder in zview directory... 	*/
@@ -86,7 +86,7 @@ int16 plugins_init( void)
 
 		len = ( int16)strlen( plugin_dir);
 		
-		if( plugin_dir[len-1] != '\\')
+		if( len > 0 && plugin_dir[len-1] != '\\' && plugin_dir[len-1] != '/')
 			strcat( plugin_dir, "\\"); 
 
 		strcat( plugin_dir, "codecs\\");

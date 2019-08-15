@@ -1744,7 +1744,7 @@ void GlobalParams::parseYesNo(const char *cmdName, GBool *flag,
   }
 }
 
-GBool GlobalParams::parseYesNo2(char *token, GBool *flag) {
+GBool GlobalParams::parseYesNo2(const char *token, GBool *flag) {
   if (!strcmp(token, "yes")) {
     *flag = gTrue;
   } else if (!strcmp(token, "no")) {
@@ -3260,7 +3260,7 @@ void GlobalParams::setInitialZoom(char *s) {
   unlockGlobalParams;
 }
 
-GBool GlobalParams::setEnableFreeType(char *s) {
+GBool GlobalParams::setEnableFreeType(const char *s) {
   GBool ok;
 
   lockGlobalParams;
@@ -3270,7 +3270,7 @@ GBool GlobalParams::setEnableFreeType(char *s) {
 }
 
 
-GBool GlobalParams::setAntialias(char *s) {
+GBool GlobalParams::setAntialias(const char *s) {
   GBool ok;
 
   lockGlobalParams;
@@ -3279,7 +3279,7 @@ GBool GlobalParams::setAntialias(char *s) {
   return ok;
 }
 
-GBool GlobalParams::setVectorAntialias(char *s) {
+GBool GlobalParams::setVectorAntialias(const char *s) {
   GBool ok;
 
   lockGlobalParams;

@@ -1,5 +1,5 @@
 /*
- * tgaslb.c - initialization code for the shared library
+ * zvpdf.c - initialization code for the shared library
  *
  * Copyright (C) 2019 Thorsten Otto
  *
@@ -13,9 +13,16 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
-#include "zview.h"
-#include "plugin.h"
-#include "plugin_version.h"
+#include <slb/freetype.h>
+#include "../zview.h"
+#include "../general.h"
+#include "../winimg.h"
+#include "../plugins/common/imginfo.h"
+#include "../plugins/common/zvplugin.h"
+#include "../plugins/common/plugin.h"
+#include "../plugins/common/plugin_version.h"
+#include "zvpdf.h"
+#include "pdflib.h"
 
 #if defined(__MSHORT__) || defined(__PUREC__) || defined(__AHCC__)
 # error "the slb must not be compiled with -mshort"
@@ -34,54 +41,11 @@ void slb_close(BASEPAGE *bp);
 long __CDECL slb_control(long fn, void *arg);
 
 
+static struct _zvpdf_funcs *my_funcs;
 
-#define MINT_MAX_PID 999
-#define MAX_PIDS (MINT_MAX_PID + 1)
-
-struct per_proc {
-	struct _zview_plugin_funcs *funcs;
-	pid_t pid;
-};
-
-static struct per_proc procs[MAX_PIDS];
-
-static pid_t slb_user(void)
+static struct _zvpdf_funcs *get_slb_funcs(void)
 {
-	pid_t pid = Pgetpid();
-	if (pid == (pid_t)-ENOSYS)
-		pid = 1;
-	return pid;
-}
-
-
-static struct per_proc *get_proc(pid_t pid, pid_t slot)
-{
-	int i;
-	
-	/*
-	 * see if we can use it as a direct index into our array
-	 */
-	if (pid > 0 && pid < MAX_PIDS && procs[pid].pid == slot)
-		return &procs[pid];
-	/*
-	 * TODO: if MiNT ever uses pids >= 1000,
-	 * use a hash instead
-	 */
-	for (i = 1; i < MAX_PIDS; i++)
-		if (procs[i].pid == slot)
-			return &procs[i];
-	return NULL;
-}
-
-
-__attribute__((__noinline__))
-struct _zview_plugin_funcs *get_slb_funcs(void)
-{
-	pid_t pid = slb_user();
-	struct per_proc *proc = get_proc(pid, pid);
-	if (proc == NULL)
-		return NULL;
-	return proc->funcs;
+	return my_funcs;
 }
 
 
@@ -112,20 +76,12 @@ void slb_exit(void)
 
 long slb_open(BASEPAGE *bp)
 {
-	pid_t pid = slb_user();
-	struct per_proc *proc = get_proc(pid, 0);
-	
-	(void)(bp);
-	if (proc == NULL)
-		return -ENFILE; /* ENFILE: file table overflow, well, proc table in this case */
 	/*
 	 * check if SLB is already in use by this process;
 	 * should not happen since MiNT should have taken care of that already
 	 */
-	if (proc->funcs != NULL)
+	if (my_funcs != NULL)
 		return -EACCES;
-	
-	proc->pid = pid;
 	
 	return 0;
 }
@@ -133,14 +89,7 @@ long slb_open(BASEPAGE *bp)
 
 void slb_close(BASEPAGE *bp)
 {
-	pid_t pid = slb_user();
-	struct per_proc *proc = get_proc(pid, pid);
-
-	(void)(bp);
-	if (proc == NULL)
-		return;
-	proc->funcs = NULL;
-	proc->pid = 0;
+	my_funcs = NULL;
 }
 
 
@@ -149,20 +98,17 @@ void slb_close(BASEPAGE *bp)
  * Automatically done in slb_zlib_open()
  */
 __attribute__((__noinline__))
-static long set_imports(struct _zview_plugin_funcs *funcs)
+static long set_imports(struct _zvpdf_funcs *funcs)
 {
-	pid_t pid = slb_user();
-	struct per_proc *proc = get_proc(pid, pid);
-
-	if (proc == NULL)
-		return -ESRCH;
 	if (funcs->struct_size != sizeof(*funcs))
 		return -EINVAL;
 	if (funcs->plugin_version > PLUGIN_VERSION)
 		return -EBADARG;
 	if (funcs->int_size != sizeof(int))
 		return -ERANGE;
-	proc->funcs = funcs;
+	my_funcs = funcs;
+
+	p_get_text_width = funcs->p_get_text_width;
 
 	return 0;
 }
@@ -196,6 +142,26 @@ long __CDECL slb_control(long fn, void *arg)
 		return (long)slb_header;
 	case 4:
 		return (long)my_base->p_cmdlin;
+	case 5:
+		return (long)(FREETYPE_SHAREDLIB_NAME "\0");
 	}
 	return -ENOSYS;
+}
+
+
+long zvpdf_freetype_open(void)
+{
+	return get_slb_funcs()->p_slb_open(LIB_FREETYPE);
+}
+
+
+void zvpdf_freetype_close(void)
+{
+	get_slb_funcs()->p_slb_close(LIB_FREETYPE);
+}
+
+
+SLB *slb_freetype_get(void)
+{
+	return get_slb_funcs()->p_slb_get(LIB_FREETYPE);
 }

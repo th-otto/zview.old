@@ -12,9 +12,15 @@ COMPRESS			= : upx -9
 CPU				= -m68020-60
 ifeq ($(CPU),-m68020-60)
 CPU_SUBDIR                      = m68020-60/
+SLB_SUBDIR                      = 020/
+endif
+ifeq ($(CPU),-m68000)
+CPU_SUBDIR                      = 
+SLB_SUBDIR                      = 000/
 endif
 ifeq ($(CPU),-mcpu=5475)
 CPU_SUBDIR                      = m5475/
+SLB_SUBDIR                      = v4e/
 endif
 OPTIMISATION			= -O2 -fomit-frame-pointer
 DEBUG				= # -DDEBUG

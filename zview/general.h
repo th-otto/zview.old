@@ -139,7 +139,7 @@ typedef struct _txt_data
 {
 	int16		lines;					/* Number of lines in the text 						*/
 	int16		max_lines_length;		/* The length of the greater line ( in nbr char)	*/
-	int8    	*txt[256];
+	char    	*txt[256];
 } txt_data;
 #endif
 
@@ -149,10 +149,10 @@ typedef struct
 	/* Image Info */
 	uint16  	img_w, img_h; 		/* original size													*/
 	int16		bits;				/* image's colors bits 												*/
-	int8		working_time[12];	/* ex: 15,2s														*/
+	char		working_time[12];	/* ex: 15,2s														*/
 	uint32		colors;				/* Picture colors's number 											*/
-	int8		info[38];			/* Information about the image, for ex: "Portable Network Graphic"	*/
-	int8		compression[5];		/* Compression type, ex: "LZW" 										*/
+	char		info[38];			/* Information about the image, for ex: "Portable Network Graphic"	*/
+	char		compression[5];		/* Compression type, ex: "LZW" 										*/
 	int16		page;				/* Number of page/image in the file 								*/
 	uint16		delay[1024];		/* Animation delay in millise. between each frame					*/
 

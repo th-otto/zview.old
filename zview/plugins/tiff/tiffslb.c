@@ -36,7 +36,7 @@ long slb_init(void);
 void slb_exit(void);
 long slb_open(BASEPAGE *bp);
 void slb_close(BASEPAGE *bp);
-long _CDECL slb_control(long fn, void *arg);
+long __CDECL slb_control(long fn, void *arg);
 
 
 
@@ -193,7 +193,7 @@ static long slb_compile_flags(void)
 }
 
 
-long _CDECL slb_control(long fn, void *arg)
+long __CDECL slb_control(long fn, void *arg)
 {
 	switch ((int)fn)
 	{

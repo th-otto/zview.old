@@ -159,7 +159,10 @@ static short const my_font_8[1280] =
 void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 {
 	MFDB pic;
-	short fx_mem[16], sys_pxy[20], char_width, tcolor[2] = { color, WHITE};
+	short fx_mem[16];
+	short sys_pxy[8];
+	short char_width;
+	short tcolor[2];
 	unsigned short c;
 	
 	pic.fd_addr = fx_mem;
@@ -168,7 +171,9 @@ void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 	pic.fd_wdwidth = 1;
 	pic.fd_stand = 0;
 	pic.fd_nplanes = 1;
-	
+	tcolor[0] = color;
+	tcolor[1] = G_WHITE;
+
 	sys_pxy[0] = 0;
 	sys_pxy[1] = 0;
 	sys_pxy[2] = 0;

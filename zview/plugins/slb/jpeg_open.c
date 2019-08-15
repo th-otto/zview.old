@@ -104,7 +104,7 @@ static INT32 __CDECL gcc_fprintf(FILE *fp, const char *format, ...)
 	return ret;
 }
 
-static jint_t _CDECL gcc_sprintf(char *buf, const char *format, ...)
+static jint_t __CDECL gcc_sprintf(char *buf, const char *format, ...)
 {
 	va_list args;
 	int ret;

@@ -5,7 +5,7 @@
 #include "pic_load.h"
 #include "winimg.h"
 #include "pdf_load.h"
-#include "pdflib.h"
+#include "pdflib/pdflib.h"
 #include "plugins.h"
 #include "av_prot.h"
 #include "wintimer.h"
@@ -51,9 +51,12 @@ void applexit( void)
 
 	EvntDelete( NULL, WM_XTIMER);
 	
-	if( pdf_initialised == TRUE)
+	if( pdf_initialized)
 		pdf_exit();
-	
+#ifdef ZVPDF_SLB
+	zvpdf_close();
+#endif
+
 	( void)prefs_write();
 
 	plugins_quit();
@@ -122,7 +125,7 @@ static void applinit( void)
 
 	if ( magic_os || mint_os)
 	{
-		( void)Pdomain( 1);
+		( void)Pdomain(1);
 	}
 
 	RsrcXtype( RSRC_XTYPE, NULL, 0);

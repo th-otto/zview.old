@@ -34,5 +34,9 @@ long __CDECL plugin_slb_control(SLB *slb, long fn, void *arg);
 #define plugin_get_libpath(slb) ((const char *)plugin_slb_control(slb, 4, 0))
 #define plugin_required_libs(slb) ((const char *)plugin_slb_control(slb, 5, 0))
 
+long __CDECL plugin_slb_open(zv_int_t lib);
+void __CDECL plugin_slb_close(zv_int_t lib);
+SLB *__CDECL plugin_slb_get(zv_int_t lib);
+
 long plugin_open(const char *name, const char *path, SLB *slb);
 void plugin_close(SLB *slb);

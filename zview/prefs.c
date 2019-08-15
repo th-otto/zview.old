@@ -23,7 +23,7 @@ int show_write_progress_bar			= 1;			/* show the write progress bar							*/
 char skip_drive[32] 				= "ABU";		/* Skip this drives in the browser						*/
 int smooth_thumbnail 				= 0;			/* 0 = None, 1 = Triangle, 2 = Blackman, 3 = Gaussian, 4 = Quadratic, 5 = Cubic, 6 = Lanczos */
 int pdf_fit_to_win 				= 1;			/* Fit the PDF to the Window							*/
-int pdf_aa		 			= 1;			/* Font Antialiasing								*/
+boolean pdf_aa		 			= 1;			/* Font Antialiasing								*/
 
 
 /*==================================================================================*

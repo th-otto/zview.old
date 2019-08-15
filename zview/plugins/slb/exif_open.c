@@ -62,42 +62,42 @@ static int get_cookie(long key, long *value)
 
 #if defined(__MSHORT__) || defined(__PUREC__) || defined(__AHCC__)
 
-static void *_CDECL exif_gcc_memset(void *s, exif_int_t val, size_t len)
+static void *__CDECL exif_gcc_memset(void *s, exif_int_t val, size_t len)
 {
 	return memset(s, (int)val, len);
 }
 
-static void *_CDECL exif_gcc_memcpy(void *d, const void *s, size_t len)
+static void *__CDECL exif_gcc_memcpy(void *d, const void *s, size_t len)
 {
 	return memcpy(d, s, len);
 }
 
-static exif_int_t _CDECL exif_gcc_memcmp(const void *s, const void *d, size_t len)
+static exif_int_t __CDECL exif_gcc_memcmp(const void *s, const void *d, size_t len)
 {
 	return memcmp(s, d, len);
 }
 
-static size_t _CDECL exif_gcc_strlen(const char *s)
+static size_t __CDECL exif_gcc_strlen(const char *s)
 {
 	return strlen(s);
 }
 
-static char *_CDECL exif_gcc_strcpy(char *d, const char *s)
+static char *__CDECL exif_gcc_strcpy(char *d, const char *s)
 {
 	return strcpy(d, s);
 }
 
-static exif_int_t _CDECL exif_gcc_strcmp(const char *d, const char *s)
+static exif_int_t __CDECL exif_gcc_strcmp(const char *d, const char *s)
 {
 	return strcmp(d, s);
 }
 
-static void *_CDECL exif_gcc_malloc(size_t s)
+static void *__CDECL exif_gcc_malloc(size_t s)
 {
 	return malloc(s);
 }
 
-static void _CDECL exif_gcc_free(void *s)
+static void __CDECL exif_gcc_free(void *s)
 {
 	free(s);
 }

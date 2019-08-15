@@ -10,11 +10,12 @@
 #include "zvdi/color.h"
 #include "zvdi/raster.h"
 #include "zvdi/vdi.h"
-#include "pdflib.h"
+#include "pdflib/pdflib.h"
+#include "custom_font.h"
 #include "pdf_load.h"
 
 
-int16 pdf_initialised = FALSE;
+boolean pdf_initialized = FALSE;
 
 
 /*==================================================================================*
@@ -122,7 +123,7 @@ int16 read_pdf( IMAGE *img, int16 page, double scale)
 	   	
 	free( data);	
 
-	chrono_off( ( char*)img->working_time);
+	chrono_off( img->working_time);
 
 	return( 1);	
 }
@@ -173,22 +174,35 @@ double get_scale_value( IMAGE *img, int16 page, uint16 target_width, uint16 targ
  * returns: 	'0' if error.														*
  *==================================================================================*/
 
-int16 pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
+boolean pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 {	
 	int16 i;
 	uint16 w = width;
 	double scale = 1.0;
 	
-	if( pdf_initialised == FALSE)
-		pdf_initialised = pdf_init( zview_path);
+	if( pdf_initialized == FALSE)
+	{
+#ifdef ZVPDF_SLB
+		if (zvpdf_open() < 0)
+			return FALSE;
+#else
+		p_get_text_width = get_text_width;
+#endif
+		pdf_initialized = pdf_init(zview_path);
+		if (!pdf_initialized)
+		{
+			errshow(NULL, -ENOMEM);
+			return FALSE;
+		}
+	}
 
-	if( lib_pdf_load( file, img) == FALSE)
-		return( 0);
+	if( lib_pdf_load( file, img, pdf_aa) == FALSE)
+		return FALSE;
 
 	if( ( img->image = ( MFDB *)malloc( sizeof( MFDB) *  img->page)) == NULL)
 	{
 		pdf_quit( img);
-		return ( 0);
+		return FALSE;
 	}
 
 	for( i = 0 ; i < img->page ; i++)	
@@ -210,17 +224,17 @@ int16 pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 	if( !read_pdf( img, 1, scale))
 	{
 		pdf_quit( img);
-		return ( 0);
+		return FALSE;
 	}
 
 	if( !init_txt_data( img, 8, 256))
 	{
 		pdf_quit( img);
 		delete_mfdb( img->image, img->page);
-		return ( 0);
+		return FALSE;
 	}
 		
 	pdf_get_info( img, img->comments);
 
-	return ( 1);
+	return TRUE;
 }

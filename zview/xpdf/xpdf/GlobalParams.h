@@ -350,9 +350,9 @@ public:
   void setTextPageBreaks(GBool pageBreaks);
   void setTextKeepTinyChars(GBool keep);
   void setInitialZoom(char *s);
-  GBool setEnableFreeType(char *s);
-  GBool setAntialias(char *s);
-  GBool setVectorAntialias(char *s);
+  GBool setEnableFreeType(const char *s);
+  GBool setAntialias(const char *s);
+  GBool setVectorAntialias(const char *s);
   void setScreenType(ScreenType t);
   void setScreenSize(int size);
   void setScreenDotRadius(int r);
@@ -410,7 +410,7 @@ private:
   void parsePopupMenuCmd(GList *tokens, GString *fileName, int line);
   void parseYesNo(const char *cmdName, GBool *flag,
 		  GList *tokens, GString *fileName, int line);
-  GBool parseYesNo2(char *token, GBool *flag);
+  GBool parseYesNo2(const char *token, GBool *flag);
   void parseString(const char *cmdName, GString **s,
 		   GList *tokens, GString *fileName, int line);
   void parseInteger(const char *cmdName, int *val,

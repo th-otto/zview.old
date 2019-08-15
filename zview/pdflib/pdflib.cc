@@ -1,31 +1,41 @@
-#include "general.h"
-#include "prefs.h"
-#include "winimg.h"
-#include "aconf.h"
-#include "custom_font.h"
-#include "goo/GString.h"
-#include "goo/GList.h"
-#include "xpdf/GlobalParams.h"
-#include "xpdf/Object.h"
-#include "xpdf/PDFDoc.h"
-#include "splash/SplashBitmap.h"
-#include "splash/Splash.h"
-#include "xpdf/SplashOutputDev.h"
-#include "xpdf/CharTypes.h"
-#include "xpdf/UnicodeMap.h"
-#include "xpdf/Outline.h"
-#include "xpdf/Link.h"
+#include "../general.h"
+#include "../winimg.h"
+#include "../aconf.h"
+#include "../custom_font.h"
+#include "../xpdf/goo/GString.h"
+#include "../goo/GList.h"
+#include "../xpdf/GlobalParams.h"
+#include "../xpdf/Object.h"
+#include "../xpdf/PDFDoc.h"
+#include "../splash/SplashBitmap.h"
+#include "../splash/Splash.h"
+#include "../xpdf/SplashOutputDev.h"
+#include "../xpdf/CharTypes.h"
+#include "../xpdf/UnicodeMap.h"
+#include "../xpdf/Outline.h"
+#include "../xpdf/Link.h"
+#include "pdflib.h"
 
 extern "C" {
 
+int16 (*p_get_text_width)(const char *str);
 
-static char latin_to_atari[] = { /*0x00A0*/'*','≠','õ','ú','*','ù',17,'›','π','Ω','¶','Æ','™','-','æ',
-'ˇ','¯','Ò','˝','˛','∫','Ê','º','˙','*','\'','ß','Ø','¨','´','*','®','∂','A','A','∑','é','è','í',
-'Ä','E','ê','E','E','I','I','I','I','D','•','O','O','O','∏','ô','x','≤','U','U','U','ö','Y','*',
-'û','Ö','†','É','∞','Ñ','Ü','ë','á','ä','Ç','à','â','ç','°','å','ã','Î','§','ï','¢','ì','±','î','ˆ',
-'≥','ó','£','ñ','Å','y','*','ò'};
+static unsigned char const latin_to_atari[] = {
+	/* 0x00A0 */ 0x2A, 0xAD, 0x9B, 0x9C, 0x2A, 0x9D, 0x11, 0xDD,
+	/* 0x00A8 */ 0xB9, 0xBD, 0xA6, 0xAE, 0xAA, 0x2D, 0xBE, 0xFF,
+	/* 0x00b0 */ 0xF8, 0xF1, 0xFD, 0xFE, 0xBA, 0xE6, 0xBC, 0xFA,
+	/* 0x00b8 */ 0x2A, 0x27, 0xA7, 0xAF, 0xAC, 0xAB, 0x2A, 0xA8,
+	/* 0x00c0 */ 0xB6, 0x41, 0x41, 0xB7, 0x8E, 0x8F, 0x92, 0x80,
+	/* 0x00c8 */ 0x45, 0x90, 0x45, 0x45, 0x49, 0x49, 0x49, 0x49,
+	/* 0x00d0 */ 0x44, 0xA5, 0x4F, 0x4F, 0x4F, 0xB8, 0x99, 0x78,
+	/* 0x00d8 */ 0xB2, 0x55, 0x55, 0x55, 0x9A, 0x59, 0x2A, 0x9E,
+	/* 0x00e0 */ 0x85, 0xA0, 0x83, 0xB0, 0x84, 0x86, 0x91, 0x87,
+	/* 0x00e8 */ 0x8A, 0x82, 0x88, 0x89, 0x8D, 0xA1, 0x8C, 0x8B,
+	/* 0x00f0 */ 0xEB, 0xA4, 0x95, 0xA2, 0x93, 0xB1, 0x94, 0xF6,
+	/* 0x00f8 */ 0xB3, 0x97, 0xA3, 0x96, 0x81, 0x79, 0x2A, 0x98
+};
 
-char pdf_title[256];
+static char pdf_title[256];
 
 
 void delete_bookmark_child( Bookmark *book)
@@ -56,7 +66,7 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 	GList *kids;
 	LinkAction	*link_action;
 	char buf[8], *test;
-	int i, j, n, count, lenght;
+	int i, j, n, count, length;
 
 	for (i = 0; i < items->getLength(); ++i)
 	{
@@ -116,27 +126,27 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 
 
 		/* Unicode to Latin 1 */
-	    for (j = 0, lenght = 0; j < item->getTitleLength(); ++j)
+	    for (j = 0, length = 0; j < item->getTitleLength(); ++j)
 	    {
       		n = uMap->mapUnicode(item->getTitle()[j], buf, sizeof(buf));
 
-			for( count = 0; n > count && lenght < 254; count++)
-	   			test[lenght++] = buf[count++];
+			for( count = 0; n > count && length < 254; count++)
+	   			test[length++] = buf[count++];
     	}
 
-	  	test[lenght] = '\0';
+	  	test[length] = '\0';
 
 		/* Latin 1 to Atari */
-	    for ( lenght = 0; test[lenght] != '\0'; ++lenght)
+	    for ( length = 0; test[length] != '\0'; ++length)
 	    {
-			if( ( uint8)test[lenght] > 0x9F)
+			if( ( uint8)test[length] > 0x9F)
 	    	{
-  				uint8 c = ( uint8)test[lenght] - 0xA0;
-				test[lenght] = latin_to_atari[c];
+  				uint8 c = ( uint8)test[length] - 0xA0;
+				test[length] = latin_to_atari[c];
     		}
     	}
 
-		book[i].txt_width = get_text_width( book[i].name);
+		book[i].txt_width = p_get_text_width( book[i].name);
 
 	    item->open();
 
@@ -207,13 +217,13 @@ void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
 }
 
 
-boolean lib_pdf_load( const char *name, IMAGE *img)
+boolean lib_pdf_load( const char *name, IMAGE *img, boolean antialias)
 {
 	PDFDoc *doc = NULL;
 	SplashColor paperColor;
 	SplashOutputDev *splashOut = NULL;
 
-	char* aaString = const_cast<char*>( pdf_aa ? "yes" : "no");
+	const char* aaString = antialias ? "yes" : "no";
 	globalParams->setAntialias( aaString);
 
         GString nameString( name);
@@ -236,8 +246,8 @@ boolean lib_pdf_load( const char *name, IMAGE *img)
 	img->_priv_ptr			= ( void*)doc;
 	img->_priv_ptr_more		= ( void*)splashOut;
 
-	strcpy( ( char*)img->info, "PDF");
-	strcpy( ( char*)img->compression, "None");
+	strcpy( img->info, "PDF");
+	strcpy( img->compression, "None");
 
 	return TRUE;
 }
@@ -299,7 +309,7 @@ static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
 	Unicode u;
 	char buf[8];
 	static char text[256];
-	int i, n, lenght = 0, count;
+	int i, n, length = 0, count;
 
 	if (infoDict->lookup(key, &obj)->isString())
 	{
@@ -333,19 +343,19 @@ static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
 
 			count = 0;
 
-			if(( n + lenght) > 234)
+			if(( n + length) > 234)
 			{
-				text[lenght] = '\0';
+				text[length] = '\0';
 				obj.free();
 				return ( char*)&text;
 			}
 
 			while( n > count)
-      			text[lenght++] = buf[count++];
+      			text[length++] = buf[count++];
     	}
   	}
 
-  	text[lenght] = '\0';
+  	text[length] = '\0';
   	obj.free();
 
   	return ( char*)&text;
@@ -464,23 +474,31 @@ void pdf_quit( IMAGE *img)
 
 	delete splashOut;
 	delete doc;
+	img->_priv_ptr = NULL;
+	img->_priv_ptr_more = NULL;
 }
 
-char *get_pdf_title( void)
+const char *get_pdf_title( void)
 {
-  	return ( char*)&pdf_title;
+  	return pdf_title;
 }
 
 boolean pdf_init( const char *path)
 {
 	globalParams = new GlobalParams( NULL);
+	if (globalParams == NULL)
+		return FALSE;
 	globalParams->setupBaseFonts( path);
 	return TRUE;
 }
 
 void pdf_exit( void)
 {
-	delete globalParams;
+	if (globalParams)
+	{
+		delete globalParams;
+		globalParams = NULL;
+	}
 }
 
 }

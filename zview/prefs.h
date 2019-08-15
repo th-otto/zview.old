@@ -16,7 +16,7 @@ extern int show_read_progress_bar;
 extern int show_write_progress_bar;
 extern int empty_trash_confirmation;
 extern int pdf_fit_to_win;
-extern int pdf_aa;
+extern boolean pdf_aa;
 extern int smooth_thumbnail;
 extern char skip_drive[32];
 

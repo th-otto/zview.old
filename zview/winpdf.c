@@ -8,7 +8,7 @@
 #include "pdf_load.h"
 #include "menu.h"
 #include "infobox.h"
-#include "pdflib.h"
+#include "pdflib/pdflib.h"
 #include "pic_resize.h"
 #include "wintimer.h"
 #include "ztext.h"

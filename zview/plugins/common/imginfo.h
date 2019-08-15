@@ -45,7 +45,7 @@ typedef struct _txt_data
 {
 	int16_t		lines;					/* Number of lines in the text 						*/
 	int16_t		max_lines_length;		/* The length of the greater line ( in nbr char)	*/
-	int8_t    	*txt[256];
+	char    	*txt[256];
 } txt_data;
 #endif
 
@@ -90,8 +90,8 @@ typedef struct _img_info
 
 	/* The following variable are only for Information Purpose, the zview doesn't
 	   use it for decoding routine but only for the information dialog								*/
-	int8_t		info[40];				/* Picture's info, for ex: "Gif 87a" 						*/
-	int8_t		compression[5];			/* Compression type, ex: "LZW" 								*/
+	char		info[40];				/* Picture's info, for ex: "Gif 87a" 						*/
+	char		compression[5];			/* Compression type, ex: "LZW" 								*/
 	uint16_t    real_width;				/* Real picture width( if the thumbnail variable is 1)		*/
 	uint16_t	real_height;			/* Real picture height( if the thumbnail variable is 1)		*/
 

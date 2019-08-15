@@ -152,7 +152,7 @@ static size_t __CDECL gcc_fwrite(const void *buf, size_t size, size_t count, FIL
 	return fwrite(buf, size, count, fp);
 }
 
-static bz_int_t _CDECL gcc_fprintf(FILE *fp, const char *format, ...)
+static bz_int_t __CDECL gcc_fprintf(FILE *fp, const char *format, ...)
 {
 	va_list args;
 	int ret;
@@ -162,7 +162,7 @@ static bz_int_t _CDECL gcc_fprintf(FILE *fp, const char *format, ...)
 	return ret;
 }
 
-static bz_int_t _CDECL gcc_printf(const char *format, ...)
+static bz_int_t __CDECL gcc_printf(const char *format, ...)
 {
 	va_list args;
 	int ret;
@@ -172,7 +172,7 @@ static bz_int_t _CDECL gcc_printf(const char *format, ...)
 	return ret;
 }
 
-static bz_int_t _CDECL gcc_sprintf(char *buf, const char *format, ...)
+static bz_int_t __CDECL gcc_sprintf(char *buf, const char *format, ...)
 {
 	va_list args;
 	int ret;

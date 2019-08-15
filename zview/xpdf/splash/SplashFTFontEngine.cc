@@ -28,6 +28,11 @@
 #else
 #  include <freetype/ftcffdrv.h>
 #endif
+#if defined(ZVPDF_SLB)
+#include "../general.h"
+#include "../winimg.h"
+#include "../pdflib/pdflib.h"
+#endif
 
 #ifdef VMS
 #if (__VMS_VER < 70000000)
@@ -68,7 +73,10 @@ SplashFTFontEngine::SplashFTFontEngine(GBool aaA, Guint flagsA,
 SplashFTFontEngine *SplashFTFontEngine::init(GBool aaA, Guint flagsA) {
   FT_Library libA;
 
-#ifdef FREETYPE_SLB
+#if defined(ZVPDF_SLB)
+  if (zvpdf_freetype_open() < 0)
+  	 return NULL;
+#elif defined(FREETYPE_SLB)
   if (slb_freetype_open(NULL) < 0)
   	 return NULL;
 #endif
@@ -80,7 +88,9 @@ SplashFTFontEngine *SplashFTFontEngine::init(GBool aaA, Guint flagsA) {
 
 SplashFTFontEngine::~SplashFTFontEngine() {
   FT_Done_FreeType(lib);
-#ifdef FREETYPE_SLB
+#if defined(ZVPDF_SLB)
+  zvpdf_freetype_close();
+#elif defined(FREETYPE_SLB)
   slb_freetype_close();
 #endif
 }

@@ -4,10 +4,15 @@ include $(top_srcdir)/configvars
 
 DEBUG_LIB			= # -lwout
 
-XPDF_LIBS			= 
+ZVPDF_SLB = 1
+
 XPDF_CPPFLAGS                   := -DUSE_PRIVATE_FONTDIR \
 				    -I$(shell dirname $(dir $(shell $(CC) --print-file-name=libc.a)))/include/freetype2 \
-				    -DFREETYPE_SLB -DPNGLIB_SLB -DZLIB_SLB -DBZIP2_SLB 
+				    -DFREETYPE_SLB -DPNGLIB_SLB -DZLIB_SLB -DBZIP2_SLB
+ifeq ($(ZVPDF_SLB),1)
+XPDF_CPPFLAGS +=		-DZVPDF_SLB
+endif
+
 XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash $(XPDF_CPPFLAGS)
 LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lfreetype.slb
                                 # -lpng.slb -lbz2.slb -lz.slb
@@ -36,14 +41,9 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o plugins/slb/exif_open.o plugins/slb/bzip2_open.o
 
 PROGRAM 			= zview.app
-PDF_LIB				= libpdf.a
 
 all:: $(PROGRAM)
 	$(MAKE) -C plugins
-
-$(PROGRAM): $(PDF_LIB) $(OBJ)
-	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,512k -L. -lpdf $(XPDF_LIBS) $(LIB)
-	$(COMPRESS) $(PROGRAM)
 
 ##############################################################################
 
@@ -65,8 +65,7 @@ PDF_OBJ				= xpdf/xpdf/Annot.o xpdf/xpdf/Array.o xpdf/xpdf/BuiltinFont.o xpdf/xp
 				  xpdf/splash/SplashFTFont.o xpdf/splash/SplashFTFontEngine.o xpdf/splash/SplashFTFontFile.o \
 				  xpdf/splash/SplashFont.o xpdf/splash/SplashFontEngine.o xpdf/splash/SplashFontFile.o \
 				  xpdf/splash/SplashFontFileID.o xpdf/splash/SplashPath.o xpdf/splash/SplashPattern.o \
-				  xpdf/splash/SplashScreen.o xpdf/splash/SplashState.o xpdf/splash/SplashXPath.o xpdf/splash/SplashXPathScanner.o \
-                                  pdflib.o
+				  xpdf/splash/SplashScreen.o xpdf/splash/SplashState.o xpdf/splash/SplashXPath.o xpdf/splash/SplashXPathScanner.o
 
 ifeq ($(firstword $(subst ., ,$(XPDF_VERSION))),4)
 PDF_OBJ				+= xpdf/xpdf/PDF417Barcode.o
@@ -87,19 +86,37 @@ xpdf/config.status:
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
 	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --host=m68k-atari-mint
 	
-$(PDF_LIB): $(PDF_OBJ)
-	rm -f $@
-	$(AR) cru $@ $(PDF_OBJ)
-
 ##############################################################################
 
 include $(top_srcdir)/rules
 
+##############################################################################
+
+libpdf.a: $(PDF_OBJ)
+	$(RM) $@
+	$(AR) rcs $@ $(PDF_OBJ)
+
+ifeq ($(ZVPDF_SLB),1)
+$(PROGRAM): $(OBJ) pdflib/zvpdf_load.o slb/$(SLB_SUBDIR)zvpdf.slb
+	$(CC) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/zvpdf_load.o $(LDFLAGS) -Wl,--stack,512k $(LIB) -lm -Wl,-Map,zview.map
+else
+$(PROGRAM): $(OBJ) pdflib/pdflib.o libpdf.a
+	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/pdflib.o libpdf.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -Wl,-Map,zview.map
+endif
+	$(COMPRESS) $(PROGRAM)
+
+slb/$(SLB_SUBDIR)zvpdf.slb: pdflib/header.lo pdflib/zvpdf.lo pdflib/pdflib.lo libpdf.a
+	$(CXX) -s -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) # -nostdlib -lgcc -lstdc++ -lgcc
+
+pdflib/header.lo: plugins/common/plugin.h plugins/common/zview.h pdflib/exports.h
+
+##############################################################################
+
 clean_zview:
-	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o $(PDF_LIB) xpdf*/*/*.o
+	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o pdflib/*.o pdflib/*.lo slb/*/*.slb xpdf*/*/*.o
 	$(MAKE) -C plugins clean
 
 clean_pdf:
-	rm -f $(PDF_LIB) $(PDF_OBJ)
+	rm -f pdflib/*.o slb/*/*.slb $(PDF_OBJ) libpdf.a
 
 clean: clean_zview

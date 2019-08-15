@@ -18,10 +18,6 @@
 #include <sys/stat.h>
 #include "imginfo.h"
 
-#ifndef _CDECL
-#define _CDECL
-#endif
-
 #define LIB_PNG      0
 #define LIB_Z        1
 #define LIB_JPEG     2
@@ -50,73 +46,73 @@ struct _zview_plugin_funcs {
 	 */
 	long plugin_version;
 
-	long _CDECL (*p_slb_open)(zv_int_t lib);
-	void _CDECL (*p_slb_close)(zv_int_t lib);
-	SLB *_CDECL (*p_slb_get)(zv_int_t lib);
+	long __CDECL (*p_slb_open)(zv_int_t lib);
+	void __CDECL (*p_slb_close)(zv_int_t lib);
+	SLB *__CDECL (*p_slb_get)(zv_int_t lib);
 	
-	void *_CDECL (*p_memset)(void *, zv_int_t, size_t);
-	void *_CDECL (*p_memcpy)(void *, const void *, size_t);
-	void *_CDECL (*p_memchr)(const void *, zv_int_t, size_t);
-	zv_int_t _CDECL (*p_memcmp)(const void *, const void *, size_t);
+	void *__CDECL (*p_memset)(void *, zv_int_t, size_t);
+	void *__CDECL (*p_memcpy)(void *, const void *, size_t);
+	void *__CDECL (*p_memchr)(const void *, zv_int_t, size_t);
+	zv_int_t __CDECL (*p_memcmp)(const void *, const void *, size_t);
 
-	size_t _CDECL (*p_strlen)(const char *);
-	char *_CDECL (*p_strcpy)(char *, const char *);
-	char *_CDECL (*p_strncpy)(char *, const char *, size_t);
-	char *_CDECL (*p_strcat)(char *, const char *);
-	char *_CDECL (*p_strncat)(char *, const char *, size_t);
-	zv_int_t _CDECL (*p_strcmp)(const char *, const char *);
-	zv_int_t _CDECL (*p_strncmp)(const char *, const char *, size_t);
+	size_t __CDECL (*p_strlen)(const char *);
+	char *__CDECL (*p_strcpy)(char *, const char *);
+	char *__CDECL (*p_strncpy)(char *, const char *, size_t);
+	char *__CDECL (*p_strcat)(char *, const char *);
+	char *__CDECL (*p_strncat)(char *, const char *, size_t);
+	zv_int_t __CDECL (*p_strcmp)(const char *, const char *);
+	zv_int_t __CDECL (*p_strncmp)(const char *, const char *, size_t);
 
-	void *_CDECL (*p_malloc)(size_t);
-	void *_CDECL (*p_calloc)(size_t, size_t);
-	void *_CDECL (*p_realloc)(void *ptr, size_t size);
-	void _CDECL (*p_free)(void *);
+	void *__CDECL (*p_malloc)(size_t);
+	void *__CDECL (*p_calloc)(size_t, size_t);
+	void *__CDECL (*p_realloc)(void *ptr, size_t size);
+	void __CDECL (*p_free)(void *);
 
-	zv_int_t _CDECL (*p_get_errno)(void);
-	char *_CDECL (*p_strerror)(zv_int_t);
-	__attribute__((__noreturn__)) void _CDECL (*p_abort)(void);
+	zv_int_t __CDECL (*p_get_errno)(void);
+	char *__CDECL (*p_strerror)(zv_int_t);
+	__attribute__((__noreturn__)) void __CDECL (*p_abort)(void);
 	FILE *stderr_location;
 
-	zv_int_t _CDECL (*p_remove)(const char *);
+	zv_int_t __CDECL (*p_remove)(const char *);
 
-	zv_int_t _CDECL (*p_open)(const char *, zv_int_t, ...);
-	zv_int_t _CDECL (*p_close)(zv_int_t);
-	ssize_t _CDECL (*p_read)(zv_int_t, void *, size_t);
-	ssize_t _CDECL (*p_write)(zv_int_t, const void *, size_t);
-	off_t _CDECL (*p_lseek)(zv_int_t, off_t, zv_int_t);
+	zv_int_t __CDECL (*p_open)(const char *, zv_int_t, ...);
+	zv_int_t __CDECL (*p_close)(zv_int_t);
+	ssize_t __CDECL (*p_read)(zv_int_t, void *, size_t);
+	ssize_t __CDECL (*p_write)(zv_int_t, const void *, size_t);
+	off_t __CDECL (*p_lseek)(zv_int_t, off_t, zv_int_t);
 
-	FILE *_CDECL (*p_fopen)(const char *, const char *);
-	FILE *_CDECL (*p_fdopen)(zv_int_t, const char *);
-	zv_int_t _CDECL (*p_fclose)(FILE *);
-	zv_int_t _CDECL (*p_fseek)(FILE *, long, zv_int_t);
-	zv_int_t _CDECL (*p_fseeko)(FILE *, off_t, zv_int_t);
-	long _CDECL (*p_ftell)(FILE *);
-	off_t _CDECL (*p_ftello)(FILE *);
-	zv_int_t _CDECL (*p_printf)(const char *, ...);
-	zv_int_t _CDECL (*p_sprintf)(char *, const char *, ...);
-	zv_int_t _CDECL (*p_vsnprintf)(char *, size_t, const char *, va_list);
-	zv_int_t _CDECL (*p_vfprintf)(FILE *, const char *, va_list);
-	size_t _CDECL (*p_fread)(void *, size_t, size_t, FILE *);
-	size_t _CDECL (*p_fwrite)(const void *, size_t, size_t, FILE *);
-	zv_int_t _CDECL (*p_ferror)(FILE *);
-	zv_int_t _CDECL (*p_fflush)(FILE *);
+	FILE *__CDECL (*p_fopen)(const char *, const char *);
+	FILE *__CDECL (*p_fdopen)(zv_int_t, const char *);
+	zv_int_t __CDECL (*p_fclose)(FILE *);
+	zv_int_t __CDECL (*p_fseek)(FILE *, long, zv_int_t);
+	zv_int_t __CDECL (*p_fseeko)(FILE *, off_t, zv_int_t);
+	long __CDECL (*p_ftell)(FILE *);
+	off_t __CDECL (*p_ftello)(FILE *);
+	zv_int_t __CDECL (*p_printf)(const char *, ...);
+	zv_int_t __CDECL (*p_sprintf)(char *, const char *, ...);
+	zv_int_t __CDECL (*p_vsnprintf)(char *, size_t, const char *, va_list);
+	zv_int_t __CDECL (*p_vfprintf)(FILE *, const char *, va_list);
+	size_t __CDECL (*p_fread)(void *, size_t, size_t, FILE *);
+	size_t __CDECL (*p_fwrite)(const void *, size_t, size_t, FILE *);
+	zv_int_t __CDECL (*p_ferror)(FILE *);
+	zv_int_t __CDECL (*p_fflush)(FILE *);
 
-	zv_int_t _CDECL (*p_rand)(void);
-	void _CDECL (*p_srand)(zv_uint_t seed);
+	zv_int_t __CDECL (*p_rand)(void);
+	void __CDECL (*p_srand)(zv_uint_t seed);
 
-	void _CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
-	void *_CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
+	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
+	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
                      
-	time_t _CDECL (*p_time)(time_t *tloc);
-	struct tm *_CDECL (*p_localtime)(const time_t *timep);
-	struct tm *_CDECL (*p_gmtime)(const time_t *);
+	time_t __CDECL (*p_time)(time_t *tloc);
+	struct tm *__CDECL (*p_localtime)(const time_t *timep);
+	struct tm *__CDECL (*p_gmtime)(const time_t *);
 
-	zv_int_t _CDECL (*p_fstat)(zv_int_t fd, struct stat *s);
+	zv_int_t __CDECL (*p_fstat)(zv_int_t fd, struct stat *s);
 	
-	zv_int_t _CDECL (*p_sigsetjmp)(jmp_buf, zv_int_t);
-	__attribute__((__noreturn__)) void _CDECL (*p_longjmp)(jmp_buf, zv_int_t);
+	zv_int_t __CDECL (*p_sigsetjmp)(jmp_buf, zv_int_t);
+	__attribute__((__noreturn__)) void __CDECL (*p_longjmp)(jmp_buf, zv_int_t);
 	
-	double _CDECL (*p_atof)(const char *);
+	double __CDECL (*p_atof)(const char *);
 
 	/* room for later extensions */
 	void *unused[31];
