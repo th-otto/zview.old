@@ -1,6 +1,5 @@
 #include "../general.h"
 #include "../pic_load.h"
-#include "dither.h"
 #include "raster.h"
 #include "raster_resize.h"
 

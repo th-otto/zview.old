@@ -1,5 +1,6 @@
 #include "../general.h"
 #include "../pic_load.h"
+#include "vdi.h"
 #include "dither.h"
 #include "raster.h"
 

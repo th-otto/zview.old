@@ -16,7 +16,7 @@ CXXFLAGS			+= $(XPDF_INCS) -I../common
 
 FILE_OBJ 			= file/sort.o file/file.o file/delete.o file/rename.o file/count.o
 EDIT_OBJ 			= zedit/char.o zedit/edit.o zedit/zedit.o
-VDI_OBJ 			= zvdi/p2c.o zvdi/color.o zvdi/dither.o zvdi/raster.o zvdi/raster_resize.o zvdi/pixel.o zvdi/vdi.o
+VDI_OBJ 			= zvdi/p2c.o zvdi/color.o zvdi/raster.o zvdi/raster_resize.o zvdi/pixel.o zvdi/vdi.o
 CATALOG_OBJ			= catalog/catalog_slider.o catalog/catalog_size.o catalog/catalog_other_event.o	\
 				  catalog/catalog_keyb.o catalog/catalog_mouse.o catalog/catalog_iconify.o 		\
 				  catalog/catalog_icons.o catalog/catalog_entry.o catalog/catalog_mini_entry.o 	\

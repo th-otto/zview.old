@@ -1360,7 +1360,7 @@ WINDOW *WindPdf( char *filename)
 	IMAGE 		*img;
 	double		scale = 1.0;
 	int16		w, h;
-	char		temp[10];
+	char		temp[20];
 
 	if ( ( windata = ( WINDATA*) malloc( sizeof( WINDATA))) == NULL)
 	{

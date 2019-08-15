@@ -87,7 +87,8 @@ static char* ParseArgs( char* cmdline )
 
 void __CDECL va_start(WINDOW *win EVNT_BUFF_PARAM)
 {
-	char *p = *(char **) &EVNT_BUFF[3];
+	char **pp = (char **) &EVNT_BUFF[3];
+	char *p = *pp;
 
 	if( p)
 	{
