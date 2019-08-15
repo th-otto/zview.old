@@ -22,9 +22,11 @@
 #include "FoFiType1C.h"
 #include "SplashFTFontFile.h"
 #include "SplashFTFontEngine.h"
-#include FT_MODULE_H
-#ifdef FT_CFF_DRIVER_H
-#  include FT_CFF_DRIVER_H
+#include <freetype/ftmodapi.h>
+#ifdef FT_DRIVER_H
+#  include <freetype/ftdriver.h>
+#else
+#  include <freetype/ftcffdrv.h>
 #endif
 
 #ifdef VMS
@@ -66,6 +68,10 @@ SplashFTFontEngine::SplashFTFontEngine(GBool aaA, Guint flagsA,
 SplashFTFontEngine *SplashFTFontEngine::init(GBool aaA, Guint flagsA) {
   FT_Library libA;
 
+#ifdef FREETYPE_SLB
+  if (slb_freetype_open(NULL) < 0)
+  	 return NULL;
+#endif
   if (FT_Init_FreeType(&libA)) {
     return NULL;
   }
@@ -74,6 +80,9 @@ SplashFTFontEngine *SplashFTFontEngine::init(GBool aaA, Guint flagsA) {
 
 SplashFTFontEngine::~SplashFTFontEngine() {
   FT_Done_FreeType(lib);
+#ifdef FREETYPE_SLB
+  slb_freetype_close();
+#endif
 }
 
 SplashFontFile *SplashFTFontEngine::loadType1Font(SplashFontFileID *idA,

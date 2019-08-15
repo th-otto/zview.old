@@ -265,7 +265,10 @@ long slb_load(const char *sharedlib, const char *path, long ver, SLB_HANDLE *slb
 	}
 
 	if (err < 0)
+	{
+		*slb = 0;
 		return err;
+	}
 
 	return 0;
 }

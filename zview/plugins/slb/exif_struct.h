@@ -64,8 +64,8 @@ struct _exif_funcs {
 	exif_int_t __CDECL (*p_snprintf)(char *, size_t, const char *, ...);
 	exif_int_t __CDECL (*p_printf)(const char *, ...);
 	
-	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, exif_int_t (*compar)(const void *, const void *));
-	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, exif_int_t (*compar)(const void *, const void *));
+	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, exif_int_t __CDECL (*compar)(const void *, const void *));
+	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, exif_int_t __CDECL (*compar)(const void *, const void *));
                      
 	time_t __CDECL (*p_time)(time_t *);
 	struct tm *__CDECL (*p_localtime)(const time_t *timep);

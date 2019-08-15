@@ -5,8 +5,12 @@ include $(top_srcdir)/configvars
 DEBUG_LIB			= # -lwout
 
 XPDF_LIBS			= 
-XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash -DUSE_PRIVATE_FONTDIR
-LIB				= -lfreetype $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lpng -lz
+XPDF_CPPFLAGS                   := -DUSE_PRIVATE_FONTDIR \
+				    -I$(shell dirname $(dir $(shell $(CC) --print-file-name=libc.a)))/include/freetype2 \
+				    -DFREETYPE_SLB -DPNGLIB_SLB -DZLIB_SLB -DBZIP2_SLB 
+XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash $(XPDF_CPPFLAGS)
+LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lfreetype.slb
+                                # -lpng.slb -lbz2.slb -lz.slb
 CFLAGS				+= $(XPDF_INCS) -I../common
 CXXFLAGS			+= $(XPDF_INCS) -I../common
 
@@ -29,7 +33,7 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 # because that would pull in the import functions for the shared library,
 # and would also be used by the pdf library, which is not yet prepared for that
 #
-OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o plugins/slb/exif_open.o
+OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o plugins/slb/exif_open.o plugins/slb/bzip2_open.o
 
 PROGRAM 			= zview.app
 PDF_LIB				= libpdf.a
@@ -79,10 +83,9 @@ $(PDF_OBJ): xpdf/config.status
 xpdf/config.status:
 	test -d xpdf || exit 1 && \
 	cd xpdf && \
-	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkg-config && \
-	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkg-config && \
-	CFLAGS='-O2 -fomit-frame-pointer $(CPU)' CXXFLAGS='-O2 -fomit-frame-pointer $(CPU)' ./configure --without-x --host=m68k-atari-mint && \
-	$(MAKE)
+	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
+	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
+	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --host=m68k-atari-mint
 	
 $(PDF_LIB): $(PDF_OBJ)
 	rm -f $@

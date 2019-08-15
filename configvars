@@ -16,7 +16,7 @@ endif
 ifeq ($(CPU),-mcpu=5475)
 CPU_SUBDIR                      = m5475/
 endif
-OPTIMISATION			= -g -O2 -fomit-frame-pointer
+OPTIMISATION			= -O2 -fomit-frame-pointer
 DEBUG				= # -DDEBUG
 
 ifeq ($(USE_WINDOM2),)

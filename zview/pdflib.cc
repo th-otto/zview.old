@@ -471,7 +471,7 @@ char *get_pdf_title( void)
   	return ( char*)&pdf_title;
 }
 
-boolean pdf_init( char *path)
+boolean pdf_init( const char *path)
 {
 	globalParams = new GlobalParams( NULL);
 	globalParams->setupBaseFonts( path);

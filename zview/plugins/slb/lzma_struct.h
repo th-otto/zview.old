@@ -9,8 +9,8 @@
 #ifndef __LZMASTRUCT_H__
 #define __LZMASTRUCT_H__ 1
 
-#ifndef _CDECL
-#define _CDECL
+#ifndef __CDECL
+#define __CDECL
 #endif
 
 #include <mint/slb.h>
@@ -34,22 +34,22 @@ struct _lzma_funcs {
 	 */
 	long lzma_vernum;
 	
-	void *_CDECL (*p_memset)(void *, lzma_int_t, size_t);
-	void *_CDECL (*p_memcpy)(void *, const void *, size_t);
-	lzma_int_t _CDECL (*p_memcmp)(const void *, const void *, size_t);
+	void *__CDECL (*p_memset)(void *, lzma_int_t, size_t);
+	void *__CDECL (*p_memcpy)(void *, const void *, size_t);
+	lzma_int_t __CDECL (*p_memcmp)(const void *, const void *, size_t);
 	
-	size_t _CDECL (*p_strlen)(const char *);
-	char *_CDECL (*p_strcpy)(char *, const char *);
-	lzma_int_t _CDECL (*p_strcmp)(const char *, const char *);
+	size_t __CDECL (*p_strlen)(const char *);
+	char *__CDECL (*p_strcpy)(char *, const char *);
+	lzma_int_t __CDECL (*p_strcmp)(const char *, const char *);
 
-	void *_CDECL (*p_malloc)(size_t);
-	void _CDECL (*p_free)(void *);
+	void *__CDECL (*p_malloc)(size_t);
+	void __CDECL (*p_free)(void *);
 
 	/* room for later extensions */
 	void *unused[12];
 };
 
-long _CDECL lzma_slb_control(long fn, void *arg);
+long __CDECL lzma_slb_control(long fn, void *arg);
 struct _lzma_funcs *lzma_get_slb_funcs(void);
 
 #endif

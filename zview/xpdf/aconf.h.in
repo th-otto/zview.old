@@ -15,20 +15,8 @@
 /* Defined when building the closed source XpdfReader binary. */
 #undef BUILDING_XPDFREADER
 
-/* include support for CMYK rasterization */
-#undef CMYK
-
-/* Enable support for DeviceN output. */
-#undef DEVICEN
-
 /* Defined for evaluation mode. */
 #undef EVAL_MODE
-
-/* use C++ exceptions */
-#undef EXCEPTIONS
-
-/* use fixed point (instead of floating point) arithmetic */
-#undef FIXEDPOINT
 
 /* Define to 1 if you have the <argz.h> header file. */
 #undef HAVE_ARGZ_H
@@ -113,7 +101,7 @@
 /* Define to 1 if you have the <pwd.h> header file. */
 #undef HAVE_PWD_H
 
-/* Defined if the Splash library is avaiable. */
+/* Defined if the Splash library is available. */
 #undef HAVE_SPLASH
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -160,9 +148,6 @@
 
 /* do not allow text selection */
 #undef NO_TEXT_SELECT
-
-/* include support for OPI comments */
-#undef OPI
 
 /* include support for OPI comments */
 #undef OPI_SUPPORT

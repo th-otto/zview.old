@@ -11,9 +11,9 @@
 #ifdef HAVE_FREETYPE
 
 #include <ft2build.h>
-#include FT_OUTLINE_H
-#include FT_SIZES_H
-#include FT_GLYPH_H
+#include <freetype/ftoutln.h>
+#include <freetype/ftsizes.h>
+#include <freetype/ftglyph.h>
 #include "gmem.h"
 #include "gmempp.h"
 #include "SplashMath.h"

@@ -22,12 +22,14 @@
 #define _CDECL
 #endif
 
-#define LIB_PNG   0
-#define LIB_Z     1
-#define LIB_JPEG  2
-#define LIB_TIFF  3
-#define LIB_LZMA  4
-#define LIB_EXIF  5
+#define LIB_PNG      0
+#define LIB_Z        1
+#define LIB_JPEG     2
+#define LIB_TIFF     3
+#define LIB_LZMA     4
+#define LIB_EXIF     5
+#define LIB_BZIP2    6
+#define LIB_FREETYPE 7
 
 struct _zview_plugin_funcs {
 	/*

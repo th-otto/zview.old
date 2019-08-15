@@ -9,6 +9,8 @@
 #include <slb/tiff.h>
 #include <slb/lzma.h>
 #include <slb/exif.h>
+#include <slb/bzip2.h>
+#include <slb/freetype.h>
 #include "zvplugin.h"
 #include "plugin.h"
 #include "plugin_version.h"
@@ -246,6 +248,46 @@ void slb_lzma_close(void)
 }
 
 
+static SLB bzip2_slb = { 0, slb_not_loaded };
+
+SLB *slb_bzip2_get(void)
+{
+	return &bzip2_slb;
+}
+
+
+void slb_bzip2_close(void)
+{
+	SLB *bzip2 = slb_bzip2_get();
+
+	if (!bzip2->handle)
+		return;
+	slb_unload(bzip2->handle);
+	bzip2->handle = 0;
+	bzip2->exec = slb_unloaded;
+}
+
+
+static SLB freetype_slb = { 0, slb_not_loaded };
+
+SLB *slb_freetype_get(void)
+{
+	return &freetype_slb;
+}
+
+
+void slb_freetype_close(void)
+{
+	SLB *freetype = slb_freetype_get();
+
+	if (!freetype->handle)
+		return;
+	slb_unload(freetype->handle);
+	freetype->handle = 0;
+	freetype->exec = slb_unloaded;
+}
+
+
 static long _CDECL slb_open(zv_int_t lib)
 {
 	switch (lib)
@@ -262,6 +304,10 @@ static long _CDECL slb_open(zv_int_t lib)
 		return slb_lzma_open(NULL);
 	case LIB_EXIF:
 		return slb_exif_open(NULL);
+	case LIB_BZIP2:
+		return slb_bzip2_open(NULL);
+	case LIB_FREETYPE:
+		return slb_freetype_open(NULL);
 	}
 	return -ENOENT;
 }
@@ -289,6 +335,12 @@ static void _CDECL slb_close(zv_int_t lib)
 	case LIB_EXIF:
 		slb_exif_close();
 		break;
+	case LIB_BZIP2:
+		slb_bzip2_close();
+		break;
+	case LIB_FREETYPE:
+		slb_freetype_close();
+		break;
 	}
 }
 
@@ -309,6 +361,10 @@ static SLB *_CDECL slb_get(zv_int_t lib)
 		return slb_lzma_get();
 	case LIB_EXIF:
 		return slb_exif_get();
+	case LIB_BZIP2:
+		return slb_bzip2_get();
+	case LIB_FREETYPE:
+		return slb_freetype_get();
 	}
 	return NULL;
 }
@@ -403,7 +459,10 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 
 	ret = slb_load(name, path, PLUGIN_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)
+	{
+		slb->handle = 0;
 		return ret;
+	}
 
 	/*
 	 * check compile flags; that function should be as simple as to just return a constant

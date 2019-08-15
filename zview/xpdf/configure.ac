@@ -73,7 +73,7 @@ m4_define(ac_option_lcase, [translit($1,-ABCDEFGHIJKLMNOPQRSTUVWXYZ,_abcdefghijk
 # AH_OPTION(OPTION, DESC, DEFAULT, DEFINE)
 # ----------------------------------------
 AC_DEFUN([AC_OPTION], [
-AH_TEMPLATE([ac_option_ucase($1)], [$2])
+AH_TEMPLATE([ac_option_ucase(m4_case($4,,$1,$4))], [$2])
 AC_ARG_ENABLE($1,
 [AC_HELP_STRING(--m4_case($3,,enable,no,enable,yes,disable,must-be-yes-or-no)-[]$1, [$2])],
 [case [$]enableval in
@@ -319,14 +319,16 @@ AH_TEMPLATE([HAVE_FREETYPE], [This is defined if using FreeType 2.])
 PKG_CHECK_MODULES(FREETYPE2, freetype2, have_freetype=yes, have_freetype=no)
 if test "$have_freetype" = yes; then
   AC_DEFINE([HAVE_FREETYPE])
-  AC_DEFINE([HAVE_SPLASH], 1, [Defined if the Splash library is avaiable.])
+  AC_DEFINE([HAVE_SPLASH], 1, [Defined if the Splash library is available.])
+else
+  AC_MSG_ERROR([freetype libraries not available])
 fi
 AM_CONDITIONAL(HAVE_FREETYPE, test "$have_freetype" = yes)
 AM_CONDITIONAL(HAVE_SPLASH, test "$have_freetype" = yes)
 dnl this can get wrong if PKG_CONFIG_PATH is not set
 if test "$TARGET_OS" = tos; then
-   FREETYPE2_LIBS="-lfreetype -lpng -lbz2 -lz"
-   FREETYPE2_CFLAGS=""
+   FREETYPE2_LIBS="-lfreetype.slb -lpng.slb -lbz2.slb -lz.slb"
+   FREETYPE2_CFLAGS="-DUSE_PRIVATE_FONTDIR -DFREETYPE_SLB -DPNGLIB_SLB -DZLIB_SLB -DBZIP2_SLB -I$(dirname $(dirname $($CC --print-file-name=libc.a)))/include/freetype2"
 fi
 
 ###############################################################################
