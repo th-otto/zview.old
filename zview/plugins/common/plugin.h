@@ -186,6 +186,7 @@ struct _zview_plugin_funcs {
 #undef fstat
 
 #undef sigsetjmp
+#undef setjmp
 #undef longjmp
 
 #undef atof
@@ -260,6 +261,7 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define fstat(fd, s) get_slb_funcs()->p_fstat(fd, s)
 
 #define sigsetjmp get_slb_funcs()->p_sigsetjmp
+#define setjmp(j) get_slb_funcs()->p_sigsetjmp(j, 1)
 #define longjmp get_slb_funcs()->p_longjmp
 
 #define atof(x) get_slb_funcs()->p_atof(x)

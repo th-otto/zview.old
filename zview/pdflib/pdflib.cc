@@ -301,14 +301,13 @@ uint32 *pdf_get_page_addr( IMAGE *img)
 	return ( uint32*)( data); // ( data.rgb8);
 }
 
-static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
+static void InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap, char *text)
 {
 	Object obj;
 	GString *s1;
 	GBool isUnicode;
 	Unicode u;
 	char buf[8];
-	static char text[256];
 	int i, n, length = 0, count;
 
 	if (infoDict->lookup(key, &obj)->isString())
@@ -347,7 +346,7 @@ static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
 			{
 				text[length] = '\0';
 				obj.free();
-				return ( char*)&text;
+				return;
 			}
 
 			while( n > count)
@@ -357,17 +356,14 @@ static char *InfoString(Dict *infoDict, const char *key, UnicodeMap *uMap)
 
   	text[length] = '\0';
   	obj.free();
-
-  	return ( char*)&text;
 }
 
-static char *InfoDate(Dict *infoDict, const char *key)
+static void InfoDate(Dict *infoDict, const char *key, char *text)
 {
 	Object obj;
 	char *s;
 	int year, mon, day, hour, min, sec;
 	struct tm tmStruct;
-	static char buf[256];
 
 	if (infoDict->lookup(key, &obj)->isString())
 	{
@@ -390,19 +386,18 @@ static char *InfoDate(Dict *infoDict, const char *key)
       		tmStruct.tm_yday = -1;
       		tmStruct.tm_isdst = -1;
       		// compute the tm_wday and tm_yday fields
-      		if (mktime(&tmStruct) != (time_t)-1 && strftime(buf, sizeof(buf), "%c", &tmStruct))
+      		if (mktime(&tmStruct) != (time_t)-1 && strftime(text, 256 - 1, "%c", &tmStruct))
       		{
 				obj.free();
-				return ( char*)&buf;
+				return;
       		}
     	}
 
-		strcpy( buf, s);
+		strcpy( text, s);
   	}
-	else buf[0] = '\0';
+	else text[0] = '\0';
 
   	obj.free();
-  	return ( char*)&buf;
 }
 
 void pdf_get_info( IMAGE *img, txt_data *txtdata)
@@ -410,7 +405,7 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
 	Object info;
 	UnicodeMap *uMap;
   	PDFDoc *doc = ( PDFDoc*)img->_priv_ptr;
-	char *txt;
+	char text[256];
 
 	if (!( uMap = globalParams->getTextEncoding()))
 	{
@@ -430,25 +425,25 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
 
 	if (info.isDict())
 	{
-		txt = InfoString(info.getDict(), "Title", uMap);
-		sprintf( ( char*)txtdata->txt[0] , "Title:  %s", txt);
-		strcpy( pdf_title, txt);
-		txt = InfoString(info.getDict(), "Subject", uMap);
-		sprintf( ( char*)txtdata->txt[1] , "Subject:  %s", txt);
-		txt = InfoString(info.getDict(), "Keywords", uMap);
-		sprintf( ( char*)txtdata->txt[2] , "Keywords:  %s", txt);
-		txt = InfoString(info.getDict(), "Author", uMap);
-		sprintf( ( char*)txtdata->txt[3] , "Author:  %s", txt);
-		txt = InfoString(info.getDict(), "Creator", uMap);
-		sprintf( ( char*)txtdata->txt[4] , "Creator:  %s", txt);
-		txt = InfoString(info.getDict(), "Producer", uMap);
-		sprintf( ( char*)txtdata->txt[5] , "Producer:  %s", txt);
-//		sprintf( ( char*)txtdata->txt[6] , "PDF version:       %.1f", doc->getPDFVersion());
+		InfoString(info.getDict(), "Title", uMap, text);
+		sprintf( txtdata->txt[0] , "Title:  %s", text);
+		strcpy( pdf_title, text);
+		InfoString(info.getDict(), "Subject", uMap, text);
+		sprintf( txtdata->txt[1] , "Subject:  %s", text);
+		InfoString(info.getDict(), "Keywords", uMap, text);
+		sprintf( txtdata->txt[2] , "Keywords:  %s", text);
+		InfoString(info.getDict(), "Author", uMap, text);
+		sprintf( txtdata->txt[3] , "Author:  %s", text);
+		InfoString(info.getDict(), "Creator", uMap, text);
+		sprintf( txtdata->txt[4] , "Creator:  %s", text);
+		InfoString(info.getDict(), "Producer", uMap, text);
+		sprintf( txtdata->txt[5] , "Producer:  %s", text);
+//		sprintf( txtdata->txt[6] , "PDF version:       %.1f", doc->getPDFVersion());
 
-		txt = InfoDate(info.getDict(), "CreationDate");
-		sprintf( ( char*)txtdata->txt[6] , "Creation Date:  %s", txt);
-		txt = InfoDate(info.getDict(), "ModDate");
-		sprintf( ( char*)txtdata->txt[7] , "Modification Date:  %s", txt);
+		InfoDate(info.getDict(), "CreationDate", text);
+		sprintf( txtdata->txt[6] , "Creation Date:  %s", text);
+		InfoDate(info.getDict(), "ModDate", text);
+		sprintf( txtdata->txt[7] , "Modification Date:  %s", text);
 	}
 	else
 	{
@@ -501,4 +496,17 @@ void pdf_exit( void)
 	}
 }
 
+}
+
+/*
+ * avoid pulling in references to std::terminate() and write()
+ */
+#include <cxxabi.h>
+
+extern "C" void
+__cxxabiv1::__cxa_pure_virtual (void)
+{
+  Cconws("pure virtual method called\n");
+  Pterm(-1);
+  __builtin_unreachable();
 }

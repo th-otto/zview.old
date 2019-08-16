@@ -106,7 +106,7 @@ endif
 	$(COMPRESS) $(PROGRAM)
 
 slb/$(SLB_SUBDIR)zvpdf.slb: pdflib/header.lo pdflib/zvpdf.lo pdflib/pdflib.lo libpdf.a
-	$(CXX) -s -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) # -nostdlib -lgcc -lstdc++ -lgcc
+	$(CXX) -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) -nostdlib -lgcc -lstdc++ -lm -lgcc
 
 pdflib/header.lo: plugins/common/plugin.h plugins/common/zview.h pdflib/exports.h
 

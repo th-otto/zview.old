@@ -405,8 +405,10 @@ private:
   void blitImageClipped(SplashBitmap *src, GBool srcAlpha,
 			int xSrc, int ySrc, int xDest, int yDest,
 			int w, int h);
+#ifndef ZVPDF_SLB
   void dumpPath(SplashPath *path);
   void dumpXPath(SplashXPath *path);
+#endif
 
 
   static SplashPipeResultColorCtrl pipeResultColorNoAlphaBlend[];

@@ -34,7 +34,9 @@ class GString;
 //------------------------------------------------------------------------
 
 // Get home directory path.
+#ifndef ZVPDF_SLB
 extern GString *getHomeDir();
+#endif
 
 // Get current directory.
 extern GString *getCurrentDir();
@@ -54,9 +56,11 @@ extern GBool isAbsolutePath(char *path);
 // relative) or prepending user's directory (if path starts with '~').
 extern GString *makePathAbsolute(GString *path);
 
+#if 0
 // Get the modification time for <fileName>.  Returns 0 if there is an
 // error.
 extern time_t getModTime(char *fileName);
+#endif
 
 // Create a temporary file and open it for writing.  If <ext> is not
 // NULL, it will be used as the file name extension.  Returns both the
@@ -67,11 +71,15 @@ extern time_t getModTime(char *fileName);
 extern GBool openTempFile(GString **name, FILE **f,
 			  const char *mode, const char *ext);
 
+#ifndef ZVPDF_SLB
 // Create a directory.  Returns true on success.
 extern GBool createDir(char *path, int mode);
+#endif
 
+#if 0
 // Execute <command>.  Returns true on success.
 extern GBool executeCommand(char *cmd);
+#endif
 
 #ifdef _WIN32
 // Convert a file name from Latin-1 to UTF-8.

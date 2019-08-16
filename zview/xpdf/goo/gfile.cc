@@ -40,8 +40,14 @@
 #define PATH_MAX 1024
 #endif
 
+#ifdef __MINT__
+  /* we have it, but it is identical to fseek() */
+# undef HAVE_FSEEKO
+#endif
+
 //------------------------------------------------------------------------
 
+#ifndef ZVPDF_SLB
 GString *getHomeDir() {
 #ifdef VMS
   //---------- VMS ----------
@@ -83,6 +89,7 @@ GString *getHomeDir() {
   return ret;
 #endif
 }
+#endif
 
 GString *getCurrentDir() {
   char buf[PATH_MAX+1];
@@ -343,13 +350,15 @@ GString *makePathAbsolute(GString *path) {
 
 #else
   //---------- Unix and OS/2+EMX ----------
-  struct passwd *pw;
   char buf[PATH_MAX+1];
-  GString *s;
-  char *p1, *p2;
-  int n;
 
+#ifndef ZVPDF_SLB
   if (path->getChar(0) == '~') {
+    struct passwd *pw;
+    GString *s;
+    char *p1, *p2;
+    int n;
+
     if (path->getChar(1) == '/' ||
 #ifdef __EMX__
 	path->getChar(1) == '\\' ||
@@ -375,7 +384,9 @@ GString *makePathAbsolute(GString *path) {
 	path->insert(0, pw->pw_dir);
       }
     }
-  } else if (!isAbsolutePath(path->getCString())) {
+  } else
+#endif
+  if (!isAbsolutePath(path->getCString())) {
     if (getcwd(buf, sizeof(buf))) {
 #ifndef __EMX__
       path->insert(0, '/');
@@ -387,6 +398,7 @@ GString *makePathAbsolute(GString *path) {
 #endif
 }
 
+#if 0
 time_t getModTime(char *fileName) {
 #ifdef _WIN32
   //~ should implement this, but it's (currently) only used in xpdf
@@ -400,6 +412,7 @@ time_t getModTime(char *fileName) {
   return statBuf.st_mtime;
 #endif
 }
+#endif
 
 GBool openTempFile(GString **name, FILE **f,
 		   const char *mode, const char *ext) {
@@ -471,10 +484,12 @@ GBool openTempFile(GString **name, FILE **f,
 #else
   //---------- Unix ----------
   char *s;
-  int fd;
 
+  *f = NULL;
   if (ext) {
 #ifdef HAVE_MKSTEMPS
+    int fd;
+    
     if ((s = getenv("TMPDIR"))) {
       *name = new GString(s);
     } else {
@@ -482,16 +497,20 @@ GBool openTempFile(GString **name, FILE **f,
     }
     (*name)->append("/XXXXXX")->append(ext);
     fd = mkstemps((*name)->getCString(), (int)strlen(ext));
+    if (fd >= 0)
+    	*f = fdopen(fd, mode);
 #else
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
     *name = new GString(s);
     (*name)->append(ext);
-    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    *f = fopen((*name)->getCString(), mode);
 #endif
   } else {
 #ifdef HAVE_MKSTEMP
+    int fd;
+    
     if ((s = getenv("TMPDIR"))) {
       *name = new GString(s);
     } else {
@@ -499,15 +518,17 @@ GBool openTempFile(GString **name, FILE **f,
     }
     (*name)->append("/XXXXXX");
     fd = mkstemp((*name)->getCString());
+    if (fd >= 0)
+    	*f = fdopen(fd, mode);
 #else /* HAVE_MKSTEMP */
     if (!(s = tmpnam(NULL))) {
       return gFalse;
     }
     *name = new GString(s);
-    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    *f = fopen((*name)->getCString(), mode);
 #endif /* HAVE_MKSTEMP */
   }
-  if (fd < 0 || !(*f = fdopen(fd, mode))) {
+  if (*f == NULL) {
     delete *name;
     *name = NULL;
     return gFalse;
@@ -516,6 +537,7 @@ GBool openTempFile(GString **name, FILE **f,
 #endif
 }
 
+#ifndef ZVPDF_SLB
 GBool createDir(char *path, int mode) {
 #ifdef _WIN32
   return !mkdir(path);
@@ -523,7 +545,9 @@ GBool createDir(char *path, int mode) {
   return !mkdir(path, mode);
 #endif
 }
+#endif
 
+#if 0
 GBool executeCommand(char *cmd) {
 #ifdef VMS
   return system(cmd) ? gTrue : gFalse;
@@ -531,6 +555,7 @@ GBool executeCommand(char *cmd) {
   return system(cmd) ? gFalse : gTrue;
 #endif
 }
+#endif
 
 #ifdef _WIN32
 GString *fileNameToUTF8(char *path) {

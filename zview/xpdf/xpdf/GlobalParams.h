@@ -218,7 +218,9 @@ public:
 
   ~GlobalParams();
 
+#ifndef ZVPDF_SLB
   void setBaseDir(const char *dir);
+#endif
   void setupBaseFonts(const char *dir);
 
   void parseLine(char *buf, GString *fileName, int line);
@@ -227,7 +229,9 @@ public:
 
   CharCode getMacRomanCharCode(char *charName);
 
+#ifndef ZVPDF_SLB
   GString *getBaseDir();
+#endif
   Unicode mapNameToUnicode(const char *charName);
   UnicodeMap *getResidentUnicodeMap(GString *encodingName);
   FILE *getUnicodeMapFile(GString *encodingName);
@@ -312,7 +316,9 @@ public:
   GList *getKeyBinding(int code, int mods, int context);
   int getNumPopupMenuCmds();
   PopupMenuCmd *getPopupMenuCmd(int idx);
+#ifndef ZVPDF_SLB
   GString *getTabStateFile();
+#endif
   GBool getPrintCommands();
   GBool getErrQuiet();
 
@@ -365,7 +371,9 @@ public:
   void setMapUnknownCharNames(GBool map);
   void setMapExtTrueTypeFontsViaUnicode(GBool map);
   void setEnableXFA(GBool enable);
+#ifndef ZVPDF_SLB
   void setTabStateFile(char *tabStateFileA);
+#endif
   void setPrintCommands(GBool printCommandsA);
   void setErrQuiet(GBool errQuietA);
 
@@ -379,6 +387,7 @@ public:
 private:
 
   void createDefaultKeyBindings();
+#ifndef ZVPDF_SLB
   void parseFile(GString *fileName, FILE *f);
   void parseNameToUnicode(GList *tokens, GString *fileName, int line);
   void parseCIDToUnicode(GList *tokens, GString *fileName, int line);
@@ -408,15 +417,18 @@ private:
 		 const char *cmdName,
 		 GList *tokens, GString *fileName, int line);
   void parsePopupMenuCmd(GList *tokens, GString *fileName, int line);
+#endif
   void parseYesNo(const char *cmdName, GBool *flag,
 		  GList *tokens, GString *fileName, int line);
   GBool parseYesNo2(const char *token, GBool *flag);
+#ifndef ZVPDF_SLB
   void parseString(const char *cmdName, GString **s,
 		   GList *tokens, GString *fileName, int line);
   void parseInteger(const char *cmdName, int *val,
 		    GList *tokens, GString *fileName, int line);
   void parseFloat(const char *cmdName, double *val,
 		  GList *tokens, GString *fileName, int line);
+#endif
   UnicodeMap *getUnicodeMap2(GString *encodingName);
 
   //----- static tables
@@ -426,7 +438,9 @@ private:
 
   //----- user-modifiable settings
 
+#ifndef ZVPDF_SLB
   GString *baseDir;		// base directory - for plugins, etc.
+#endif
   NameToCharCode *		// mapping from char name to Unicode
     nameToUnicode;
   GHash *cidToUnicodes;		// files for mappings from char collections
@@ -541,7 +555,9 @@ private:
   GBool enableXFA;		// enable XFA form rendering
   GList *keyBindings;		// key & mouse button bindings [KeyBinding]
   GList *popupMenuCmds;		// popup menu commands [PopupMenuCmd]
+#ifndef ZVPDF_SLB
   GString *tabStateFile;	// path for the tab state save file
+#endif
   GBool printCommands;		// print the drawing commands
   GBool errQuiet;		// suppress error messages?
 

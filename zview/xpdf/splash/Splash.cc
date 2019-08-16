@@ -2388,11 +2388,13 @@ SplashError Splash::stroke(SplashPath *path) {
   SplashCoord t0, t1, t2, t3, w, w2, lineDashMax, lineDashTotal;
   int lineCap, lineJoin, i;
 
+#ifndef ZVPDF_SLB
   if (debugMode) {
     printf("stroke [dash:%d] [width:%.2f]:\n",
 	   state->lineDashLength, (double)state->lineWidth);
     dumpPath(path);
   }
+#endif
   opClipRes = splashClipAllOutside;
   if (path->length == 0) {
     return splashErrEmptyPath;
@@ -2931,10 +2933,12 @@ SplashPath *Splash::makeDashedPath(SplashPath *path) {
 }
 
 SplashError Splash::fill(SplashPath *path, GBool eo) {
+#ifndef ZVPDF_SLB
   if (debugMode) {
     printf("fill [eo:%d]:\n", eo);
     dumpPath(path);
   }
+#endif
   return fillWithPattern(path, eo, state->fillPattern, state->fillAlpha);
 }
 
@@ -3215,10 +3219,12 @@ SplashError Splash::fillChar(SplashCoord x, SplashCoord y,
   int x0, y0, xFrac, yFrac;
   SplashError err;
 
+#ifndef ZVPDF_SLB
   if (debugMode) {
     printf("fillChar: x=%.2f y=%.2f c=%3d=0x%02x='%c'\n",
 	   (double)x, (double)y, c, c, c);
   }
+#endif
   transform(state->matrix, x, y, &xt, &yt);
   x0 = splashFloor(xt);
   xFrac = splashFloor((xt - x0) * splashFontFraction);
@@ -3362,11 +3368,13 @@ SplashError Splash::fillImageMask(SplashImageMaskSource src, void *srcData,
   SplashCoord wSize, hSize, t0, t1;
   int x0, y0, x1, y1, scaledWidth, scaledHeight;
 
+#ifndef ZVPDF_SLB
   if (debugMode) {
     printf("fillImageMask: w=%d h=%d mat=[%.2f %.2f %.2f %.2f %.2f %.2f]\n",
 	   w, h, (double)mat[0], (double)mat[1], (double)mat[2],
 	   (double)mat[3], (double)mat[4], (double)mat[5]);
   }
+#endif
 
   // check for singular matrix
   if (!splashCheckDet(mat[0], mat[1], mat[2], mat[3], 0.000001)) {
@@ -4423,11 +4431,13 @@ SplashError Splash::drawImage(SplashImageSource src, void *srcData,
   int x0, y0, x1, y1, scaledWidth, scaledHeight;
   int nComps;
 
+#ifndef ZVPDF_SLB
   if (debugMode) {
     printf("drawImage: srcMode=%d srcAlpha=%d w=%d h=%d mat=[%.2f %.2f %.2f %.2f %.2f %.2f]\n",
 	   srcMode, srcAlpha, w, h, (double)mat[0], (double)mat[1], (double)mat[2],
 	   (double)mat[3], (double)mat[4], (double)mat[5]);
   }
+#endif
 
   // check color modes
   ok = gFalse; // make gcc happy
@@ -7158,6 +7168,7 @@ SplashClipResult Splash::limitRectToClipRect(int *xMin, int *yMin,
 			       state->strokeAdjust);
 }
 
+#ifndef ZVPDF_SLB
 void Splash::dumpPath(SplashPath *path) {
   int i;
 
@@ -7190,4 +7201,4 @@ void Splash::dumpXPath(SplashXPath *path) {
 	   path->segs[i].count);
   }
 }
-
+#endif

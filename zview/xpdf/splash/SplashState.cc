@@ -291,4 +291,3 @@ void SplashState::setTransfer(Guchar *red, Guchar *green, Guchar *blue,
   }
 #endif
 }
-

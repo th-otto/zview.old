@@ -28,7 +28,6 @@
 #include "SplashBitmap.h"
 #include "SplashGlyphBitmap.h"
 #include "SplashPattern.h"
-#include "SplashScreen.h"
 #include "SplashPath.h"
 #include "SplashState.h"
 #include "SplashErrorCodes.h"

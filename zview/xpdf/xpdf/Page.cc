@@ -326,7 +326,7 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
 			GBool (*abortCheckCbk)(void *data),
 			void *abortCheckCbkData) {
 #ifndef PDF_PARSER_ONLY
-  PDFRectangle *mediaBox, *cropBox;
+  PDFRectangle *cropBox;
   PDFRectangle box;
   Gfx *gfx;
   Object obj;
@@ -352,12 +352,14 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
   cropBox = getCropBox();
 
   if (globalParams->getPrintCommands()) {
-    mediaBox = getMediaBox();
+#ifndef ZVPDF_SLB
+    PDFRectangle *mediaBox = getMediaBox();
     printf("***** MediaBox = ll:%g,%g ur:%g,%g\n",
 	   mediaBox->x1, mediaBox->y1, mediaBox->x2, mediaBox->y2);
     printf("***** CropBox = ll:%g,%g ur:%g,%g\n",
 	   cropBox->x1, cropBox->y1, cropBox->x2, cropBox->y2);
     printf("***** Rotate = %d\n", attrs->getRotate());
+#endif
   }
 
   gfx = new Gfx(doc, out, num, attrs->getResourceDict(),
@@ -378,7 +380,9 @@ void Page::displaySlice(OutputDev *out, double hDPI, double vDPI,
     annotList->generateAnnotAppearances();
     if (annotList->getNumAnnots() > 0) {
       if (globalParams->getPrintCommands()) {
+#ifndef ZVPDF_SLB
 	printf("***** Annotations\n");
+#endif
       }
       for (i = 0; i < annotList->getNumAnnots(); ++i) {
 	if (abortCheckCbk && (*abortCheckCbk)(abortCheckCbkData)) {

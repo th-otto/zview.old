@@ -413,9 +413,11 @@ void PDFDoc::displayPage(OutputDev *out, int page,
 			 GBool useMediaBox, GBool crop, GBool printing,
 			 GBool (*abortCheckCbk)(void *data),
 			 void *abortCheckCbkData) {
+#ifndef ZVPDF_SLB
   if (globalParams->getPrintCommands()) {
     printf("***** page %d *****\n", page);
   }
+#endif
   catalog->getPage(page)->display(out, hDPI, vDPI,
 				  rotate, useMediaBox, crop, printing,
 				  abortCheckCbk, abortCheckCbkData);

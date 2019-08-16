@@ -705,6 +705,7 @@ void Gfx::go(GBool topLevel) {
     // got a command - execute it
     if (obj.isCmd()) {
       if (printCommands) {
+#ifndef ZVPDF_SLB
 	obj.print(stdout);
 	for (i = 0; i < numArgs; ++i) {
 	  printf(" ");
@@ -712,6 +713,7 @@ void Gfx::go(GBool topLevel) {
 	}
 	printf("\n");
 	fflush(stdout);
+#endif
       }
       if (!execOp(&obj, args, numArgs)) {
 	++errCount;
@@ -736,10 +738,12 @@ void Gfx::go(GBool topLevel) {
     } else {
       error(errSyntaxError, getPos(), "Too many args in content stream");
       if (printCommands) {
+#ifndef ZVPDF_SLB
 	printf("throwing away arg: ");
 	obj.print(stdout);
 	printf("\n");
 	fflush(stdout);
+#endif
       }
       obj.free();
     }
@@ -754,6 +758,7 @@ void Gfx::go(GBool topLevel) {
     if (!aborted) {
       error(errSyntaxError, getPos(), "Leftover args in content stream");
       if (printCommands) {
+#ifndef ZVPDF_SLB
 	printf("%d leftovers:", numArgs);
 	for (i = 0; i < numArgs; ++i) {
 	  printf(" ");
@@ -761,6 +766,7 @@ void Gfx::go(GBool topLevel) {
 	}
 	printf("\n");
 	fflush(stdout);
+#endif
       }
     }
     for (i = 0; i < numArgs; ++i) {
@@ -970,9 +976,11 @@ void Gfx::opSetExtGState(Object args[], int numArgs) {
     return;
   }
   if (printCommands) {
+#ifndef ZVPDF_SLB
     printf("  gfx state dict: ");
     obj1.print();
     printf("\n");
+#endif
   }
 
   // parameters that are also set by individual PDF operators
@@ -3640,11 +3648,13 @@ void Gfx::doSetFont(GfxFont *font, double size) {
     return;
   }
   if (printCommands) {
+#ifndef ZVPDF_SLB
     printf("  font: tag=%s name='%s' %g\n",
 	   font->getTag()->getCString(),
 	   font->getName() ? font->getName()->getCString() : "???",
 	   size);
     fflush(stdout);
+#endif
   }
   state->setFont(font, size);
   fontChanged = gTrue;
@@ -5048,12 +5058,14 @@ void Gfx::opBeginMarkedContent(Object args[], int numArgs) {
   GfxMarkedContentKind mcKind;
 
   if (printCommands) {
+#ifndef ZVPDF_SLB
     printf("  marked content: %s ", args[0].getName());
     if (numArgs == 2) {
       args[1].print(stdout);
     }
     printf("\n");
     fflush(stdout);
+#endif
   }
   mcKind = gfxMCOther;
   if (args[0].isName("OC") && numArgs == 2 && args[1].isName() &&
@@ -5105,11 +5117,13 @@ void Gfx::opEndMarkedContent(Object args[], int numArgs) {
 
 void Gfx::opMarkPoint(Object args[], int numArgs) {
   if (printCommands) {
+#ifndef ZVPDF_SLB
     printf("  mark point: %s ", args[0].getName());
     if (numArgs == 2)
       args[1].print(stdout);
     printf("\n");
     fflush(stdout);
+#endif
   }
 }
 

@@ -93,6 +93,8 @@ void slb_close(BASEPAGE *bp)
 }
 
 
+FILE *stderr;
+
 /*
  * get the function table pointer passed from the application.
  * Automatically done in slb_zlib_open()
@@ -109,6 +111,7 @@ static long set_imports(struct _zvpdf_funcs *funcs)
 	my_funcs = funcs;
 
 	p_get_text_width = funcs->p_get_text_width;
+	stderr = funcs->stderr_location;
 
 	return 0;
 }
@@ -148,20 +151,381 @@ long __CDECL slb_control(long fn, void *arg)
 	return -ENOSYS;
 }
 
+#undef CHECK
+#if 0
+#define CHECK(s, r) \
+	if (get_slb_funcs()->p_ ## s == 0) \
+	{ \
+		(void) Cconws(#s " was not set\r\n"); \
+		r; \
+	}
+#else
+#define CHECK(s, r)
+#endif
 
 long zvpdf_freetype_open(void)
 {
+	CHECK(slb_open, return -33);
 	return get_slb_funcs()->p_slb_open(LIB_FREETYPE);
 }
 
 
 void zvpdf_freetype_close(void)
 {
+	CHECK(slb_close, return);
 	get_slb_funcs()->p_slb_close(LIB_FREETYPE);
 }
 
 
 SLB *slb_freetype_get(void)
 {
+	CHECK(slb_get, return NULL);
 	return get_slb_funcs()->p_slb_get(LIB_FREETYPE);
 }
+
+
+/*
+ * resolve references from XPDF library
+ */
+void *malloc(size_t s)
+{
+	CHECK(malloc, return NULL);
+	return get_slb_funcs()->p_malloc(s);
+}
+
+void free(void *p)
+{
+	CHECK(free, return);
+	get_slb_funcs()->p_free(p);
+}
+
+void *realloc(void *ptr, size_t s)
+{
+	CHECK(realloc, return NULL);
+	return get_slb_funcs()->p_realloc(ptr, s);
+}
+
+int memcmp(const void *d, const void *s, size_t n)
+{
+	CHECK(memcmp, return 0);
+	return get_slb_funcs()->p_memcmp(d, s, n);
+}
+
+void *memcpy(void *d, const void *s, size_t n)
+{
+	CHECK(memcpy, return d);
+	return get_slb_funcs()->p_memcpy(d, s, n);
+}
+
+void *memmove(void *d, const void *s, size_t n)
+{
+	CHECK(memcmp, return d);
+	return get_slb_funcs()->p_memcpy(d, s, n);
+}
+
+void *memset(void *d, int c, size_t n)
+{
+	CHECK(memset, return d);
+	return get_slb_funcs()->p_memset(d, c, n);
+}
+
+size_t strlen(const char *s)
+{
+	CHECK(strlen, return 0);
+	return get_slb_funcs()->p_strlen(s);
+}
+
+int strcmp(const char *d, const char *s)
+{
+	CHECK(strcmp, return 0);
+	return get_slb_funcs()->p_strcmp(d, s);
+}
+
+int strncmp(const char *d, const char *s, size_t n)
+{
+	CHECK(strncmp, return 0);
+	return get_slb_funcs()->p_strncmp(d, s, n);
+}
+
+char *strcpy(char *d, const char *s)
+{
+	CHECK(strcpy, return d);
+	return get_slb_funcs()->p_strcpy(d, s);
+}
+
+char *strncpy(char *d, const char *s, size_t n)
+{
+	CHECK(strncpy, return d);
+	return get_slb_funcs()->p_strncpy(d, s, n);
+}
+
+char *strtok(char *str, const char *delim)
+{
+	CHECK(strtok, return NULL);
+	return get_slb_funcs()->p_strtok(str, delim);
+}
+
+char *strstr(const char *str, const char *delim)
+{
+	CHECK(strstr, return NULL);
+	return get_slb_funcs()->p_strstr(str, delim);
+}
+
+char *strchr(const char *str, int c)
+{
+	CHECK(strchr, return NULL);
+	return get_slb_funcs()->p_strchr(str, c);
+}
+
+char *strrchr(const char *str, int c)
+{
+	CHECK(strrchr, return NULL);
+	return get_slb_funcs()->p_strrchr(str, c);
+}
+
+int strcasecmp(const char *d, const char *s)
+{
+	CHECK(strcasecmp, return 0);
+	return get_slb_funcs()->p_strcasecmp(d, s);
+}
+
+size_t strcspn(const char *s, const char *reject)
+{
+	CHECK(strcspn, return 0);
+	return get_slb_funcs()->p_strcspn(s, reject);
+}
+
+void abort(void)
+{
+	Pterm(6 | 0x80);
+	__builtin_unreachable();
+}
+
+char *getcwd(char *buf, size_t size)
+{
+	CHECK(getcwd, return NULL);
+	return get_slb_funcs()->p_getcwd(buf, size);
+}
+
+void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
+{
+	CHECK(qsort, return);
+	get_slb_funcs()->p_qsort(base, nmemb, size, compar);
+}
+
+void srand(unsigned int seed)
+{
+	CHECK(srand, return);
+	get_slb_funcs()->p_srand(seed);
+}
+
+int rand(void)
+{
+	CHECK(rand, return 0);
+	return get_slb_funcs()->p_rand();
+}
+
+char *getenv(const char *name)
+{
+	CHECK(getenv, return NULL);
+	return get_slb_funcs()->p_getenv(name);
+}
+
+char *tmpnam(char *s)
+{
+	CHECK(tmpnam, return NULL);
+	return get_slb_funcs()->p_tmpnam(s);
+}
+
+int mkstemp(char *template)
+{
+	CHECK(mkstemp, return -1);
+	return get_slb_funcs()->p_mkstemp(template);
+}
+
+time_t mktime(struct tm *tm)
+{
+	CHECK(mktime, return 0);
+	return get_slb_funcs()->p_mktime(tm);
+}
+
+size_t strftime(char *s, size_t max, const char *format, const struct tm *tm)
+{
+	CHECK(strftime, return 0);
+	return get_slb_funcs()->p_strftime(s, max, format, tm);
+}
+
+int (isspace)(int c)
+{
+	CHECK(isspace, return 0);
+	return get_slb_funcs()->p_isspace(c);
+}
+
+int (isalnum)(int c)
+{
+	CHECK(isalnum, return 0);
+	return get_slb_funcs()->p_isalnum(c);
+}
+
+int (isalpha)(int c)
+{
+	CHECK(isalpha, return 0);
+	return get_slb_funcs()->p_isalpha(c);
+}
+
+int (isxdigit)(int c)
+{
+	CHECK(isxdigit, return 0);
+	return get_slb_funcs()->p_isxdigit(c);
+}
+
+int (isupper)(int c)
+{
+	CHECK(isupper, return 0);
+	return get_slb_funcs()->p_isupper(c);
+}
+
+int (islower)(int c)
+{
+	CHECK(islower, return 0);
+	return get_slb_funcs()->p_islower(c);
+}
+
+int (toupper)(int c)
+{
+	CHECK(toupper, return c);
+	return get_slb_funcs()->p_toupper(c);
+}
+
+int (tolower)(int c)
+{
+	CHECK(tolower, return c);
+	return get_slb_funcs()->p_tolower(c);
+}
+
+int sprintf(char *str, const char *format, ...)
+{
+	va_list args;
+	int ret;
+	CHECK(vsprintf, return 0);
+	va_start(args, format);
+	ret = get_slb_funcs()->p_vsprintf(str, format, args);
+	va_end(args);
+	return ret;
+}
+
+int fprintf(FILE *fp, const char *format, ...)
+{
+	va_list args;
+	int ret;
+	CHECK(vfprintf, return 0);
+	va_start(args, format);
+	ret = get_slb_funcs()->p_vfprintf(fp, format, args);
+	va_end(args);
+	return ret;
+}
+
+int fflush(FILE *fp)
+{
+	CHECK(fflush, return 0);
+	return get_slb_funcs()->p_fflush(fp);
+}
+
+int fputs(const char *s, FILE *fp)
+{
+	CHECK(fputs, return 0);
+	return get_slb_funcs()->p_fputs(s, fp);
+}
+
+int fputc(int c, FILE *fp)
+{
+	CHECK(fputc, return c);
+	return get_slb_funcs()->p_fputc(c, fp);
+}
+
+FILE *fopen(const char *pathname, const char *mode)
+{
+	CHECK(fopen, return NULL);
+	return get_slb_funcs()->p_fopen(pathname, mode);
+}
+
+int fclose(FILE *fp)
+{
+	CHECK(fclose, return -1);
+	return get_slb_funcs()->p_fclose(fp);
+}
+
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+	CHECK(fread, return 0);
+	return get_slb_funcs()->p_fread(ptr, size, nmemb, stream);
+}
+
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+	CHECK(fwrite, return 0);
+	return get_slb_funcs()->p_fwrite(ptr, size, nmemb, stream);
+}
+
+int fseek(FILE *stream, long offset, int whence)
+{
+	CHECK(fseek, return 0);
+	return get_slb_funcs()->p_fseek(stream, offset, whence);
+}
+
+long ftell(FILE *stream)
+{
+	CHECK(ftell, return 0);
+	return get_slb_funcs()->p_ftell(stream);
+}
+
+int unlink(const char *pathname)
+{
+	CHECK(unlink, return -1);
+	return get_slb_funcs()->p_unlink(pathname);
+}
+
+int sscanf(const char *str, const char *format, ...)
+{
+	va_list args;
+	int ret;
+	CHECK(vsscanf, return 0);
+	va_start(args, format);
+	ret = get_slb_funcs()->p_vsscanf(str, format, args);
+	va_end(args);
+	return ret;
+}
+
+int atoi(const char *nptr)
+{
+	CHECK(atoi, return 0);
+	return get_slb_funcs()->p_atoi(nptr);
+}
+
+double atof(const char *nptr)
+{
+	CHECK(atof, return 0);
+	return get_slb_funcs()->p_atof(nptr);
+}
+
+int fgetc(FILE *stream)
+{
+	CHECK(fgetc, return EOF);
+	return get_slb_funcs()->p_fgetc(stream);
+}
+
+int ungetc(int c, FILE *stream)
+{
+	CHECK(ungetc, return c);
+	return get_slb_funcs()->p_ungetc(c, stream);
+}
+
+FILE *fdopen(int fd, const char *mode)
+{
+	CHECK(fdopen, return NULL);
+	return get_slb_funcs()->p_fdopen(fd, mode);
+}
+
+#undef errno
+/* only referenced from some math functions */
+int errno;

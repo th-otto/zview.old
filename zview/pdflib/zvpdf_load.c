@@ -103,6 +103,7 @@ void __CDECL delete_bookmark_child(Bookmark *book)
 	slb->exec(slb->handle, 11, SLB_NARGS(1), book);
 }
 
+#define S(x) zvpdf_funcs.p_ ## x = x
 
 long zvpdf_open(void)
 {
@@ -124,17 +125,81 @@ long zvpdf_open(void)
 	zvpdf_funcs.p_slb_open = plugin_slb_open;
 	zvpdf_funcs.p_slb_close = plugin_slb_close;
 	zvpdf_funcs.p_slb_get = plugin_slb_get;
-	zvpdf_funcs.p_get_text_width = get_text_width;
 	
+	zvpdf_funcs.stderr_location = stderr;
+
+	S(get_text_width);
+
+	S(malloc);
+	S(free);
+	S(realloc);
+
+	S(memcmp);
+	S(memcpy);
+	S(memset);
+
+	S(strlen);
+	S(strcmp);
+	S(strncmp);
+	S(strcpy);
+	S(strncpy);
+	S(strtok);
+	S(strstr);
+	S(strchr);
+	S(strrchr);
+	S(strcasecmp);
+	S(strcspn);
+
+	S(getcwd);
+	S(qsort);
+	S(srand);
+	S(rand);
+	S(getenv);
+	S(tmpnam);
+	S(mkstemp);
+	
+	S(mktime);
+	S(strftime);
+	
+	S(isspace);
+	S(isalnum);
+	S(isalpha);
+	S(isxdigit);
+	S(isupper);
+	S(islower);
+	S(toupper);
+	S(tolower);
+
+	S(vsprintf);
+	S(vfprintf);
+	S(fflush);
+	S(fputs);
+	S(fputc);
+	S(fopen);
+	S(fclose);
+	S(fread);
+	S(fwrite);
+	S(fseek);
+	S(ftell);
+	S(unlink);
+	S(vsscanf);
+	S(atoi);
+	S(atof);
+	S(fgetc);
+	S(ungetc);
+	S(fdopen);
+	
+#undef S
+
 	strcpy(zview_slb_dir, zview_path);
-	strcat(zview_slb_dir, "\\slb");
+	strcat(zview_slb_dir, "slb\\");
 	end = zview_slb_dir + strlen(zview_slb_dir);
 #if defined(__mcoldfire__)
-	strcat(zview_slb_dir, "\\v4e");
+	strcat(zview_slb_dir, "v4e\\");
 #elif defined(__mc68020__) || defined(__mc68030__) || defined(__mc68040__) || defined(__mc68060__) || defined(__mc68080__) || defined(__apollo__)
-	strcat(zview_slb_dir, "\\020");
+	strcat(zview_slb_dir, "020\\");
 #else
-	strcat(zview_slb_dir, "\\000");
+	strcat(zview_slb_dir, "000\\");
 #endif
 	ret = slb_load(name, zview_slb_dir, PLUGIN_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)

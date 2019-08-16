@@ -72,7 +72,9 @@ void CDECL error(ErrorCategory category, GFileOffset pos,
   if (errorCbk) {
     (*errorCbk)(errorCbkData, category, (int)pos, sanitized->getCString());
   } else {
+#ifndef ZVPDF_SLB
     fflush(stdout);
+#endif
     if (pos >= 0) {
       fprintf(stderr, "%s (%d): %s\n",
 	      errorCategoryNames[category], (int)pos, sanitized->getCString());
