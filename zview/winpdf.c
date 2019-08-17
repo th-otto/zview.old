@@ -1316,18 +1316,7 @@ static void __CDECL WindPdfClose( WINDOW *win EVNT_BUFF_PARAM)
 
 	pdf_quit( img);
 
-	if( windata->root)
-	{
-		int i;
-
-		for ( i = 0; i < windata->nbr_bookmark; i++)
-		{
-			if ( windata->root[i].nbr_child)
-				delete_bookmark_child( &windata->root[i]);
-		}
-
-		free( windata->root);
-	}
+	delete_bookmarks(windata);
 
 	if( windata->frame_slider)
 		ObjcFree( windata->frame_slider);
@@ -1385,6 +1374,7 @@ WINDOW *WindPdf( char *filename)
 	img = &windata->img;
 
 	img->_priv_ptr 		= NULL;
+	img->_priv_ptr_more = NULL;
 	img->view_mode 		= full_size;
 	img->progress_bar 	= show_read_progress_bar;
 

@@ -97,13 +97,119 @@ void __CDECL pdf_get_info(IMAGE *img, txt_data *txtdata)
 }
 
 
-void __CDECL delete_bookmark_child(Bookmark *book)
+void __CDECL delete_bookmarks(WINDATA *windata)
 {
 	SLB *slb = &zvpdf;
-	slb->exec(slb->handle, 11, SLB_NARGS(1), book);
+	slb->exec(slb->handle, 11, SLB_NARGS(1), windata);
 }
 
 #define S(x) zvpdf_funcs.p_ ## x = x
+
+
+#define DBG_ALLOC 0
+
+#if DBG_ALLOC
+struct alloc {
+	struct alloc *next;
+};
+static struct alloc *alloc_list;
+
+static void check_alloc(struct alloc *pptr)
+{
+	struct alloc **p;
+	
+	p = &alloc_list;
+	while (*p)
+	{
+		if (*p == pptr)
+			return;
+		p = &(*p)->next;
+	}
+#if DBG_ALLOC >= 2
+	nf_debugprintf("ptr not on list: %08lx\n", (unsigned long)(pptr + 1));
+#endif
+}
+
+
+static int remove_alloc(struct alloc *pptr)
+{
+	struct alloc **p;
+	
+	p = &alloc_list;
+	while (*p)
+	{
+		if (*p == pptr)
+		{
+			*p = pptr->next;
+			return 1;
+		}
+		p = &(*p)->next;
+	}
+#if DBG_ALLOC >= 2
+	nf_debugprintf("ptr not on list: %08lx\n", (unsigned long)(pptr + 1));
+#endif
+	return 0;
+}
+
+
+static void *my_malloc(size_t len)
+{
+	struct alloc *p;
+
+	p = malloc(len + sizeof(struct alloc));
+	if (p)
+	{
+		p->next = alloc_list;
+		alloc_list = p;
+		++p;
+	}
+#if DBG_ALLOC >= 3
+	nf_debugprintf("malloc %lu: %08lx\n", len, (unsigned long)(p));
+#endif
+	return p;
+}
+
+static void *my_realloc(void *ptr, size_t len)
+{
+	struct alloc *p;
+	struct alloc *pptr;
+
+	pptr = ptr;
+	pptr--;
+	check_alloc(pptr);
+	p = realloc(pptr, len + sizeof(struct alloc));
+	if (p)
+	{
+		if (p != pptr)
+		{
+			remove_alloc(pptr);
+			p->next = alloc_list;
+			alloc_list = p;
+		}
+		++p;
+	} else if (pptr)
+	{
+		remove_alloc(pptr);
+	}
+#if DBG_ALLOC >= 3
+	nf_debugprintf("realloc %08lx %lu: %08lx\n", (unsigned long)(pptr + 1), len, (unsigned long)(p));
+#endif
+	return p;
+}
+
+static void my_free(void *p)
+{
+	struct alloc *pptr;
+	pptr = p;
+	pptr--;
+#if DBG_ALLOC >= 3
+	nf_debugprintf("free %08lx\n", (unsigned long)(pptr + 1));
+#endif
+	if (remove_alloc(pptr))
+		free(pptr);
+}
+#endif
+
 
 long zvpdf_open(void)
 {
@@ -191,6 +297,12 @@ long zvpdf_open(void)
 	
 #undef S
 
+#if DBG_ALLOC
+	zvpdf_funcs.p_malloc = my_malloc;
+	zvpdf_funcs.p_realloc = my_realloc;
+	zvpdf_funcs.p_free = my_free;
+#endif
+
 	strcpy(zview_slb_dir, zview_path);
 	strcat(zview_slb_dir, "slb\\");
 	end = zview_slb_dir + strlen(zview_slb_dir);
@@ -258,5 +370,15 @@ long zvpdf_open(void)
 void zvpdf_close(void)
 {
 	SLB *slb = &zvpdf;
+#if DBG_ALLOC >= 2
+	{
+		struct alloc *p;
+		
+		for (p = alloc_list; p; p = p->next)
+		{
+			nf_debugprintf("not freed: %08lx\n", (unsigned long)(p + 1));
+		}
+	}
+#endif
 	plugin_close(slb);
 }

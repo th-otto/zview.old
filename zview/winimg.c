@@ -982,6 +982,7 @@ WINDOW *WindView( char *filename)
 	img = &windata->img;
 
 	img->_priv_ptr 		= NULL;
+	img->_priv_ptr_more = NULL;
 	img->view_mode 		= full_size;
 	img->progress_bar 	= show_read_progress_bar;
 

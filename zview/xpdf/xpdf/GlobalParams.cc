@@ -563,10 +563,11 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   char *paperName;
   const struct paper *paperType;
   paperinit();
-  if ((paperName = systempapername())) {
+  if ((paperName = systempapername()) != NULL) {
     paperType = paperinfo(paperName);
     psPaperWidth = (int)paperpswidth(paperType);
     psPaperHeight = (int)paperpsheight(paperType);
+    free(paperName);
   } else {
     error(errConfig, -1, "No paper information available - using defaults");
     psPaperWidth = defPaperWidth;

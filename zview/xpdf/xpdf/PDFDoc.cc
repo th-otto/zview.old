@@ -46,8 +46,24 @@
 // PDFDoc
 //------------------------------------------------------------------------
 
-PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
-	       GString *userPassword, PDFCore *coreA) {
+PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword, GString *userPassword, PDFCore *coreA)
+  : fileName(fileNameA)
+#ifdef _WIN32
+  , fileNameU(NULL)
+#endif
+  , file(NULL)
+  , str(NULL)
+  , core(coreA)
+  , pdfVersion(0)
+  , xref(NULL)
+  , catalog(NULL)
+#ifndef DISABLE_OUTLINE
+  , outline(NULL)
+#endif
+  , optContent(NULL)
+  , ok(gFalse)
+  , errCode(errNone)
+{
   Object obj;
   GString *fileName1, *fileName2;
 #ifdef _WIN32
@@ -101,8 +117,24 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword,
 }
 
 #ifdef _WIN32
-PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GString *ownerPassword,
-	       GString *userPassword, PDFCore *coreA) {
+PDFDoc::PDFDoc(const wchar_t *fileNameA, int fileNameLen, GString *ownerPassword, GString *userPassword, PDFCore *coreA)
+  : fileName(NULL)
+#ifdef _WIN32
+  , fileNameU(NULL)
+#endif
+  , file(NULL)
+  , str(NULL)
+  , core(coreA)
+  , pdfVersion(0)
+  , xref(NULL)
+  , catalog(NULL)
+#ifndef DISABLE_OUTLINE
+  , outline(NULL)
+#endif
+  , optContent(NULL)
+  , ok(gFalse)
+  , errCode(errNone)
+{
   OSVERSIONINFO version;
   Object obj;
   int i;
@@ -141,8 +173,24 @@ PDFDoc::PDFDoc(wchar_t *fileNameA, int fileNameLen, GString *ownerPassword,
 }
 #endif
 
-PDFDoc::PDFDoc(char *fileNameA, GString *ownerPassword,
-	       GString *userPassword, PDFCore *coreA) {
+PDFDoc::PDFDoc(const char *fileNameA, GString *ownerPassword, GString *userPassword, PDFCore *coreA)
+  : fileName(NULL)
+#ifdef _WIN32
+  , fileNameU(NULL)
+#endif
+  , file(NULL)
+  , str(NULL)
+  , core(coreA)
+  , pdfVersion(0)
+  , xref(NULL)
+  , catalog(NULL)
+#ifndef DISABLE_OUTLINE
+  , outline(NULL)
+#endif
+  , optContent(NULL)
+  , ok(gFalse)
+  , errCode(errNone)
+{
 #ifdef _WIN32
   OSVERSIONINFO version;
 #endif
@@ -195,8 +243,24 @@ PDFDoc::PDFDoc(char *fileNameA, GString *ownerPassword,
   ok = setup(ownerPassword, userPassword);
 }
 
-PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword,
-	       GString *userPassword, PDFCore *coreA) {
+PDFDoc::PDFDoc(BaseStream *strA, GString *ownerPassword, GString *userPassword, PDFCore *coreA)
+  : fileName(NULL)
+#ifdef _WIN32
+  , fileNameU(NULL)
+#endif
+  , file(NULL)
+  , str(NULL)
+  , core(coreA)
+  , pdfVersion(0)
+  , xref(NULL)
+  , catalog(NULL)
+#ifndef DISABLE_OUTLINE
+  , outline(NULL)
+#endif
+  , optContent(NULL)
+  , ok(gFalse)
+  , errCode(errNone)
+{
 #ifdef _WIN32
   int n, i;
 #endif

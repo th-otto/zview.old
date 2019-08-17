@@ -38,12 +38,12 @@ static unsigned char const latin_to_atari[] = {
 static char pdf_title[256];
 
 
-void delete_bookmark_child( Bookmark *book)
+static void delete_bookmark_child( Bookmark *book)
 {
 	int i;
 
 	/* if nothing to do, end the function */
-	if( book->child == NULL)
+	if (book == NULL || book->child == NULL)
 		return;
 
 	/* make a loop to see if the childs mini entries have child, if it's true, delete it */
@@ -54,13 +54,31 @@ void delete_bookmark_child( Bookmark *book)
 	}
 
 	/* Free the memory and put the counter to zero */
-	gfree( book->child);
+	free( book->child);
 	book->child 		= NULL;
 	book->nbr_child 	= 0;
 }
 
 
-int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap, Bookmark *book, Bookmark *parent)
+void delete_bookmarks(WINDATA *windata)
+{
+	int i;
+
+	if (windata->root == NULL)
+		return;
+	for (i = 0; i < windata->nbr_bookmark; i++)
+	{
+		if ( windata->root[i].nbr_child)
+			delete_bookmark_child( &windata->root[i]);
+	}
+
+	free( windata->root);
+	windata->root 			= NULL;
+	windata->nbr_bookmark	= 0;
+}
+
+
+static int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap, Bookmark *book, Bookmark *parent)
 {
 	OutlineItem *item;
 	GList *kids;
@@ -68,15 +86,19 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 	char buf[8], *test;
 	int i, j, n, count, length;
 
+	if (book == NULL)
+		return FALSE;
 	for (i = 0; i < items->getLength(); ++i)
 	{
-	    item = (OutlineItem *)items->get(i);
-
 		book[i].parent		= parent;
 		book[i].child		= NULL;
 		book[i].nbr_child	= 0;
 		book[i].state 		= UNKNOWN;
 		book[i].valid		= FALSE;
+	}
+	for (i = 0; i < items->getLength(); ++i)
+	{
+	    item = (OutlineItem *)items->get(i);
 
 		link_action = item->getAction();
 
@@ -124,7 +146,6 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 
 		test = book[i].name;
 
-
 		/* Unicode to Latin 1 */
 	    for (j = 0, length = 0; j < item->getTitleLength(); ++j)
 	    {
@@ -161,11 +182,11 @@ int setupOutlineItems( WINDOW * win, PDFDoc *doc, GList *items, UnicodeMap *uMap
 				free( book[i].child);
 				book[i].child 		= NULL;
 				book[i].nbr_child	= 0;
-				return( 0);
+				return FALSE;
 			}
     	}
 	}
-	return( 1);
+	return TRUE;
 }
 
 void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
@@ -174,7 +195,6 @@ void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
 	PDFDoc		*doc = ( PDFDoc*)img->_priv_ptr;
 	Outline 	*outline;
 	GList 		*items;
-	int			i;
 
 	outline = doc->getOutline();
 
@@ -201,15 +221,7 @@ void pdf_build_bookmark( WINDATA *windata, WINDOW *win)
 
     	if( !setupOutlineItems( win, doc, items, uMap, windata->root, NULL))
 		{
-			for ( i = 0; i < windata->nbr_bookmark; i++)
-			{
-				if ( windata->root[i].nbr_child)
-					delete_bookmark_child( &windata->root[i]);
-			}
-
-			free( windata->root);
-			windata->root 			= NULL;
-			windata->nbr_bookmark	= 0;
+			delete_bookmarks(windata);
 		}
 
     	uMap->decRefCnt();
@@ -226,8 +238,8 @@ boolean lib_pdf_load( const char *name, IMAGE *img, boolean antialias)
 	const char* aaString = antialias ? "yes" : "no";
 	globalParams->setAntialias( aaString);
 
-        GString nameString( name);
-	doc = new PDFDoc( &nameString);
+    GString *nameString = new GString(name);
+	doc = new PDFDoc(nameString);
 
 	if (!doc->isOk())
 	{

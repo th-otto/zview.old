@@ -24,7 +24,7 @@
 /*   8 */ LIBFUNC(8, get_pdf_title, 0)
 /*   9 */ LIBFUNC(9, pdf_build_bookmark, 2)
 /*  10 */ LIBFUNC(10, pdf_get_info, 2)
-/*  11 */ LIBFUNC(11, delete_bookmark_child, 1)
+/*  11 */ LIBFUNC(11, delete_bookmarks, 1)
 
 #undef LIBFUNC
 #undef LIBFUNC2

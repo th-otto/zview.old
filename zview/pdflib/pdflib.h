@@ -15,7 +15,7 @@ void __CDECL pdf_quit(IMAGE *img);
 const char *__CDECL get_pdf_title(void);
 void __CDECL pdf_build_bookmark(WINDATA *windata, WINDOW *win);
 void __CDECL pdf_get_info(IMAGE *img, txt_data *txtdata);
-void __CDECL delete_bookmark_child(Bookmark *book);
+void __CDECL delete_bookmarks(WINDATA *windata);
 
 
 long zvpdf_freetype_open(void);

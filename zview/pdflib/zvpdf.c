@@ -111,6 +111,7 @@ static long set_imports(struct _zvpdf_funcs *funcs)
 	my_funcs = funcs;
 
 	p_get_text_width = funcs->p_get_text_width;
+
 	stderr = funcs->stderr_location;
 
 	return 0;
