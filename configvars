@@ -36,7 +36,7 @@ WINDOM_LIBS=-lwindom1
 endif
 
 CFLAGS   = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
-CXXFLAGS = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror
+CXXFLAGS = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror -fno-exceptions
 LDFLAGS  = -s
 ARFLAGS  = rcs
 

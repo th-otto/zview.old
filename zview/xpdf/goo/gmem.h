@@ -12,25 +12,13 @@
 #include <stdio.h>
 #include <aconf.h>
 
-#ifdef USE_EXCEPTIONS
-
 class GMemException {
 public:
   GMemException() {}
   ~GMemException() {}
 };
 
-#if __cplusplus >= 201103L
-#  define GMEM_EXCEP noexcept(false)
-#else
-#  define GMEM_EXCEP throw(GMemException)
-#endif
-
-#else /* USE_EXCEPTIONS */
-
-#define GMEM_EXCEP
-
-#endif /* USE_EXCEPTIONS */
+#define GMEM_EXCEP THROWS(GMemException)
 
 #ifdef __cplusplus
 extern "C" {

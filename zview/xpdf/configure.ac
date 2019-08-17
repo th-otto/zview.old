@@ -32,6 +32,19 @@ AH_BOTTOM([
  * Copyright 2002-2003 Glyph & Cog, LLC
  */
 
+#if defined(__cplusplus) && defined(USE_EXCEPTIONS)
+# if __cplusplus >= 201103L
+#  define NO_THROWS noexcept(true)
+#  define THROWS(a, ...) noexcept(false)
+# else
+#  define NO_THROWS throw()
+#  define THROWS(a, ...) throw(a ## __VA_ARGS__)
+# endif
+#else
+# define NO_THROWS
+# define THROWS(a, ...)
+#endif
+
 #endif /* ACONF_H */
 ])
 
@@ -248,6 +261,9 @@ AM_CONDITIONAL(MULTITHREADED, test "$enable_multithreaded" = yes)
 AH_TEMPLATE([USE_EXCEPTIONS], [use C++ exceptions])
 AC_OPTION(exceptions, [use C++ exceptions], yes, [USE_EXCEPTIONS])
 AM_CONDITIONAL(USE_EXCEPTIONS, test "$enable_exceptions" = yes)
+if test "$enable_exceptions" = no; then
+	AC_ADD_CFLAG(CXXFLAGS, "-fno-exceptions")
+fi
 AH_TEMPLATE([USE_FIXEDPOINT], [use fixed point (instead of floating point) arithmetic])
 AC_OPTION(fixedpoint, [use fixed point (instead of floating point) arithmetic], yes, [USE_FIXEDPOINT])
 AH_TEMPLATE([SPLASH_CMYK], [include support for CMYK rasterization])

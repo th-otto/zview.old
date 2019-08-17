@@ -19,6 +19,9 @@
 #  include <windows.h>
 #endif
 #include "gmem.h"
+#ifdef __MINT__
+#include <osbind.h>
+#endif
 
 #ifdef DEBUG_MEM
 
@@ -355,7 +358,12 @@ void gMemError(const char *msg) GMEM_EXCEP {
   throw GMemException();
 #else
   fprintf(stderr, "%s\n", msg);
+#ifdef __MINT__
+  Pterm(-39);
+  __builtin_unreachable();
+#else
   exit(1);
+#endif
 #endif
 }
 
