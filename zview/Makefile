@@ -14,8 +14,8 @@ XPDF_CPPFLAGS +=		-DZVPDF_SLB
 endif
 
 XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash $(XPDF_CPPFLAGS)
-LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lfreetype.slb
-                                # -lpng.slb -lbz2.slb -lz.slb
+LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lfreetype.slb \
+                                  -lpng.slb -lbz2.slb -lz.slb -ljpeg.slb -ltiff.slb -llzma.slb -lexif.slb
 CFLAGS				+= $(XPDF_INCS) -I../common
 CXXFLAGS			+= $(XPDF_INCS) -I../common
 
@@ -32,13 +32,6 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
 				  debug.o progress.o ztext.o close_modal.o jpg_dialog.o tiff_dialog.o main.o \
 				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
-
-#
-# These are currently needed because we cannot link to zlib.slb.a etc,
-# because that would pull in the import functions for the shared library,
-# and would also be used by the pdf library, which is not yet prepared for that
-#
-OBJ +=	plugins/slb/zlib_open.o plugins/slb/png_open.o plugins/slb/lzma_open.o plugins/slb/jpeg_open.o plugins/slb/tiff_open.o plugins/slb/exif_open.o plugins/slb/bzip2_open.o
 
 PROGRAM 			= zview.app
 
