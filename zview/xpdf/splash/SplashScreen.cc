@@ -20,7 +20,7 @@
 
 //------------------------------------------------------------------------
 
-static SplashScreenParams defaultParams = {
+static struct SplashScreenParams const defaultParams = {
   splashScreenDispersed,	// type
   2,				// size
   2,				// dotRadius
@@ -61,7 +61,7 @@ static int cmpDistances(const void *p0, const void *p1) {
 // sqrt(2)).  If <clustered> is false, this generates an optimal
 // threshold matrix using recursive tesselation.  Gamma correction
 // (gamma = 1 / 1.33) is also computed here.
-SplashScreen::SplashScreen(SplashScreenParams *params) {
+SplashScreen::SplashScreen(const SplashScreenParams *params) {
   Guchar u;
   int black, white, i;
 

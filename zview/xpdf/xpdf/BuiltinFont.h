@@ -20,7 +20,7 @@ struct BuiltinFont;
 struct BuiltinFontWidth {
   const char *name;
   Gushort width;
-  const BuiltinFontWidth *next;
+  const struct BuiltinFontWidth *next;
 };
 
 struct BuiltinFont {

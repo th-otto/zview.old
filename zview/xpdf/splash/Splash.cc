@@ -90,7 +90,7 @@ struct SplashPipe {
 		      Guchar *shapePtr, SplashColorPtr cSrcPtr);
 };
 
-SplashPipeResultColorCtrl Splash::pipeResultColorNoAlphaBlend[] = {
+SplashPipeResultColorCtrl const Splash::pipeResultColorNoAlphaBlend[] = {
   splashPipeResultColorNoAlphaBlendMono,
   splashPipeResultColorNoAlphaBlendMono,
   splashPipeResultColorNoAlphaBlendRGB,
@@ -101,7 +101,7 @@ SplashPipeResultColorCtrl Splash::pipeResultColorNoAlphaBlend[] = {
 #endif
 };
 
-SplashPipeResultColorCtrl Splash::pipeResultColorAlphaNoBlend[] = {
+SplashPipeResultColorCtrl const Splash::pipeResultColorAlphaNoBlend[] = {
   splashPipeResultColorAlphaNoBlendMono,
   splashPipeResultColorAlphaNoBlendMono,
   splashPipeResultColorAlphaNoBlendRGB,
@@ -112,7 +112,7 @@ SplashPipeResultColorCtrl Splash::pipeResultColorAlphaNoBlend[] = {
 #endif
 };
 
-SplashPipeResultColorCtrl Splash::pipeResultColorAlphaBlend[] = {
+SplashPipeResultColorCtrl const Splash::pipeResultColorAlphaBlend[] = {
   splashPipeResultColorAlphaBlendMono,
   splashPipeResultColorAlphaBlendMono,
   splashPipeResultColorAlphaBlendRGB,

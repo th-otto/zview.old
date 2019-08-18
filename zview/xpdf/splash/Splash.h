@@ -411,10 +411,9 @@ private:
 #endif
 
 
-  static SplashPipeResultColorCtrl pipeResultColorNoAlphaBlend[];
-  static SplashPipeResultColorCtrl pipeResultColorAlphaNoBlend[];
-  static SplashPipeResultColorCtrl pipeResultColorAlphaBlend[];
-  static int pipeNonIsoGroupCorrection[];
+  static SplashPipeResultColorCtrl const pipeResultColorNoAlphaBlend[];
+  static SplashPipeResultColorCtrl const pipeResultColorAlphaNoBlend[];
+  static SplashPipeResultColorCtrl const pipeResultColorAlphaBlend[];
 
   SplashBitmap *bitmap;
   int bitmapComps;

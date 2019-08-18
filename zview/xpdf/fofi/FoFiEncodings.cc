@@ -16,7 +16,7 @@
 // Type 1 and 1C font data
 //------------------------------------------------------------------------
 
-const char *fofiType1StandardEncoding[256] = {
+const char *const fofiType1StandardEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -275,7 +275,7 @@ const char *fofiType1StandardEncoding[256] = {
   NULL
 };
 
-const char *fofiType1ExpertEncoding[256] = {
+const char *const fofiType1ExpertEncoding[256] = {
   NULL,
   NULL,
   NULL,
@@ -538,7 +538,7 @@ const char *fofiType1ExpertEncoding[256] = {
 // Type 1C font data
 //------------------------------------------------------------------------
 
-const char *fofiType1CStdStrings[391] = {
+const char *const fofiType1CStdStrings[391] = {
   ".notdef",
   "space",
   "exclam",
@@ -932,7 +932,7 @@ const char *fofiType1CStdStrings[391] = {
   "Semibold"
 };
 
-Gushort fofiType1CISOAdobeCharset[229] = {
+Gushort const fofiType1CISOAdobeCharset[229] = {
     0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
    10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
    20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
@@ -958,7 +958,7 @@ Gushort fofiType1CISOAdobeCharset[229] = {
   220, 221, 222, 223, 224, 225, 226, 227, 228
 };
 
-Gushort fofiType1CExpertCharset[166] = {
+Gushort const fofiType1CExpertCharset[166] = {
     0,   1, 229, 230, 231, 232, 233, 234, 235, 236,
   237, 238,  13,  14,  15,  99, 239, 240, 241, 242,
   243, 244, 245, 246, 247, 248,  27,  28, 249, 250,
@@ -978,7 +978,7 @@ Gushort fofiType1CExpertCharset[166] = {
   373, 374, 375, 376, 377, 378
 };
 
-Gushort fofiType1CExpertSubsetCharset[87] = {
+Gushort const fofiType1CExpertSubsetCharset[87] = {
     0,   1, 231, 232, 235, 236, 237, 238,  13,  14,
    15,  99, 239, 240, 241, 242, 243, 244, 245, 246,
   247, 248,  27,  28, 249, 250, 251, 253, 254, 255,

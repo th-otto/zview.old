@@ -19,7 +19,7 @@
 
 //------------------------------------------------------------------------
 
-static char hexChars[17] = "0123456789ABCDEF";
+static char const hexChars[17] = "0123456789ABCDEF";
 
 //------------------------------------------------------------------------
 
@@ -2698,11 +2698,11 @@ GBool FoFiType1C::readCharset() {
   int nLeft, i, j;
 
   if (topDict.charsetOffset == 0) {
-    charset = fofiType1CISOAdobeCharset;
+    charset = const_cast<Gushort *>(fofiType1CISOAdobeCharset);
   } else if (topDict.charsetOffset == 1) {
-    charset = fofiType1CExpertCharset;
+    charset = const_cast<Gushort *>(fofiType1CExpertCharset);
   } else if (topDict.charsetOffset == 2) {
-    charset = fofiType1CExpertSubsetCharset;
+    charset = const_cast<Gushort *>(fofiType1CExpertSubsetCharset);
   } else {
     charset = (Gushort *)gmallocn(nGlyphs, sizeof(Gushort));
     for (i = 0; i < nGlyphs; ++i) {

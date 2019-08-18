@@ -324,7 +324,7 @@ struct SplashFTFontPath {
 };
 
 SplashPath *SplashFTFont::getGlyphPath(int c) {
-  static FT_Outline_Funcs outlineFuncs = {
+  static FT_Outline_Funcs const outlineFuncs = {
 #if FREETYPE_MINOR <= 1
     (int (*)(FT_Vector *, void *))&glyphPathMoveTo,
     (int (*)(FT_Vector *, void *))&glyphPathLineTo,

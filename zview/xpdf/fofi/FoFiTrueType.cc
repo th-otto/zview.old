@@ -984,7 +984,7 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
 			     int *codeToGID) {
   // this substitute cmap table maps char code ffff to glyph 0,
   // with tables for MacRoman and MS Unicode
-  static char cmapTab[44] = {
+  static Guchar const cmapTab[44] = {
     0, 0,			// table version number
     0, 2,			// number of encoding tables
     0, 1,			// platform ID
@@ -1000,19 +1000,19 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
     0, 2,			// 2 * 2 ^ floor(log2(segCount))
     0, 0,			// floor(log2(segCount))
     0, 0,			// 2*segCount - 2*2^floor(log2(segCount))
-    (char)0xff, (char)0xff,	// endCount[0]
+    0xff, 0xff,			// endCount[0]
     0, 0,			// reserved
-    (char)0xff, (char)0xff,	// startCount[0]
+    0xff, 0xff,			// startCount[0]
     0, 1,			// idDelta[0]
     0, 0			// idRangeOffset[0]
   };
-  static char nameTab[8] = {
+  static Guchar const nameTab[8] = {
     0, 0,			// format
     0, 0,			// number of name records
     0, 6,			// offset to start of string storage
     0, 0			// pad to multiple of four bytes
   };
-  static char postTab[32] = {
+  static Guchar const postTab[32] = {
     0, 1, 0, 0,			// format
     0, 0, 0, 0,			// italic angle
     0, 0,			// underline position
@@ -1023,10 +1023,10 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
     0, 0, 0, 0,			// min Type 1 memory
     0, 0, 0, 0			// max Type 1 memory
   };
-  static char os2Tab[86] = {
+  static Guchar const os2Tab[86] = {
     0, 1,			// version
     0, 1,			// xAvgCharWidth
-    0x01, (char)0x90,		// usWeightClass
+    0x01, 0x90,			// usWeightClass
     0, 5,			// usWidthClass
     0, 0,			// fsType
     0, 0,			// ySubscriptXSize
@@ -1064,11 +1064,11 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   int nHMetrics, advWidth, lsb;
   TrueTypeLoca *locaTable;
   TrueTypeTable *newTables;
-  char *newNameTab, *newCmapTab, *newHHEATab, *newHMTXTab;
+  Guchar *newNameTab, *newCmapTab, *newHHEATab, *newHMTXTab;
   int nNewTables, cmapIdx, cmapLen, glyfLen, newNameLen, newCmapLen, next;
   int newHHEALen, newHMTXLen;
   Guint locaChecksum, glyfChecksum, fileChecksum;
-  char *tableDir;
+  Guchar *tableDir;
   char locaBuf[4], checksumBuf[4];
   GBool ok;
   Guint t;
@@ -1261,7 +1261,7 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   if (name) {
     n = (int)strlen(name);
     newNameLen = (6 + 4*12 + 2 * (3*n + 7) + 3) & ~3;
-    newNameTab = (char *)gmalloc(newNameLen);
+    newNameTab = (Guchar *)gmalloc(newNameLen);
     memset(newNameTab, 0, newNameLen);
     newNameTab[0] = 0;		// format selector
     newNameTab[1] = 0;
@@ -1278,13 +1278,13 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
       newNameTab[6 + i*12 + 4] = 0x04;	// language ID = American English
       newNameTab[6 + i*12 + 5] = 0x09;
       newNameTab[6 + i*12 + 6] = 0;	// name ID
-      newNameTab[6 + i*12 + 7] = (char)(i + 1);
+      newNameTab[6 + i*12 + 7] = i + 1;
       // string length
-      newNameTab[6 + i*12 + 8] = (char)(i+1 == 2 ? 0 : ((2*n) >> 8));
-      newNameTab[6 + i*12 + 9] = (char)(i+1 == 2 ? 14 : ((2*n) & 0xff));
+      newNameTab[6 + i*12 + 8] = (i+1 == 2 ? 0 : ((2*n) >> 8));
+      newNameTab[6 + i*12 + 9] = (i+1 == 2 ? 14 : ((2*n) & 0xff));
       // string offset
-      newNameTab[6 + i*12 + 10] = (char)(next >> 8);
-      newNameTab[6 + i*12 + 11] = (char)(next & 0xff);
+      newNameTab[6 + i*12 + 10] = (next >> 8);
+      newNameTab[6 + i*12 + 11] = (next & 0xff);
       if (i+1 == 2) {
 	memcpy(newNameTab + 6 + 4*12 + next, "\0R\0e\0g\0u\0l\0a\0r", 14);
 	next += 14;
@@ -1304,7 +1304,7 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   // construct the new cmap table
   if (codeToGID) {
     newCmapLen = 44 + 256 * 2;
-    newCmapTab = (char *)gmalloc(newCmapLen);
+    newCmapTab = (Guchar *)gmalloc(newCmapLen);
     newCmapTab[0] = 0;		// table version number = 0
     newCmapTab[1] = 0;
     newCmapTab[2] = 0;		// number of encoding tables = 1
@@ -1332,15 +1332,15 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
     newCmapTab[24] = 0;		// 2*segCount - 2*2^floor(log2(segCount))
     newCmapTab[25] = 0;
     newCmapTab[26] = 0x00;	// endCount[0]
-    newCmapTab[27] = (char)0xff;
-    newCmapTab[28] = (char)0xff; // endCount[1]
-    newCmapTab[29] = (char)0xff;
+    newCmapTab[27] = 0xff;
+    newCmapTab[28] = 0xff;	// endCount[1]
+    newCmapTab[29] = 0xff;
     newCmapTab[30] = 0;		// reserved
     newCmapTab[31] = 0;
     newCmapTab[32] = 0x00;	// startCount[0]
     newCmapTab[33] = 0x00;
-    newCmapTab[34] = (char)0xff; // startCount[1]
-    newCmapTab[35] = (char)0xff;
+    newCmapTab[34] = 0xff;	// startCount[1]
+    newCmapTab[35] = 0xff;
     newCmapTab[36] = 0;		// idDelta[0]
     newCmapTab[37] = 0;
     newCmapTab[38] = 0;		// idDelta[1]
@@ -1357,8 +1357,8 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
 	newCmapTab[44 + 2*i] = 0;
 	newCmapTab[44 + 2*i + 1] = 0;
       } else {
-	newCmapTab[44 + 2*i] = (char)(codeToGID[i] >> 8);
-	newCmapTab[44 + 2*i + 1] = (char)(codeToGID[i] & 0xff);
+	newCmapTab[44 + 2*i] = (codeToGID[i] >> 8);
+	newCmapTab[44 + 2*i + 1] = (codeToGID[i] & 0xff);
       }
     }
   } else {
@@ -1371,33 +1371,33 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
     i = seekTable("hhea");
     pos = tables[i].offset;
     newHHEALen = 36;
-    newHHEATab = (char *)gmalloc(newHHEALen);
+    newHHEATab = (Guchar *)gmalloc(newHHEALen);
     for (i = 0; i < newHHEALen; ++i) {
-      newHHEATab[i] = (char)getU8(pos++, &ok);
+      newHHEATab[i] = getU8(pos++, &ok);
     }
-    newHHEATab[34] = (char)(nGlyphs >> 8);
-    newHHEATab[35] = (char)(nGlyphs & 0xff);
+    newHHEATab[34] = (nGlyphs >> 8);
+    newHHEATab[35] = (nGlyphs & 0xff);
     i = seekTable("hmtx");
     pos = tables[i].offset;
     newHMTXLen = 4 * nGlyphs;
-    newHMTXTab = (char *)gmalloc(newHMTXLen);
+    newHMTXTab = (Guchar *)gmalloc(newHMTXLen);
     advWidth = 0;
     for (i = 0; i < nHMetrics; ++i) {
       advWidth = getU16BE(pos, &ok);
       lsb = getU16BE(pos + 2, &ok);
       pos += 4;
-      newHMTXTab[4*i    ] = (char)(advWidth >> 8);
-      newHMTXTab[4*i + 1] = (char)(advWidth & 0xff);
-      newHMTXTab[4*i + 2] = (char)(lsb >> 8);
-      newHMTXTab[4*i + 3] = (char)(lsb & 0xff);
+      newHMTXTab[4*i    ] = (advWidth >> 8);
+      newHMTXTab[4*i + 1] = (advWidth & 0xff);
+      newHMTXTab[4*i + 2] = (lsb >> 8);
+      newHMTXTab[4*i + 3] = (lsb & 0xff);
     }
     for (; i < nGlyphs; ++i) {
       lsb = getU16BE(pos, &ok);
       pos += 2;
-      newHMTXTab[4*i    ] = (char)(advWidth >> 8);
-      newHMTXTab[4*i + 1] = (char)(advWidth & 0xff);
-      newHMTXTab[4*i + 2] = (char)(lsb >> 8);
-      newHMTXTab[4*i + 3] = (char)(lsb & 0xff);
+      newHMTXTab[4*i    ] = (advWidth >> 8);
+      newHMTXTab[4*i + 1] = (advWidth & 0xff);
+      newHMTXTab[4*i + 2] = (lsb >> 8);
+      newHMTXTab[4*i + 3] = (lsb & 0xff);
     }
   } else {
     newHHEATab = newHMTXTab = NULL;
@@ -1434,10 +1434,10 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
       }
       if (newTables[j].tag == cmapTag && codeToGID) {
 	newTables[j].len = newCmapLen;
-	newTables[j].checksum = computeTableChecksum((Guchar *)newCmapTab,
+	newTables[j].checksum = computeTableChecksum(newCmapTab,
 						     newCmapLen);
       } else if (newTables[j].tag == cmapTag && emptyCmap) {
-	newTables[j].checksum = computeTableChecksum((Guchar *)cmapTab,
+	newTables[j].checksum = computeTableChecksum(cmapTab,
 						     sizeof(cmapTab));
 	newTables[j].len = sizeof(cmapTab);
       } else if (newTables[j].tag == cmapTag && badCmapLen) {
@@ -1450,15 +1450,15 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
 	newTables[j].checksum = glyfChecksum;
       } else if (newTables[j].tag == nameTag && name) {
 	newTables[j].len = newNameLen;
-	newTables[j].checksum = computeTableChecksum((Guchar *)newNameTab,
+	newTables[j].checksum = computeTableChecksum(newNameTab,
 						     newNameLen);
       } else if (newTables[j].tag == hheaTag && abbrevHMTX) {
 	newTables[j].len = newHHEALen;
-	newTables[j].checksum = computeTableChecksum((Guchar *)newHHEATab,
+	newTables[j].checksum = computeTableChecksum(newHHEATab,
 						     newHHEALen);
       } else if (newTables[j].tag == hmtxTag && abbrevHMTX) {
 	newTables[j].len = newHMTXLen;
-	newTables[j].checksum = computeTableChecksum((Guchar *)newHMTXTab,
+	newTables[j].checksum = computeTableChecksum(newHMTXTab,
 						     newHMTXLen);
       }
       ++j;
@@ -1467,11 +1467,11 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   if (missingCmap) {
     newTables[j].tag = cmapTag;
     if (codeToGID) {
-      newTables[j].checksum = computeTableChecksum((Guchar *)newCmapTab,
+      newTables[j].checksum = computeTableChecksum(newCmapTab,
 						   newCmapLen);
       newTables[j].len = newCmapLen;
     } else {
-      newTables[j].checksum = computeTableChecksum((Guchar *)cmapTab,
+      newTables[j].checksum = computeTableChecksum(cmapTab,
 						   sizeof(cmapTab));
       newTables[j].len = sizeof(cmapTab);
     }
@@ -1480,11 +1480,11 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   if (missingName) {
     newTables[j].tag = nameTag;
     if (name) {
-      newTables[j].checksum = computeTableChecksum((Guchar *)newNameTab,
+      newTables[j].checksum = computeTableChecksum(newNameTab,
 						   newNameLen);
       newTables[j].len = newNameLen;
     } else {
-      newTables[j].checksum = computeTableChecksum((Guchar *)nameTab,
+      newTables[j].checksum = computeTableChecksum(nameTab,
 						   sizeof(nameTab));
       newTables[j].len = sizeof(nameTab);
     }
@@ -1492,14 +1492,14 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   }
   if (missingPost) {
     newTables[j].tag = postTag;
-    newTables[j].checksum = computeTableChecksum((Guchar *)postTab,
+    newTables[j].checksum = computeTableChecksum(postTab,
 						 sizeof(postTab));
     newTables[j].len = sizeof(postTab);
     ++j;
   }
   if (missingOS2) {
     newTables[j].tag = os2Tag;
-    newTables[j].checksum = computeTableChecksum((Guchar *)os2Tab,
+    newTables[j].checksum = computeTableChecksum(os2Tab,
 						 sizeof(os2Tab));
     newTables[j].len = sizeof(os2Tab);
     ++j;
@@ -1520,46 +1520,46 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
   }
 
   // write the table directory
-  tableDir = (char *)gmalloc(12 + nNewTables * 16);
+  tableDir = (Guchar *)gmalloc(12 + nNewTables * 16);
   tableDir[0] = 0x00;					// sfnt version
   tableDir[1] = 0x01;
   tableDir[2] = 0x00;
   tableDir[3] = 0x00;
-  tableDir[4] = (char)((nNewTables >> 8) & 0xff);	// numTables
-  tableDir[5] = (char)(nNewTables & 0xff);
+  tableDir[4] = ((nNewTables >> 8) & 0xff);	// numTables
+  tableDir[5] = (nNewTables & 0xff);
   for (i = -1, t = (Guint)nNewTables; t; ++i, t >>= 1) ;
   t = 1 << (4 + i);
-  tableDir[6] = (char)((t >> 8) & 0xff);		// searchRange
-  tableDir[7] = (char)(t & 0xff);
-  tableDir[8] = (char)((i >> 8) & 0xff);		// entrySelector
-  tableDir[9] = (char)(i & 0xff);
+  tableDir[6] = ((t >> 8) & 0xff);		// searchRange
+  tableDir[7] = (t & 0xff);
+  tableDir[8] = ((i >> 8) & 0xff);		// entrySelector
+  tableDir[9] = (i & 0xff);
   t = nNewTables * 16 - t;
-  tableDir[10] = (char)((t >> 8) & 0xff);		// rangeShift
-  tableDir[11] = (char)(t & 0xff);
+  tableDir[10] = ((t >> 8) & 0xff);		// rangeShift
+  tableDir[11] = (t & 0xff);
   pos = 12;
   for (i = 0; i < nNewTables; ++i) {
-    tableDir[pos   ] = (char)(newTables[i].tag >> 24);
-    tableDir[pos+ 1] = (char)(newTables[i].tag >> 16);
-    tableDir[pos+ 2] = (char)(newTables[i].tag >>  8);
-    tableDir[pos+ 3] = (char) newTables[i].tag;
-    tableDir[pos+ 4] = (char)(newTables[i].checksum >> 24);
-    tableDir[pos+ 5] = (char)(newTables[i].checksum >> 16);
-    tableDir[pos+ 6] = (char)(newTables[i].checksum >>  8);
-    tableDir[pos+ 7] = (char) newTables[i].checksum;
-    tableDir[pos+ 8] = (char)(newTables[i].offset >> 24);
-    tableDir[pos+ 9] = (char)(newTables[i].offset >> 16);
-    tableDir[pos+10] = (char)(newTables[i].offset >>  8);
-    tableDir[pos+11] = (char) newTables[i].offset;
-    tableDir[pos+12] = (char)(newTables[i].len >> 24);
-    tableDir[pos+13] = (char)(newTables[i].len >> 16);
-    tableDir[pos+14] = (char)(newTables[i].len >>  8);
-    tableDir[pos+15] = (char) newTables[i].len;
+    tableDir[pos   ] = (newTables[i].tag >> 24);
+    tableDir[pos+ 1] = (newTables[i].tag >> 16);
+    tableDir[pos+ 2] = (newTables[i].tag >>  8);
+    tableDir[pos+ 3] = newTables[i].tag;
+    tableDir[pos+ 4] = (newTables[i].checksum >> 24);
+    tableDir[pos+ 5] = (newTables[i].checksum >> 16);
+    tableDir[pos+ 6] = (newTables[i].checksum >>  8);
+    tableDir[pos+ 7] = newTables[i].checksum;
+    tableDir[pos+ 8] = (newTables[i].offset >> 24);
+    tableDir[pos+ 9] = (newTables[i].offset >> 16);
+    tableDir[pos+10] = (newTables[i].offset >>  8);
+    tableDir[pos+11] = newTables[i].offset;
+    tableDir[pos+12] = (newTables[i].len >> 24);
+    tableDir[pos+13] = (newTables[i].len >> 16);
+    tableDir[pos+14] = (newTables[i].len >>  8);
+    tableDir[pos+15] = newTables[i].len;
     pos += 16;
   }
-  (*outputFunc)(outputStream, tableDir, 12 + nNewTables * 16);
+  (*outputFunc)(outputStream, (const char *)tableDir, 12 + nNewTables * 16);
 
   // compute the file checksum
-  fileChecksum = computeTableChecksum((Guchar *)tableDir,
+  fileChecksum = computeTableChecksum(tableDir,
 				      12 + nNewTables * 16);
   for (i = 0; i < nNewTables; ++i) {
     fileChecksum += newTables[i].checksum;
@@ -1571,10 +1571,10 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
     if (newTables[i].tag == headTag) {
       if (checkRegion(newTables[i].origOffset, newTables[i].len)) {
 	(*outputFunc)(outputStream, (char *)file + newTables[i].origOffset, 8);
-	checksumBuf[0] = (char)(fileChecksum >> 24);
-	checksumBuf[1] = (char)(fileChecksum >> 16);
-	checksumBuf[2] = (char)(fileChecksum >> 8);
-	checksumBuf[3] = (char)fileChecksum;
+	checksumBuf[0] = (fileChecksum >> 24);
+	checksumBuf[1] = (fileChecksum >> 16);
+	checksumBuf[2] = (fileChecksum >> 8);
+	checksumBuf[3] = fileChecksum;
 	(*outputFunc)(outputStream, checksumBuf, 4);
 	(*outputFunc)(outputStream,
 		      (char *)file + newTables[i].origOffset + 12,
@@ -1585,32 +1585,32 @@ GBool FoFiTrueType::writeTTF(FoFiOutputFunc outputFunc,
 	}
       }
     } else if (newTables[i].tag == cmapTag && codeToGID) {
-      (*outputFunc)(outputStream, newCmapTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)newCmapTab, newTables[i].len);
     } else if (newTables[i].tag == cmapTag && missingCmap) {
-      (*outputFunc)(outputStream, cmapTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)cmapTab, newTables[i].len);
     } else if (newTables[i].tag == nameTag && name) {
-      (*outputFunc)(outputStream, newNameTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)newNameTab, newTables[i].len);
     } else if (newTables[i].tag == nameTag && missingName) {
-      (*outputFunc)(outputStream, nameTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)nameTab, newTables[i].len);
     } else if (newTables[i].tag == postTag && missingPost) {
-      (*outputFunc)(outputStream, postTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)postTab, newTables[i].len);
     } else if (newTables[i].tag == os2Tag && missingOS2) {
-      (*outputFunc)(outputStream, os2Tab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)os2Tab, newTables[i].len);
     } else if (newTables[i].tag == hheaTag && abbrevHMTX) {
-      (*outputFunc)(outputStream, newHHEATab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)newHHEATab, newTables[i].len);
     } else if (newTables[i].tag == hmtxTag && abbrevHMTX) {
-      (*outputFunc)(outputStream, newHMTXTab, newTables[i].len);
+      (*outputFunc)(outputStream, (const char *)newHMTXTab, newTables[i].len);
     } else if (newTables[i].tag == locaTag && unsortedLoca) {
       for (j = 0; j <= nGlyphs; ++j) {
 	if (locaFmt) {
-	  locaBuf[0] = (char)(locaTable[j].newOffset >> 24);
-	  locaBuf[1] = (char)(locaTable[j].newOffset >> 16);
-	  locaBuf[2] = (char)(locaTable[j].newOffset >>  8);
-	  locaBuf[3] = (char) locaTable[j].newOffset;
+	  locaBuf[0] = (locaTable[j].newOffset >> 24);
+	  locaBuf[1] = (locaTable[j].newOffset >> 16);
+	  locaBuf[2] = (locaTable[j].newOffset >>  8);
+	  locaBuf[3] = locaTable[j].newOffset;
 	  (*outputFunc)(outputStream, locaBuf, 4);
 	} else {
-	  locaBuf[0] = (char)(locaTable[j].newOffset >> 9);
-	  locaBuf[1] = (char)(locaTable[j].newOffset >> 1);
+	  locaBuf[0] = (locaTable[j].newOffset >> 9);
+	  locaBuf[1] = (locaTable[j].newOffset >> 1);
 	  (*outputFunc)(outputStream, locaBuf, 2);
 	}
       }
@@ -2091,7 +2091,7 @@ void FoFiTrueType::dumpString(Guchar *s, int length,
   (*outputFunc)(outputStream, "00>\n", 4);
 }
 
-Guint FoFiTrueType::computeTableChecksum(Guchar *data, int length) {
+Guint FoFiTrueType::computeTableChecksum(const Guchar *data, int length) {
   Guint checksum, word;
   int i;
 

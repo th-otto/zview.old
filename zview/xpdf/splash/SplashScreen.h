@@ -22,7 +22,7 @@ typedef Guchar *SplashScreenCursor;
 class SplashScreen {
 public:
 
-  SplashScreen(SplashScreenParams *params);
+  SplashScreen(const SplashScreenParams *params);
   SplashScreen(SplashScreen *screen);
   ~SplashScreen();
 

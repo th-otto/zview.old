@@ -22,7 +22,7 @@
 //------------------------------------------------------------------------
 
 // number of components in each color mode
-int splashColorModeNComps[] = {
+int const splashColorModeNComps[] = {
   1, 1, 3, 3
 #ifdef SPLASH_CMYK
   , 4

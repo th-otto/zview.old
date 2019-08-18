@@ -178,7 +178,7 @@ private:
   void dumpString(Guchar *s, int length,
 		  FoFiOutputFunc outputFunc,
 		  void *outputStream);
-  Guint computeTableChecksum(Guchar *data, int length);
+  Guint computeTableChecksum(const Guchar *data, int length);
   void parse(int fontNum, GBool allowHeadlessCFF);
   void parseTTC(int fontNum, int *pos);
   void parseDfont(int fontNum, int *offset, int *pos);
