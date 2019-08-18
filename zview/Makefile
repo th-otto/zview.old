@@ -72,13 +72,24 @@ xpdf-${XPDF_VERSION}.tar.gz:
 
 $(PDF_OBJ): xpdf/config.status
 
-xpdf/config.status:
+xpdf/config.status: xpdf/configure
 	test -d xpdf || exit 1 && \
 	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
 	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint
-	
+
+xpdf/configure: xpdf/configure.ac xpdf/Makefile.am
+	cd xpdf && \
+	mkdir -p build-aux && \
+	aclocal -I m4 && \
+	autoconf && \
+	autoheader && \
+	automake --copy --add-missing && \
+	rm -rf autom4te.cache
+
+xpdf/aconf.h: xpdf/config.status
+
 ##############################################################################
 
 include $(top_srcdir)/rules
@@ -99,9 +110,12 @@ endif
 	$(COMPRESS) $(PROGRAM)
 
 slb/$(SLB_SUBDIR)zvpdf.slb: pdflib/header.lo pdflib/zvpdf.lo pdflib/pdflib.lo libpdf.a
+	@mkdir -p slb/$(SLB_SUBDIR)
 	$(CXX) -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) -nostdlib -lgcc -lstdc++ -lm -lgcc
 
 pdflib/header.lo: plugins/common/plugin.h plugins/common/zview.h pdflib/exports.h
+
+pdflib/pdflib.o pdflib/pdflib.lo: xpdf/aconf.h
 
 ##############################################################################
 
