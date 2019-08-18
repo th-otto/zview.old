@@ -8,6 +8,7 @@
 #include "../ztext.h"
 #include "../mfdb.h"
 #include "../infobox.h"
+#include "../pic_load.h"
 #include "../menu.h"
 #include "../txt_data.h"
 #include "../custom_font.h"
@@ -19,8 +20,6 @@
 #include "catalog_iconify.h"
 #include "catalog_other_event.h"
 #include "catalog.h"
-#include "../menu.h"
-#include "../pic_load.h"
 
 /* Global variable */
 int16	border_size 			= 5;

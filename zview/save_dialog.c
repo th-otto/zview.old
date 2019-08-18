@@ -22,15 +22,42 @@ static const char *source_file;
 #define MAX_TYPENAME_LEN 10
 
 
+unsigned int get_option_mask(CODEC *codec)
+{
+	unsigned int have_options = 0;
+	SLB *slb;
+	int i;
+	LDG *ldg;
+
+	ldg_funcs.set_jpg_option = NULL;	
+	ldg_funcs.set_tiff_option = NULL;
+	switch (codec->type)
+	{
+	case CODEC_LDG:
+		ldg = codec->c.ldg;
+		ldg_funcs.set_jpg_option = ldg_find( "set_jpg_option", ldg);
+		if (ldg_funcs.set_jpg_option)
+			have_options |= (1 << OPTION_QUALITY) | (1 << OPTION_COLOR_SPACE) | (1 << OPTION_PROGRESSIVE);
+		ldg_funcs.set_tiff_option = ldg_find( "set_tiff_option", ldg);
+		if (ldg_funcs.set_tiff_option)
+			have_options |= (1 << OPTION_QUALITY) | (1 << OPTION_COMPRESSION);
+		break;
+	case CODEC_SLB:
+		slb = &codec->c.slb;
+		for (i = OPTION_QUALITY; i < 32; i++)
+			if (plugin_get_option(slb, i) >= 0)
+				have_options |= 1 << i;
+		break;
+	}
+	return have_options;
+}
+
 static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const char *name)
 {
-	boolean have_options = FALSE;
 	CODEC *codec = encoder[encoder_selected];
 	OBJECT *tree = get_tree( SAVE_DIAL);
 	
 	curr_output_plugin = NULL;
-	ldg_funcs.set_jpg_option = NULL;	
-	ldg_funcs.set_tiff_option = NULL;
 
 	switch (codec->type)
 	{
@@ -48,12 +75,6 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
 				errshow(codec->extensions, LDG_ERR_BASE + ldg_error());
 				return FALSE;
 			}
-			if( strncmp(codec->extensions, "JPG", 3) == 0)
-				ldg_funcs.set_jpg_option = ldg_find( "set_jpg_option", ldg);
-			else if(strncmp(codec->extensions, "TIF", 3) == 0)
-				ldg_funcs.set_tiff_option = ldg_find( "set_tiff_option", ldg);
-				
-			have_options = ldg_funcs.set_jpg_option != NULL || ldg_funcs.set_tiff_option != NULL;
 		}
 		break;
 	case CODEC_SLB:
@@ -68,8 +89,6 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
 				errshow(codec->extensions, err);
 				return FALSE;
 			}
-			err = plugin_get_option(slb, OPTION_QUALITY);
-			have_options = err >= 0;
 			curr_output_plugin = slb;
 		}
 		break;
@@ -81,7 +100,7 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
 
 	if (win)
 	{
-		if (have_options)
+		if (get_option_mask(codec))
 			ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, NORMAL, 0);
 		else
 			ObjcChange( OC_FORM, win, SAVE_DIAL_OPTIONS, DISABLED, 0);
@@ -89,7 +108,7 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
    		ObjcDraw( OC_FORM, win, SAVE_DIAL_OPTIONS, 1);
 	} else	
 	{
-		if (have_options)
+		if (get_option_mask(codec))
 			tree[SAVE_DIAL_OPTIONS].ob_state &= ~OS_DISABLED;
 		else
 			tree[SAVE_DIAL_OPTIONS].ob_state |= OS_DISABLED;
@@ -172,16 +191,8 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 			break;
 
 		case SAVE_DIAL_OPTIONS:
-			if( strncmp( encoder[last_choice-1]->extensions, "JPG", 3) == 0)
-			{
-				ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
-				jpg_option_dialog( source_file);
-			}
-			else if( strncmp( encoder[last_choice-1]->extensions, "TIF", 3) == 0)
-			{
-				ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
-				tiff_option_dialog();
-			}
+			ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
+			save_option_dialog(source_file, encoder[last_choice - 1]);
 			break;
 
 		case SAVE_DIAL_SAVE:

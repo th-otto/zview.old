@@ -5,19 +5,19 @@
  */
 
 /*
- * Number of Strings:        326
+ * Number of Strings:        311
  * Number of Bitblks:        2
  * Number of Iconblks:       0
  * Number of Color Iconblks: 9
  * Number of Color Icons:    15
- * Number of Tedinfos:       41
- * Number of Free Strings:   45
+ * Number of Tedinfos:       37
+ * Number of Free Strings:   44
  * Number of Free Images:    0
- * Number of Objects:        246
- * Number of Trees:          15
+ * Number of Objects:        234
+ * Number of Trees:          14
  * Number of Userblks:       0
  * Number of Images:         2
- * Total file size:          18252
+ * Total file size:          17802
  */
 
 #undef RSC_NAME
@@ -35,17 +35,17 @@
 # define RSC_STATIC_FILE 0
 #endif
 #if !RSC_STATIC_FILE
-#define NUM_STRINGS 326
-#define NUM_FRSTR 45
+#define NUM_STRINGS 311
+#define NUM_FRSTR 44
 #define NUM_UD 0
 #define NUM_IMAGES 2
 #define NUM_BB 2
 #define NUM_FRIMG 0
 #define NUM_IB 0
 #define NUM_CIB 9
-#define NUM_TI 41
-#define NUM_OBS 246
-#define NUM_TREE 15
+#define NUM_TI 37
+#define NUM_OBS 234
+#define NUM_TREE 14
 #endif
 
 
@@ -155,32 +155,24 @@
 #define HSLIDERS_HBACK                     4 /* BOX in tree HSLIDERS */
 #define HSLIDERS_HMOVER                    5 /* BOX in tree HSLIDERS */
 
-#define JPGPREF                           10 /* form/dialog */
-#define JPGPREF_PERCENT                    5 /* BOXTEXT in tree JPGPREF */ /* max len 2 */
-#define JPGPREF_OK                         6 /* BUTTON in tree JPGPREF */
-#define JPGPREF_BG                         7 /* IBOX in tree JPGPREF */
-#define JPGPREF_LF                         8 /* BOXCHAR in tree JPGPREF */
-#define JPGPREF_RT                         9 /* BOXCHAR in tree JPGPREF */
-#define JPGPREF_PG                        10 /* BOX in tree JPGPREF */
-#define JPGPREF_SL                        11 /* BOX in tree JPGPREF */
-#define JPGPREF_GRAY                      12 /* BUTTON in tree JPGPREF */
-#define JPGPREF_PROGRESSIVE               13 /* BUTTON in tree JPGPREF */
+#define SAVEPREF                          10 /* form/dialog */
+#define PREF_PERCENT                       2 /* BOXTEXT in tree SAVEPREF */ /* max len 2 */
+#define PREF_BG                            4 /* IBOX in tree SAVEPREF */
+#define PREF_LF                            5 /* BOXCHAR in tree SAVEPREF */
+#define PREF_RT                            6 /* BOXCHAR in tree SAVEPREF */
+#define PREF_PG                            7 /* BOX in tree SAVEPREF */
+#define PREF_SL                            8 /* BOX in tree SAVEPREF */
+#define PREF_GRAY                         12 /* BUTTON in tree SAVEPREF */
+#define PREF_PROGRESSIVE                  13 /* BUTTON in tree SAVEPREF */
+#define PREF_COMPRESSION_BOX              14 /* BUTTON in tree SAVEPREF */
+#define TIFFPREF_NONE                     15 /* BUTTON in tree SAVEPREF */
+#define TIFFPREF_RLE                      16 /* BUTTON in tree SAVEPREF */
+#define TIFFPREF_LZW                      17 /* BUTTON in tree SAVEPREF */
+#define TIFFPREF_JPEG                     18 /* BUTTON in tree SAVEPREF */
+#define TIFFPREF_DEFLATE                  19 /* BUTTON in tree SAVEPREF */
+#define PREF_OK                           20 /* BUTTON in tree SAVEPREF */
 
-#define TIFFPREF                          11 /* form/dialog */
-#define TIFFPREF_PERCENT                   5 /* BOXTEXT in tree TIFFPREF */ /* max len 3 */
-#define TIFFPREF_OK                        6 /* BUTTON in tree TIFFPREF */
-#define TIFFPREF_BG                        7 /* IBOX in tree TIFFPREF */
-#define TIFFPREF_LF                        8 /* BOXCHAR in tree TIFFPREF */
-#define TIFFPREF_RT                        9 /* BOXCHAR in tree TIFFPREF */
-#define TIFFPREF_PG                       10 /* BOX in tree TIFFPREF */
-#define TIFFPREF_SL                       11 /* BOX in tree TIFFPREF */
-#define TIFFPREF_None                     14 /* BUTTON in tree TIFFPREF */
-#define TIFFPREF_RLE                      15 /* BUTTON in tree TIFFPREF */
-#define TIFFPREF_LZW                      16 /* BUTTON in tree TIFFPREF */
-#define TIFFPREF_JPEG                     17 /* BUTTON in tree TIFFPREF */
-#define TIFFPREF_DEFLATE                  18 /* BUTTON in tree TIFFPREF */
-
-#define VIEWTOOLBAR                       12 /* form/dialog */
+#define VIEWTOOLBAR                       11 /* form/dialog */
 #define VIEWTOOLBAR_BACK                   0 /* BOX in tree VIEWTOOLBAR */
 #define VIEWTOOLBAR_BIG                    1 /* BUTTON in tree VIEWTOOLBAR */
 #define VIEWTOOLBAR_SMALL                  2 /* BUTTON in tree VIEWTOOLBAR */
@@ -190,7 +182,7 @@
 #define VIEWTOOLBAR_FULLSCREEN             6 /* BUTTON in tree VIEWTOOLBAR */
 #define VIEWTOOLBAR_PRINT                  7 /* BUTTON in tree VIEWTOOLBAR */
 
-#define PDFTOOLBAR                        13 /* form/dialog */
+#define PDFTOOLBAR                        12 /* form/dialog */
 #define PDFTOOLBAR_BACK                    0 /* BOX in tree PDFTOOLBAR */
 #define PDFTOOLBAR_BIG                     1 /* BUTTON in tree PDFTOOLBAR */
 #define PDFTOOLBAR_SMALL                   2 /* BUTTON in tree PDFTOOLBAR */
@@ -203,7 +195,7 @@
 #define PDFTOOLBAR_INFO                    9 /* BUTTON in tree PDFTOOLBAR */
 #define PDFTOOLBAR_PERCENT                10 /* BOXTEXT in tree PDFTOOLBAR */ /* max len 9 */
 
-#define PREFS                             14 /* form/dialog */
+#define PREFS                             13 /* form/dialog */
 #define PREFS_PANEL3                       1 /* BUTTON in tree PREFS */
 #define PREFS_PDF_ANTIALIAS                2 /* BUTTON in tree PREFS */
 #define PREFS_PDF_FIT_TO_WINDOW            3 /* BUTTON in tree PREFS */
@@ -367,19 +359,16 @@
 #define DELETE_ASK                        39 /* Free string */
 /* Delete the selected file(s)? */
 
-#define JPG_OPTION_TITLE                  40 /* Free string */
-/* JPEG Options */
+#define SAVE_OPTION_TITLE                 40 /* Free string */
+/* Output Options */
 
-#define TIFF_OPTION_TITLE                 41 /* Free string */
-/* TIFF Options */
-
-#define NOZCODECS                         42 /* Alert string */
+#define NOZCODECS                         41 /* Alert string */
 /* [3][|zView can't load |the plugins or find |the codecs folder. ][Quit] */
 
-#define NOICONS                           43 /* Alert string */
+#define NOICONS                           42 /* Alert string */
 /* [3][|zView can't load |the icons. ][Quit] */
 
-#define NO_EDDI                           44 /* Alert string */
+#define NO_EDDI                           43 /* Alert string */
 /* [3][zView needs a VDI|with EdDI standard.][Quit] */
 
 
