@@ -34,6 +34,7 @@ OBJECT *get_tree( int16 obj_index)
 
 /* Return a string from resource file */
 
+__attribute__((noinline))
 char *get_string( int16 str_index) 
 {
 	char *txt;	

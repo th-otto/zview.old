@@ -991,7 +991,6 @@ WINDOW *WindView( char *filename)
 	if ( !pic_load( filename, img))
 	{
 		free( windata);
-		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}

@@ -1396,7 +1396,6 @@ WINDOW *WindPdf( char *filename)
 	{
 		WindDelete( winview);
 		free( windata);
-		/* errshow(NULL, IMG_NO_VALID); */
 		graf_mouse( ARROW, NULL);
 		return NULL;
 	}

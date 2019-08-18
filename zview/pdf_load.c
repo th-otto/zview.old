@@ -197,11 +197,15 @@ boolean pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 	}
 
 	if( lib_pdf_load( file, img, pdf_aa) == FALSE)
+	{
+		errshow(NULL, IMG_NO_VALID);
 		return FALSE;
+	}
 
 	if( ( img->image = ( MFDB *)malloc( sizeof( MFDB) *  img->page)) == NULL)
 	{
 		pdf_quit( img);
+		errshow(NULL, -ENOMEM);
 		return FALSE;
 	}
 
