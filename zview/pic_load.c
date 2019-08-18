@@ -238,7 +238,7 @@ void quit_img( IMGINFO info, DECDATA data)
 
 CODEC *get_codec( const char *file)
 {
-	int16 	i, j, c = 0;
+	int16 	i, j, c;
 	char 	plugin[4];
 	LDG *ldg;
 	const char *p;
@@ -246,6 +246,7 @@ CODEC *get_codec( const char *file)
 	const char *dot;
 	char extension[MAXNAMLEN];
 
+	curr_input_plugin = NULL;
 	dot = strrchr(file, '.');
 	if (dot == NULL)
 		return FALSE;
@@ -253,9 +254,8 @@ CODEC *get_codec( const char *file)
 	str2upper(extension);
 	plugin[3] = '\0';
 
-	curr_input_plugin = NULL;
 	/* We check if a plug-ins can do the job */
-	for( i = 0; i < plugins_nbr; i++, c = 0)
+	for( i = 0; i < plugins_nbr; i++)
 	{
 		switch (codecs[i].type)
 		{
@@ -282,6 +282,7 @@ CODEC *get_codec( const char *file)
 				/* old version, with exactly 3 chars per extension */
 				for( j = 0; j < codecs[i].num_extensions; j++)
 				{
+					c = 0;
 					plugin[0] = codecs[i].extensions[c++];
 					plugin[1] = codecs[i].extensions[c++];
 					plugin[2] = codecs[i].extensions[c++];

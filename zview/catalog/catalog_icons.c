@@ -265,14 +265,9 @@ boolean icons_init( void)
 
 void set_entry_icon( Entry *entry) 
 {
-	int16 i, j, c = 0;
-	char extension[4], plugin[4];
-	const char *p;
+	char extension[MAXNAMLEN];
+	const char *dot;
 	
-	strcpy(extension, entry->name + strlen(entry->name) - 3);
-	
-	str2upper(extension);
-
 	if ( S_ISDIR( entry->stat.st_mode))
 	{
 		entry->type 	= ET_DIR;
@@ -280,61 +275,35 @@ void set_entry_icon( Entry *entry)
 		return;
 	}
 
-
-	if(( strcmp ( extension, "TTP") == 0) 
-	|| ( strcmp ( extension, "TOS") == 0) 
-	|| ( strcmp ( extension, "GTP") == 0) 
-	|| ( strcmp ( extension, "PRG") == 0) 
-	|| ( strcmp ( extension, "APP") == 0))
+	dot = strrchr(entry->name, '.');
+	if (dot != NULL)
 	{
-		entry->type 	= ET_PRG;
-		entry->icon		= &icon_prg.image[0];
-		return;
-	}		
-
-	if( strcmp ( extension, "PDF") == 0)	
-	{
-		entry->type 	= ET_PDF;
-		entry->icon		= &icon_pdf.image[0];
-		return;
-	}		
-
-	plugin[3] = '\0';
-	for( i = 0; i < plugins_nbr; i++, c = 0)
-	{
-		if (codecs[i].num_extensions == 0)
+		strcpy(extension, dot + 1);
+		str2upper(extension);
+		if(( strcmp ( extension, "TTP") == 0)
+		|| ( strcmp ( extension, "TOS") == 0)
+		|| ( strcmp ( extension, "GTP") == 0)
+		|| ( strcmp ( extension, "PRG") == 0)
+		|| ( strcmp ( extension, "APP") == 0))
 		{
-			/*
-			 * newer plugin, with 0-terminated list
-			 */
-			p = codecs[i].extensions;
-			while (*p)
-			{
-				if (strcmp(extension, p) == 0)
-				{
-					entry->type	= ET_IMAGE;
-					entry->icon	= &icon_image.image[0];				
-					return;
-				}
-				p += strlen(p) + 1;
-			}
-		} else
-		{
-			/* old version, with exactly 3 chars per extension */
-			for (j = 0; j < codecs[i].num_extensions; j++)
-			{
-				plugin[0] = codecs[i].extensions[c++];
-				plugin[1] = codecs[i].extensions[c++];
-				plugin[2] = codecs[i].extensions[c++];
-	
-				if (strcmp(extension, plugin) == 0)
-				{
-					entry->type	= ET_IMAGE;
-					entry->icon	= &icon_image.image[0];				
-					return;
-				}
-			}
+			entry->type 	= ET_PRG;
+			entry->icon		= &icon_prg.image[0];
+			return;
 		}
+	
+		if( strcmp ( extension, "PDF") == 0)
+		{
+			entry->type 	= ET_PDF;
+			entry->icon		= &icon_pdf.image[0];
+			return;
+		}
+	}
+
+	if (get_codec(entry->name))
+	{
+		entry->type	= ET_IMAGE;
+		entry->icon	= &icon_image.image[0];
+		return;
 	}
 	
 	entry->type		= ET_FILE;
