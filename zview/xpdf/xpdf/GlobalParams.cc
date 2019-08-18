@@ -527,7 +527,9 @@ GlobalParams::GlobalParams(const char *cfgFileName) {
   tlsWin32ErrorInfo = TlsAlloc();
 #endif
 
+#if 0
   initBuiltinFontTables();
+#endif
 
   // scan the encoding in reverse because we want the lowest-numbered
   // index for each char name ('space' is encoded twice)
@@ -1850,7 +1852,9 @@ GlobalParams::~GlobalParams() {
   GString *key;
   GList *list;
 
+#if 0
   freeBuiltinFontTables();
+#endif
 
   delete macRomanReverseMap;
 

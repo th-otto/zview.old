@@ -14,10 +14,12 @@
 #define nBuiltinFonts      14
 #define nBuiltinFontSubsts 12
 
-extern BuiltinFont builtinFonts[nBuiltinFonts];
-extern BuiltinFont *builtinFontSubst[nBuiltinFontSubsts];
+extern BuiltinFont const builtinFonts[nBuiltinFonts];
+extern const BuiltinFont *const builtinFontSubst[nBuiltinFontSubsts];
 
+#if 0
 extern void initBuiltinFontTables();
 extern void freeBuiltinFontTables();
+#endif
 
 #endif

@@ -14,9 +14,14 @@
 #include "gtypes.h"
 
 struct BuiltinFont;
-class BuiltinFontWidths;
 
 //------------------------------------------------------------------------
+
+struct BuiltinFontWidth {
+  const char *name;
+  Gushort width;
+  const BuiltinFontWidth *next;
+};
 
 struct BuiltinFont {
   const char *name;
@@ -25,30 +30,11 @@ struct BuiltinFont {
   short ascent;
   short descent;
   short bbox[4];
-  BuiltinFontWidths *widths;
+  unsigned int size;
+  const struct BuiltinFontWidth *widths;
+  const struct BuiltinFontWidth *const *hashtab;
 };
 
-//------------------------------------------------------------------------
-
-struct BuiltinFontWidth {
-  const char *name;
-  Gushort width;
-  BuiltinFontWidth *next;
-};
-
-class BuiltinFontWidths {
-public:
-
-  BuiltinFontWidths(BuiltinFontWidth *widths, int sizeA);
-  ~BuiltinFontWidths();
-  GBool getWidth(const char *name, Gushort *width);
-
-private:
-
-  int hash(const char *name);
-
-  BuiltinFontWidth **tab;
-  int size;
-};
+GBool BuiltinFontWidths_getWidth(const struct BuiltinFont *font, const char *name, Gushort *width);
 
 #endif

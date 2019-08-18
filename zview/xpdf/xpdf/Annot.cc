@@ -1218,7 +1218,7 @@ void Annot::drawText(GString *text, GString *da, int quadding, double margin,
   w = 0;
   for (i = 0; i < text2->getLength(); ++i) {
     charName = winAnsiEncoding[text->getChar(i) & 0xff];
-    if (charName && builtinFonts[4].widths->getWidth(charName, &charWidth)) {
+    if (charName && BuiltinFontWidths_getWidth(&builtinFonts[4], charName, &charWidth)) {
       w += charWidth;
     } else {
       w += 0.5;

@@ -865,7 +865,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   GfxFont(tagA, idA, nameA, typeA, embFontIDA)
 {
   GString *name2;
-  BuiltinFont *builtinFont;
+  const BuiltinFont *builtinFont;
   const char *const *baseEnc;
   char *buf;
   int len;
@@ -1309,11 +1309,11 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   } else if (builtinFont) {
     // this is a kludge for broken PDF files that encode char 32
     // as .notdef
-    if (builtinFont->widths->getWidth("space", &w)) {
+    if (BuiltinFontWidths_getWidth(builtinFont, "space", &w)) {
       widths[32] = 0.001 * w;
     }
     for (code = 0; code < 256; ++code) {
-      if (enc[code] && builtinFont->widths->getWidth(enc[code], &w)) {
+      if (enc[code] && BuiltinFontWidths_getWidth(builtinFont, enc[code], &w)) {
 	widths[code] = 0.001 * w;
       }
     }
@@ -1339,11 +1339,11 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
     builtinFont = builtinFontSubst[i];
     // this is a kludge for broken PDF files that encode char 32
     // as .notdef
-    if (builtinFont->widths->getWidth("space", &w)) {
+    if (BuiltinFontWidths_getWidth(builtinFont, "space", &w)) {
       widths[32] = 0.001 * w;
     }
     for (code = 0; code < 256; ++code) {
-      if (enc[code] && builtinFont->widths->getWidth(enc[code], &w)) {
+      if (enc[code] && BuiltinFontWidths_getWidth(builtinFont, enc[code], &w)) {
 	widths[code] = 0.001 * w;
       }
     }

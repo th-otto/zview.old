@@ -1600,7 +1600,7 @@ void SplashOutputDev::doUpdateFont(GfxState *state) {
 	   (name[0] >= 'a' && name[0] <= 'z') ||
 	   (name[0] >= '0' && name[0] <= '9'))) {
 	w = ((Gfx8BitFont *)gfxFont)->getWidth((Guchar)code);
-	builtinFontSubst[substIdx]->widths->getWidth(name, &ww);
+	BuiltinFontWidths_getWidth(builtinFontSubst[substIdx], name, &ww);
 	if (w > 0.01 && ww > 10) {
 	  w /= ww * 0.001;
 	  if (w < fontScaleMin) {
