@@ -45,9 +45,12 @@ static void __CDECL MenuHandle(WINDOW *win EVNT_BUFF_PARAM)
 static void __CDECL Menu_about(WINDOW *win, int item, int title, void *data)
 {
 	OBJECT *aboutbox = get_tree( ABOUT);
+	WINDOW *winabout;
 
-	WINDOW *winabout = FormCreate( aboutbox, NAME|MOVER|CLOSER, generic_form_event, get_string( ABOUT_TITLE), NULL, TRUE, FALSE);
+	ObjcString(aboutbox, ABOUT_DATE, (char *)program_date);
+	ObjcString(aboutbox, ABOUT_VERSION, (char *)program_version);
 
+	winabout = FormCreate( aboutbox, NAME|MOVER|CLOSER, generic_form_event, get_string( ABOUT_TITLE), NULL, TRUE, FALSE);
 	/* Set the window modal */
 	WindSet( winabout, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
 	/* New closer event function */
