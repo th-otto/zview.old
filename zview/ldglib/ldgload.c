@@ -162,7 +162,10 @@ LDG *ldg_load(int apid, const char *path)
 	/* Why is this necessary? The caches were flushed before Pexec(4). */
 	ldg_cpush();
 #endif
+#if 0
+	/* this is wrong: Pexec(4) already waits for the process to terminate */
 	Pwait();
+#endif
 
 	if (ldg == NULL ||					/* Not a library */
 		ldg->magic != LDG_COOKIE)		/* wrong format library */
