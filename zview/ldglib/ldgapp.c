@@ -26,30 +26,58 @@
 #include "ldg.h"
 #include "global.h"
 
+#define USE_COOKIE 0
+#if !USE_COOKIE
+static short ldg_errno;
+#endif
+
+
+/*
+ * Error handling: the error code is
+ * written to the field of the LDGM cookie dedicated to
+ * this purpose.
+ */
+void ldg_set_error(int code)
+{
+#if USE_COOKIE
+	LDG_INFOS *cook;
+
+	if (ldg_cookie(LDG_COOKIE, (long *) &cook) && cook->version >= 0x0210)
+		cook->error = (short) (code & 0xFFFF);
+#else
+	ldg_errno = code;
+#endif
+}
+
+
 /* Binding des fonctions du cookies */
 
 LDG *ldg_open(const char *lib, _WORD *gl)
 {
+#if USE_COOKIE
 	LDG_INFOS *cook;
 
 	if (ldg_cookie(LDG_COOKIE, (long *) &cook) && cook->version >= 0x0200 && cook->ldg_open)
 		return (*cook->ldg_open) (lib, gl);
 	/* Si pas TSR, chargement direct */
+#endif
 	return ldg_load(gl[2], lib);
 }
 
 
 void *ldg_find(const char *name_fct, LDG *ldg)
 {
-	LDG_INFOS *cook;
 	static int lastpos = 0;
 	int i, j;
 
+#if USE_COOKIE
+	LDG_INFOS *cook;
 	if (ldg_cookie(LDG_COOKIE, (long *) &cook))
 	{
 		if (cook->version >= 0x200 && cook->ldg_find)
 			return (*cook->ldg_find) (name_fct, ldg);
 	}
+#endif
 	if (ldg == NULL)
 	{
 		ldg_set_error(LDG_NO_FUNC);
@@ -64,16 +92,18 @@ void *ldg_find(const char *name_fct, LDG *ldg)
 			return ((void *) ldg->list[j].func);
 		}
 	}
-	return (NULL);
+	return NULL;
 }
 
 
 short ldg_close(LDG *ldg, _WORD *global)
 {
+#if USE_COOKIE
 	LDG_INFOS *cook;
 
 	if (ldg_cookie(LDG_COOKIE, (long *) &cook) && cook->version >= 0x210 && cook->ldg_close)
 		return (*cook->ldg_close) (ldg, global);
+#endif
 	/* Si pas de cookie, d‚chargement direct */
 	return ldg_unload(global[2], ldg);
 }
@@ -99,6 +129,7 @@ short ldg_close(LDG *ldg, _WORD *global)
 
 short ldg_error(void)
 {
+#if USE_COOKIE
 	LDG_INFOS *cook;
 
 	if (ldg_cookie(LDG_COOKIE, (long *) &cook))
@@ -109,12 +140,16 @@ short ldg_error(void)
 
 			cook->error = 0;
 			return err;
-		} else
-			return LDG_BAD_TSR;
+		}
+		return LDG_BAD_TSR;
 	}
 	return LDG_NO_TSR;
+#else
+	return ldg_errno;
+#endif
 }
 
+#if USE_COOKIE
 /*
  *	Cherche le chemin d'une librairie
  */
@@ -132,3 +167,4 @@ short ldg_libpath(char *path, _WORD *gl)
 	}
 	return LDG_NO_TSR;
 }
+#endif

@@ -55,10 +55,10 @@ void plugins_quit( void)
  *==================================================================================*/
 int16 plugins_init( void)
 {
-	char 			*env_ldg;
+	char 			*env_ldg = 0;
 	char plugin_dir[MAX_PATH];
 	DIR	 			*dir;
-	LDG_INFOS 		*cook;
+	LDG_INFOS 		*cook = 0;
 	struct dirent	*de;
 	int16			len;
 	char  			extension[4];
@@ -77,8 +77,8 @@ int16 plugins_init( void)
 	   	   the zcodecs folder in the default LDG path, with 
 	   	   the LDG cookie or with the environment variable.	*/
 
-		if( ldg_cookie( LDG_COOKIE, ( int32*)&cook))	
-			strcpy( plugin_dir, cook->path);
+		if( ldg_cookie( LDG_COOKIE, ( int32*)&cook) && cook)
+			strcpy(plugin_dir, cook->path);
 		else if( env_ldg)
 			strcpy( plugin_dir, env_ldg);
 		else 

@@ -77,20 +77,6 @@ int ldg_cookie(long cookie, long *value)
 }
 
 
-/*
- * Error handling: the error code is
- * written to the field of the LDGM cookie dedicated to
- * this purpose.
- */
-void ldg_set_error(int code)
-{
-	LDG_INFOS *cook;
-
-	if (ldg_cookie(LDG_COOKIE, (long *) &cook) && cook->version >= 0x0210)
-		cook->error = (short) (code & 0xFFFF);
-}
-
-
 #if 0
 /*
  * Debug function
