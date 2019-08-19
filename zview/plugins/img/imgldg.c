@@ -22,7 +22,7 @@ static PROC IMGFunc[] =
 
 static LDGLIB img_plugin =
 {
-	PLUGIN_VERSION, 		/* Plugin version */
+	0x200, 				/* Plugin version */
 	sizeof(IMGFunc) / sizeof(IMGFunc[0]),					/* Number of plugin's functions */
 	IMGFunc,			/* List of functions */
 	"IMG\0",				/* File's type Handled */

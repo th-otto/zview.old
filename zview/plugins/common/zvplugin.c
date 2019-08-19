@@ -385,7 +385,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	zview_plugin_funcs.int_size = sizeof(zv_int_t);
 	if (zview_plugin_funcs.int_size != sizeof(long))
 		return -EINVAL;
-	zview_plugin_funcs.plugin_version = PLUGIN_VERSION;
+	zview_plugin_funcs.interface_version = PLUGIN_INTERFACE_VERSION;
 	zview_plugin_funcs.p_slb_open = plugin_slb_open;
 	zview_plugin_funcs.p_slb_close = plugin_slb_close;
 	zview_plugin_funcs.p_slb_get = plugin_slb_get;
@@ -457,7 +457,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(atof);
 #undef S
 
-	ret = slb_load(name, path, PLUGIN_VERSION, &slb->handle, &slb->exec);
+	ret = slb_load(name, path, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)
 	{
 		slb->handle = 0;

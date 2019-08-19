@@ -4,6 +4,9 @@
 #include <mint/slb.h>
 #include "imginfo.h"
 
+long plugin_open(const char *name, const char *path, SLB *slb);
+void plugin_close(SLB *slb);
+
 boolean __CDECL plugin_reader_init(SLB *slb, const char *name, IMGINFO info);
 boolean __CDECL plugin_reader_read(SLB *slb, IMGINFO info, uint8_t *buffer);
 void __CDECL plugin_reader_get_txt(SLB *slb, IMGINFO info, txt_data *txtdata);
@@ -25,6 +28,9 @@ void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 long __CDECL plugin_get_option(SLB *slb, zv_int_t which);
 long __CDECL plugin_set_option(SLB *slb, zv_int_t which, zv_int_t value);
 
+/*
+ * internal functions used while loading libraries
+ */
 long __CDECL plugin_slb_control(SLB *slb, long fn, void *arg);
 
 #define plugin_compile_flags(slb) plugin_slb_control(slb, 0, 0)
@@ -34,9 +40,9 @@ long __CDECL plugin_slb_control(SLB *slb, long fn, void *arg);
 #define plugin_get_libpath(slb) ((const char *)plugin_slb_control(slb, 4, 0))
 #define plugin_required_libs(slb) ((const char *)plugin_slb_control(slb, 5, 0))
 
+/*
+ * callback functions used to load other shared libs like zlib etc.
+ */
 long __CDECL plugin_slb_open(zv_int_t lib);
 void __CDECL plugin_slb_close(zv_int_t lib);
 SLB *__CDECL plugin_slb_get(zv_int_t lib);
-
-long plugin_open(const char *name, const char *path, SLB *slb);
-void plugin_close(SLB *slb);

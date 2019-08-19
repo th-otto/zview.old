@@ -32,7 +32,7 @@ static PROC PNGFunc[] =
 
 static LDGLIB png_plugin =
 {
-	PLUGIN_VERSION, 	/* Plugin version */
+	0x200, 	/* Plugin version */
 	sizeof(PNGFunc)/sizeof(PNGFunc[0]),					/* Number of plugin's functions */
 	PNGFunc,			/* List of functions */
 	"PNG\0",			/* File's type Handled */

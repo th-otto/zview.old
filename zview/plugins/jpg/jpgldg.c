@@ -61,7 +61,7 @@ static PROC LibFunc[] =
 
 static LDGLIB plugin =
 {
-	PLUGIN_VERSION, 	/* Plugin version */
+	0x200, 			/* Plugin version */
 	sizeof(LibFunc) / sizeof(LibFunc[0]),					/* Number of plugin's functions */
 	LibFunc,			/* List of functions */
 	"JPG\0JPE\0JPEG\0",		/* File's type Handled */

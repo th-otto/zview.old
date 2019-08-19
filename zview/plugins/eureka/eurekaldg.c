@@ -32,7 +32,7 @@ static PROC RAWFunc[] =
 
 LDGLIB raw_plugin =
 {
-	PLUGIN_VERSION, 	/* Plugin version */
+	PLUGIN_INTERFACE_VERSION, 	/* Plugin version */
 	sizeof(RAWFunc) / sizeof(RAWFunc[0]),					/* Number of plugin's functions */
 	RAWFunc,			/* List of functions */
 	"RAW\0",			/* File's type Handled */

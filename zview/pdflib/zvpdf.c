@@ -104,7 +104,7 @@ static long set_imports(struct _zvpdf_funcs *funcs)
 {
 	if (funcs->struct_size != sizeof(*funcs))
 		return -EINVAL;
-	if (funcs->plugin_version > PLUGIN_VERSION)
+	if (funcs->interface_version > PLUGIN_INTERFACE_VERSION)
 		return -EBADARG;
 	if (funcs->int_size != sizeof(int))
 		return -ERANGE;

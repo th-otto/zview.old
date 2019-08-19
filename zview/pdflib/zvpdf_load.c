@@ -227,7 +227,7 @@ long zvpdf_open(void)
 	zvpdf_funcs.int_size = sizeof(int);
 	if (zvpdf_funcs.int_size != sizeof(long))
 		return -EINVAL;
-	zvpdf_funcs.plugin_version = PLUGIN_VERSION;
+	zvpdf_funcs.interface_version = PLUGIN_INTERFACE_VERSION;
 	zvpdf_funcs.p_slb_open = plugin_slb_open;
 	zvpdf_funcs.p_slb_close = plugin_slb_close;
 	zvpdf_funcs.p_slb_get = plugin_slb_get;
@@ -313,11 +313,11 @@ long zvpdf_open(void)
 #else
 	strcat(zview_slb_dir, "000\\");
 #endif
-	ret = slb_load(name, zview_slb_dir, PLUGIN_VERSION, &slb->handle, &slb->exec);
+	ret = slb_load(name, zview_slb_dir, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)
 	{
 		*end = '\0';
-		ret = slb_load(name, zview_slb_dir, PLUGIN_VERSION, &slb->handle, &slb->exec);
+		ret = slb_load(name, zview_slb_dir, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);
 	}
 
 	if (ret < 0)

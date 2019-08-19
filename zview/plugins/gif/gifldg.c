@@ -34,7 +34,7 @@ static PROC GIFFunc[] =
 
 static LDGLIB gif_plugin =
 {
-	PLUGIN_VERSION, 		/* Plugin version */
+	PLUGIN_INTERFACE_VERSION, 		/* Plugin version */
 	sizeof(GIFFunc) / sizeof(GIFFunc[0]),				/* Number of plugin's functions */
 	GIFFunc,		/* List of functions */
 	"GIF\0",			/* File's type Handled */

@@ -31,7 +31,7 @@ static PROC NEOFunc[] =
 
 static LDGLIB neo_plugin =
 {
-	PLUGIN_VERSION, 		/* Plugin version */
+	0x200, 			/* Plugin version */
 	sizeof(NEOFunc) / sizeof(NEOFunc[0]),					/* Number of plugin's functions */
 	NEOFunc,				/* List of functions */
 	"NEO\0",					/* File's type Handled */

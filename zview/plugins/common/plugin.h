@@ -44,7 +44,7 @@ struct _zview_plugin_funcs {
 	 * As for now, should match the version that was
 	 * used to compile the library.
 	 */
-	long plugin_version;
+	long interface_version;
 
 	long __CDECL (*p_slb_open)(zv_int_t lib);
 	void __CDECL (*p_slb_close)(zv_int_t lib);

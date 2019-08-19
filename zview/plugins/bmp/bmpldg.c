@@ -32,7 +32,7 @@ static PROC BMPFunc[] =
 
 static LDGLIB bmp_plugin =
 {
-	PLUGIN_VERSION, 	/* Plugin version */
+	PLUGIN_INTERFACE_VERSION, 	/* Plugin version */
 	sizeof(BMPFunc) / sizeof(BMPFunc[0]),					/* Number of plugin's functions */
 	BMPFunc,			/* List of functions */
 	"BMP\0",			/* File's type Handled */

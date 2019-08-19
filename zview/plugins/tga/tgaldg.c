@@ -35,7 +35,7 @@ static PROC TGAFunc[] =
 
 static LDGLIB tga_plugin =
 {
-	PLUGIN_VERSION,		/* Plugin version */
+	0x200,			/* Plugin version */
 	sizeof(TGAFunc) / sizeof(TGAFunc[0]),					/* Number of plugin's functions */
 	TGAFunc,			/* List of functions */
 	"TGA\0",				/* File's type Handled */

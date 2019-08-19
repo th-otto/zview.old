@@ -54,7 +54,7 @@ static PROC TIFFFunc[] =
 
 static LDGLIB tiff_plugin =
 {
-	PLUGIN_VERSION, 	/* Plugin version */
+	0x200, 	/* Plugin version */
 	sizeof(TIFFFunc) / sizeof(TIFFFunc[0]),					/* Number of plugin's functions */
 	TIFFFunc,			/* List of functions */
 	"TIF\0TIFF\0",			/* File's type Handled */
