@@ -99,7 +99,8 @@ void __CDECL va_start(WINDOW *win EVNT_BUFF_PARAM)
 		a VA_START :( */
 		MenuBar( get_tree( MENU_BAR), 1);
 
-		WindView( p);
+		if (*p)
+			WindView( p);
 		free( p);
 	}
 }
