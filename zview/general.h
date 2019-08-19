@@ -41,7 +41,16 @@ typedef short int16;
 typedef long int32;
 typedef unsigned long uint32;
 #endif
+
+#ifndef __boolean_defined
+#define __boolean_defined 1
+#if defined(__PUREC__) || defined(__TURBOC__) || defined(__AHCC__) || defined(__MSHORT__)
+/* because it is a return code from plugin functions */
+typedef int32_t boolean;
+#else
 typedef int boolean;
+#endif
+#endif
 
 #undef _AESapid
 #if __WINDOM_MAJOR__ >= 2

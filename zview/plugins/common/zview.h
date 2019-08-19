@@ -21,12 +21,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#ifdef __GNUC__
 #include <osbind.h>
 #include <mintbind.h>
 #include <mint/falcon.h>
 #include <mint/cookie.h>
-#include <setjmp.h>
 #include <mt_gem.h>
+#else
+#include <tos.h>
+#include <aes.h>
+#endif
+#include <setjmp.h>
 #ifndef PLUGIN_SLB
 #include "../../ldglib/ldg.h"
 #include "../libshare/libshare.h"
@@ -38,8 +43,17 @@
 #define FALSE		0
 #endif
 
+#ifndef __boolean_defined
+#define __boolean_defined 1
+#if defined(__PUREC__) || defined(__TURBOC__) || defined(__AHCC__) || defined(__MSHORT__)
+/* because it is a return code from plugin functions */
+typedef int32_t boolean;
+#else
+typedef int boolean;
+#endif
+#endif
+
 #ifndef MIN
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
-
