@@ -31,7 +31,7 @@
 #else
 #include <windom1.h>
 #endif
-#include <ldg.h>
+#include "ldglib/ldg.h"
 
 #ifndef _TIFF_
 typedef signed char int8;

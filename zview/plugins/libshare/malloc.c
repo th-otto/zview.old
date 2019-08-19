@@ -21,7 +21,7 @@
 #include <osbind.h>
 #include "lib.h"
 
-#include <ldg.h>
+#include "../../ldglib/ldg.h"
 
 
 /* CAUTION: use _mallocChunkSize() to tailor to your environment,

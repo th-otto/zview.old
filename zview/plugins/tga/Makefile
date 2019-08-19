@@ -1,7 +1,8 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LIB       = ../libshare/libshare.a -lldg
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
+LIB       = ../libshare/libshare.a
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -11,7 +12,7 @@ all:: tga.ldg zvtga.slb
 
 include $(top_srcdir)/rules
 
-tga.ldg: tgaldg.o tga.o
+tga.ldg: tgaldg.o tga.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvtga.slb: header.lo tgaslb.lo tga.lo

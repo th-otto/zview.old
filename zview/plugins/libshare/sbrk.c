@@ -32,7 +32,7 @@
 #include <mint/osbind.h>
 #include "lib.h"
 
-#include <ldg.h>
+#include "../../ldglib/ldg.h"
 
 static void *
 HeapAlloc (unsigned long sz)

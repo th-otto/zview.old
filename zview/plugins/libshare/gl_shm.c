@@ -16,7 +16,7 @@
 #include <mint/mintbind.h>
 #include <sys/ioctl.h>
 
-#include <ldg.h>
+#include "../../ldglib/ldg.h"
 
 #include "lib.h"
 #include "libshare.h"

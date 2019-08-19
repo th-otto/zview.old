@@ -1,8 +1,9 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
 GIFLIB = -lgif
-LIB       = ../libshare/libshare.a -lldg $(GIFLIB)
+LIB       = ../libshare/libshare.a $(GIFLIB)
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -12,7 +13,7 @@ all:: gif.ldg zvgif.slb
 
 include $(top_srcdir)/rules
 
-gif.ldg: gifldg.o gif.o
+gif.ldg: gifldg.o gif.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvgif.slb: header.lo gifslb.lo gif.lo

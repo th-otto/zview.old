@@ -1,7 +1,8 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LIB       = ../libshare/libshare.a -lldg -ltiff -ljpeg -llzma -lz
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
+LIB       = ../libshare/libshare.a -ltiff -ljpeg -llzma -lz
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -11,7 +12,7 @@ all:: tiff.ldg zvtiff.slb
 
 include $(top_srcdir)/rules
 
-tiff.ldg: tiffldg.o tiff.o
+tiff.ldg: tiffldg.o tiff.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvtiff.slb: header.lo tiffslb.lo tiff.lo

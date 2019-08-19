@@ -1,7 +1,8 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LIB       = ../libshare/libshare.a -lldg
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
+LIB       = ../libshare/libshare.a
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -11,7 +12,7 @@ all:: neo.ldg zvneo.slb
 
 include $(top_srcdir)/rules
 
-neo.ldg: neoldg.o neo.o
+neo.ldg: neoldg.o neo.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvneo.slb: header.lo neoslb.lo neo.lo

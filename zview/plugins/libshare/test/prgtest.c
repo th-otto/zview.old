@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <gem.h>
-#include <ldg.h>
+#include <ldglib/ldg.h>
 
 LDG *ldgtest;
 void (*information)(void) = NULL;

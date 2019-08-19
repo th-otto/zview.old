@@ -1,7 +1,8 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LIB       = ../libshare/libshare.a -lldg
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
+LIB       = ../libshare/libshare.a
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -11,7 +12,7 @@ all:: degas.ldg zvdegas.slb
 
 include $(top_srcdir)/rules
 
-degas.ldg: degasldg.o degas.o
+degas.ldg: degasldg.o degas.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvdegas.slb: header.lo degasslb.lo degas.lo

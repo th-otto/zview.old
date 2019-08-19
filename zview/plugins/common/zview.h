@@ -28,7 +28,7 @@
 #include <setjmp.h>
 #include <mt_gem.h>
 #ifndef PLUGIN_SLB
-#include <ldg.h>
+#include "../../ldglib/ldg.h"
 #include "../libshare/libshare.h"
 #endif
 

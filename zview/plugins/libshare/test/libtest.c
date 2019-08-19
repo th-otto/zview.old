@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mint/osbind.h>
-#include <ldg.h>
+#include <ldglib/ldg.h>
 #include <gem.h>
 
 #include <libshare.h>

@@ -4,6 +4,8 @@
 
 include ../../../configvars
 
+CPPFLAGS += -I../..
+
 OBJ = libshare.o gl_shm.o calloc.o chdir.o malloc.o realloc.o sbrk.o
 
 TARGET = libshare.a

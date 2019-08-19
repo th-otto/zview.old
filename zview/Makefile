@@ -14,7 +14,7 @@ XPDF_CPPFLAGS +=		-DZVPDF_SLB
 endif
 
 XPDF_INCS			= -Ixpdf -Ixpdf/fofi -Ixpdf/goo -Ixpdf/splash $(XPDF_CPPFLAGS)
-LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lldg -lgem -lfreetype.slb \
+LIB				= $(DEBUG_LIB) $(WINDOM_LIBS) -lgem -lfreetype.slb \
                                   -lpng.slb -lbz2.slb -lz.slb -ljpeg.slb -ltiff.slb -llzma.slb -lexif.slb
 CFLAGS				+= $(XPDF_INCS) -I../common
 CXXFLAGS			+= $(XPDF_INCS) -I../common
@@ -31,7 +31,8 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
 				  debug.o progress.o ztext.o close_modal.o save_option_dialog.o main.o \
-				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
+				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o \
+				  ldglib/ldgapp.c ldglib/ldgload.c ldglib/ldgutil.c
 
 PROGRAM 			= zview.app
 
