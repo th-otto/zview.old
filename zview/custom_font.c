@@ -212,7 +212,8 @@ void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 
 int16 get_text_width( const char *str)
 {
-	int16 c, text_width = 0;
+	unsigned char c;
+	int16 text_width = 0;
 	
 	while ( (c = *str++) != 0) 
 	{
