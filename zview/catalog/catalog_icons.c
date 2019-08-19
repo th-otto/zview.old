@@ -92,7 +92,7 @@ void icons_exit(void)
 static boolean icon_load( const char *file, IMAGE *img)
 {
 	char path[MAX_PATH];
-	boolean ret = pic_load(strcat(strcpy(path, zview_path), file), img);
+	boolean ret = pic_load(strcat(strcpy(path, zview_path), file), img, TRUE);
 	return ret;
 }
 

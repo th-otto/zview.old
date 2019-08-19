@@ -30,4 +30,4 @@ CODEC *get_codec( const char *file);
 boolean get_pic_info( const char *file, IMGINFO info);
 void quit_img( IMGINFO info, DECDATA data);
 
-boolean pic_load( const char *file, IMAGE *img);
+boolean pic_load( const char *file, IMAGE *img, boolean quiet);

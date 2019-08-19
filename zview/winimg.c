@@ -988,7 +988,7 @@ WINDOW *WindView( char *filename)
 
 	strcpy( windata->name, filename);
 
-	if ( !pic_load( filename, img))
+	if ( !pic_load( filename, img, FALSE))
 	{
 		free( windata);
 		graf_mouse( ARROW, NULL);

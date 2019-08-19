@@ -353,7 +353,7 @@ boolean get_pic_info( const char *file, IMGINFO info)
  * returns: 	'0' if error or picture not supported								*
  *==================================================================================*/
 
-boolean pic_load( const char *file, IMAGE *img)
+boolean pic_load( const char *file, IMAGE *img, boolean quiet)
 {
 	IMGINFO info;
 	DECDATA data;
@@ -389,7 +389,8 @@ boolean pic_load( const char *file, IMAGE *img)
 		free( data);
 		free( info);
 		win_progress_end();
-		errshow(NULL, IMG_NO_VALID);
+		if (!quiet)
+			errshow(NULL, IMG_NO_VALID);
 		return FALSE;
 	}
 

@@ -112,7 +112,7 @@ void WindMakePreview( WINDOW *win)
 
 			// MenuDisable();
 
-			if( pic_load( wicones->entry[i].name, &wicones->entry[i].preview))
+			if( pic_load( wicones->entry[i].name, &wicones->entry[i].preview, TRUE))
 				redraw_icon( win, &wicones->entry[i]);
 			else
 				wicones->entry[i].type = ET_FILE;
