@@ -228,20 +228,16 @@ int16 name_shorter( int16 max_size, char *str)
 {
 	int16 len, current_len;
 
-	len = ( int16) strlen( str) - 1;
+	len = ( int16) strlen( str);
 	
-	do
+	while ((current_len = get_text_width( str)) > max_size && len > 4)
 	{
+		len--;
 		str[len - 3] 	= '.';
 		str[len - 2] 	= '.';
 		str[len - 1] 	= '.';
 		str[len] 		= '\0';
-
-		len--;		
-
-		current_len = get_text_width( str);
-		
-	} while ( ( current_len >= max_size) && ( len > 0));
+	}
 
 	return current_len;
 }

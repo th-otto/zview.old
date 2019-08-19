@@ -404,8 +404,7 @@ void __CDECL WinCatalog_Keyb( WINDOW *win EVNT_BUFF_PARAM)
 
 				strcpy( wicones->first_selected->name_shown, wicones->first_selected->name);
 
-				if (( wicones->first_selected->icon_txt_w = get_text_width( wicones->first_selected->name_shown)) >= wicones->case_w - 4)
-					wicones->first_selected->icon_txt_w = name_shorter( wicones->case_w - 6, wicones->first_selected->name_shown);
+				wicones->first_selected->icon_txt_w = name_shorter( wicones->case_w - 4, wicones->first_selected->name_shown);
 
 				exit_edit_mode( win, wicones->first_selected);
 

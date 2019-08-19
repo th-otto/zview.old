@@ -185,8 +185,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		set_entry_icon( entry);
 
 		/* find if the entry name is bigger than the case width */	
-		if (( entry->icon_txt_w = get_text_width( entry->name_shown)) >= dirfile->case_w - 4)
-			entry->icon_txt_w = name_shorter( dirfile->case_w - 6, entry->name_shown);
+		entry->icon_txt_w = name_shorter( dirfile->case_w - 4, entry->name_shown);
 
 		dirfile->nbr_icons++;
 	}
