@@ -3,6 +3,7 @@ include ../../configvars
 PLUGINS = \
 	bmp \
 	degas \
+	doodle \
 	eureka \
 	gif \
 	godpaint \
@@ -11,7 +12,8 @@ PLUGINS = \
 	neochrome \
 	png \
 	tga \
-	tiff
+	tiff \
+	$(empty)
 
 all: $(PLUGINS)
 
@@ -25,8 +27,7 @@ libshare::
 dist:
 	rm -rf ../_dist/codecs
 	mkdir ../_dist/codecs
-	for f in $(PLUGINS); do cp $$f/*.ldg ../_dist/codecs; done
-	$(STRIP) -s ../_dist/codecs/*.ldg
+	for f in $(PLUGINS); do cp -a $$f/*.slb ../_dist/codecs; done
 
 clean:
 	rm -f */*.ldg */*.slb */*.o */*.a */*.lo
