@@ -18,6 +18,7 @@ gif.ldg: gifldg.o gif.o $(LDGOBJS)
 
 zvgif.slb: header.lo gifslb.lo gif.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(GIFLIB) $(LDFLAGS) $(LDSHAREDLIBC)
+	stripex $@
 
 header.lo gifslb.lo gif.lo: ../common/plugin.h ../common/zview.h
 

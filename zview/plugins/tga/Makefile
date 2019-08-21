@@ -17,6 +17,7 @@ tga.ldg: tgaldg.o tga.o $(LDGOBJS)
 
 zvtga.slb: header.lo tgaslb.lo tga.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+	stripex $@
 
 header.lo tgaslb.lo tga.lo: ../common/plugin.h ../common/zview.h
 

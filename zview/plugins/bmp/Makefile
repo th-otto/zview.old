@@ -17,6 +17,7 @@ bmp.ldg: bmpldg.o bmp.o $(LDGOBJS)
 
 zvbmp.slb: header.lo bmpslb.lo bmp.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+	stripex $@
 
 header.lo bmpslb.lo bmp.lo: ../common/plugin.h ../common/zview.h
 

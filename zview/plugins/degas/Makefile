@@ -17,6 +17,7 @@ degas.ldg: degasldg.o degas.o $(LDGOBJS)
 
 zvdegas.slb: header.lo degasslb.lo degas.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
+	stripex $@
 
 header.lo degasslb.lo degas.lo: ../common/plugin.h ../common/zview.h
 

@@ -22,6 +22,7 @@ jpg.ldg: jpgldg.o jpg.o jpgdsp.o $(LDGOBJS)
 
 zvjpg.slb: header.lo jpgslb.lo jpg.lo jpgdsp.lo $(jpeg_SOBJS) $(libexif_SOBJS)
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ljpeg8d.slb -lexif.slb -lm $(LDSHAREDLIBC)
+	stripex $@
 
 header.lo jpgslb.lo jpg.lo: ../common/plugin.h ../common/zview.h
 
