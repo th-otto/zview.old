@@ -26,9 +26,7 @@ static void swap( uint8_t *a, uint8_t *b)
 	uint8_t temp;
 
 	temp = *a;
-
 	*a = *b;
-
 	*b = temp;
 }
 
@@ -48,8 +46,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
 	int16_t 		handle;
 	int32_t		file_size, palette[768];
-	uint8_t     	header[4], *img_buffer;
-	uint16_t *p;
+	uint16_t header[2];
+	uint8_t *img_buffer;
 	
 	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
 		return FALSE;
@@ -65,9 +63,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}
 
 	info->planes 				= 8;
-	p = (uint16_t *)&header[0];
-	info->width 				= p[0];
-	info->height 				= p[1];
+	info->width 				= header[0];
+	info->height 				= header[1];
 	info->colors  				= 256;
 	info->components			= 3;
 	info->real_width			= info->width;
@@ -80,7 +77,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	info->max_comments_length 	= 0;
 	info->_priv_var				= ( uint32_t)handle;
 
-	if( ( info->width * info->height) == file_size)
+	if( ((int32_t)info->width * (int32_t)info->height) == file_size)
 	{
 		info->indexed_color	= FALSE;
 	}
@@ -89,7 +86,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		/* 3072 is the palette's size */
 		file_size -= 3072;
 
-		if( ( info->width * info->height) != file_size)
+		if( ( (int32_t)info->width * (int32_t)info->height) != file_size)
 		{
 			Fclose( handle);
 			return FALSE;	
@@ -101,9 +98,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	strcpy( info->info, "Eureka RAW Picture");	
 	strcpy( info->compression, "None");	
 
-	if( info->indexed_color	== TRUE)
+	if( info->indexed_color)
 	{
-		register int16_t i;
+		int16_t i;
 
 		Fread( handle, 3072, palette);
 
@@ -116,15 +113,15 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}
 	else
 	{
-		register int16_t i;
+		int16_t i;
 
 		info->indexed_color	= TRUE;
 
 		for ( i = 0; i < info->colors; i++)
 		{
 			info->palette[i].red   = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
-			info->palette[i].green = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
-			info->palette[i].blue  = ( uint8_t)((( uint32_t)red[i] * 255L) / 1000L);
+			info->palette[i].green = ( uint8_t)((( uint32_t)green[i] * 255L) / 1000L);
+			info->palette[i].blue  = ( uint8_t)((( uint32_t)blue[i] * 255L) / 1000L);
 		}
 	}
 
@@ -146,7 +143,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}		
 	else
 	{
-		register uint16_t i, j, w = info->width >> 1;
+		uint16_t i, j, w = info->width >> 1;
 
 		for( i = 0; i < info->height; i++)
 			for( j = 0; j < w; j++)
