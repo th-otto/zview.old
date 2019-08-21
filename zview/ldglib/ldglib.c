@@ -98,9 +98,6 @@ static void trnfm_to_stdcall(void)
 	}
 
 	lib.flags |= LDG_STDCALL;
-#ifndef __mcoldfire__
-	ldg_cpush();
-#endif
 }
 #endif /* __GNUC__ */
 

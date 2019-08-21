@@ -46,37 +46,6 @@ struct _ldg_version ldg_version = { LDG_NAME, LDG_NUM };
 #define MiNT_COOKIE     0x4D694E54L		/* 'MiNT' */
 
 
-/*
- * @TODO : get a better version of get_cookie (from WinDom or Ssytem()'s Mint)
- */
-
-static long cookieptr(void)
-{
-	return *((long *) 0x5a0);
-}
-
-
-int ldg_cookie(long cookie, long *value)
-{
-	long *cookiejar = (long *) Supexec(cookieptr);
-
-	if (cookiejar)
-	{
-		while (*cookiejar)
-		{
-			if (*cookiejar == cookie)
-			{
-				if (value)
-					*value = *++cookiejar;
-				return (1);
-			}
-			cookiejar += 2;
-		}
-	}
-	return 0;
-}
-
-
 #if 0
 /*
  * Debug function
@@ -189,40 +158,4 @@ void *ldg_Realloc(void *oldblk, long oldsize, long newsize)
 int ldg_Free(void *memory)
 {
 	return Mfree(memory);
-}
-
-
-/*
- *  ldg_cpush
- *
- * Empty caches and data processor instruction
- * By calling the asm function "cpush".
- * This code can be called from the 68040 and must be
- * executed in supervisor mode (hence the use of Supexec).
- *
- * 1st version April 17, 2002 by Arnaud Bercegeay <bercegeay@atari.org>
- */
-
-#define CPU_COOKIE 0x5F435055UL			/* _CPU */
-
-void ldg_cpush(void)
-{
-#ifndef __mcoldfire__
-	static long _cpu = -1;
-
-	static unsigned short const do_cpush[] = {
-		0x4E71,							/* NOP         ; 1 nop useful for some 68040 */
-		0xF4F8,							/* CPUSHA BC   ; emptying caches data & instruction */
-		0x4E75							/* RTS         ; end of the procedure */
-	};
-
-	if (_cpu < 0)
-	{
-		ldg_cookie(CPU_COOKIE, &_cpu);
-		_cpu &= 0xFFFF;
-	}
-
-	if (_cpu > 30)
-		Supexec((long (*)(void)) do_cpush);
-#endif
 }

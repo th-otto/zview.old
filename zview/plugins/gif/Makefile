@@ -1,7 +1,7 @@
 top_srcdir=../../..
 include $(top_srcdir)/configvars
 
-LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgutil.o
+LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgcook.o ../../ldglib/ldgutil.o
 GIFLIB = -lgif
 LIB       = ../libshare/libshare.a $(GIFLIB)
 STACKSIZE = 64k

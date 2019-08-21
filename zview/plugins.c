@@ -66,7 +66,6 @@ int16 plugins_init( void)
 	
 	strcpy( plugin_dir, zview_path);
 	strcat( plugin_dir, "codecs\\");
-	name = plugin_dir + strlen(plugin_dir);
 	
 	/* We try to find the zcodecs folder in zview directory... 	*/
 	if ((dir = opendir(plugin_dir)) == NULL)
@@ -90,23 +89,21 @@ int16 plugins_init( void)
 			strcat( plugin_dir, "\\"); 
 
 		strcat( plugin_dir, "codecs\\");
-		name = plugin_dir + strlen(plugin_dir);
 
 		dir = opendir(plugin_dir);
 	}
 
 	if (dir != NULL)
 	{
+		name = plugin_dir + strlen(plugin_dir);
 		while ((de = readdir(dir)) != NULL && plugins_nbr < MAX_CODECS)
 		{
 			len = (int16)strlen(de->d_name);
 			if (len < 3)
 				continue;
 			strcpy(name, de->d_name);
-			str2lower(de->d_name);
-			if (strcmp(de->d_name, "xpdf.slb") == 0)
-				continue;
 			strcpy(extension, de->d_name + len - 3);
+			str2lower(extension);
 
 			if (strcmp(extension, "ldg") == 0)
 			{

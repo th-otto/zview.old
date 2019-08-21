@@ -31,8 +31,7 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
 				  debug.o progress.o ztext.o close_modal.o save_option_dialog.o main.o \
-				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o \
-				  ldglib/ldgapp.c ldglib/ldgload.c ldglib/ldgutil.c
+				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
 
 PROGRAM 			= zview.app
 
@@ -101,12 +100,16 @@ libpdf.a: $(PDF_OBJ)
 	$(RM) $@
 	$(AR) rcs $@ $(PDF_OBJ)
 
+ldglib/libldg.a: ldglib/ldgapp.o ldglib/ldgload.o ldglib/ldgutil.o ldglib/ldgcook.o ldglib/ldgcpush.o
+	$(RM) $@
+	$(AR) rcs $@ $^
+
 ifeq ($(ZVPDF_SLB),1)
-$(PROGRAM): $(OBJ) pdflib/zvpdf_load.o slb/$(SLB_SUBDIR)zvpdf.slb
-	$(CC) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/zvpdf_load.o $(LDFLAGS) -Wl,--stack,512k $(LIB) -lm -Wl,-Map,zview.map
+$(PROGRAM): $(OBJ) pdflib/zvpdf_load.o slb/$(SLB_SUBDIR)zvpdf.slb ldglib/libldg.a
+	$(CC) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/zvpdf_load.o ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -lm -Wl,-Map,zview.map
 else
-$(PROGRAM): $(OBJ) pdflib/pdflib.o libpdf.a
-	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/pdflib.o libpdf.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -Wl,-Map,zview.map
+$(PROGRAM): $(OBJ) pdflib/pdflib.o libpdf.a ldglib/libldg.a
+	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/pdflib.o libpdf.a ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -Wl,-Map,zview.map
 endif
 	$(COMPRESS) $(PROGRAM)
 

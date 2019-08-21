@@ -192,7 +192,7 @@ LDG *ldg_load(int apid, const char *path)
 			currpath[2] = '\\';
 			currpath[3] = '\0';
 			Dgetpath(currpath + 2, 0);
-			strncpy(ldg->path, currpath, PATHLEN - 1);
+			strcpy(ldg->path, currpath);
 			strcat(ldg->path, "\\");
 			strcat(ldg->path, path);
 		} else
