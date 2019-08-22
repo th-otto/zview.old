@@ -288,28 +288,48 @@ void slb_freetype_close(void)
 }
 
 
-long __CDECL plugin_slb_open(zv_int_t lib)
+static long __CDECL plugin_slb_try_open(zv_int_t lib, const char *path)
 {
 	switch (lib)
 	{
 	case LIB_PNG:
-		return slb_pnglib_open(NULL);
+		return slb_pnglib_open(path);
 	case LIB_Z:
-		return slb_zlib_open(NULL);
+		return slb_zlib_open(path);
 	case LIB_JPEG:
-		return slb_jpeglib_open(NULL);
+		return slb_jpeglib_open(path);
 	case LIB_TIFF:
-		return slb_tiff_open(NULL);
+		return slb_tiff_open(path);
 	case LIB_LZMA:
-		return slb_lzma_open(NULL);
+		return slb_lzma_open(path);
 	case LIB_EXIF:
-		return slb_exif_open(NULL);
+		return slb_exif_open(path);
 	case LIB_BZIP2:
-		return slb_bzip2_open(NULL);
+		return slb_bzip2_open(path);
 	case LIB_FREETYPE:
-		return slb_freetype_open(NULL);
+		return slb_freetype_open(path);
 	}
 	return -ENOENT;
+}
+
+
+long __CDECL plugin_slb_open(zv_int_t lib)
+{
+	long ret;
+	
+	ret = plugin_slb_try_open(lib, zview_slb_dir);
+	if (ret < 0)
+	{
+		char c = *zview_slb_dir_end;
+		*zview_slb_dir_end = '\0';
+		ret = plugin_slb_try_open(lib, zview_slb_dir);
+		*zview_slb_dir_end = c;
+	}
+	if (ret < 0)
+	{
+		ret = plugin_slb_try_open(lib, NULL);
+	}
+	return ret;
 }
 
 

@@ -25,6 +25,8 @@ int 	vq_mint		( void);
 WINDOW *win_catalog = NULL;
 
 char 	zview_path[MAX_PATH];
+char *zview_slb_dir;
+char *zview_slb_dir_end;
 char 	startup_path[MAX_PATH];
 int16	mint_os = 0, magic_os = 0;
 
@@ -149,6 +151,18 @@ static void applinit( void)
 		if (zview_path[0] == '\0')
 			strcpy(zview_path, startup_path);
 	}
+
+	zview_slb_dir = malloc(strlen(zview_path) + 20);
+	strcpy(zview_slb_dir, zview_path);
+	strcat(zview_slb_dir, "slb\\");
+	zview_slb_dir_end = zview_slb_dir + strlen(zview_slb_dir);
+#if defined(__mcoldfire__)
+	strcat(zview_slb_dir, "v4e\\");
+#elif defined(__mc68020__) || defined(__mc68030__) || defined(__mc68040__) || defined(__mc68060__) || defined(__mc68080__) || defined(__apollo__)
+	strcat(zview_slb_dir, "020\\");
+#else
+	strcat(zview_slb_dir, "000\\");
+#endif
 
 	prefs_read();
 

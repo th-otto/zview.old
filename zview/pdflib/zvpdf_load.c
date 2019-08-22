@@ -24,7 +24,6 @@ static SLB zvpdf;
 #define SLB_NARGS(_nargs) _nargs
 #endif
 
-static char zview_slb_dir[MAX_PATH];
 
 
 boolean __CDECL pdf_init(const char *path)
@@ -218,7 +217,6 @@ long zvpdf_open(void)
 	unsigned long flags;
 	long cpu = 0;
 	static char const name[] = "zvpdf.slb";
-	char *end;
 
 	if (slb->handle)
 		return 0;
@@ -303,21 +301,13 @@ long zvpdf_open(void)
 	zvpdf_funcs.p_free = my_free;
 #endif
 
-	strcpy(zview_slb_dir, zview_path);
-	strcat(zview_slb_dir, "slb\\");
-	end = zview_slb_dir + strlen(zview_slb_dir);
-#if defined(__mcoldfire__)
-	strcat(zview_slb_dir, "v4e\\");
-#elif defined(__mc68020__) || defined(__mc68030__) || defined(__mc68040__) || defined(__mc68060__) || defined(__mc68080__) || defined(__apollo__)
-	strcat(zview_slb_dir, "020\\");
-#else
-	strcat(zview_slb_dir, "000\\");
-#endif
 	ret = slb_load(name, zview_slb_dir, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);
 	if (ret < 0)
 	{
-		*end = '\0';
+		char c = *zview_slb_dir_end;
+		*zview_slb_dir_end = '\0';
 		ret = slb_load(name, zview_slb_dir, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);
+		*zview_slb_dir_end = c;
 	}
 
 	if (ret < 0)

@@ -4,6 +4,9 @@
 #include <mint/slb.h>
 #include "imginfo.h"
 
+extern char *zview_slb_dir;
+extern char *zview_slb_dir_end;
+
 long plugin_open(const char *name, const char *path, SLB *slb);
 void plugin_close(SLB *slb);
 
