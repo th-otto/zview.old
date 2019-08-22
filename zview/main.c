@@ -18,8 +18,6 @@ char const program_date[] = "August 18, 2019";
 #ifndef VA_START
 #define VA_START 0x4711
 #endif
-int     vq_magx     ( void);
-int 	vq_mint		( void);
 
 
 WINDOW *win_catalog = NULL;
@@ -28,7 +26,6 @@ char 	zview_path[MAX_PATH];
 char *zview_slb_dir;
 char *zview_slb_dir_end;
 char 	startup_path[MAX_PATH];
-int16	mint_os = 0, magic_os = 0;
 
 /*==================================================================================*
  * void applexit:																	*
@@ -125,13 +122,7 @@ static void applinit( void)
 		exit(1);
 	}
 
-	magic_os = vq_magx();
-	mint_os  = vq_mint();
-
-	if ( magic_os || mint_os)
-	{
-		( void)Pdomain(1);
-	}
+	Pdomain(1);
 
 	RsrcXtype( RSRC_XTYPE, NULL, 0);
 

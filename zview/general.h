@@ -264,7 +264,6 @@ extern WINDOW 	*win_catalog;
 extern WINDOW 	*win_image;
 extern char 	zview_path[MAX_PATH];
 extern char 	startup_path[MAX_PATH];
-extern int16	mint_os, magic_os;
 
 /* Windom's function not defined in windom.h */
 extern void	frm_cls( WINDOW *win);
