@@ -14,7 +14,7 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
-		return (long)("GIF\0");
+		return (long) ("GIF\0");
 	}
 	return -ENOSYS;
 }
@@ -33,31 +33,30 @@ long __CDECL get_option(zv_int_t which)
  * return:	 																		*
  *     --																			*
  *==================================================================================*/
-static inline void decodecolormap( uint8_t *src, uint8_t *dst, GifColorType *cm, uint16_t width, int16_t trans_index, uint32_t transparent_color, int16_t draw_trans)
+static void decodecolormap(uint8_t *src, uint8_t *dst, GifColorType *cm, uint16_t width, int16_t trans_index,
+						   uint32_t transparent_color, int16_t draw_trans)
 {
 	GifColorType *cmentry;
-	register uint16_t i;
+	uint16_t i;
 
-	for( i = 0; i < width; i++)
+	for (i = 0; i < width; i++)
 	{
-		if( src[i] == trans_index)
-		{		
-			if( draw_trans == FALSE)
+		if (src[i] == trans_index)
+		{
+			if (draw_trans == FALSE)
 			{
 				dst += 3;
-				continue;	
+				continue;
 			}
-				
-			*(dst++) = ( ( transparent_color >> 16) & 0xFF);
-			*(dst++) = ( ( transparent_color >> 8) & 0xFF);
-			*(dst++) = ( ( transparent_color) & 0xFF);
-		}
-		else
+			*(dst++) = ((transparent_color >> 16) & 0xFF);
+			*(dst++) = ((transparent_color >> 8) & 0xFF);
+			*(dst++) = ((transparent_color) & 0xFF);
+		} else
 		{
-			cmentry		=	&cm[src[i]];
-			*(dst++)	=	cmentry->Red;
-			*(dst++)	=	cmentry->Green;
-			*(dst++)	=	cmentry->Blue;
+			cmentry = &cm[src[i]];
+			*(dst++) = cmentry->Red;
+			*(dst++) = cmentry->Green;
+			*(dst++) = cmentry->Blue;
 		}
 	}
 }
@@ -75,289 +74,298 @@ static inline void decodecolormap( uint8_t *src, uint8_t *dst, GifColorType *cm,
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_init( const char *name, IMGINFO info)
+boolean __CDECL reader_init(const char *name, IMGINFO info)
 {
-	static int16_t 	InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 };  
-	int16_t			i, j, error = 0, transpar = -1, interlace = FALSE, draw_trans = TRUE;
-	uint16_t			delaycount	= 0;
-	GifFileType		*gif		= NULL;
-	GifRecordType 	rec;
-	txt_data		comment		= { 0,};
-	img_data		img			= { 0,};
+	static int16_t InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 };
+	int16_t i, j;
+	int16_t error = 0;
+	int16_t transpar = -1;
+	int16_t interlace = FALSE;
+	int16_t draw_trans = TRUE;
+	uint16_t delaycount = 0;
+	GifFileType *gif;
+	GifRecordType rec;
+	txt_data comment = { 0, };
+	img_data img = { 0, };
 
-	if ( ( gif = DGifOpenFileName ( name, NULL)) == NULL)
+	if ((gif = DGifOpenFileName(name, NULL)) == NULL)
 		return FALSE;
 
-	img.imagecount = 0;	
-		
-	do 
+	img.imagecount = 0;
+
+	do
 	{
-		if( DGifGetRecordType (gif, &rec) == GIF_ERROR) 
+		if (DGifGetRecordType(gif, &rec) == GIF_ERROR)
 		{
 			error = 1;
 			break;
 		}
-			
-		if ( rec == IMAGE_DESC_RECORD_TYPE) 
+
+		if (rec == IMAGE_DESC_RECORD_TYPE)
 		{
-			if ( DGifGetImageDesc( gif) == GIF_ERROR) 
+			if (DGifGetImageDesc(gif) == GIF_ERROR)
 			{
 				error = 1;
 				break;
-			}					
-			else 
+			} else
 			{
-				GifImageDesc *dsc	= &gif->Image;
-				ColorMapObject *map	= ( dsc->ColorMap ? dsc->ColorMap : gif->SColorMap);
+				ColorMapObject *map = (gif->Image.ColorMap ? gif->Image.ColorMap : gif->SColorMap);
 				int Row, Col, Width, Height;
 				int32_t line_size;
-				uint8_t *line_buffer	= NULL, *img_buffer;
+				uint8_t *line_buffer = NULL;
+				uint8_t *img_buffer;
 
-				if( map == NULL)
+				if (map == NULL)
 				{
 					error = 1;
 					break;
 				}
 
-				Row 	= dsc->Top; 	/* Image Position relative to Screen. */
-				Col 	= dsc->Left;
-				Width 	= dsc->Width;
-				Height 	= dsc->Height;
-				
-				/* if ( Col + Width > gif->SWidth || Row + Height > gif->SWidth) 
+				Row = gif->Image.Top;		/* Image Position relative to Screen. */
+				Col = gif->Image.Left;
+				Width = gif->Image.Width;
+				Height = gif->Image.Height;
+
+#if 0
+				if ( Col + Width > gif->SWidth || Row + Height > gif->SWidth)
 				{
 					error = 1;
 					break;
 				}
-				*/				
-				info->components	= ( map->BitsPerPixel == 1 ? 1 : 3);
-				info->planes   		= map->BitsPerPixel;
-				info->colors  		= map->ColorCount;
-				info->width 		= ( uint16_t)gif->SWidth;
-				info->height 		= ( uint16_t)gif->SHeight;
-				line_size			= ( int32_t)gif->SWidth * ( int32_t)info->components;
+#endif
+				info->components = map->BitsPerPixel == 1 ? 1 : 3;
+				info->planes = map->BitsPerPixel;
+				info->colors = map->ColorCount;
+				info->width = (uint16_t) gif->SWidth;
+				info->height = (uint16_t) gif->SHeight;
+				line_size = (int32_t) gif->SWidth * (int32_t) info->components;
 
-				if( dsc->Interlace) 
+				if (gif->Image.Interlace)
 					interlace = TRUE;
-					
-				img.image_buf[img.imagecount] = ( uint8_t*)malloc( line_size * ( gif->SHeight + 2));
-				img_buffer	= img.image_buf[img.imagecount];
-					
-				if( img_buffer == NULL)
+
+				img.image_buf[img.imagecount] = (uint8_t *) malloc(line_size * (gif->SHeight + 2));
+				img_buffer = img.image_buf[img.imagecount];
+
+				if (img_buffer == NULL)
 				{
 					error = 1;
 					break;
 				}
 
-				if( map->BitsPerPixel != 1)
+				if (map->BitsPerPixel != 1)
 				{
-					line_buffer	= ( uint8_t*)malloc( line_size + 128); 
+					line_buffer = (uint8_t *) malloc(line_size + 128);
 
-					if( line_buffer == NULL)
+					if (line_buffer == NULL)
 					{
-						free( ( void*)img.image_buf[img.imagecount]);
+						free(img.image_buf[img.imagecount]);
 						error = 1;
 						break;
 					}
 				}
 
-				if( img.imagecount > 0)
+				if (img.imagecount)
 				{
 					/* the transparency is the background picture */
 					draw_trans = FALSE;
 
-					if(( Row > 0 && Height < gif->SHeight) || ( Col > 0 && Width < gif->SWidth))
-						memcpy( img_buffer, img.image_buf[img.imagecount - 1], line_size * gif->SHeight);
-					else draw_trans = TRUE;
+					if ((Row > 0 && Height < gif->SHeight) || (Col > 0 && Width < gif->SWidth))
+						memcpy(img_buffer, img.image_buf[img.imagecount - 1], line_size * gif->SHeight);
+					else
+						draw_trans = TRUE;
 				}
-												
-				if( interlace == TRUE)
+
+				if (interlace)
 				{
-					for( i = 0; i < 4; i++)
+					for (i = 0; i < 4; i++)
 					{
-						for ( j = Row + InterlacedOffset[i]; j < Row + Height; j += InterlacedJumps[i])
+						for (j = Row + InterlacedOffset[i]; j < Row + Height; j += InterlacedJumps[i])
 						{
-							if( map->BitsPerPixel != 1)
+							if (map->BitsPerPixel != 1)
 							{
-								if( DGifGetLine ( gif, line_buffer, Width) != GIF_OK)
+								if (DGifGetLine(gif, line_buffer, Width) != GIF_OK)
 								{
 									error = 1;
-									free( ( void*)img.image_buf[img.imagecount]);
+									free(img.image_buf[img.imagecount]);
 									break;
 								}
 
-								decodecolormap( line_buffer, &img_buffer[(j * line_size) + (Col * 3)], map->Colors, Width, transpar, info->background_color, draw_trans);
-							}
-							else if( DGifGetLine ( gif, &img_buffer[(j * line_size) + Col], Width) != GIF_OK)
+								decodecolormap(line_buffer, &img_buffer[(j * line_size) + (Col * 3)], map->Colors,
+											   Width, transpar, info->background_color, draw_trans);
+							} else if (DGifGetLine(gif, &img_buffer[(j * line_size) + Col], Width) != GIF_OK)
 							{
-								free( ( void*)img.image_buf[img.imagecount]);
+								free(img.image_buf[img.imagecount]);
 								error = 1;
 								break;
 							}
 						}
-					}	
-				}
-				else
+					}
+				} else
 				{
-					for( i = 0; i < Height; i++, Row++)
+					for (i = 0; i < Height; i++, Row++)
 					{
-						if( map->BitsPerPixel != 1)
+						if (map->BitsPerPixel != 1)
 						{
-							if( DGifGetLine( gif, line_buffer, Width) != GIF_OK)
+							if (DGifGetLine(gif, line_buffer, Width) != GIF_OK)
 							{
 								error = 1;
-								free( ( void*)img.image_buf[img.imagecount]);
+								free(img.image_buf[img.imagecount]);
 								break;
 							}
 
-							decodecolormap( line_buffer, &img_buffer[(Row * line_size) + (Col * 3)], map->Colors, Width, transpar, info->background_color, draw_trans);
-						}
-						else if( DGifGetLine( gif, &img_buffer[(Row * line_size) + Col], Width) != GIF_OK)
+							decodecolormap(line_buffer, &img_buffer[(Row * line_size) + (Col * 3)], map->Colors, Width,
+										   transpar, info->background_color, draw_trans);
+						} else if (DGifGetLine(gif, &img_buffer[(Row * line_size) + Col], Width) != GIF_OK)
 						{
-							free( ( void*)img.image_buf[img.imagecount]);
+							free(img.image_buf[img.imagecount]);
 							error = 1;
 							break;
 						}
 					}
 				}
-									
-				if( line_buffer)
+
+				if (line_buffer)
 				{
-					free( ( void*)line_buffer);
+					free(line_buffer);
 					line_buffer = NULL;
-				}	
+				}
 
 				img.imagecount++;
 			}
-			
-			if( info->thumbnail	== TRUE)		
-				break;
-		
-		} 
-		else if ( rec == EXTENSION_RECORD_TYPE) 
-		{
-			int           code;
-			GifByteType * block;
 
-			if ( DGifGetExtension (gif, &code, &block) == GIF_ERROR) 
+			if (info->thumbnail == TRUE)
+				break;
+
+		} else if (rec == EXTENSION_RECORD_TYPE)
+		{
+			int code;
+			GifByteType *block;
+
+			if (DGifGetExtension(gif, &code, &block) == GIF_ERROR)
 			{
 				error = 1;
 				break;
-			}		
-			else while ( block != NULL) 
+			} else
 			{
-				switch( code)
+				while (block != NULL)
 				{
-				   	case COMMENT_EXT_FUNC_CODE: 
-				   		if( comment.lines > 254)
-				   			break;
-				   	
-						block[block[0]+1] = '\000';   /* Convert gif's pascal-like string */
-						comment.txt[comment.lines] = ( int8_t*)malloc( block[0] + 1);
-
-						if( comment.txt[comment.lines] == NULL)
+					switch (code)
+					{
+					case COMMENT_EXT_FUNC_CODE:
+						if (comment.lines > 254)
 							break;
 
-						strcpy( comment.txt[comment.lines], (char*)block + 1);
-						comment.max_lines_length = MAX( comment.max_lines_length, ( int16_t)strlen( comment.txt[comment.lines]) + 1);
+						block[block[0] + 1] = '\0';	/* Convert gif's pascal-like string */
+						comment.txt[comment.lines] = (char *) malloc(block[0] + 1);
+
+						if (comment.txt[comment.lines] == NULL)
+							break;
+
+						strcpy(comment.txt[comment.lines], (char *) block + 1);
+						comment.max_lines_length =
+							MAX(comment.max_lines_length, (int16_t) strlen(comment.txt[comment.lines]) + 1);
 						comment.lines++;
-		    			break; 
+						break;
 
-				   	case GRAPHICS_EXT_FUNC_CODE: 
-						if( block[1] & 1)
-							transpar = ( uint16_t)block[4];
+					case GRAPHICS_EXT_FUNC_CODE:
+						if (block[1] & 1)
+							transpar = (uint16_t) block[4];
 						else
-				   			transpar = -1;
-					   							   	
-						img.delay[delaycount++] = ( block[2] + (block[3] << 8)) << 1;				
+							transpar = -1;
 
-		    			break;
-					/*
-					In version 2.0 beta Netscape, introduce a special extention for
-					set a maximum loop playback.. Netscape itself doesn't use it anymore
-					and play the animation infinitly... so we don't care about it.
+						img.delay[delaycount++] = (block[2] + (block[3] << 8)) << 1;
 
+						break;
+
+#if 0
+						/*
+						   In version 2.0 beta Netscape, introduce a special extention for
+						   set a maximum loop playback.. Netscape itself doesn't use it anymore
+						   and play the animation infinitly... so we don't care about it.
+						 */
 					case APPLICATION_EXT_FUNC_CODE:
-						if( reading_netscape_ext == 0)
+						if (reading_netscape_ext == 0)
 						{
-							if( memcmp( block + 1, "NETSCAPE", 8) != 0) 
+							if (memcmp(block + 1, "NETSCAPE", 8) != 0)
 								break;
 
-							if( block[0] != 11) 
+							if (block[0] != 11)
 								break;
 
-							if( memcmp( block + 9, "2.0", 3) != 0)
+							if (memcmp( block + 9, "2.0", 3) != 0)
 								break;
 
-	  						reading_netscape_ext = 1;
-						}
-						else
+							reading_netscape_ext = 1;
+						} else
 						{
-							if (( block[1] & 7) == 1)
+							if ((block[1] & 7) == 1)
 								info->max_loop_count = block[2] | ( block[3] << 8);
 						}
-					*/
+						break;
+#endif
 					default:
 						break;
+					}
+
+					if (DGifGetExtensionNext(gif, &block) == GIF_ERROR)
+					{
+						error = 1;
+						break;
+					}
 				}
-
-				if ( DGifGetExtensionNext (gif, &block) == GIF_ERROR) 
-				{
-					error = 1;
-					break;
-				}	
 			}
-		}
-		else break;
-	} while ( rec != TERMINATE_RECORD_TYPE);
+		} else
+			break;
+	} while (rec != TERMINATE_RECORD_TYPE);
 
-	
-	if( error) 
+
+	if (error)
 	{
-		for ( i = 0; i < comment.lines; i++) 
+		for (i = 0; i < comment.lines; i++)
 		{
-			if( comment.txt[i])
-				free( ( void*)comment.txt[i]);
+			if (comment.txt[i])
+				free(comment.txt[i]);
 		}
 
-		for ( i = 0; i < img.imagecount; i++) 
+		for (i = 0; i < img.imagecount; i++)
 		{
-			if( img.image_buf[i])
-				free( ( void*)img.image_buf[i]);
-		}	
+			if (img.image_buf[i])
+				free(img.image_buf[i]);
+		}
 
-		DGifCloseFile ( gif, NULL);
+		DGifCloseFile(gif, NULL);
 		return FALSE;
 	}
 
-	info->real_height  			= info->height;
-	info->real_width 			= info->width;
-	info->orientation			= UP_TO_DOWN;
-	info->page	 				= img.imagecount;
-	info->num_comments			= comment.lines;
-	info->max_comments_length	= comment.max_lines_length;
-	info->indexed_color 		= FALSE;
-	info->memory_alloc			= TT_RAM;
-	info->_priv_var				= 0L;	/* page line counter */
-	info->_priv_var_more		= 0L;	/* current page returned */
-	info->_priv_ptr				= ( void*)&comment;
-	info->_priv_ptr_more		= ( void*)&img;
+	info->real_height = info->height;
+	info->real_width = info->width;
+	info->orientation = UP_TO_DOWN;
+	info->page = img.imagecount;
+	info->num_comments = comment.lines;
+	info->max_comments_length = comment.max_lines_length;
+	info->indexed_color = FALSE;
+	info->memory_alloc = TT_RAM;
+	info->_priv_var = 0L;				/* page line counter */
+	info->_priv_var_more = 0L;			/* current page returned */
+	info->_priv_ptr = (void *) &comment;
+	info->_priv_ptr_more = (void *) &img;
 
-	strcpy( info->info, "GIF");
+	strcpy(info->info, "GIF");
 
-	/*if( gif->Version)
-		strcat( info->info, "89a"); 
+#if 0
+	if (gif->Version)
+		strcat(info->info, "89a"); 
 	else
-		strcat( info->info, "87a"); 
-	*/
+		strcat(info->info, "87a"); 
+#endif
 
-	if( interlace)
-		strcat( info->info, " (Interlaced)"); 
+	if (interlace)
+		strcat(info->info, " (Interlaced)");
 
-	strcpy( info->compression, "LZW");	
+	strcpy(info->compression, "LZW");
 
-	DGifCloseFile( gif, NULL);
-	
+	DGifCloseFile(gif, NULL);
+
 	return TRUE;
 }
 
@@ -374,13 +382,13 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
+void __CDECL reader_get_txt(IMGINFO info, txt_data * txtdata)
 {
-	register int16_t i;
-	txt_data *comment	= ( txt_data *)info->_priv_ptr;
+	int16_t i;
+	txt_data *comment = (txt_data *) info->_priv_ptr;
 
-	for ( i = 0; i < txtdata->lines; i++) 
-		strcpy( txtdata->txt[i] , comment->txt[i]);
+	for (i = 0; i < txtdata->lines; i++)
+		strcpy(txtdata->txt[i], comment->txt[i]);
 }
 
 
@@ -395,28 +403,27 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
+boolean __CDECL reader_read(IMGINFO info, uint8_t * buffer)
 {
-	img_data	*img		= ( img_data*)info->_priv_ptr_more;
-	int32_t		line_size	= ( int32_t)info->width * ( int32_t)info->components;
-	uint8_t		*line_src;
+	img_data *img = (img_data *) info->_priv_ptr_more;
+	int32_t line_size = (int32_t) info->width * (int32_t) info->components;
+	uint8_t *line_src;
 
-	if( ( int32_t)info->page_wanted != info->_priv_var_more)
+	if ((int32_t) info->page_wanted != info->_priv_var_more)
 	{
-		info->_priv_var_more 	= ( int32_t)info->page_wanted;
-		info->_priv_var 		= 0L;
+		info->_priv_var_more = (int32_t) info->page_wanted;
+		info->_priv_var = 0;
 	}
 
-	line_src	= &img->image_buf[info->page_wanted][info->_priv_var];
+	line_src = &img->image_buf[info->page_wanted][info->_priv_var];
 
 	info->_priv_var += line_size;
 	info->delay = img->delay[info->page_wanted];
 
-	memcpy( buffer, line_src, line_size);
+	memcpy(buffer, line_src, line_size);
 
 	return TRUE;
 }
-
 
 
 /*==================================================================================*
@@ -430,21 +437,21 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void __CDECL reader_quit( IMGINFO info)
-{	
-	txt_data 	*comment	= ( txt_data *)info->_priv_ptr;
-	img_data	*img		= ( img_data *)info->_priv_ptr_more;	
-	register int16_t i;
+void __CDECL reader_quit(IMGINFO info)
+{
+	txt_data *comment = (txt_data *) info->_priv_ptr;
+	img_data *img = (img_data *) info->_priv_ptr_more;
+	int16_t i;
 
-	for ( i = 0; i < comment->lines; i++) 
+	for (i = 0; i < comment->lines; i++)
 	{
-		if( comment->txt[i])
-			free( ( void*)comment->txt[i]);
+		if (comment->txt[i])
+			free(comment->txt[i]);
 	}
-	
-	for ( i = 0; i < img->imagecount; i++) 
+
+	for (i = 0; i < img->imagecount; i++)
 	{
-		if( img->image_buf[i])
-			free( ( void*)img->image_buf[i]);
-	}	
+		if (img->image_buf[i])
+			free(img->image_buf[i]);
+	}
 }
