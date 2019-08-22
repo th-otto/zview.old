@@ -1,0 +1,21 @@
+Version 1.0.2 - 2019/08/xx
+=============
+
+First release made by me (Thorsten Otto)
+
+ Notable changes:
+ ----------------
+
+ * all codecs recompiled as SLBs, making them
+ * much smaller
+ * Update PDF library to  4.01.01
+ * PDF is now a plugin of its own, only loaded when needed
+ * Third-Party-Libraries like TIFF, PNGLIB, ZLIB etc. take up their
+   memory only once (ZLIB for example is needed by several modules)
+ * Separate versions for 68k, 68020+ and ColdFire are available
+ 
+ Bug Fixes:
+ ----------
+ * Registered file types are not longer restricted to exactly 3 characters
+ * TIFF module will no longer register itself for *.IFF (use *.TIF or *.TIFF
+   instead, *.IFF should be reserved for Interchange File Format)
