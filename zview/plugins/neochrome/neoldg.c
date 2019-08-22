@@ -1,7 +1,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvneo.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean CDECL init:																*

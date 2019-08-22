@@ -3,7 +3,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvtiff.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean set_tiff_option:															*

@@ -2,7 +2,6 @@
 #include "imginfo.h"
 #include <png.h>
 #include "zvpng.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean CDECL init:																*

@@ -2,7 +2,6 @@
 #include "imginfo.h"
 #include "img.h"
 #include "zvimg.h"
-#include "plugin_version.h"
 
 static void __CDECL init( void)
 {

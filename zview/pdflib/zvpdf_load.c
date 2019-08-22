@@ -7,7 +7,7 @@
 #include "../general.h"
 #include "../plugins/common/slbload.h"
 #include "../plugins/common/zvplugin.h"
-#include "../plugins/common/plugin_version.h"
+#include "../plugins/common/plugver.h"
 #include "zvpdf.h"
 #include "../winimg.h"
 #include "../custom_font.h"

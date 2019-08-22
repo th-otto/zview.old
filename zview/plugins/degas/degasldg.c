@@ -1,7 +1,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvdegas.h"
-#include "plugin_version.h"
 
 
 /*==================================================================================*
@@ -33,7 +32,7 @@ static PROC DEGASFunc[] =
 
 static LDGLIB degas_plugin =
 {
-	PLUGIN_INTERFACE_VERSION, 		/* Plugin version */
+	0x200, 		/* Plugin version */
 	sizeof(DEGASFunc) / sizeof(DEGASFunc[0]),					/* Number of plugin's functions */
 	DEGASFunc,			/* List of functions */
 	"PI1\0PI2\0PI3\0PC1\0PC2\0PC3\0",		/* File's type Handled */

@@ -13,7 +13,7 @@
 #include <slb/freetype.h>
 #include "zvplugin.h"
 #include "plugin.h"
-#include "plugin_version.h"
+#include "plugver.h"
 #include "slbload.h"
 
 static struct _zview_plugin_funcs zview_plugin_funcs;

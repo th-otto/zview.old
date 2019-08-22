@@ -38,21 +38,6 @@
 #endif
 
 
-#ifndef TRUE
-#define TRUE		1
-#define FALSE		0
-#endif
-
-#ifndef __boolean_defined
-#define __boolean_defined 1
-#if defined(__PUREC__) || defined(__TURBOC__) || defined(__AHCC__) || defined(__MSHORT__)
-/* because it is a return code from plugin functions */
-typedef int32_t boolean;
-#else
-typedef int boolean;
-#endif
-#endif
-
 #ifndef MIN
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))

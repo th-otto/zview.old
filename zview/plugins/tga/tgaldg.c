@@ -2,7 +2,6 @@
 #include "imginfo.h"
 #include "libtarga.h"
 #include "zvtga.h"
-#include "plugin_version.h"
 
 
 /*==================================================================================*

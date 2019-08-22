@@ -8,7 +8,6 @@
 #include <libexif/exif-data.h>
 #include <libexif/exif-utils.h>
 #include "zvjpg.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean set_jpg_option:															*

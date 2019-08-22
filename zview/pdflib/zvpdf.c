@@ -20,13 +20,8 @@
 #include "../plugins/common/imginfo.h"
 #include "../plugins/common/zvplugin.h"
 #include "../plugins/common/plugin.h"
-#include "../plugins/common/plugin_version.h"
 #include "zvpdf.h"
 #include "pdflib.h"
-
-#if defined(__MSHORT__) || defined(__PUREC__) || defined(__AHCC__)
-# error "the slb must not be compiled with -mshort"
-#endif
 
 extern char const slb_header[];
 static const BASEPAGE *my_base;
@@ -34,10 +29,10 @@ static const BASEPAGE *my_base;
 /*
  * referenced from header.S
  */
-long slb_init(void);
-void slb_exit(void);
-long slb_open(BASEPAGE *bp);
-void slb_close(BASEPAGE *bp);
+long __CDECL slb_init(void);
+void __CDECL slb_exit(void);
+long __CDECL slb_open(BASEPAGE *bp);
+void __CDECL slb_close(BASEPAGE *bp);
 long __CDECL slb_control(long fn, void *arg);
 
 
@@ -54,7 +49,7 @@ static struct _zvpdf_funcs *get_slb_funcs(void)
  * to zero in the header, even if they
  * currently don't do anything
  */
-long slb_init(void)
+long __CDECL slb_init(void)
 {
 	const BASEPAGE *bp;
 	const long *exec_longs;
@@ -69,12 +64,12 @@ long slb_init(void)
 }
 
 
-void slb_exit(void)
+void __CDECL slb_exit(void)
 {
 }
 
 
-long slb_open(BASEPAGE *bp)
+long __CDECL slb_open(BASEPAGE *bp)
 {
 	/*
 	 * check if SLB is already in use by this process;
@@ -87,7 +82,7 @@ long slb_open(BASEPAGE *bp)
 }
 
 
-void slb_close(BASEPAGE *bp)
+void __CDECL slb_close(BASEPAGE *bp)
 {
 	my_funcs = NULL;
 }

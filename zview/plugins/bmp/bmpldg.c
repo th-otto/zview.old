@@ -1,7 +1,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvbmp.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean __CDECL init:															*
@@ -32,7 +31,7 @@ static PROC BMPFunc[] =
 
 static LDGLIB bmp_plugin =
 {
-	PLUGIN_INTERFACE_VERSION, 	/* Plugin version */
+	0x200, 	/* Plugin version */
 	sizeof(BMPFunc) / sizeof(BMPFunc[0]),					/* Number of plugin's functions */
 	BMPFunc,			/* List of functions */
 	"BMP\0",			/* File's type Handled */

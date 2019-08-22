@@ -1,7 +1,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zveureka.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean CDECL init:																*
@@ -32,7 +31,7 @@ static PROC RAWFunc[] =
 
 LDGLIB raw_plugin =
 {
-	PLUGIN_INTERFACE_VERSION, 	/* Plugin version */
+	VERSION, 	/* Plugin version */
 	sizeof(RAWFunc) / sizeof(RAWFunc[0]),					/* Number of plugin's functions */
 	RAWFunc,			/* List of functions */
 	"RAW\0",			/* File's type Handled */

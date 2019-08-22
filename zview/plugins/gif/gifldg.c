@@ -3,7 +3,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvgif.h"
-#include "plugin_version.h"
 
 /*==================================================================================*
  * boolean CDECL init:																*
@@ -34,7 +33,7 @@ static PROC GIFFunc[] =
 
 static LDGLIB gif_plugin =
 {
-	PLUGIN_INTERFACE_VERSION, 		/* Plugin version */
+	0x200, 		/* Plugin version */
 	sizeof(GIFFunc) / sizeof(GIFFunc[0]),				/* Number of plugin's functions */
 	GIFFunc,		/* List of functions */
 	"GIF\0",			/* File's type Handled */

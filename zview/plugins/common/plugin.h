@@ -1,5 +1,5 @@
 /*
- * zview_plugin_struct.h - internal header file.
+ * plugin_struct.h - internal header file.
  * List of functions that are imported from the application
  *
  * Copyright (C) 2018 Thorsten Otto
@@ -12,10 +12,23 @@
 
 #include <stdarg.h>
 #include <mint/slb.h>
+#ifdef __GNUC__
 #include <unistd.h>
+#endif
 #include <setjmp.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#ifdef __PUREC__
+#include <tos.h>
+#else
+#include <osbind.h>
+#endif
+
 #include "imginfo.h"
 
 #define LIB_PNG      0
@@ -26,6 +39,8 @@
 #define LIB_EXIF     5
 #define LIB_BZIP2    6
 #define LIB_FREETYPE 7
+
+#include "plugver.h"
 
 struct _zview_plugin_funcs {
 	/*
@@ -117,12 +132,6 @@ struct _zview_plugin_funcs {
 	/* room for later extensions */
 	void *unused[31];
 };
-
-#include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
 
 #ifdef PLUGIN_SLB
 
@@ -266,6 +275,29 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #define atof(x) get_slb_funcs()->p_atof(x)
 
+#ifdef __PUREC__
+/* not implemented yet; needs format conversion */
+#undef atof
+#define atof(x) function_not_implemented
+#undef fstat
+#define fstat(fd, s) function_not_implemented
+#endif
+
 #endif /* PLUGIN_SLB */
+
+#if defined(__PUREC__) || defined(LATTICE)
+/*
+ * be sure to get the TOS error codes here,
+ * not any pseudo UNIX-style error numbers
+ */
+#undef ENOSYS
+#define ENOSYS 32
+#undef EINVAL
+#define EINVAL 25
+#undef EBADARG
+#define EBADARG 64
+#undef ERANGE
+#define ERANGE 88
+#endif
 
 #endif

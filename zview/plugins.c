@@ -3,7 +3,7 @@
 #include "plugins.h"
 #include "pic_load.h"
 #include "plugins/common/zvplugin.h"
-#include "plugins/common/plugin_version.h"
+#include "plugins/common/plugver.h"
 
 
 

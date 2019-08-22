@@ -28,8 +28,34 @@ typedef enum
 #define PROGRESSIVE_JPG		2
 #define ALL_OK				3
 
+#ifndef TRUE
+#define TRUE		1
+#define FALSE		0
+#endif
+
+#ifndef __boolean_defined
+#define __boolean_defined 1
+#if defined(__PUREC__) || defined(__TURBOC__) || defined(__AHCC__) || defined(__MSHORT__)
+/* because it is a return code from plugin functions */
+typedef int32_t boolean;
+#else
+typedef int boolean;
+#endif
+#endif
+
+#if defined(__PUREC__) || defined(__MSHORT__)
+typedef long zv_int_t;
+typedef unsigned long zv_uint_t;
+#else
 typedef int zv_int_t;
 typedef unsigned int zv_uint_t;
+#endif
+
+#ifndef __GNUC__
+#ifndef __attribute__
+#define __attribute__(x)
+#endif
+#endif
 
 typedef struct _img_data
 {
@@ -63,11 +89,11 @@ typedef struct _img_info *IMGINFO;
 typedef struct _img_info
 {
 	/* Data returned by the decoder Picture's initialisation */
-	uint16_t    width;					/* Picture width 											*/
+	uint16_t	width;					/* Picture width 											*/
 	uint16_t	height;					/* Picture height											*/
-	uint16_t 	components;  			/* Picture components 										*/
+	uint16_t	components;  			/* Picture components 										*/
 	uint16_t	planes;					/* Picture bits by pixel									*/
-	uint32_t   	colors;					/* Picture colors number									*/
+	uint32_t	colors;					/* Picture colors number									*/
 	int16_t		orientation;			/* picture orientation: UP_TO_DOWN or DONW_TO_UP ( ex: TGA)	*/
 	uint16_t	page;					/* Number of page/image in the file 						*/
 	uint16_t	delay;					/* Animation delay in 200th sec. between each frame.		*/
@@ -92,7 +118,7 @@ typedef struct _img_info
 	   use it for decoding routine but only for the information dialog								*/
 	char		info[40];				/* Picture's info, for ex: "Gif 87a" 						*/
 	char		compression[5];			/* Compression type, ex: "LZW" 								*/
-	uint16_t    real_width;				/* Real picture width( if the thumbnail variable is 1)		*/
+	uint16_t	real_width;				/* Real picture width( if the thumbnail variable is 1)		*/
 	uint16_t	real_height;			/* Real picture height( if the thumbnail variable is 1)		*/
 
 

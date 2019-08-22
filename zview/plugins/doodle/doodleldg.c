@@ -1,7 +1,7 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvdoodle.h"
-#include "plugin_version.h"
+
 
 static void __CDECL init(void)
 {

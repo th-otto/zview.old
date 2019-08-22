@@ -17,11 +17,7 @@
 #include <string.h>
 #include "zview.h"
 #include "plugin.h"
-#include "plugin_version.h"
-
-#if defined(__MSHORT__) || defined(__PUREC__) || defined(__AHCC__)
-# error "the slb must not be compiled with -mshort"
-#endif
+#include "plugver.h"
 
 extern char const slb_header[];
 static const BASEPAGE *my_base;
@@ -29,10 +25,10 @@ static const BASEPAGE *my_base;
 /*
  * referenced from header.S
  */
-long slb_init(void);
-void slb_exit(void);
-long slb_open(BASEPAGE *bp);
-void slb_close(BASEPAGE *bp);
+long __CDECL slb_init(void);
+void __CDECL slb_exit(void);
+long __CDECL slb_open(BASEPAGE *bp);
+void __CDECL slb_close(BASEPAGE *bp);
 long __CDECL slb_control(long fn, void *arg);
 
 
@@ -92,7 +88,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void)
  * to zero in the header, even if they
  * currently don't do anything
  */
-long slb_init(void)
+long __CDECL slb_init(void)
 {
 	const BASEPAGE *bp;
 	const long *exec_longs;
@@ -107,12 +103,12 @@ long slb_init(void)
 }
 
 
-void slb_exit(void)
+void __CDECL slb_exit(void)
 {
 }
 
 
-long slb_open(BASEPAGE *bp)
+long __CDECL slb_open(BASEPAGE *bp)
 {
 	pid_t pid = slb_user();
 	struct per_proc *proc = get_proc(pid, 0);
@@ -133,7 +129,7 @@ long slb_open(BASEPAGE *bp)
 }
 
 
-void slb_close(BASEPAGE *bp)
+void __CDECL slb_close(BASEPAGE *bp)
 {
 	pid_t pid = slb_user();
 	struct per_proc *proc = get_proc(pid, pid);

@@ -6,7 +6,7 @@
  */
 
 #include "../plugins/common/symbols.h"
-#include "../plugins/common/plugin_version.h"
+#include "../plugins/common/plugver.h"
 
 	.globl C_SYMBOL_NAME(slb_header)
 

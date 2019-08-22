@@ -1,7 +1,6 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "zvgod.h"
-#include "plugin_version.h"
 
 
 
