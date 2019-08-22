@@ -279,10 +279,10 @@ CODEC *get_codec( const char *file)
 				}
 			} else
 			{
+				c = 0;
 				/* old version, with exactly 3 chars per extension */
 				for( j = 0; j < codecs[i].num_extensions; j++)
 				{
-					c = 0;
 					plugin[0] = codecs[i].extensions[c++];
 					plugin[1] = codecs[i].extensions[c++];
 					plugin[2] = codecs[i].extensions[c++];
