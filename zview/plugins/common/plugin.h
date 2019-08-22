@@ -5,6 +5,11 @@
  * Copyright (C) 2018 Thorsten Otto
  *
  * For conditions of distribution and use, see copyright notice in zlib.h
+ *
+ * This file should only be used by the codecs itself,
+ * and by the interface code in the application that loads them.
+ * Its purpose is to provide some common library functions to the
+ * codecs, and to redirect calls to them.
  */
 
 #ifndef __ZVIEW_PLUGIN_STRUCT_H__
@@ -31,6 +36,13 @@
 
 #include "imginfo.h"
 
+/*
+ * 3rd-party libraries the application knows about.
+ * Codecs that need some of these libraries should
+ * arrange to call back to the application in order
+ * to load them, via p_slb_open/p_slb_close/p_slb_get
+ * defined in the zview_plugin_funcs struct
+ */
 #define LIB_PNG      0
 #define LIB_Z        1
 #define LIB_JPEG     2

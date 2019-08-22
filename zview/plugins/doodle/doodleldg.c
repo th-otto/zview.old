@@ -2,6 +2,9 @@
 #include "imginfo.h"
 #include "zvdoodle.h"
 
+/*
+ * 1.11 Handles salert.txt in codecs folder
+ */
 
 static void __CDECL init(void)
 {
@@ -19,7 +22,7 @@ static PROC DOODLEFunc[] =
 
 LDGLIB doodle_plugin =
 {
-	0x110, 	/* Plugin version */
+	0x111, 	/* Plugin version */
 	5,					/* Number of plugin's functions */
 	DOODLEFunc,			/* List of functions */
 	"DOO\0",			/* File's type Handled */

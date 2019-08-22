@@ -233,7 +233,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				img.imagecount++;
 			}
 
-			if (info->thumbnail == TRUE)
+			if (info->thumbnail)
 				break;
 
 		} else if (rec == EXTENSION_RECORD_TYPE)
