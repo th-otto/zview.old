@@ -293,7 +293,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 		switch( dsp_result)
 		{
-			case GOLBAL_ERROR:
+			case GLOBAL_ERROR:
 				dsp_decoding = FALSE;
 				return FALSE;
 			

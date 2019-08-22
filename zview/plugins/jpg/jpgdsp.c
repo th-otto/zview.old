@@ -104,7 +104,7 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 	JPGD_PTR 	jpgd;
 
 	if ( ( jpeg_file = ( int16_t)Fopen( name, 0)) < 0)
-		return GOLBAL_ERROR;
+		return GLOBAL_ERROR;
 
 	jpeg_file_size = Fseek( 0L, jpeg_file, 2);
 
@@ -113,14 +113,14 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 	if (( src = ( void*)Mxalloc( jpeg_file_size + sizeof( pad), dsp_ram)) == NULL)
 	{
 		Fclose( jpeg_file);
-		return GOLBAL_ERROR;	
+		return GLOBAL_ERROR;
 	}
 
 	if ( Fread( jpeg_file, jpeg_file_size, src) != jpeg_file_size)
 	{
 		Mfree( src);
 		Fclose( jpeg_file);
-		return GOLBAL_ERROR;	
+		return GLOBAL_ERROR;
 	}
 
 	Fclose( jpeg_file);
@@ -140,7 +140,7 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 	if( jpgd == NULL)
 	{
 		Mfree( src);
-		return GOLBAL_ERROR;
+		return GLOBAL_ERROR;
 	}
 
 	memset( ( void *)jpgd, 0, jpgdsize);
@@ -179,7 +179,7 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 		JPGDCloseDriver( jpgd, jpgdrv);
 		Mfree( jpgd);
 		Mfree( src);
-		return GOLBAL_ERROR;
+		return GLOBAL_ERROR;
 	}
 
 	jpgd->OutPointer  = dst;
