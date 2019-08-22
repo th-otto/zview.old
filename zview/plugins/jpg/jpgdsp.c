@@ -1,6 +1,7 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "jpgdh.h"
+#include "zvjpg.h"
 
 int16_t dsp_ram = 0;
 

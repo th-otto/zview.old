@@ -20,13 +20,8 @@ typedef enum
 } J_COLOR_SPACE;
 #endif
 
-#define M_EXIF 0xE1
 #define UP_TO_DOWN 		0
 #define DOWN_TO_UP		1
-#define GLOBAL_ERROR		0
-#define DSP_ERROR			1
-#define PROGRESSIVE_JPG		2
-#define ALL_OK				3
 
 #ifndef TRUE
 #define TRUE		1

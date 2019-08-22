@@ -1,3 +1,10 @@
+#define M_EXIF 0xE1
+
+#define GLOBAL_ERROR		0
+#define DSP_ERROR			1
+#define PROGRESSIVE_JPG		2
+#define ALL_OK				3
+
 boolean __CDECL reader_init( const char *name, IMGINFO info);
 boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer);
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata);
