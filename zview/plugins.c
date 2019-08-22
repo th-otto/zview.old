@@ -116,6 +116,11 @@ int16 plugins_init( void)
 						codecs[plugins_nbr].type = CODEC_LDG;
 						codecs[plugins_nbr].extensions = codecs[plugins_nbr].c.ldg->infos;
 						codecs[plugins_nbr].num_extensions = codecs[plugins_nbr].c.ldg->user_ext;
+						codecs[plugins_nbr].capabilities = 0;
+						if (ldg_find("reader_init", codecs[plugins_nbr].c.ldg) != 0)
+							codecs[plugins_nbr].capabilities |= CAN_DECODE;
+						if (ldg_find("encoder_init", codecs[plugins_nbr].c.ldg) != 0)
+							codecs[plugins_nbr].capabilities |= CAN_ENCODE;
 						codec_init();
 						plugins_nbr++;
 					} else
@@ -138,6 +143,9 @@ int16 plugins_init( void)
 					codecs[plugins_nbr].type = CODEC_SLB;
 					codecs[plugins_nbr].extensions = (const char *)plugin_get_option(slb, OPTION_EXTENSIONS);
 					codecs[plugins_nbr].num_extensions = 0;
+					codecs[plugins_nbr].capabilities = plugin_get_option(slb, OPTION_CAPABILITIES);
+					if (codecs[plugins_nbr].capabilities < 0)
+						codecs[plugins_nbr].capabilities = 0;
 					plugins_nbr++;
 				} else
 				{

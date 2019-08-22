@@ -94,14 +94,14 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		for( y = 0; y < img_h; y++)
 		{
 			if (curr_input_plugin)
-				plugin_reader_read(curr_input_plugin, in_info, data->RowBuf);
+				plugin_reader_read(&curr_input_plugin->c.slb, in_info, data->RowBuf);
 			else
 				ldg_funcs.decoder_read(in_info, data->RowBuf);
 				
 			( *raster)( data, dst);
 	
 			if (curr_output_plugin)
-				plugin_encoder_write(curr_output_plugin, out_info, dst);
+				plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
 			else
 				ldg_funcs.encoder_write(out_info, dst);
 
@@ -118,7 +118,7 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		for( y = 0; y < img_h; y++)
 		{
 			if (curr_input_plugin)
-				plugin_reader_read(curr_input_plugin, in_info, data->RowBuf);
+				plugin_reader_read(&curr_input_plugin->c.slb, in_info, data->RowBuf);
 			else
 				ldg_funcs.decoder_read(in_info, data->RowBuf);
 
@@ -136,7 +136,7 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		for( ; y < h; y++)
 		{
 			if (curr_output_plugin)
-				plugin_encoder_write(curr_output_plugin, out_info, dst);
+				plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
 			else
 				ldg_funcs.encoder_write(out_info, dst);
 
@@ -164,7 +164,7 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	if (encoder_init_done)
 	{
 		if (curr_output_plugin)
-			plugin_encoder_quit(curr_output_plugin, out_info);
+			plugin_encoder_quit(&curr_output_plugin->c.slb, out_info);
 		else
 			ldg_funcs.encoder_quit(out_info);
 	}
@@ -172,7 +172,7 @@ static void exit_pic_save( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 	if (decoder_init_done)
 	{
 		if (curr_input_plugin)
-			plugin_reader_quit(curr_input_plugin, in_info);
+			plugin_reader_quit(&curr_input_plugin->c.slb, in_info);
 		else
 			ldg_funcs.decoder_quit( in_info);
 	}
@@ -206,20 +206,15 @@ int16 pic_save( const char *in_file, const char *out_file)
 
     graf_mouse( BUSYBEE, NULL);	
 
-	in_info 	= ( img_info *) malloc( sizeof( img_info));
-	out_info 	= ( img_info *) malloc( sizeof( img_info));	
+	in_info 	= ( img_info *) calloc(1, sizeof( img_info));
+	out_info 	= ( img_info *) calloc(1, sizeof( img_info));	
 	data 		= ( dec_data *) malloc( sizeof( dec_data));
 	
 	if ( !in_info || !out_info || !data)
 	{
-		if ( data)
-			free( data);
-
-		if ( out_info)
-			free( out_info);
-
-		if ( in_info)
-			free( in_info);
+		free( data);
+		free( out_info);
+		free( in_info);
 
 		graf_mouse( ARROW, NULL);			
 		errshow(NULL, -ENOMEM);		
@@ -249,7 +244,7 @@ int16 pic_save( const char *in_file, const char *out_file)
 	*out_info = *in_info;
 
 	if (curr_output_plugin)
-		encoder_init_done = plugin_encoder_init(curr_output_plugin, out_file, out_info);
+		encoder_init_done = plugin_encoder_init(&curr_output_plugin->c.slb, out_file, out_info);
 	else
 		encoder_init_done = ldg_funcs.encoder_init(out_file, out_info);
 	if (encoder_init_done == FALSE)

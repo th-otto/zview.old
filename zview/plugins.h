@@ -20,10 +20,6 @@ struct _ldg_funcs {
 	void 	__CDECL ( *set_tiff_option) (int16 set_quality, uint16 set_encode_compression);
 };
 
-extern struct _ldg_funcs ldg_funcs;
-extern SLB *curr_input_plugin;
-extern SLB *curr_output_plugin;
-
 typedef struct {
 	int type;
 #define CODEC_NONE 0
@@ -33,6 +29,7 @@ typedef struct {
 		LDG *ldg;
 		SLB slb;
 	} c;
+	long capabilities;
 	const char *extensions;
 	long num_extensions;
 } CODEC;
@@ -40,5 +37,9 @@ typedef struct {
 
 extern CODEC codecs[MAX_CODECS];
 extern int16 plugins_nbr;
+
+extern struct _ldg_funcs ldg_funcs;
+extern CODEC *curr_input_plugin;
+extern CODEC *curr_output_plugin;
 
 #endif /* __ZVIEW_PLUGINS_H__ */

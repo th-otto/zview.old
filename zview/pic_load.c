@@ -23,8 +23,8 @@ void 		  ( *raster_true) 			( DECDATA, void *);
 void 		  ( *cnvpal_color)			( IMGINFO, DECDATA);
 void 		  ( *raster_gray) 			( DECDATA, void *);
 struct _ldg_funcs ldg_funcs;
-SLB *curr_input_plugin;
-SLB *curr_output_plugin;
+CODEC *curr_input_plugin;
+CODEC *curr_output_plugin;
 
 
 
@@ -78,7 +78,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 			return ( 0);
 		
 		if (curr_input_plugin)
-			plugin_reader_get_txt(curr_input_plugin, info, img->comments);
+			plugin_reader_get_txt(&curr_input_plugin->c.slb, info, img->comments);
 		else
 			ldg_funcs.decoder_get_txt(info, img->comments);
 	} else
@@ -175,7 +175,7 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 		{
 			if (curr_input_plugin)
 			{
-				if (!plugin_reader_read(curr_input_plugin, info, buf))
+				if (!plugin_reader_read(&curr_input_plugin->c.slb, info, buf))
 					return;		
 			} else
 			{
@@ -218,7 +218,7 @@ void quit_img( IMGINFO info, DECDATA data)
 	if (decoder_init_done)
 	{
 		if (curr_input_plugin)
-			plugin_reader_quit(curr_input_plugin, info);
+			plugin_reader_quit(&curr_input_plugin->c.slb, info);
 		else
 			ldg_funcs.decoder_quit(info);
 	}
@@ -317,7 +317,7 @@ CODEC *get_codec( const char *file)
 			{
 				if (strcmp(extension, p) == 0)
 				{
-					curr_input_plugin = &codecs[i].c.slb;
+					curr_input_plugin = &codecs[i];
 					return &codecs[i];
 				}
 				p += strlen(p) + 1;
@@ -336,8 +336,13 @@ boolean get_pic_info( const char *file, IMGINFO info)
 	if (get_codec(file))
 	{
 		if (curr_input_plugin)
-			return plugin_reader_init(curr_input_plugin, file, info);
-		return ldg_funcs.decoder_init(file, info);
+		{
+			if (curr_input_plugin->capabilities & CAN_DECODE)
+				return plugin_reader_init(&curr_input_plugin->c.slb, file, info);
+		} else
+		{
+			return ldg_funcs.decoder_init(file, info);
+		}
 	}
 	return FALSE;
 }
@@ -358,7 +363,7 @@ boolean pic_load( const char *file, IMAGE *img, boolean quiet)
 	IMGINFO info;
 	DECDATA data;
 
-	info = ( img_info *) malloc( sizeof( img_info));
+	info = ( img_info *) calloc(1, sizeof( img_info));
 	
 	if ( !info)
 	{

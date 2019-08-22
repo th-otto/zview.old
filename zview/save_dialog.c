@@ -78,19 +78,12 @@ static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const ch
 		}
 		break;
 	case CODEC_SLB:
+		if (!(codec->capabilities & CAN_ENCODE))
 		{
-			SLB *slb;
-			long err;
-			
-			slb = &codec->c.slb;
-			err = plugin_get_option(slb, OPTION_CAPABILITIES);
-			if (err < 0 || !(err & CAN_ENCODE))
-			{
-				errshow(codec->extensions, err);
-				return FALSE;
-			}
-			curr_output_plugin = slb;
+			errshow(codec->extensions, -ENOSYS);
+			return FALSE;
 		}
+		curr_output_plugin = codec;
 		break;
 	default:
 		return FALSE;
