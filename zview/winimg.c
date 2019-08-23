@@ -468,10 +468,7 @@ static void WindViewAnim( WINDOW *win)
 	if( ( windata->pause == TRUE) || ( full_screen == TRUE))
 		return;
 
-	page_to_show = windata->page_to_show + 1;
-
-	if( page_to_show >= windata->img.page)
-		page_to_show = 0;
+	page_to_show = windata->page_to_show;
 
 	relative_t = current_t - windata->chrono_value;
 
@@ -479,6 +476,9 @@ static void WindViewAnim( WINDOW *win)
 		return;
 
 	windata->chrono_value = current_t;
+
+	if( ++page_to_show >= windata->img.page)
+		page_to_show = 0;
 
 	windata->page_to_show = page_to_show;
 
