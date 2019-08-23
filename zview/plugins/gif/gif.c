@@ -62,6 +62,31 @@ static void decodecolormap(uint8_t *src, uint8_t *dst, GifColorType *cm, uint16_
 }
 
 
+static void free_info(IMGINFO info)
+{
+	txt_data *comment = (txt_data *) info->_priv_ptr;
+	img_data *img = (img_data *) info->_priv_ptr_more;
+	int16_t i;
+
+	if (comment)
+	{
+		for (i = 0; i < comment->lines; i++)
+		{
+			free(comment->txt[i]);
+		}
+		free(comment);
+	}
+
+	if (img)
+	{
+		for (i = 0; i < img->imagecount; i++)
+		{
+			free(img->image_buf[i]);
+		}
+		free(img);
+	}
+}
+
 /*==================================================================================*
  * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -85,13 +110,21 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	uint16_t delaycount = 0;
 	GifFileType *gif;
 	GifRecordType rec;
-	txt_data comment = { 0, };
-	img_data img = { 0, };
+	txt_data *comment;
+	img_data *img;
 
 	if ((gif = DGifOpenFileName(name, NULL)) == NULL)
 		return FALSE;
 
-	img.imagecount = 0;
+	if ((comment = malloc(sizeof(*comment))) == NULL ||
+		(img = malloc(sizeof(*img))) == NULL)
+	{
+		return FALSE;
+	}
+	info->_priv_ptr = comment;
+	info->_priv_ptr_more = img;
+	img->imagecount = 0;
+	comment->lines = 0;
 
 	do
 	{
@@ -143,8 +176,8 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				if (gif->Image.Interlace)
 					interlace = TRUE;
 
-				img.image_buf[img.imagecount] = (uint8_t *) malloc(line_size * (gif->SHeight + 2));
-				img_buffer = img.image_buf[img.imagecount];
+				img->image_buf[img->imagecount] = (uint8_t *) malloc(line_size * (gif->SHeight + 2));
+				img_buffer = img->image_buf[img->imagecount];
 
 				if (img_buffer == NULL)
 				{
@@ -158,19 +191,19 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 					if (line_buffer == NULL)
 					{
-						free(img.image_buf[img.imagecount]);
+						free(img->image_buf[img->imagecount]);
 						error = 1;
 						break;
 					}
 				}
 
-				if (img.imagecount)
+				if (img->imagecount)
 				{
 					/* the transparency is the background picture */
 					draw_trans = FALSE;
 
 					if ((Row > 0 && Height < gif->SHeight) || (Col > 0 && Width < gif->SWidth))
-						memcpy(img_buffer, img.image_buf[img.imagecount - 1], line_size * gif->SHeight);
+						memcpy(img_buffer, img->image_buf[img->imagecount - 1], line_size * gif->SHeight);
 					else
 						draw_trans = TRUE;
 				}
@@ -186,7 +219,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 								if (DGifGetLine(gif, line_buffer, Width) != GIF_OK)
 								{
 									error = 1;
-									free(img.image_buf[img.imagecount]);
+									free(img->image_buf[img->imagecount]);
 									break;
 								}
 
@@ -194,7 +227,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 											   Width, transpar, info->background_color, draw_trans);
 							} else if (DGifGetLine(gif, &img_buffer[(j * line_size) + Col], Width) != GIF_OK)
 							{
-								free(img.image_buf[img.imagecount]);
+								free(img->image_buf[img->imagecount]);
 								error = 1;
 								break;
 							}
@@ -209,7 +242,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 							if (DGifGetLine(gif, line_buffer, Width) != GIF_OK)
 							{
 								error = 1;
-								free(img.image_buf[img.imagecount]);
+								free(img->image_buf[img->imagecount]);
 								break;
 							}
 
@@ -217,7 +250,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 										   transpar, info->background_color, draw_trans);
 						} else if (DGifGetLine(gif, &img_buffer[(Row * line_size) + Col], Width) != GIF_OK)
 						{
-							free(img.image_buf[img.imagecount]);
+							free(img->image_buf[img->imagecount]);
 							error = 1;
 							break;
 						}
@@ -230,7 +263,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 					line_buffer = NULL;
 				}
 
-				img.imagecount++;
+				img->imagecount++;
 			}
 
 			if (info->thumbnail)
@@ -252,19 +285,19 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 					switch (code)
 					{
 					case COMMENT_EXT_FUNC_CODE:
-						if (comment.lines > 254)
+						if (comment->lines > 254)
 							break;
 
 						block[block[0] + 1] = '\0';	/* Convert gif's pascal-like string */
-						comment.txt[comment.lines] = (char *) malloc(block[0] + 1);
+						comment->txt[comment->lines] = (char *) malloc(block[0] + 1);
 
-						if (comment.txt[comment.lines] == NULL)
+						if (comment->txt[comment->lines] == NULL)
 							break;
 
-						strcpy(comment.txt[comment.lines], (char *) block + 1);
-						comment.max_lines_length =
-							MAX(comment.max_lines_length, (int16_t) strlen(comment.txt[comment.lines]) + 1);
-						comment.lines++;
+						strcpy(comment->txt[comment->lines], (char *) block + 1);
+						comment->max_lines_length =
+							MAX(comment->max_lines_length, (int16_t) strlen(comment->txt[comment->lines]) + 1);
+						comment->lines++;
 						break;
 
 					case GRAPHICS_EXT_FUNC_CODE:
@@ -273,7 +306,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 						else
 							transpar = -1;
 
-						img.delay[delaycount++] = (block[2] + (block[3] << 8)) << 1;
+						img->delay[delaycount++] = (block[2] + (block[3] << 8)) << 1;
 
 						break;
 
@@ -321,18 +354,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	if (error)
 	{
-		for (i = 0; i < comment.lines; i++)
-		{
-			if (comment.txt[i])
-				free(comment.txt[i]);
-		}
-
-		for (i = 0; i < img.imagecount; i++)
-		{
-			if (img.image_buf[i])
-				free(img.image_buf[i]);
-		}
-
+		free_info(info);
 		DGifCloseFile(gif, NULL);
 		return FALSE;
 	}
@@ -340,15 +362,13 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->real_height = info->height;
 	info->real_width = info->width;
 	info->orientation = UP_TO_DOWN;
-	info->page = img.imagecount;
-	info->num_comments = comment.lines;
-	info->max_comments_length = comment.max_lines_length;
+	info->page = img->imagecount;
+	info->num_comments = comment->lines;
+	info->max_comments_length = comment->max_lines_length;
 	info->indexed_color = FALSE;
 	info->memory_alloc = TT_RAM;
-	info->_priv_var = 0L;				/* page line counter */
-	info->_priv_var_more = 0L;			/* current page returned */
-	info->_priv_ptr = (void *) &comment;
-	info->_priv_ptr_more = (void *) &img;
+	info->_priv_var = 0;				/* page line counter */
+	info->_priv_var_more = 0;			/* current page returned */
 
 	strcpy(info->info, "GIF");
 
@@ -387,8 +407,11 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data * txtdata)
 	int16_t i;
 	txt_data *comment = (txt_data *) info->_priv_ptr;
 
-	for (i = 0; i < txtdata->lines; i++)
-		strcpy(txtdata->txt[i], comment->txt[i]);
+	if (comment)
+	{
+		for (i = 0; i < txtdata->lines; i++)
+			strcpy(txtdata->txt[i], comment->txt[i]);
+	}
 }
 
 
@@ -439,19 +462,5 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t * buffer)
  *==================================================================================*/
 void __CDECL reader_quit(IMGINFO info)
 {
-	txt_data *comment = (txt_data *) info->_priv_ptr;
-	img_data *img = (img_data *) info->_priv_ptr_more;
-	int16_t i;
-
-	for (i = 0; i < comment->lines; i++)
-	{
-		if (comment->txt[i])
-			free(comment->txt[i]);
-	}
-
-	for (i = 0; i < img->imagecount; i++)
-	{
-		if (img->image_buf[i])
-			free(img->image_buf[i]);
-	}
+	free_info(info);
 }
