@@ -463,6 +463,7 @@ static void WindViewAnim( WINDOW *win)
 	uint16 page_to_show;
 	clock_t current_t = clock();
 	clock_t relative_t;
+	clock_t delay;
 	MFDB 	*picture, screen = {0};
 
 	if( ( windata->pause == TRUE) || ( full_screen == TRUE))
@@ -472,7 +473,10 @@ static void WindViewAnim( WINDOW *win)
 
 	relative_t = current_t - windata->chrono_value;
 
-	if( relative_t < windata->img.delay[page_to_show])
+	delay = windata->img.delay[page_to_show];
+	if (delay < 10)
+		delay = 10;
+	if( relative_t < delay)
 		return;
 
 	windata->chrono_value = current_t;
