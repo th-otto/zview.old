@@ -17,7 +17,7 @@ godpaint.ldg: godldg.o god.o $(LDGOBJS)
 
 zvgod.slb: header.lo godslb.lo god.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo godslb.lo god.lo: ../common/plugin.h ../common/zview.h
 

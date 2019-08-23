@@ -1,5 +1,6 @@
 USE_WINDOM2=1
-include ../configvars
+top_srdir=..
+include $(top_srcdir)/configvars
 
 LIBXML2_INC		= /usr/m68k-atari-mint/sys-root/usr/include/libxml2
 

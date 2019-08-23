@@ -1,4 +1,5 @@
-include ../../configvars
+top_srcdir=../..
+include $(top_srcdir)/configvars
 
 PLUGINS = \
 	bmp \
@@ -15,7 +16,7 @@ PLUGINS = \
 	tiff \
 	$(empty)
 
-all: $(PLUGINS)
+all:: $(PLUGINS)
 
 .PHONY: $(PLUGINS)
 $(PLUGINS): libshare

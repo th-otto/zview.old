@@ -1,7 +1,8 @@
 #  makefile for libshare/test.ldg:
 #  by Arnaud BERCEGEAY (Feb 2004)
 
-include ../../../../configvars
+top_srcdir=../../../..
+include $(top_srcdir)/configvars
 
 LIBOBJ = libtest.o ../../../ldglib/ldglib.o ../../../ldglib/ldgutil.o
 PRGOBJ = prgtest.o ../../../ldglib/ldgapp.c ../../../ldglib/ldgload.c ../../../ldglib/ldgutil.c
@@ -9,7 +10,7 @@ PRGOBJ = prgtest.o ../../../ldglib/ldgapp.c ../../../ldglib/ldgload.c ../../../l
 LIBTARGET = test.ldg 
 PRGTARGET = test.tos
 
-all: $(LIBTARGET) $(PRGTARGET)
+all:: $(LIBTARGET) $(PRGTARGET)
 
 $(LIBTARGET): $(LIBOBJ)
 	$(CC) -o $@ $(LIBOBJ) ../libshare.a -lgem

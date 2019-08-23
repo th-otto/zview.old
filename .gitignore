@@ -65,3 +65,4 @@ zview/xpdf-*
 *.bmp
 zview/_dist/zview.rsc
 zview/tests
+zview/tools/stripex

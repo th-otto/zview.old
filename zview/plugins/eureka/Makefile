@@ -17,7 +17,7 @@ eureka.ldg: eurekaldg.o eureka.o $(LDGOBJS)
 
 zveureka.slb: header.lo eurekaslb.lo eureka.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo eurekaslb.lo eureka.lo: ../common/plugin.h ../common/zview.h
 

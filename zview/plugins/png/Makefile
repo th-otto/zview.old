@@ -24,7 +24,7 @@ png.ldg: pngldg.o png.o $(LDGOBJS)
 
 zvpng.slb: header.lo pngslb.lo png.lo $(LIBPNG_SOBJS)
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lpng.slb -lz.slb -lm $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo pngslb.lo png.lo: ../common/plugin.h ../common/zview.h
 

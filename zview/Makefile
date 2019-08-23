@@ -35,7 +35,7 @@ OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 
 PROGRAM 			= zview.app
 
-all:: $(PROGRAM)
+all:: $(STRIPEX) $(PROGRAM)
 	$(MAKE) -C plugins
 
 ##############################################################################
@@ -77,7 +77,8 @@ xpdf/config.status: xpdf/configure
 	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
-	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint
+	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint || \
+		{ test "$$TRAVIS_REPO_SLUG" != "" && cat config.log; exit 1; }
 
 xpdf/configure: xpdf/configure.ac xpdf/Makefile.am
 	cd xpdf && \
@@ -123,11 +124,25 @@ pdflib/pdflib.o pdflib/pdflib.lo: xpdf/aconf.h
 
 ##############################################################################
 
+$(STRIPEX): $(top_srcdir)/zview/tools/stripex.c
+	$(CC_FOR_BUILD) -O2 -o $@ $<
+
+##############################################################################
+
 clean_zview:
 	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o pdflib/*.o pdflib/*.lo slb/*/*.slb xpdf*/*/*.o
+	$(RM) $(STRIPEX)
 	$(MAKE) -C plugins clean
 
 clean_pdf:
 	rm -f pdflib/*.o slb/*/*.slb $(PDF_OBJ) libpdf.a
 
 clean: clean_zview
+
+##############################################################################
+
+dist:: all
+	cp -a $(PROGRAM) zview.rsc _dist
+	@mkdir -p _dist/slb/$(SLB_SUBDIR)
+	cp -a slb/$(SLB_SUBDIR)zvpdf.slb _dist/slb/$(SLB_SUBDIR)
+	$(MAKE) -C plugins $@

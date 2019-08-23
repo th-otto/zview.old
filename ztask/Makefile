@@ -1,5 +1,6 @@
 USE_WINDOM2=1
-include ../configvars
+top_srdir=..
+include $(top_srcdir)/configvars
 
 STACKSIZE		= 64k
 LIB			= $(WINDOM_LIBS) -lgem -lldg -lm #-lwout

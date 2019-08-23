@@ -43,3 +43,6 @@ ARFLAGS  = rcs
 LDSHARED = $(CC) -s -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k
 LDSHAREDLIBC = -nostdlib -lgcc
 SFLAGS =
+
+CC_FOR_BUILD = gcc
+STRIPEX := $(top_srcdir)/zview/tools/stripex

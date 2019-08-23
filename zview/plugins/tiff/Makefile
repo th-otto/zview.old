@@ -17,7 +17,7 @@ tiff.ldg: tiffldg.o tiff.o $(LDGOBJS)
 
 zvtiff.slb: header.lo tiffslb.lo tiff.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ltiff.slb -ljpeg.slb -llzma.slb -lz.slb $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo tiffslb.lo tiff.lo: ../common/plugin.h ../common/zview.h
 

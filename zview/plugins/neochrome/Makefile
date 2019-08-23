@@ -17,7 +17,7 @@ neo.ldg: neoldg.o neo.o $(LDGOBJS)
 
 zvneo.slb: header.lo neoslb.lo neo.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo neoslb.lo neo.lo: ../common/plugin.h ../common/zview.h
 

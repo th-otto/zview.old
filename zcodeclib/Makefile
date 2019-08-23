@@ -1,4 +1,4 @@
-all:
+all::
 	$(MAKE) -C src clean CPU=""
 	$(MAKE) -C src CPU=""
 

@@ -17,7 +17,7 @@ img.ldg: imgldg.o img.o xp32.o $(LDGOBJS)
 
 zvimg.slb: header.lo imgslb.lo img.lo xp32.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo imgslb.lo img.lo: ../common/plugin.h ../common/zview.h
 

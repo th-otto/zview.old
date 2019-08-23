@@ -2,7 +2,8 @@
 #  libshare is a dirty patch to make LDG compiled against mintlib shareable
 #  by Arnaud BERCEGEAY (Feb 2004)
 
-include ../../../configvars
+top_srcdir=../../..
+include $(top_srcdir)/configvars
 
 CPPFLAGS += -I../..
 
@@ -11,7 +12,7 @@ OBJ = libshare.o gl_shm.o calloc.o chdir.o malloc.o realloc.o sbrk.o
 TARGET = libshare.a
 HEADERS = libshare.h lib.h
 
-all: $(TARGET)
+all:: $(TARGET)
 
 $(TARGET): $(OBJ)
 	rm -f $@

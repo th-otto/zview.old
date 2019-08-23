@@ -1,4 +1,5 @@
-include ../../configvars
+top_srcdir=../..
+include $(top_srcdir)/configvars
 
 CFLAGS                  += -I../include -I../../common
 
@@ -8,7 +9,7 @@ OBJ			= $(VDI_OBJ)  img.o resize.o codecs.o mfdb.o load_img.o ztext.o
 PROGRAM			= ../lib/$(CPU_SUBDIR)libzcodec.a
 
 # override
-all: $(PROGRAM)
+all:: $(PROGRAM)
 
 # override
 $(PROGRAM): $(OBJ)

@@ -17,7 +17,7 @@ doodle.ldg: doodleldg.o doodle.o $(LDGOBJS)
 
 zvdoodle.slb: header.lo doodleslb.lo doodle.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
-	stripex $@
+	$(STRIPEX) $@
 
 header.lo doodleslb.lo doodle.lo: ../common/plugin.h ../common/zview.h
 
