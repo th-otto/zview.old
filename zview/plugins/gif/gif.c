@@ -43,7 +43,7 @@ static void decodecolormap(uint8_t *src, uint8_t *dst, GifColorType *cm, uint16_
 	{
 		if (src[i] == trans_index)
 		{
-			if (draw_trans == FALSE)
+			if (draw_trans)
 			{
 				dst += 3;
 				continue;
@@ -89,6 +89,7 @@ static void free_info(IMGINFO info)
 	}
 }
 
+
 /*==================================================================================*
  * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -109,8 +110,9 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	int16_t error = 0;
 	int16_t transpar = -1;
 	int16_t interlace = FALSE;
-	int16_t draw_trans = TRUE;
+	int16_t draw_trans = FALSE;
 	uint16_t delaycount = 0;
+	uint16_t delay;
 	GifFileType *gif;
 	GifRecordType rec;
 	txt_data *comment;
@@ -162,22 +164,17 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				Width = gif->Image.Width;
 				Height = gif->Image.Height;
 
-#if 0
-				if ( Col + Width > gif->SWidth || Row + Height > gif->SWidth)
+				if (Col + Width > gif->SWidth || Row + Height > gif->SHeight)
 				{
 					error = 1;
 					break;
 				}
-#endif
 				info->components = map->BitsPerPixel == 1 ? 1 : 3;
 				info->planes = map->BitsPerPixel;
 				info->colors = map->ColorCount;
 				info->width = (uint16_t) gif->SWidth;
 				info->height = (uint16_t) gif->SHeight;
 				line_size = (int32_t) gif->SWidth * (int32_t) info->components;
-
-				if (gif->Image.Interlace)
-					interlace = TRUE;
 
 				img->image_buf[img->imagecount] = (uint8_t *) malloc(line_size * (gif->SHeight + 2));
 				img_buffer = img->image_buf[img->imagecount];
@@ -203,16 +200,18 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				if (img->imagecount)
 				{
 					/* the transparency is the background picture */
-					draw_trans = FALSE;
+					draw_trans = TRUE;
 
-					if ((Row > 0 && Height < gif->SHeight) || (Col > 0 && Width < gif->SWidth))
-						memcpy(img_buffer, img->image_buf[img->imagecount - 1], line_size * gif->SHeight);
-					else
-						draw_trans = TRUE;
+					memcpy(img_buffer, img->image_buf[img->imagecount - 1], line_size * gif->SHeight);
+				} else
+				{
+					/* 1st frame, force it to the background color */
+					memset(img_buffer, info->background_color, line_size * gif->SHeight);
 				}
 
-				if (interlace)
+				if (gif->Image.Interlace)
 				{
+					interlace = TRUE;	/* at least one frame is interlaced [lp] */
 					for (i = 0; i < 4; i++)
 					{
 						for (j = Row + InterlacedOffset[i]; j < Row + Height; j += InterlacedJumps[i])
@@ -310,7 +309,12 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 						else
 							transpar = -1;
 
-						img->delay[delaycount++] = (block[2] + (block[3] << 8)) << 1;
+						/* gif spec: delay expressed as (1/100th) of a second */
+						delay = (block[2] + (block[3] << 8)) << 1;	/* *2 */
+						if (delay == 0)
+							delay = 10 << 1;	/* 10ms */
+
+						img->delay[delaycount++] = delay;
 
 						break;
 
@@ -413,7 +417,7 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data * txtdata)
 
 	if (comment)
 	{
-		for (i = 0; i < txtdata->lines; i++)
+		for (i = 0; i < comment->lines; i++)
 			strcpy(txtdata->txt[i], comment->txt[i]);
 	}
 }

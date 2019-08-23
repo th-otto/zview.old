@@ -42,7 +42,7 @@ void delete_txt_data( IMAGE *img)
 int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 {
 	int16 	i;
-	size_t	line_size = max_lines_length * sizeof( int8); 
+	size_t	line_size = max_lines_length + 1;
 
 	img->comments = malloc( sizeof( txt_data));
 
