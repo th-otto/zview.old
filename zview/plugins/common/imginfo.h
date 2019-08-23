@@ -60,15 +60,7 @@ typedef struct _img_data
 } img_data;
 
 
-#ifndef __txt_data_defined
-#define __txt_data_defined 1
-typedef struct _txt_data
-{
-	int16_t		lines;					/* Number of lines in the text 						*/
-	int16_t		max_lines_length;		/* The length of the greater line ( in nbr char)	*/
-	char    	*txt[256];
-} txt_data;
-#endif
+#include "txt_data.h"
 
 
 typedef struct

@@ -75,6 +75,7 @@ static void free_info(IMGINFO info)
 			free(comment->txt[i]);
 		}
 		free(comment);
+		info->_priv_ptr = NULL;
 	}
 
 	if (img)
@@ -84,6 +85,7 @@ static void free_info(IMGINFO info)
 			free(img->image_buf[i]);
 		}
 		free(img);
+		info->_priv_ptr_more = NULL;
 	}
 }
 
@@ -101,7 +103,8 @@ static void free_info(IMGINFO info)
  *==================================================================================*/
 boolean __CDECL reader_init(const char *name, IMGINFO info)
 {
-	static int16_t InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 };
+	static int16_t const InterlacedOffset[] = { 0, 4, 2, 1 };
+	static int16_t const InterlacedJumps[] = { 8, 8, 4, 2 };
 	int16_t i, j;
 	int16_t error = 0;
 	int16_t transpar = -1;
@@ -285,19 +288,20 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 					switch (code)
 					{
 					case COMMENT_EXT_FUNC_CODE:
-						if (comment->lines > 254)
-							break;
+						if (comment->lines < MAX_TXT_DATA)
+						{
+							/* Convert gif's pascal-like string */
+							size_t len = block[0];
+							comment->txt[comment->lines] = (char *) malloc(len + 1);
 
-						block[block[0] + 1] = '\0';	/* Convert gif's pascal-like string */
-						comment->txt[comment->lines] = (char *) malloc(block[0] + 1);
-
-						if (comment->txt[comment->lines] == NULL)
-							break;
-
-						strcpy(comment->txt[comment->lines], (char *) block + 1);
-						comment->max_lines_length =
-							MAX(comment->max_lines_length, (int16_t) strlen(comment->txt[comment->lines]) + 1);
-						comment->lines++;
+							if (comment->txt[comment->lines] != NULL)
+							{
+								memcpy(comment->txt[comment->lines], block + 1, len);
+								comment->txt[comment->lines][len] = '\0';
+								comment->max_lines_length = MAX(comment->max_lines_length, (int16_t) len);
+								comment->lines++;
+							}
+						}
 						break;
 
 					case GRAPHICS_EXT_FUNC_CODE:

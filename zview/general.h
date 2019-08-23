@@ -142,15 +142,7 @@ typedef enum
 	ET_PRG
 } EntryType;
 
-#ifndef __txt_data_defined
-#define __txt_data_defined 1
-typedef struct _txt_data
-{
-	int16		lines;					/* Number of lines in the text 						*/
-	int16		max_lines_length;		/* The length of the greater line ( in nbr char)	*/
-	char    	*txt[256];
-} txt_data;
-#endif
+#include "plugins/common/txt_data.h"
 
 
 typedef struct
