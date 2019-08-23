@@ -116,7 +116,7 @@ int16 pic_resize( MFDB *in, MFDB *out)
 	if( in->fd_nplanes == 2)
 		return ( 0);
 
-	data = ( dec_data *)malloc( sizeof( dec_data));
+	data = ( dec_data *)calloc(1, sizeof( dec_data));
 
 	if( !data)
 		return ( 0);

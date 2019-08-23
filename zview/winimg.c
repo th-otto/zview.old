@@ -938,7 +938,7 @@ void __CDECL Win_Arrow( WINDOW *win EVNT_BUFF_PARAM)
 
 
 
-WINDOW *WindView( char *filename)
+WINDOW *WindView( const char *filename)
 {
 	WINDOW 		*winview = NULL;
 	WINDATA		*windata;
@@ -961,7 +961,7 @@ WINDOW *WindView( char *filename)
 	if (dot != NULL && (strcmp(dot + 1, "pdf") == 0 || strcmp(dot + 1, "PDF") == 0))
 		return WindPdf( filename);
 
-	if ( ( windata = ( WINDATA*) malloc( sizeof( WINDATA))) == NULL)
+	if ( ( windata = ( WINDATA*) calloc(1, sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);

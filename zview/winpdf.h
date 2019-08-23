@@ -1,1 +1,1 @@
-extern WINDOW *WindPdf( char *filename);
+extern WINDOW *WindPdf( const char *filename);

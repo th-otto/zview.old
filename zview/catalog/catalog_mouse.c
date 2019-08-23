@@ -160,6 +160,9 @@ void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 				WindView( fullname); 
 
 				// WindView( wicones->first_selected->name);
+			} else
+			{
+				errshow(wicones->first_selected->name, IMG_NO_VALID);
 			}
 		}
 		else if( evnt.mbut == 2)

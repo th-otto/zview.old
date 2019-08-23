@@ -1342,7 +1342,7 @@ static void __CDECL WindPdfClose( WINDOW *win EVNT_BUFF_PARAM)
 
 
 
-WINDOW *WindPdf( char *filename)
+WINDOW *WindPdf( const char *filename)
 {
 	WINDOW 		*winview = NULL;
 	WINDATA		*windata;
@@ -1351,7 +1351,7 @@ WINDOW *WindPdf( char *filename)
 	int16		w, h;
 	char		temp[20];
 
-	if ( ( windata = ( WINDATA*) malloc( sizeof( WINDATA))) == NULL)
+	if ( ( windata = ( WINDATA*) calloc(1, sizeof( WINDATA))) == NULL)
 	{
 		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);

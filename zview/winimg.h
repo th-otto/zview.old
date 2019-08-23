@@ -45,7 +45,7 @@ typedef struct
 	int16 		nbr_bookmark;				/* Number of valid root's bookmarks	*/
 }WINDATA;
 
-extern WINDOW *WindView( char *filename);
+extern WINDOW *WindView( const char *filename);
 extern void __CDECL WindViewIcon( WINDOW *win EVNT_BUFF_PARAM);
 extern void __CDECL Win_VSlide( WINDOW *win EVNT_BUFF_PARAM);
 extern void __CDECL Win_HSlide( WINDOW *win EVNT_BUFF_PARAM);

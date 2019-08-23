@@ -371,7 +371,7 @@ boolean pic_load( const char *file, IMAGE *img, boolean quiet)
 		return FALSE;
 	}
 
-	data = ( dec_data *) malloc( sizeof( dec_data));
+	data = ( dec_data *) calloc(1, sizeof( dec_data));
 
 	if ( !data)
 	{
