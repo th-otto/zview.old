@@ -5,19 +5,19 @@
  */
 
 /*
- * Number of Strings:        311
+ * Number of Strings:        312
  * Number of Bitblks:        2
  * Number of Iconblks:       0
  * Number of Color Iconblks: 9
  * Number of Color Icons:    15
  * Number of Tedinfos:       37
- * Number of Free Strings:   44
+ * Number of Free Strings:   45
  * Number of Free Images:    0
  * Number of Objects:        234
  * Number of Trees:          14
  * Number of Userblks:       0
  * Number of Images:         2
- * Total file size:          17802
+ * Total file size:          17822
  */
 
 #undef RSC_NAME
@@ -35,8 +35,8 @@
 # define RSC_STATIC_FILE 0
 #endif
 #if !RSC_STATIC_FILE
-#define NUM_STRINGS 311
-#define NUM_FRSTR 44
+#define NUM_STRINGS 312
+#define NUM_FRSTR 45
 #define NUM_UD 0
 #define NUM_IMAGES 2
 #define NUM_BB 2
@@ -370,6 +370,9 @@
 
 #define NO_EDDI                           43 /* Alert string */
 /* [3][zView needs a VDI|with EdDI standard.][Quit] */
+
+#define PLEASE_WAIT                       44 /* Free string */
+/* Please wait... */
 
 
 

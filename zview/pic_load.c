@@ -381,7 +381,7 @@ boolean pic_load( const char *file, IMAGE *img, boolean quiet)
 	}
 
 	if( img->progress_bar)
-		win_progress_begin( "Please Wait...");
+		win_progress_begin(get_string(PLEASE_WAIT));
 
 	/* We initialise some variables needed by the codecs */
 	info->background_color	= 0xFFFFFF;
