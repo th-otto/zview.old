@@ -1,5 +1,5 @@
 /*
- * functions that can be called by the application
+ * functions that are called by the application
  */
 #include <mint/slb.h>
 #include "imginfo.h"
@@ -18,6 +18,11 @@ boolean __CDECL plugin_encoder_init(SLB *slb, const char *name, IMGINFO info);
 boolean __CDECL plugin_encoder_write(SLB *slb, IMGINFO info, uint8_t *buffer);
 void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 
+/*
+ * Parameters to get_option()/set_option()
+ * OPTION_CAPABILITIES and OPTION_EXTENSIONS are
+ * mandatory for get_option, others are optional
+ */
 #define OPTION_CAPABILITIES 0
 #define OPTION_EXTENSIONS   1
 #define OPTION_QUALITY      2
@@ -25,6 +30,9 @@ void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 #define OPTION_PROGRESSIVE  4
 #define OPTION_COMPRESSION  5
 
+/*
+ * Flags for get_option(OPTION_CAPABILITIES)
+ */
 #define CAN_DECODE 0x01
 #define CAN_ENCODE 0x02
 

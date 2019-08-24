@@ -15,8 +15,8 @@ typedef struct
 	int16_t		pattern_length;
 	int16_t		pix_width;
 	int16_t		pix_height;
-	int16_t		w;
-	int16_t		h;
+	int16_t		width;
+	int16_t		height;
 } IMGHDR;
 
 #endif
@@ -42,7 +42,7 @@ typedef struct
 typedef struct
 {
 	uint8_t red, green, blue;
-}RGB;
+} RGB;
 
 typedef struct _picture
 {
