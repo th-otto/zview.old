@@ -29,8 +29,9 @@ for flavour in 000 v4e 020; do
 	cd "_dist"
 	zip -r "${OUT}/${ARCHIVE}" .
 	ARCHIVES="$ARCHIVES $ARCHIVE"
+	cd ..
 done
 
 export ARCHIVES
 
-cd ../..
+cd ..
