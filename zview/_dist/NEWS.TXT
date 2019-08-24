@@ -1,4 +1,4 @@
-Version 1.0.2 - 2019/08/xx
+Version 1.0.2 - 2019/08/25
 =============
 
 First release made by me (Thorsten Otto)
@@ -7,8 +7,8 @@ First release made by me (Thorsten Otto)
  ----------------
 
  * all codecs recompiled as SLBs, making them
- * much smaller
- * Update PDF library to  4.01.01
+   much smaller
+ * Update PDF library to 4.01.01
  * PDF is now a plugin of its own, only loaded when needed
  * Third-Party-Libraries like TIFF, PNGLIB, ZLIB etc. take up their
    memory only once (ZLIB for example is needed by several modules)
@@ -19,3 +19,10 @@ First release made by me (Thorsten Otto)
  * Registered file types are not longer restricted to exactly 3 characters
  * TIFF module will no longer register itself for *.IFF (use *.TIF or *.TIFF
    instead, *.IFF should be reserved for Interchange File Format)
+ * Fixes for animated GIFs, mostly taken from Lonny Pursells updated version
+ 
+ Known Bugs:
+ ----------
+ * There are still some animated GIFs that are not displayed correctly
+ * Some bugs that were reported on Zorro's site (https://sourceforge.net/p/z-tools/bugs/)
+ * The HyperText documentation has not yet been updated.
