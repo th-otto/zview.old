@@ -22,13 +22,19 @@
 #endif
 #include <setjmp.h>
 #include <time.h>
+#if defined(__PUREC__) && !defined(_COMPILER_H)
+#include <ext.h>
+#else
 #include <sys/stat.h>
+#endif
 #include <stdio.h>
+#ifdef __MINT__
 #include <fcntl.h>
+#endif
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#ifdef __PUREC__
+#if defined(__PUREC__) && !defined(_COMPILER_H)
 #include <tos.h>
 #else
 #include <osbind.h>
@@ -297,7 +303,7 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 #endif /* PLUGIN_SLB */
 
-#if defined(__PUREC__) || defined(LATTICE)
+#if !defined(__MINT__)
 /*
  * be sure to get the TOS error codes here,
  * not any pseudo UNIX-style error numbers
@@ -306,6 +312,8 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define ENOSYS 32
 #undef EINVAL
 #define EINVAL 25
+#undef ENOMEM
+#define ENOMEM 39
 #undef EBADARG
 #define EBADARG 64
 #undef ERANGE

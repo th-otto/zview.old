@@ -1,6 +1,37 @@
+/*
+  1.00 1st release, added build info, fixed compression info message
+  1.01 fixed 1-bit compressed bug, fixed reversed 1-bit images
+  1.02 fixed missing fclose()
+  1.03 added medium rez scaling
+  1.04 firebee fixes (patched purec library)
+  1.05 reworked iff to st format code
+  1.06 missing fclose() if wrong rez info
+  1.07 added overscan support for st low - 320x240, 320x280, 416x560
+  1.08 made arrays global, reworked error handling
+  1.09 source clean-up
+  1.10 added salert support
+  1.11 fixed typo in the info section
+  1.12 smaller startup module
+  1.13 Convert to new style plugin
+*/
+
 #include "zview.h"
 #include "imginfo.h"
 #include "zvdegas.h"
+
+#define VERSION		0x0113
+#define AUTHOR      "Lonny Pursell"
+
+#define DEGAS_SIZE	32034L
+#define ELITE_SIZE	32066L
+#define	M_320x240	38434L				/* overscan modes */
+#define	M_320x280	44834L
+#define	M_416x560	116514L
+
+static uint16_t const iw[4] = { 320, 640, 640, 0 };
+static uint16_t const ih[4] = { 200, 200, 400, 0 };
+static int16_t const indexed_color[4] = { TRUE, TRUE, FALSE, FALSE };
+static uint16_t const components[4] = { 3, 3, 1, 0 };
 
 
 #ifdef PLUGIN_SLB
@@ -13,21 +44,25 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
-		return (long)("PI1\0PI2\0PI3\0PC1\0PC2\0PC3\0");
+		return (long)("PI1\0" "PI2\0" "PI3\0" "PC1\0" "PC2\0" "PC3\0");
 	}
 	return -ENOSYS;
 }
 #endif
 
+typedef struct
+{										/* 34 bytes */
+	uint16_t flags;
+	uint16_t pal[16];						/* xbios format, xbios order */
+} HEADER;
 
-typedef struct 
-{
-	uint16_t compression  : 1;
-	uint16_t reserved0	: 13;
-	uint16_t resolution	: 2;
-	uint16_t palette[16];
-} DEGASHDR;
 
+/* to be fixed: */
+#define bail(msg)
+
+#include "lof.c"
+#include "packbits.c"
+#include "tanglbts.c"
 
 
 /*==================================================================================*
@@ -44,165 +79,205 @@ typedef struct
  *==================================================================================*/
 boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
-	int16_t		handle;
-	int32_t		position, file_size;
-	DEGASHDR	*degas;
+	int16_t handle;
+	uint8_t *bmap;
+	uint8_t *temp;
+	int16_t cf, rez, flip, os;
+	uint32_t bms, file_size, bw;
+	HEADER hdr;
 
-	if ( ( handle = ( int16_t)Fopen( name, 0)) < 0)
+	if ((handle = (int16_t) Fopen(name, FO_READ)) < 0)
+	{
+		bail("Invalid path");
 		return FALSE;
+	}
+	file_size = lof(handle);
 
-	file_size = Fseek( 0L, handle, 2);
-
-	if( file_size > 33000L)
+	if (Fread(handle, sizeof(HEADER), &hdr) != sizeof(HEADER))
 	{
-		Fclose( handle);
-		return FALSE;	
-	}		
-
-	Fseek( 0L, handle, 0);
-
-	degas = ( DEGASHDR *)malloc( file_size);
-
-	if ( degas == NULL)
-	{
-		Fclose( handle);
-		return FALSE;	
+		Fclose(handle);
+		bail("Fread failed");
 	}
 
-	if ( Fread( handle, file_size, degas) != file_size)
+	/* flags -> cxxxx?rr */
+	/* cf = compression flag */
+	/* rr = res 0=low 1=med 2=high */
+	/* ?  = set in overscan file 320x240, unreliable flag */
+
+	os = 0;
+	cf = hdr.flags & 0x8000;
+	rez = hdr.flags & 3;
+	info->planes = 4 >> rez;
+	if (info->planes == 0)
 	{
-		free( degas);
-		Fclose( handle);
-		return FALSE;	
+		/* resolution 3: invalid */
+		Fclose(handle);
+		bail("unsupported");
+		return FALSE;
 	}
+	flip = hdr.pal[0] & 1;
 
-	Fclose( handle);
+	info->width = iw[rez];				/* defaults */
+	info->height = ih[rez];
 
-	info->planes = 1 << ( 2 - degas->resolution);
-
-	switch( info->planes)
+	if (file_size <= ELITE_SIZE)
+	{									/* assume compressed */
+		/* nop */
+	} else
 	{
-		case 4:
-			info->width 		= 320;
-			info->height 		= 200;
-			info->components	= 3;
-			info->indexed_color	= TRUE;
-			info->colors  		= 16;
-			break;
-
-		case 2:
-			info->width 		= 640;
-			info->height 		= 200;
-			info->components	= 3;
-			info->indexed_color	= TRUE;
-			info->colors  		= 4;
-			break;
-
-		case 1:
-			info->width 		= 640;
-			info->height 		= 400;
-			info->components	= 1;
-			info->indexed_color	= FALSE;
-			info->colors  		= 2;
-			break;
-
-		default:
-			free( degas);
-			return FALSE;		
-	}
-
-	position = sizeof( DEGASHDR);
-
-	info->real_width			= info->width;
-	info->real_height			= info->height;
-	info->memory_alloc 			= TT_RAM;
-	info->page	 				= 1;
-	info->delay					= 0;
-	info->orientation			= UP_TO_DOWN;
-	info->num_comments			= 0;
-	info->max_comments_length 	= 0;
-	info->_priv_ptr				= ( void*)degas;
-	info->_priv_var_more		= position;		
-
-	strcpy( info->info, "Degas");	
-
-	if( degas->compression)
-	{	
-		uint8_t *compress_buffer	= malloc( 320L);
-		
-		if( compress_buffer == NULL)
+		if (info->planes == 4)
 		{
-			free( degas);
+			if (file_size == M_320x240)
+			{							/* check for overscan */
+				info->height = 240;
+				os = 1;
+			} else if (file_size == M_320x280)
+			{
+				info->height = 280;
+				os = 1;
+			} else if (file_size == M_416x560)
+			{
+				info->width = 416;
+				info->height = 560;
+				os = 1;
+			} else
+			{
+				Fclose(handle);
+				bail("File size wrong");
+				return FALSE;
+			}
+		} else
+		{
+			Fclose(handle);
+			bail("File size wrong");
 			return FALSE;
 		}
-
-		info->_priv_ptr_more	= ( void*)compress_buffer;		
-
-		strcpy( info->compression, "Yes");	
-	}
-	else
-	{
-		strcpy( info->compression, "None");
-		info->_priv_ptr_more	= NULL;
 	}
 
-
-	if( info->indexed_color)
+	bw = ((((uint32_t) info->width + 15L) / 16L) * 2L) * (uint32_t) info->planes;
+	bms = bw * (uint32_t) info->height;
+	bmap = malloc(bms);
+	if (bmap == NULL)
 	{
-		register int16_t i;
+		Fclose(handle);
+		bail("Malloc(bitmap) failed");
+		return FALSE;
+	}
 
-		for ( i = 0; i < info->colors; i++)
+	if (cf)
+	{
+		if (Fread(handle, file_size - sizeof(HEADER), bmap) != file_size - sizeof(HEADER))
 		{
-			info->palette[i].red   = ((( degas->palette[i] >> 7) & 0xE) + (( degas->palette[i] >> 11) & 0x1)) * 0x11;
-			info->palette[i].green = ((( degas->palette[i] >> 3) & 0xE) + (( degas->palette[i] >> 7) & 0x1))  * 0x11;
-			info->palette[i].blue  = ((( degas->palette[i] << 1) & 0xE) + (( degas->palette[i] >> 3) & 0x1))  * 0x11;
+			free(bmap);
+			Fclose(handle);
+			bail("Fread failed");
+			return FALSE;
+		}
+		temp = malloc(bms + 256L);
+		if (temp == NULL)
+		{
+			free(bmap);
+			Fclose(handle);
+			bail("Malloc(decompression) failed");
+			return FALSE;
+		}
+		decode_packbits(temp, bmap, bms);
+		tangle_bitplanes(bmap, temp, info->width, info->height, info->planes);
+		free(temp);
+		strcpy(info->compression, "RLE");
+	} else
+	{
+		Fread(handle, bms, bmap);
+		strcpy(info->compression, "None");
+	}
+
+	Fclose(handle);
+
+	switch (info->planes)
+	{
+	case 2:							/* medium? - start scale */
+		if (Kbshift(-1) & 0x10)
+		{								/* caps lock? */
+			int16_t i;
+
+			temp = malloc(bms);
+			if (temp == NULL)
+			{
+				free(bmap);
+				bail("Malloc(scale) failed");
+				return FALSE;
+			}
+			memcpy(temp, bmap, bms);
+			free(bmap);
+			bmap = malloc(bms * 2L);
+			if (bmap == NULL)
+			{
+				free(temp);
+				bail("Malloc(rescale) failed");
+				return FALSE;
+			}
+			for (i = 0; i < info->height; i++)
+			{
+				memcpy(bmap + ((i << 1L) * bw), temp + (i * bw), bw);
+				memcpy(bmap + (((i << 1L) + 1L) * bw), temp + (i * bw), bw);
+			}
+			free(temp);
+			info->height = info->height * 2;	/* adjust */
+		}
+		break;
+	case 1:
+		if (!flip)
+		{
+			uint32_t i;
+
+			for (i = 0; i < bms; i++)
+			{
+				bmap[i] = ~bmap[i];
+			}
+		}
+		break;
+	}
+
+	info->components = components[rez];
+	info->indexed_color = indexed_color[rez];
+	info->colors = 1L << (uint32_t) info->planes;
+	info->real_width = info->width;
+	info->real_height = info->height;
+	info->memory_alloc = TT_RAM;
+	info->orientation = UP_TO_DOWN;
+	info->page = 1;						/* required - more than 1 = animation */
+	info->num_comments = 0;				/* required - disable exif tab */
+	info->_priv_var = 0;				/* y position in bmap */
+	info->_priv_ptr = bmap;
+
+	strcpy(info->info, "Degas");
+	if (file_size == ELITE_SIZE)
+	{
+		strcat(info->info, " Elite");
+	}
+	if (os)
+	{
+		strcat(info->info, " (Overscan)");
+	}
+
+	if (info->indexed_color)
+	{
+		int16_t i;
+
+		for (i = 0; i < info->colors; i++)
+		{
+			uint16_t c;
+			c = (((hdr.pal[i] >> 7) & 0xE) + ((hdr.pal[i] >> 11) & 0x1));
+			info->palette[i].red = (c << 4) | c;
+			c = (((hdr.pal[i] >> 3) & 0xE) + ((hdr.pal[i] >> 7) & 0x1));
+			info->palette[i].green = (c << 4) | c;
+			c = (((hdr.pal[i] << 1) & 0xE) + ((hdr.pal[i] >> 3) & 0x1));
+			info->palette[i].blue = (c << 4) | c;
 		}
 	}
 
 	return TRUE;
 }
-
-
-static int16_t read_line( int16_t bpl, uint8_t *src, uint8_t *compress_buffer)
-{
-    int16_t	x, n, c;
-	int16_t	count = 0;
-
-    /* decompress the line */
-    for( x = 0; x < bpl;)
-    {
-        n = src[count++];
-
-        if( n <= 127)           /* (n+1) literal bytes */
-        {
-            n++;
-
-			if( x + n > bpl)
-				return -1;
-
-			do 
-			{
-				compress_buffer[x++] = src[count++];
-			}while ( --n > 0);
-        }
-        else                    /* next byte is repeated (257-n) times */
-        {
-			n = 257 - n;
-
-			if( x + n > bpl)
-				return -1;
-
-			c = src[count++];
-
-            do {
-                compress_buffer[x++] = c;
-            } while (--n > 0);
-        }
-    }
-
-    return count;
-}
-
 
 
 /*==================================================================================*
@@ -216,127 +291,52 @@ static int16_t read_line( int16_t bpl, uint8_t *src, uint8_t *compress_buffer)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
+boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 {
-	DEGASHDR	*degas	= ( DEGASHDR*)info->_priv_ptr;
-	uint8_t 		*l, *s = ( uint8_t*)degas + info->_priv_var_more;
-	uint8_t		*compress_buffer = ( uint8_t*)info->_priv_ptr_more;
-	uint16_t		x, c, p0, p1, p2, p3;
-	int16_t		count;
-
-	if( degas->compression)
-	{	
-		count =  read_line(( info->width * info->planes) >> 3, s, compress_buffer);
-
-		if( count == -1)
-			return FALSE;
-
-		info->_priv_var_more += count;
-
-		switch( info->planes)
-		{	
-			case 4:
-				for( x = 0, l = compress_buffer; x < info->width; l += 2)
-				{
-            		p0 = (l[  0] << 8) | l[  1];
-            		p1 = (l[ 40] << 8) | l[ 41];
-            		p2 = (l[ 80] << 8) | l[ 81];
-            		p3 = (l[120] << 8) | l[121];
-
-			        for ( c = 0; c < 16; c++)
-			        {
-			     	   buffer[x++] = ((p0 >> 15) & 1) | ((p1 >> 14) & 2) | ((p2 >> 13) & 4) | ((p3 >> 12) & 8);
-			           p0 <<= 1;
-			           p1 <<= 1;
-			           p2 <<= 1;
-			           p3 <<= 1;
-			        }
-				}
-				break;
-
-			case 2:
-				for ( x = 0, l = compress_buffer; x < info->width; l += 2)
-			    {
-			    	p0 = (l[0] << 8) | l[1];
-			    	p1 = (l[80] << 8) | l[81];
-
-			    	for (c = 0; c < 16; c++)
-			        {
-			    	    buffer[x++] = ((p0 >> 15) & 1) | ((p1 >> 14) & 2);
-			            p0 <<= 1;
-			            p1 <<= 1;
-			        }
-			    }
-				break;			
-
-			case 1:
-		        for (x = 0, l = compress_buffer; x < info->width; l += 2)
-		        {
-		            p0 = ( l[0] << 8) | l[1];
-		
-		            for ( c = 0; c < 16; c++)
-		            {
-		                buffer[x++] = ((p0 >> 15) & 1);
-		                p0 <<= 1;
-		            }
-		        }
-				break;
-		}
-		
-		return TRUE;
-	}
-
-	switch( info->planes)
-	{	
-		case 4:
-			for( x = 0, l = s; x < info->width; l += 8)
-			{
-				p0 = ( l[0] << 8) | l[1]; 
-				p1 = ( l[2] << 8) | l[3];
-				p2 = ( l[4] << 8) | l[5];
-				p3 = ( l[6] << 8) | l[7];
-
-		        for ( c = 0; c < 16; c++)
-		        {
-		     	   buffer[x++] = ((p0 >> 15) & 1) | ((p1 >> 14) & 2) | ((p2 >> 13) & 4) | ((p3 >> 12) & 8);
-		           p0 <<= 1;
-		           p1 <<= 1;
-		           p2 <<= 1;
-		           p3 <<= 1;
-		        }
-			}
-			info->_priv_var_more += 160;
-			break;
-
-		case 2:
-			for ( x = 0, l = s; x < info->width; l += 4)
-		    {
-		    	p0 = (l[0] << 8) | l[1];
-		    	p1 = (l[2] << 8) | l[3];
-
-		    	for (c = 0; c < 16; c++)
-		        {
-		    	    buffer[x++] = ((p0 >> 15) & 1) | ((p1 >> 14) & 2);
-		            p0 <<= 1;
-		            p1 <<= 1;
-		        }
-		    }
-			info->_priv_var_more += 160;
-			break;			
-
-		case 1:
-	        for (x = 0, l = s; x < info->width; l += 2)
-	        {
-	            p0 = ( l[0] << 8) | l[1];
+	int16_t bit;
+	int16_t x;
+	int32_t offset;
 	
-	            for ( c = 0; c < 16; c++)
-	            {
-	                buffer[x++] = ((p0 >> 15) & 1);
-	                p0 <<= 1;
-	            }
-	        }
-			info->_priv_var_more += 80;
-			break;
+	offset = info->_priv_var;
+	if (info->planes == 1)
+	{
+		int16_t p0;
+		uint8_t *bmap = (uint8_t *)info->_priv_ptr + offset;
+
+		x = info->width >> 3;
+		info->_priv_var += x;
+		do
+		{								/* 1-bit mono v1.00 */
+			p0 = *bmap++;
+			for (bit = 7; bit >= 0; bit--)
+			{
+				*buffer++ = (p0 >> bit) & 1;
+			}
+		} while (--x > 0);
+	} else
+	{
+		int16_t ndx;
+		int16_t pln;
+		uint16_t *xmap = (uint16_t *)info->_priv_ptr + offset;	/* as word array */
+
+		x = info->width >> 4;
+		info->_priv_var += x * info->planes;
+		do
+		{								/* 1-bit to 8-bit atari st word interleaved bitmap v1.01 */
+			for (bit = 15; bit >= 0; bit--)
+			{
+				ndx = 0;
+				for (pln = 0; pln < info->planes; pln++)
+				{
+					if ((xmap[pln] >> bit) & 1)
+					{
+						ndx |= 1 << pln;
+					}
+				}
+				*buffer++ = ndx;
+			}
+			xmap += info->planes;	/* next plane */
+		} while (--x > 0);		/* next x */
 	}
 
 	return TRUE;
@@ -357,6 +357,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
+	(void)info;
+	(void)txtdata;
 }
 
 
@@ -371,13 +373,8 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-void __CDECL reader_quit( IMGINFO info)
+void __CDECL reader_quit(IMGINFO info)
 {
-	DEGASHDR	*degas			 = ( DEGASHDR*)info->_priv_ptr;
-	uint8_t		*compress_buffer = ( uint8_t*)info->_priv_ptr_more;
-
-	free( degas);
-
-	if( compress_buffer)
-		free( compress_buffer);
+	free(info->_priv_ptr);
+	info->_priv_ptr = NULL;
 }
