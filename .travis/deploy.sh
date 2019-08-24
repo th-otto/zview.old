@@ -29,7 +29,7 @@ OUT="${SRCDIR}/.travis/out"
 if [ "${TRAVIS_PULL_REQUEST}" != "false" ];
 	then
 		BINTRAY_DIR=pullrequests
-		BINTRAY_DESC="[${TRAVIS_REPO_SLUG}] Download: https://dl.bintray.com/${BINTRAY_REPO}/${BINTRAY_DIR}/${ARCHIVE}"
+		BINTRAY_DESC="[${TRAVIS_REPO_SLUG}] Download: https://dl.bintray.com/${BINTRAY_REPO}/${BINTRAY_DIR}/${ARCHIVES}"
 	else
 		BINTRAY_DIR=snapshots
 		BINTRAY_DESC="[${PROJECT}] [${TRAVIS_BRANCH}] Commit: https://github.com/${GITHUB_USER}/${PROJECT}/commit/${TRAVIS_COMMIT}"
@@ -38,7 +38,7 @@ fi
 # use the commit id as 'version' for bintray
 BINTRAY_VERSION=$TRAVIS_COMMIT
 
-echo "Deploying $ARCHIVE to ${BINTRAY_HOST}/${BINTRAY_REPO}"
+echo "Deploying $ARCHIVES to ${BINTRAY_HOST}/${BINTRAY_REPO}"
 echo "See result at ${BINTRAY_HOST}/${BINTRAY_REPO}/${BINTRAY_DIR}#files"
 
 # See https://bintray.com/docs/api for a description of the REST API
@@ -60,8 +60,10 @@ $CURL --data '{"name":"'"${BINTRAY_VERSION}"'","released":"'"${RELEASE_DATE}"'",
 echo ""
 
 #upload file(s):
-echo "upload ${BINTRAY_DIR}/${ARCHIVE}"
-$CURL --upload "${ARCHIVE}" "${BINTRAY_HOST}/content/${BINTRAY_REPO}/${BINTRAY_DIR}/${BINTRAY_VERSION}/${BINTRAY_DIR}/${ARCHIVE}?publish=1&override=1&explode=0"
+for ARCHIVE in $ARCHIVES; do
+	echo "upload ${BINTRAY_DIR}/${ARCHIVE}"
+	$CURL --upload "${ARCHIVE}" "${BINTRAY_HOST}/content/${BINTRAY_REPO}/${BINTRAY_DIR}/${BINTRAY_VERSION}/${BINTRAY_DIR}/${ARCHIVE}?publish=1&override=1&explode=0"
+done
 echo ""
 
 # publish the version
