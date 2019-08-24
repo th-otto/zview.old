@@ -13,10 +13,10 @@ all:: tiff.ldg zvtiff.slb
 include $(top_srcdir)/rules
 
 tiff.ldg: tiffldg.o tiff.o $(LDGOBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB) -lm
 
 zvtiff.slb: header.lo tiffslb.lo tiff.lo
-	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ltiff.slb -ljpeg.slb -llzma.slb -lz.slb $(LDSHAREDLIBC)
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -ltiff.slb -ljpeg.slb -llzma.slb -lz.slb $(LDSHAREDLIBC) -lm
 	$(STRIPEX) $@
 
 header.lo tiffslb.lo tiff.lo: ../common/plugin.h ../common/zview.h
