@@ -6,16 +6,16 @@ LIB       = ../libshare/libshare.a
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
-SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvneo.slb\"
+SFLAGS += -DPLUGIN_SLB -DSHAREDLIB=\"zvneoimg.slb\"
 
-all:: neo.ldg zvneo.slb
+all:: neoimg.ldg zvneoimg.slb
 
 include $(top_srcdir)/rules
 
-neo.ldg: neoldg.o neo.o $(LDGOBJS)
+neoimg.ldg: neoldg.o neo.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
-zvneo.slb: header.lo neoslb.lo neo.lo
+zvneoimg.slb: header.lo neoslb.lo neo.lo
 	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDSHAREDLIBC)
 	$(STRIPEX) $@
 
