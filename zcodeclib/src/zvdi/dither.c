@@ -3,14 +3,11 @@
 #else
 #include "../general.h"
 #endif
+#include "dither.h"
 
 
 extern uint32 	cube216[216];
 extern uint32   graymap[32];
-
-/* prototype */
-inline uint8 dither_true ( uint8 * rgb, int16 * err, int8 ** buf);
-inline uint8 dither_gray( uint8 *gray, int16 *err, int8 **buf);
 
 inline uint8 dither_true ( uint8 * rgb, int16 * err, int8 ** buf)
 {

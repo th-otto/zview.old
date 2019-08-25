@@ -13,6 +13,7 @@ all:: $(PROGRAM)
 
 # override
 $(PROGRAM): $(OBJ)
+	mkdir -p ../lib/$(CPU_SUBDIR)
 	rm -f $@
 	$(AR) cru $@ $^
 

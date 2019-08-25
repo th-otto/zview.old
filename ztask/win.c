@@ -76,7 +76,7 @@ static void CDECL timer_function( WINDOW *win, int16 buff[8])
 	
 	if( skip == 0)
 	{
-		memcpy( cpu_history, &cpu_history[1], 200);
+		memmove( cpu_history, &cpu_history[1], 200);
 		cpu_history[100] = 100 - cpu_usage;
 		
 		if( show_clock == TRUE)

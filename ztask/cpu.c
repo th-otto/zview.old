@@ -7,7 +7,7 @@ char buf[2048];
 
 
 /* returns current cpu usage in percent */
-inline int16 cpu_get_usage( void)
+int16 cpu_get_usage( void)
 {
     static int32 pre_used = 0, pre_total = 0;
     int16 usage = 0;
@@ -75,7 +75,7 @@ void get_total_ram( void)
 }
 
 
-inline void get_free_ram( uint32 *st_ram, uint32 *tt_ram)
+void get_free_ram( uint32 *st_ram, uint32 *tt_ram)
 {
     size_t bytes_read;
     uint32 free_ram;
@@ -116,7 +116,7 @@ inline void get_free_ram( uint32 *st_ram, uint32 *tt_ram)
 
 
 
-inline void get_info_by_pid( int pid, char *name, char *ram_usage, uint32 *cpu_time)
+void get_info_by_pid( int pid, char *name, char *ram_usage, uint32 *cpu_time)
 {
     size_t bytes_read;
 	char *s, *t;
@@ -135,7 +135,7 @@ inline void get_info_by_pid( int pid, char *name, char *ram_usage, uint32 *cpu_t
     fclose(fp);
 
     if( bytes_read == 0)
-    	return;    
+		return;    
     
 	s = strchr ( buf, '(') + 1;
 	t = strchr ( buf, ')');

@@ -1,5 +1,5 @@
 USE_WINDOM2=1
-top_srdir=..
+top_srcdir=..
 include $(top_srcdir)/configvars
 
 STACKSIZE		= 64k

@@ -54,7 +54,7 @@ char *zstrncpy( char *dst, const char *src, size_t n)
 
 
 
-inline void draw_text_to_buffer( int16 xf, int16 yf, int32 src_line_octets, const char *str, MFDB *bm)
+void draw_text_to_buffer( int16 xf, int16 yf, int32 src_line_octets, const char *str, MFDB *bm)
 {
 	int16 c, character_pixel_skip = 0;
 	int32 src_line_word = src_line_octets >> 1;
@@ -142,7 +142,7 @@ void draw_text( int16 vdih, int16 xf, int16 yf, int16 color, const char *str)
 
 
 
-inline int16 get_text_width( const char *str)
+int16 get_text_width( const char *str)
 {
 	register int16 c, text_width = 0;
 	
