@@ -24,6 +24,13 @@ static boolean show_preview = FALSE;
 static uint16 compression = COMPRESSION_NONE;
 static int compression_button = 0;
 
+static const char *const colorspace_items[] = {
+	"Greyscale",
+	"RGB",
+	"Y/Cb/Cr",
+	"CMYK",
+	"YCCK"
+};
 
 static void __CDECL save_option_close(WINDOW *win EVNT_BUFF_PARAM)
 {
@@ -32,14 +39,24 @@ static void __CDECL save_option_close(WINDOW *win EVNT_BUFF_PARAM)
 	frm_cls(win);
 }
 
-static void option_gray_event(WINDOW *win, int obj_index, int mode, void *data)
+static void colorspace_popup(WINDOW *win, int obj_index)
 {
-	color_space = color_space == JCS_RGB ? JCS_GRAYSCALE : JCS_RGB;
-
-	/* a wait loop while the mouse button is pressed */		
-	while (evnt.mbut == 1 || evnt.mbut == 2)
-		graf_mkstate(&evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate); 
+	int choice;
+	int16_t x, y;
+	
+	objc_offset(FORM(win), obj_index, &x, &y);
+	choice = MenuPopUp((void *)colorspace_items, x, y, (int)(sizeof(colorspace_items) / sizeof(colorspace_items[0])), -1, color_space, P_LIST | P_WNDW | P_CHCK);
+	if (choice > 0)
+	{
+		if (color_space != choice)
+		{
+			strcpy(FORM(win)[PREF_COLORSPACE].ob_spec.free_string, colorspace_items[choice - 1]);
+			ObjcDraw(OC_FORM, win, PREF_COLORSPACE, 1);
+		}
+		color_space = choice;
+	}
 }
+
 
 static void option_progressive_event(WINDOW *win, int obj_index, int mode, void *data)
 {
@@ -60,6 +77,21 @@ static void option_show_preview(WINDOW *win, int obj_index, int mode, void *data
 		graf_mkstate(&evnt.mx, &evnt.my, &evnt.mbut, &evnt.mkstate); 
 }
 #endif
+
+
+static void __CDECL option_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
+{
+	int16 object = EVNT_BUFF[4];
+
+	switch (object)
+	{
+	case PREF_COLORSPACE:
+		colorspace_popup(win, object);
+		ObjcChange(OC_FORM, win, object, NORMAL, TRUE);
+		break;
+	}	
+}
+
 
 static void __CDECL option_ok_event(WINDOW *win, int obj_index, int mode, void *data)
 {
@@ -153,7 +185,9 @@ void save_option_dialog(const char *source_file, CODEC *codec)
 
 	option_content[PREF_SL].ob_x = quality;
 
-	if ((win = FormCreate(option_content, NAME|MOVER, NULL, get_string(SAVE_OPTION_TITLE), NULL, TRUE, FALSE)) == NULL)
+	strcpy(option_content[PREF_COLORSPACE].ob_spec.free_string, colorspace_items[color_space - 1]);
+
+	if ((win = FormCreate(option_content, NAME|MOVER, option_dialog_event, get_string(SAVE_OPTION_TITLE), NULL, TRUE, FALSE)) == NULL)
 	{
 		errshow(NULL, ALERT_WINDOW);	
 		return;
@@ -187,11 +221,10 @@ void save_option_dialog(const char *source_file, CODEC *codec)
 
 	if (option_mask & (1 << OPTION_COLOR_SPACE))
 	{
-		ObjcAttachFormFunc(win, PREF_GRAY, option_gray_event, NULL);
-		ObjcChange(OC_FORM, win, PREF_GRAY, ~OS_DISABLED, TRUE);
+		ObjcChange(OC_FORM, win, PREF_COLORSPACE, ~OS_DISABLED, TRUE);
 	} else
 	{
-		ObjcChange(OC_FORM, win, PREF_GRAY, OS_DISABLED, TRUE);
+		ObjcChange(OC_FORM, win, PREF_COLORSPACE, OS_DISABLED, TRUE);
 	}
 
 	if (option_mask & (1 << OPTION_PROGRESSIVE))

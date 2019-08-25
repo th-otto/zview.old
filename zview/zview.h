@@ -162,7 +162,7 @@
 #define PREF_RT                            6 /* BOXCHAR in tree SAVEPREF */
 #define PREF_PG                            7 /* BOX in tree SAVEPREF */
 #define PREF_SL                            8 /* BOX in tree SAVEPREF */
-#define PREF_GRAY                         12 /* BUTTON in tree SAVEPREF */
+#define PREF_COLORSPACE                   12 /* BUTTON in tree SAVEPREF */
 #define PREF_PROGRESSIVE                  13 /* BUTTON in tree SAVEPREF */
 #define PREF_COMPRESSION_BOX              14 /* BUTTON in tree SAVEPREF */
 #define TIFFPREF_NONE                     15 /* BUTTON in tree SAVEPREF */

@@ -177,7 +177,7 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 	char *dot;
 
 	switch (object)
-	{	   
+	{
 		case SAVE_DIAL_FORMAT:
 			format_popup( win, object);
 			ObjcChange( OC_FORM, win, object, NORMAL, TRUE);

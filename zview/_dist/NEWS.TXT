@@ -5,6 +5,10 @@
 
  * NEOIMG module now also handles neochrome master files
    (extended resolution & palette files)
+ * JPEG output now also allows to select other colorspaces
+
+For a history of previous changes, see doc/history.txt
+
 
 25 August 2019: Version 1.0.2
 =============================
