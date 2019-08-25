@@ -1,7 +1,8 @@
-#include "zview.h"
-#include "imginfo.h"
-#include "zvdoodle.h"
+#include "plugin.h"
+#include "zvplugin.h"
 
+#define VERSION 0x200
+#define AUTHOR  "Thorsten Otto"
 
 static uint16_t const medpal[4] = {
 	0x0fff, 0x0f00, 0x00f0, 0x0000
@@ -17,8 +18,6 @@ static uint16_t const lowpal[16] = {
 
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

@@ -1,8 +1,11 @@
 #include <tiffio.h>
 #define HAVE_INTS_DEFINED
-#include "zview.h"
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
 #include "zvtiff.h"
+
+#define VERSION 0x200
+#define AUTHOR "Zorro"
 
 #define alpha_composite( composite, fg, alpha) {						\
     uint16_t temp = (( uint16_t)( fg) * ( uint16_t)( alpha) + ( uint16_t)128);	\
@@ -14,8 +17,6 @@ int		quality 			= 75;
 
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

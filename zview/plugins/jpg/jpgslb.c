@@ -15,8 +15,8 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
-#include "zview.h"
 #include "plugin.h"
+#include "zvplugin.h"
 
 extern char const slb_header[];
 static const BASEPAGE *my_base;

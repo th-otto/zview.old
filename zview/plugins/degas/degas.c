@@ -15,9 +15,8 @@
   1.13 Convert to new style plugin
 */
 
-#include "zview.h"
-#include "imginfo.h"
-#include "zvdegas.h"
+#include "plugin.h"
+#include "zvplugin.h"
 
 #define VERSION		0x0113
 #define AUTHOR      "Lonny Pursell"
@@ -35,8 +34,6 @@ static uint16_t const components[4] = { 3, 3, 1, 0 };
 
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

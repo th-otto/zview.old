@@ -35,13 +35,13 @@ typedef struct
     uint8_t	idlen;               /* length of the image_id string below.		*/
     uint8_t	cmap_type;           /* paletted image <=> cmap_type				*/
     uint8_t	image_type;          /* can be any of the IMG_TYPE constants above.	*/
-    uint16_t	cmap_first;          
-    uint16_t	cmap_length;         /* how long the colormap is					*/
+    uint16_t cmap_first;          
+    uint16_t cmap_length;        /* how long the colormap is					*/
     uint8_t	cmap_entry_size;     /* how big a palette entry is.					*/
-    uint16_t	img_spec_xorig;      /* the x origin of the image in the image data.*/
-    uint16_t	img_spec_yorig;      /* the y origin of the image in the image data.*/
-    uint16_t	img_spec_width;      /* the width of the image.						*/
-    uint16_t	img_spec_height;     /* the height of the image.					*/
+    uint16_t img_spec_xorig;     /* the x origin of the image in the image data.*/
+    uint16_t img_spec_yorig;     /* the y origin of the image in the image data.*/
+    uint16_t img_spec_width;     /* the width of the image.						*/
+    uint16_t img_spec_height;    /* the height of the image.					*/
     uint8_t	img_spec_pix_depth;  /* the depth of a pixel in the image.			*/
     uint8_t	img_spec_img_desc;   /* the image descriptor.						*/
 } targa_hdr;

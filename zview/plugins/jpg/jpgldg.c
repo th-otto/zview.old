@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <jpeglib.h>
 #define HAVE_BOOLEAN
-#include "zview.h"
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
+#include <gem.h> /* for MFDB */
 #include "jpgdh.h"
 #include <libexif/exif-data.h>
 #include <libexif/exif-utils.h>
 #include "zvjpg.h"
+#include "ldglib/ldg.h"
 
 /*==================================================================================*
  * boolean set_jpg_option:															*
@@ -39,7 +41,6 @@ static void __CDECL set_jpg_option( int16_t set_quality, J_COLOR_SPACE set_color
  *==================================================================================*/
 static void __CDECL init( void)
 {
-    libshare_init();
     jpg_init();
 }
 
@@ -65,7 +66,7 @@ static LDGLIB plugin =
 	LibFunc,			/* List of functions */
 	"JPG\0JPE\0JPEG\0",		/* File's type Handled */
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. */
-	libshare_exit,
+	0,
 	0					/* Howmany file type are supported by this plugin */
 };
 

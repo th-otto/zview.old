@@ -15,13 +15,11 @@
 #define	VERSION		0x0107
 #define AUTHOR      "Zorro,Lonny Pursell"
 
-#include "zview.h"
-#include "imginfo.h"
-#include "zvneo.h"
+#include <limits.h>
+#include "plugin.h"
+#include "zvplugin.h"
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)
@@ -83,7 +81,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	uint16_t *pal = NULL;
 	uint32_t bms;
 	uint32_t filelength;
-	char pname[MAX_PATH];						/* path to palette file */
+	char pname[PATH_MAX];						/* path to palette file */
 	size_t len;
 	uint8_t pf[200];
 	int16_t y, i;

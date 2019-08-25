@@ -5,7 +5,7 @@ LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgcook.o ../../ldglib/ldgutil.o
 LIB			= ../libshare/libshare.a -ljpeg -lexif -lm
 STACKSIZE = 64k
 
-CPPFLAGS		+= -I../../../common -I../common
+CPPFLAGS		+= -I../../../common -I../common -I../..
 CPPFLAGS += -DNO_GETENV -DJPEG_LIB_VERSION=80
 SFLAGS += -DPLUGIN_SLB -DJPEG_SLB -DEXIF_SLB -DSHAREDLIB=\"zvjpg.slb\"
 

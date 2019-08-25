@@ -1,11 +1,10 @@
 #include <stdlib.h>
 #include <gif_lib.h>
-#include "zview.h"
+#include "plugin.h"
 #include "imginfo.h"
-#include "zvgif.h"
+#include "zvplugin.h"
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
 
 long __CDECL get_option(zv_int_t which)
 {

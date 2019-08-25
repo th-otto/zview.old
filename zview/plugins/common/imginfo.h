@@ -1,7 +1,23 @@
 #ifndef __ZVIEW_IMGINFO_H__
 #define __ZVIEW_IMGINFO_H__
 
+#if defined(__PUREC__) && !defined(_COMPILER_H)
+/*
+ * far from being a complete replacement for <stdint.h>,
+ * but good enough for our purposes
+ */
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+typedef signed long int32_t;
+typedef unsigned long uint32_t;
+typedef long ssize_t;
+typedef long off_t;
+#else
 #include <stdint.h>
+#endif
+
 
 #define ST_RAM			0
 #define TT_RAM			1

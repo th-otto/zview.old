@@ -1,6 +1,8 @@
-#include "zview.h"
-#include "imginfo.h"
-#include "zvgod.h"
+#include "plugin.h"
+#include "zvplugin.h"
+
+#define VERSION 0x200
+#define AUTHOR  "Zorro"
 
 typedef struct 
 {
@@ -12,8 +14,6 @@ typedef struct
 
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

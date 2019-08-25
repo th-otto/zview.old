@@ -7,19 +7,13 @@
  */
 
 #include <stdio.h>
-#include <mint/basepage.h>
-#include <mint/mintbind.h>
-#include <mint/slb.h>
+#include <string.h>
 #include <slb/tiff.h>
 #include <slb/zlib.h>
 #include <slb/lzma.h>
 #include <slb/jpeg.h>
-#include <sys/types.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/stat.h>
-#include "zview.h"
 #include "plugin.h"
+#include "zvplugin.h"
 
 extern char const slb_header[];
 static const BASEPAGE *my_base;

@@ -1,11 +1,11 @@
-#include "zview.h"
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
 #include <png.h>
-#include "zvpng.h"
+
+#define VERSION 0x200
+#define AUTHOR "Zorro"
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

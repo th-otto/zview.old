@@ -1,6 +1,6 @@
-#include "zview.h"
-#include "imginfo.h"
-#include "zvdoodle.h"
+#include "plugin.h"
+#include "zvplugin.h"
+#include "ldglib/ldg.h"
 
 /*
  * 1.11 Handles salert.txt in codecs folder

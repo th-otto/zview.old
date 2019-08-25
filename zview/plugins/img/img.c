@@ -21,9 +21,8 @@
 #define	VERSION	0x0112
 #define AUTHOR "Lonny Pursell"
 
-#include "zview.h"
-#include "imginfo.h"
-#include "zvimg.h"
+#include "plugin.h"
+#include "zvplugin.h"
 
 #define XIMG  0x58494D47
 
@@ -48,8 +47,6 @@ typedef struct _picture
 } IMG_REF;
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

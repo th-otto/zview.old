@@ -1,20 +1,22 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "zview.h"
-
 #if defined(PLUGIN_SLB) && defined(JPEG_SLB)
 #include <slb/jpeg.h>
 #else
 #include <jpeglib.h>
 #endif
+
 #if defined(PLUGIN_SLB) && defined(EXIF_SLB)
 #include <slb/exif.h>
 #else
 #include <libexif/exif-data.h>
 #endif
 
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
 #include "zvjpg.h"
+#include <gem.h>
+#include <mint/cookie.h>
 #include "jpgdh.h"
 #include "jpgdsp.h"
 
@@ -23,10 +25,12 @@ int	quality = 90; /* quality 0 -> 100 % */
 J_COLOR_SPACE color_space = JCS_RGB;
 boolean progressive = FALSE;
 
+#undef VERSION
+#define VERSION 0x200
+#define AUTHOR "Zorro"
+
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
-
 long __CDECL get_option(zv_int_t which)
 {
 	switch (which)

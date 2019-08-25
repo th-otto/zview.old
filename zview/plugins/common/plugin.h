@@ -16,6 +16,10 @@
 #define __ZVIEW_PLUGIN_STRUCT_H__ 1
 
 #include <stdarg.h>
+#include <stdio.h>
+#if defined(__PUREC__) && !defined(_COMPILER_H)
+#define __CDECL cdecl
+#endif
 #include <mint/slb.h>
 #ifdef __GNUC__
 #include <unistd.h>
@@ -36,11 +40,26 @@
 #include <stdlib.h>
 #if defined(__PUREC__) && !defined(_COMPILER_H)
 #include <tos.h>
+#define BASEPAGE BASPAG
 #else
 #include <osbind.h>
+#include <mintbind.h>
 #endif
 
 #include "imginfo.h"
+
+#ifndef K_ALT
+#define K_RSHIFT        0x0001
+#define K_LSHIFT        0x0002
+#define K_CTRL          0x0004
+#define K_ALT           0x0008
+#endif
+
+
+#ifndef MIN
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
 
 /*
  * 3rd-party libraries the application knows about.

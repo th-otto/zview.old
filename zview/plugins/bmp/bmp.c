@@ -1,9 +1,7 @@
-#include "zview.h"
-#include "imginfo.h"
-#include "zvbmp.h"
+#include "plugin.h"
+#include "zvplugin.h"
 
 #ifdef PLUGIN_SLB
-#include "plugin.h"
 
 long __CDECL get_option(zv_int_t which)
 {

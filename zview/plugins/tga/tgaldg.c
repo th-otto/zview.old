@@ -1,7 +1,7 @@
-#include "zview.h"
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
 #include "libtarga.h"
-#include "zvtga.h"
+#include "ldglib/ldg.h"
 
 
 /*==================================================================================*
@@ -17,7 +17,6 @@
  *==================================================================================*/
 static void __CDECL init( void)
 {
-	libshare_init();
 }
 
 
@@ -41,7 +40,7 @@ static LDGLIB tga_plugin =
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. even if zview plugins are reentrant 
 						   and are shareable, we must use this flags because we don't know if the 
 						   user has ldg.prg deamon installed on his computer */
-	libshare_exit,				/* Function called when the plugin is unloaded */
+	0,					/* Function called when the plugin is unloaded */
 	0					/* Howmany file type are supported by this plugin */
 };
 
