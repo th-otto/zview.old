@@ -1,5 +1,5 @@
-Version 1.0.2 - 2019/08/25
-=============
+25 August 2019: Version 1.0.2
+=============================
 
 First release made by me (Thorsten Otto)
 

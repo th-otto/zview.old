@@ -1,3 +1,38 @@
+25 August 2019: Version 1.0.2
+=============================
+
+First release made by me (Thorsten Otto)
+
+ Notable changes:
+ ----------------
+
+ * all codecs recompiled as SLBs, making them much smaller
+ * Update PDF library to 4.01.01
+ * PDF is now a plugin of its own, only loaded when needed
+ * Third-Party-Libraries like TIFF, PNGLIB, ZLIB etc. take up their
+   memory only once (ZLIB for example is needed by several modules)
+ * Separate versions for 68k, 68020+ and ColdFire are available
+ * Degas module now also handles overscan sizes
+ 
+ Bug Fixes:
+ ----------
+ * Registered file types are not longer restricted to exactly 3 characters.
+ * TIFF module will no longer register itself for *.IFF (use *.TIF or *.TIFF
+   instead, *.IFF should be reserved for Interchange File Format).
+ * Fixes for animated GIFs, mostly taken from Lonny Pursells updated version
+ * Fixes for IMG format module, mostly taken from Lonny Pursells updated version.
+   Supports now also Hi-Color and True-Color images.
+
+ Known Bugs:
+ ----------
+ * There are still some animated GIFs that are not displayed correctly
+ * Some bugs that were reported on Zorro's site (https://sourceforge.net/p/z-tools/bugs/)
+ * The HyperText documentation has not yet been updated.
+ * The TIFF library sometimes prints warnings on the console
+ * The TIFF library per default only supports up to 16 bits/sample (that is,
+   48 bits/pixel for RGB formats). Some images from their test archive
+   are therefore not displayed
+
 03 March 2013: 1.0
 ==================
 

@@ -13,7 +13,7 @@
 #include "catalog/catalog.h"
 
 char const program_version[] = " zView 1.0.2 ";
-char const program_date[] = "August 18, 2019";
+char const program_date[] = "August 25, 2019";
 
 #ifndef VA_START
 #define VA_START 0x4711
