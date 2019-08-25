@@ -1,3 +1,11 @@
+=============================
+
+ News:
+ -----
+
+ * NEOIMG module now also handles neochrome master files
+   (extended resolution & palette files)
+
 25 August 2019: Version 1.0.2
 =============================
 
