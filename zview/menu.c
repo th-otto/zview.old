@@ -13,6 +13,7 @@
 #include "catalog/catalog_keyb.h"
 #include "zedit/zedit.h"
 #include "menu.h"
+#include "version.h"
 
 
 

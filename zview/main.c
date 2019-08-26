@@ -11,9 +11,11 @@
 #include "wintimer.h"
 #include "zvdi/vdi.h"
 #include "catalog/catalog.h"
+#include "version.h"
+#include "version_date.h"
 
-char const program_version[] = " zView 1.0.2 ";
-char const program_date[] = "August 25, 2019";
+char const program_version[] = " " NAME_STRING " " __STRINGIFY(VER_MAJOR) "." __STRINGIFY(VER_MINOR) "." __STRINGIFY(VER_MICRO) " ";
+char const program_date[] = VERSION_DATE;
 
 #ifndef VA_START
 #define VA_START 0x4711

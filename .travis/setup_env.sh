@@ -8,5 +8,19 @@ export SHORT_ID=$(git log -n1 --format="%h")
 export PROJECT_LOWER=`echo ${PROJECT} | tr '[[:upper:]]' '[[:lower:]]'`
 
 export archive_tag
+
 ATAG=${VERSION}${archive_tag}-${SHORT_ID}
+isrelease=false
+
+tag=`git tag --points-at ${TRAVIS_COMMIT}`
+case $tag in
+	VERSION_*)
+		isrelease=true
+		echo yes > .isrelease
+		;;
+	*)
+		ATAG=${VERSION}${archive_tag}-${SHORT_ID}
+		;;
+esac
 export ATAG
+export isrelease

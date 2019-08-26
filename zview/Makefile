@@ -38,6 +38,21 @@ PROGRAM 			= zview.app
 all:: $(STRIPEX) $(PROGRAM)
 	$(MAKE) -C plugins
 
+version_date.h:
+	@echo generating $@
+	@( if test -f "$(top_srcdir)/.isrelease"; then \
+		echo '/* generated from version.h */'; \
+		echo '#define VERSION_DATE " " RELEASE_DATE " (release)"'; \
+	  elif test -d "$(top_srcdir)/.git"; then \
+		echo '/* generated from git log */'; \
+		cd "$(top_srcdir)" && git log -n 1 --pretty=format:'#define VERSION_DATE " %ad (git:%h)"%n' --date=format:%Y/%m/%d; \
+	  else \
+		echo '/* generated from local source */'; \
+		echo '#define VERSION_DATE " " __DATE__ " (local)"'; \
+	  fi ) > $@
+
+main.o: version_date.h
+
 ##############################################################################
 
 XPDF_VERSION			= 4.01.01
@@ -138,6 +153,9 @@ clean_pdf:
 	rm -f pdflib/*.o slb/*/*.slb $(PDF_OBJ) libpdf.a
 
 clean: clean_zview
+
+distclean: clean
+	$(RM) version_date.h
 
 ##############################################################################
 
