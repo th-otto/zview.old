@@ -42,6 +42,20 @@ static long filesize(int16_t fd)
 }
 
 
+/* code from atarist.c, app code St2BMP (placed into public domain) */
+/* written by Hans Wessels */
+
+/*
+ * guess resolution from picturedata, 0=low, 1=med, 2=high
+ *
+ * routine guesses resolution by converting the bitplane pixels
+ * to chunky pixels in a byte, just enough to fil a byte (8 
+ * pixels for high, 4 for medium and 2 for lowres). And count
+ * the number of runlength bytes in each mode. The correct
+ * resolution is the one having the most runlength bytes.
+ * If there is a draw, mono wins, then low res, medium res is
+ * never chosen in a draw.
+ */
 static uint8_t guess_resolution(const uint8_t *buffer)
 {
 	const uint8_t *scan;
@@ -51,10 +65,10 @@ static uint8_t guess_resolution(const uint8_t *buffer)
 	int16_t i;
 	int16_t k;
 	uint8_t last_byte;
-	uint16_t word;
-	uint16_t word2;
-	uint16_t word3;
-	uint16_t word4;
+	uint16_t plane0;
+	uint16_t plane1;
+	uint16_t plane2;
+	uint16_t plane3;
 	uint16_t mask;
 	uint8_t byte;
 	
@@ -62,6 +76,7 @@ static uint8_t guess_resolution(const uint8_t *buffer)
 	resmed = 0;
 	resmono = 0;
 
+	/* test high */
 	last_byte = 0;
 	for (scan = buffer, i = 0; i < DOODLE_FILESIZE; i++)
 	{
@@ -72,25 +87,26 @@ static uint8_t guess_resolution(const uint8_t *buffer)
 			last_byte = byte;
 	}
 
+	/* test_med */
 	last_byte = 0;
 	for (scan = buffer, i = 0; i < DOODLE_FILESIZE / 4; i++)
 	{
-		word = *scan++;
+		plane0 = *scan++;
 		mask = 0x8000;
-		word <<= 8;
-		word += *scan++;
-		word2 = *scan++;
-		word2 <<= 8;
-		word2 += *scan++;
+		plane0 <<= 8;
+		plane0 += *scan++;
+		plane1 = *scan++;
+		plane1 <<= 8;
+		plane1 += *scan++;
 		do {
 			byte = 0;
 			for (k = 0; k < 4; k++)
 			{
 				byte += byte;
-				if (word & mask)
+				if (plane0 & mask)
 					byte++;
 				byte += byte;
-				if (word2 & mask)
+				if (plane1 & mask)
 					byte++;
 				mask >>= 1;
 			}
@@ -101,37 +117,38 @@ static uint8_t guess_resolution(const uint8_t *buffer)
 		} while (mask != 0);
 	}
 	
+	/* test_low */
 	last_byte = 0;
 	for (scan = buffer, i = 0; i < DOODLE_FILESIZE / 8; i++)
 	{
-		word = *scan++;
+		plane0 = *scan++;
 		mask = 0x8000;
-		word <<= 8;
-		word += *scan++;
-		word2 = *scan++;
-		word2 <<= 8;
-		word2 += *scan++;
-		word3 = *scan++;
-		word3 <<= 8;
-		word3 += *scan++;
-		word4 = *scan++;
-		word4 <<= 8;
-		word4 += *scan++;
+		plane0 <<= 8;
+		plane0 += *scan++;
+		plane1 = *scan++;
+		plane1 <<= 8;
+		plane1 += *scan++;
+		plane2 = *scan++;
+		plane2 <<= 8;
+		plane2 += *scan++;
+		plane3 = *scan++;
+		plane3 <<= 8;
+		plane3 += *scan++;
 		do {
 			byte = 0;
 			for (k = 0; k < 2; k++)
 			{
 				byte += byte;
-				if (word & mask)
+				if (plane0 & mask)
 					byte++;
 				byte += byte;
-				if (word2 & mask)
+				if (plane1 & mask)
 					byte++;
 				byte += byte;
-				if (word3 & mask)
+				if (plane2 & mask)
 					byte++;
 				byte += byte;
-				if (word4 & mask)
+				if (plane3 & mask)
 					byte++;
 				mask >>= 1;
 			}
