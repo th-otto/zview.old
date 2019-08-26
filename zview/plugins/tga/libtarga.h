@@ -53,15 +53,20 @@ typedef struct
 {
 	int16_t		handle;
 	uint8_t		*img_buf;			/* buffer for 1 line of packet TGA Data */
+	uint16_t	bytes_per_pix;
 	uint8_t		alphabits;
-	uint8_t		bytes_per_pix;
 	uint8_t		orientation;
 	int32_t		line_size;			
-	int32_t		img_buf_len;		/* L„nge des IMG-Buffers */
-	int32_t		img_buf_offset;		/* Abstand zum Anfang des IMG-Buffers */
-	int32_t		img_buf_used;		/* Anzahl der benutzten Bytes des IMG-Buffers */
-	int32_t		rest_length;		/* noch einzulesende Dateil„nge */
+#if 0
+	int32_t		img_buf_len;		/* size of the IMG buffer */
+	int32_t		img_buf_offset;		/* offset to start of IMG buffer */
+	int32_t		img_buf_used;		/* bytes already used */
+	int32_t		rest_length;		/* bytes to be done */
+#endif
+	char        id[256];			/* 255 is the limit */
 	targa_hdr	tga;
+	uint8_t *bmap;
+	uint32_t cur_pos;
 } tga_pic;
 
 #endif /* _libtarga_h_ */

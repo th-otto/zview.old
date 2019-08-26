@@ -18,9 +18,9 @@
 /*   2 */ LIBFUNC(2, reader_read, 2)
 /*   3 */ LIBFUNC(3, reader_get_txt, 2)
 /*   4 */ LIBFUNC(4, reader_quit, 1)
-/*   5 */ NOFUNC
-/*   6 */ NOFUNC
-/*   7 */ NOFUNC
+/*   5 */ LIBFUNC(5, encoder_init, 2)
+/*   6 */ LIBFUNC(6, encoder_write, 2)
+/*   7 */ LIBFUNC(7, encoder_quit, 1)
 /*   8 */ LIBFUNC(8, get_option, 1)
 /*   9 */ NOFUNC
 

@@ -6,7 +6,27 @@
  * NEOIMG module now also handles neochrome master files
    (extended resolution & palette files)
  * JPEG output now also allows to select other colorspaces
+ * TGA codec updated with fixes from Lonny's version,
+   allowing to load paletted formats, and handle older TGA files 
+ * TGA files can now be saved (uncompressed only)
 
+ Bug Fixes:
+ ----------
+ * TGA files with right-to-left orientation are now rejected;
+   they are not handled by the decoder
+
+ Known Bugs:
+ ----------
+ * There are still some animated GIFs that are not displayed correctly
+ * Some bugs that were reported on Zorro's site (https://sourceforge.net/p/z-tools/bugs/)
+ * The HyperText documentation has not yet been updated.
+ * The TIFF library sometimes prints warnings on the console
+ * The TIFF library per default only supports up to 16 bits/sample (that is,
+   48 bits/pixel for RGB formats). Some images from their test archive
+   are therefore not displayed
+ * Images which have an alpha channel, will store pre-multiplied RGB
+   when saving, and loose the alpha-channel
+ 
 For a history of previous changes, see doc/history.txt
 
 

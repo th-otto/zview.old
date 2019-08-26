@@ -33,7 +33,7 @@ long __CDECL get_option(zv_int_t which)
 	switch (which)
 	{
 	case OPTION_CAPABILITIES:
-		return CAN_DECODE|CAN_ENCODE;
+		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long) ("TGA\0");
 	}
@@ -46,7 +46,9 @@ long __CDECL get_option(zv_int_t which)
     ( composite) = ( uint8_t)(( temp + ( temp >> 8)) >> 8);				\
 }
 
-#define DEBUG 0
+#define DEBUG 1
+
+#include "depack.c"
 
 #if DEBUG
 #define print(x) if (pflg) printf x
@@ -96,38 +98,61 @@ static inline void tga_write_pixel_to_mem(uint8_t *dst, uint8_t orientation, uin
 }
 
 
-static uint32_t decode_tga(uint8_t *data, uint8_t *bmap, uint32_t bms, uint16_t bytes_per_pix)
+/*==================================================================================*
+ * uint32_t tga_convert_color:														*
+ *		Write the pixel to the data regarding how the header says the data 			*
+ *		is ordered.																	*
+ *----------------------------------------------------------------------------------*
+ * input:																			*
+ *		rgb				->	bgra value.												*
+ *		bpp_in			->	original image bitplanes.								*
+ *		alphabits		->	Alpha bit... 1 if present else 0.						*
+ *----------------------------------------------------------------------------------*
+ * return:	 																		*
+ *      the converted pixel.														*
+ *==================================================================================*/
+static inline void tga_convert_color(uint8_t *bgra, uint8_t *rgb, uint8_t bpp_in, uint8_t alphabits)
 {
-	uint8_t cmd;
-	uint16_t i, cnt;
-	uint32_t src = 0;
-	uint32_t dst = 0;
-	uint32_t size;
-	uint8_t pixel[4];			/* pixel buffer 1 to 4 bytes */
+	uint8_t r = 0,
+		g = 0,
+		b = 0,
+		a = 0;
 
-	do
+	switch (bpp_in)
 	{
-		cmd = data[src++];
-		cnt = 1 + (cmd & 0x7F);			/* number of pixels */
-		if (cmd & 0x80)
-		{								/* repeat? */
-			memcpy(pixel, &data[src], bytes_per_pix);	/* get pixel */
-			src += bytes_per_pix;
-			for (i = 0; i < cnt; i++)
-			{
-				memcpy(&bmap[dst], pixel, bytes_per_pix);
-				dst += bytes_per_pix;
-			}
+	case 32:
+	case 24:
+		if (alphabits)
+		{
+			/* not premultiplied alpha -- multiply. */
+			a = bgra[3];
+			alpha_composite(r, bgra[2], a);
+			alpha_composite(g, bgra[1], a);
+			alpha_composite(b, bgra[0], a);
 		} else
-		{								/* literals? */
-			size = (uint32_t) bytes_per_pix * (uint32_t) cnt;	/* calc 1 time */
-
-			memcpy(&bmap[dst], &data[src], size);
-			dst = dst + size;
-			src = src + size;
+		{
+			r = bgra[2];
+			g = bgra[1];
+			b = bgra[0];
 		}
-	} while (dst < bms);
-	return dst;							/* output unpacked size */
+		break;
+
+	case 16:
+	case 15:
+		{
+			/* 16-bit to 32-bit; (force alpha to full) */
+			uint16_t src16 = (((uint16_t) bgra[1] << 8) | bgra[0]);
+
+			b = ((src16) & 0x001F) << 3;
+			g = ((src16 >> 5) & 0x001F) << 3;
+			r = ((src16 >> 10) & 0x001F) << 3;
+		}
+		break;
+	}
+
+	rgb[0] = r;
+	rgb[1] = g;
+	rgb[2] = b;
 }
 
 
@@ -146,6 +171,7 @@ static uint32_t decode_tga(uint8_t *data, uint8_t *bmap, uint32_t bms, uint16_t 
 boolean __CDECL reader_init(const char *name, IMGINFO info)
 {
 	int16_t i;
+	uint32_t num_pixels;
 	uint32_t file_length;
 	int16_t handle;
 	uint8_t header_buf[HDR_LENGTH];
@@ -165,12 +191,8 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		return FALSE;
 	}
 
-	file_length = Fseek(0L, handle, 2);
-	Fseek(0L, handle, 0);
-
 	if (Fread(handle, HDR_LENGTH, &header_buf) != HDR_LENGTH)
 	{
-		print(("fread() failed\n"));
 		Fclose(handle);
 		return FALSE;
 	}
@@ -179,7 +201,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	if (tga_struct == NULL)
 	{
-		print(("malloc() failed\n"));
 		Fclose(handle);
 		return FALSE;
 	}
@@ -198,15 +219,18 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	tga_struct->tga.img_spec_pix_depth = header_buf[HDR_IMG_SPEC_PIX_DEPTH];
 	tga_struct->tga.img_spec_img_desc = header_buf[HDR_IMG_SPEC_IMG_DESC];
 
-	if (tga_struct->tga.img_spec_width <= 0 || tga_struct->tga.img_spec_height <= 0)
+	num_pixels = tga_struct->tga.img_spec_width * tga_struct->tga.img_spec_height;
+
+	if (num_pixels == 0)
 	{
-		print(("invalid image dimensions\n"));
 		free(tga_struct);
 		Fclose(handle);
 		return FALSE;
 	}
 
 	print(("cmb=%i\n", tga_struct->tga.cmap_entry_size));
+
+	file_length = Fseek(0L, handle, 2);
 
 	tga_struct->alphabits = tga_struct->tga.img_spec_img_desc & 0x0F;
 	tga_struct->handle = handle;
@@ -274,13 +298,13 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 			Fclose(handle);
 			return FALSE;
 		}
-	} else if (tga_struct->tga.image_type == TGA_IMG_UNC_PALETTED || tga_struct->tga.image_type == TGA_IMG_RLE_PALETTED)
+	} else
 	{									/* vendor specific, not supported */
 #if 0
 		cs = (tga_struct->tga.cmap_entry_size / 8) * tga_struct->tga.cmap_length;  /* calc color map size */
 		Fseek(cs, handle, SEEK_CUR);   /* try and skip it */
 #endif
-		print(("unsupported color map type %d\n", tga_struct->tga.cmap_type));
+		print(("unsupported color map type\n"));
 		free(tga_struct);
 		Fclose(handle);
 		return FALSE;
@@ -344,26 +368,22 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	if (tga_struct->bytes_per_pix == 0)
 		tga_struct->bytes_per_pix = 1;
 
-#if 0
 	tga_struct->line_size = tga_struct->tga.img_spec_width * tga_struct->bytes_per_pix;
 	tga_struct->img_buf_len = tga_struct->line_size << 1;
 
 	tga_struct->img_buf = (uint8_t *) malloc(tga_struct->img_buf_len + 256L);
+
 	if (tga_struct->img_buf == NULL)
 	{
-		print(("malloc failed\n"));
 		free(tga_struct);
 		Fclose(handle);
 		return FALSE;
 	}
-#endif
 
 	bitmap_size = (tga_struct->tga.img_spec_width * (uint32_t)tga_struct->bytes_per_pix) * tga_struct->tga.img_spec_height;				/* CALC BIT MAP SIZE IN BYTES */
 	print(("bytes_per_pix=%u\n", tga_struct->bytes_per_pix));
 
 	tga_struct->orientation = (tga_struct->tga.img_spec_img_desc & 0x30) >> 4;
-
-#if 0
 	tga_struct->rest_length = file_length - (tga_struct->tga.idlen + HDR_LENGTH);
 
 	if (tga_struct->img_buf_len > tga_struct->rest_length)
@@ -372,15 +392,12 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	tga_struct->img_buf_offset = 0;
 	tga_struct->img_buf_used = Fread(handle, tga_struct->img_buf_len, tga_struct->img_buf);
 	tga_struct->rest_length -= tga_struct->img_buf_used;
-#endif
 
 	tga_struct->bmap = malloc(bitmap_size + 256L);			/* little extra just in case */
 	if (tga_struct->bmap == NULL)
 	{
 		print(("malloc(bitmap) failed\n"));
-#if 0
 		free(tga_struct->img_buf);
-#endif
 		free(tga_struct);
 		Fclose(handle);
 		return FALSE;
@@ -404,23 +421,15 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	switch ((tga_struct->tga.img_spec_img_desc >> 4) & 3)
 	{									/* determine orientation */
 	case TGA_LOWER_LEFT:
+	case TGA_LOWER_RIGHT:
 		info->orientation = DOWN_TO_UP;
 		print(("orientation flipped\n"));
 		break;
 	case TGA_UPPER_LEFT:
+	case TGA_UPPER_RIGHT:
 		info->orientation = UP_TO_DOWN;
 		print(("orientation normal\n"));
 		break;
-	case TGA_UPPER_RIGHT:
-	case TGA_LOWER_RIGHT:
-		print(("unsupported orientation\n"));
-		free(tga_struct->bmap);
-#if 0
-		free(tga_struct->img_buf);
-#endif
-		free(tga_struct);
-		Fclose(handle);
-		return FALSE;
 	}
 
 	/* unpacked as is, pixel data is not corrected for motorola */
@@ -436,9 +445,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		if (temp == NULL)
 		{
 			free(tga_struct->bmap);
-#if 0
 			free(tga_struct->img_buf);
-#endif
 			free(tga_struct);
 			Fclose(handle);
 			return FALSE;
@@ -459,8 +466,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	}
 
 	Fclose(handle);
-	tga_struct->handle = 0;
-	
+
 	if (tga_struct->tga.image_type == TGA_IMG_UNC_PALETTED || tga_struct->tga.image_type == TGA_IMG_RLE_PALETTED)
 	{
 		print(("type 1/9 8-bit color mapped\n"));
@@ -468,7 +474,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		info->indexed_color = TRUE;
 	} else if (tga_struct->tga.image_type == TGA_IMG_UNC_TRUECOLOR || tga_struct->tga.image_type == TGA_IMG_RLE_TRUECOLOR)
 	{
-		print(("type 2/10 %d-bit high/true color %d alpha\n", tga_struct->tga.img_spec_pix_depth, tga_struct->alphabits));
+		print(("type 2/10 16/24/32-bit high/true color\n"));
 		tga_struct->tga.image_type = tga_struct->tga.img_spec_pix_depth;
 		info->indexed_color = FALSE;
 	} else if (tga_struct->tga.image_type == TGA_IMG_UNC_GRAYSCALE || tga_struct->tga.image_type == TGA_IMG_RLE_GRAYSCALE)
@@ -495,6 +501,150 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	tga_struct->cur_pos = 0;						/* reset - y pos */
 
 	return TRUE;
+}
+
+
+/*==================================================================================*
+ * int16_t fill_img_buf:															*
+ *		fill the buffer "tga_struct->img_buf" with a line from file.	 			*
+ *		the buffer can contain 2 lines, this function search also where write the	*
+ *		new line from the file.														*
+ *----------------------------------------------------------------------------------*
+ * input:																			*
+ *		tga_struct		->	tga_pic struct. with all the wanted information.		*
+ *		nread		 	->	internal counter.										*
+ *----------------------------------------------------------------------------------*
+ * return:	 																		*
+ *      Always 1 ( need to code something more secure)								*
+ *==================================================================================*/
+static int16_t fill_img_buf(tga_pic *tga_struct, int32_t nread)
+{
+	tga_struct->img_buf_used -= nread;
+	tga_struct->img_buf_offset += nread;
+
+	if (tga_struct->img_buf_offset >= (tga_struct->img_buf_len >> 1))
+	{
+		if (tga_struct->img_buf_used > 0)
+			memcpy(tga_struct->img_buf, tga_struct->img_buf + tga_struct->img_buf_offset, tga_struct->img_buf_used);
+
+		nread = tga_struct->img_buf_offset;
+
+		if (nread > tga_struct->rest_length)
+			nread = tga_struct->rest_length;
+
+		nread = Fread(tga_struct->handle, nread, tga_struct->img_buf + tga_struct->img_buf_used);
+
+		tga_struct->img_buf_used += nread;
+		tga_struct->img_buf_offset = 0;
+		tga_struct->rest_length -= nread;
+	}
+
+	return TRUE;
+}
+
+
+/*==================================================================================*
+ * uint8_t *unpack_line1:															*
+ *		depack ( for RLE image) and copy data from source to destination. 			*
+ *----------------------------------------------------------------------------------*
+ * input:																			*
+ *		tga_struct	->	tga_pic struct. with all the wanted information.			*
+ *		src		 	->	the source buffer.											*
+ *		dst		 	->	the destination buffer.										*
+ *		line_width	->	the image width.											*
+ *----------------------------------------------------------------------------------*
+ * return:	 																		*
+ *      Howmany source buffer position after that the job is done.					*
+ *==================================================================================*/
+static uint8_t *unpack_line1(tga_pic *tga_struct, uint8_t *src, uint8_t *dst, uint16_t line_width)
+{
+	uint16_t i, j;
+	uint16_t bytes_per_pix = (int16_t) tga_struct->bytes_per_pix;
+	uint8_t bgra[4];
+	uint8_t rgb[3];
+	uint8_t packet_header;
+	uint8_t repcount;
+
+	if (tga_struct->tga.image_type == TGA_IMG_UNC_TRUECOLOR)
+	{
+		for (i = 0; i < line_width; i++)
+		{
+			for (j = 0; j < bytes_per_pix; j++)
+				bgra[j] = *src++;
+
+			tga_convert_color(&bgra[0], &rgb[0], tga_struct->tga.img_spec_pix_depth, tga_struct->alphabits);
+			tga_write_pixel_to_mem(dst, tga_struct->orientation, i, line_width, &rgb[0]);
+		}
+	} else
+	{
+		uint16_t l;
+
+		for (i = 0; i < line_width;)
+		{
+			packet_header = *src++;
+
+			if (packet_header & 0x80)
+			{
+				for (j = 0; j < bytes_per_pix; j++)
+					bgra[j] = *src++;
+
+				tga_convert_color(&bgra[0], &rgb[0], tga_struct->tga.img_spec_pix_depth, tga_struct->alphabits);
+
+				repcount = (packet_header & 0x7F) + 1;
+
+				/* write all the data out */
+				for (j = 0; j < repcount; j++)
+					tga_write_pixel_to_mem(dst, tga_struct->orientation, i + j, line_width, &rgb[0]);
+
+				i += repcount;
+			} else
+			{
+				repcount = (packet_header & 0x7F) + 1;
+
+				for (l = 0; l < repcount; l++)
+				{
+					for (j = 0; j < bytes_per_pix; j++)
+						bgra[j] = *src++;
+
+					tga_convert_color(&bgra[0], &rgb[0], tga_struct->tga.img_spec_pix_depth, tga_struct->alphabits);
+
+					tga_write_pixel_to_mem(dst, tga_struct->orientation, i + l, line_width, &rgb[0]);
+				}
+
+				i += repcount;
+			}
+		}
+	}
+
+	return src;
+}
+
+
+/*==================================================================================*
+ * int16_t unpack_line:																*
+ *		Call the "source's buffer to destination's buffer" and						* 
+ *		"image to source's buffer" functions. 										*
+ *----------------------------------------------------------------------------------*
+ * input:																			*
+ *		tga_struct	->	tga_pic struct. with all the wanted information.			*
+ *		dst		 	->	the destination buffer.										*
+ *----------------------------------------------------------------------------------*
+ * return:	 																		*
+ *      1 if ok else 0.																*
+ *==================================================================================*/
+static int16_t unpack_line(tga_pic *tga_struct, uint8_t *dst)
+{
+	uint8_t *line_begin;
+	int32_t nread;
+
+	line_begin = tga_struct->img_buf + tga_struct->img_buf_offset;
+
+	nread =
+		(int32_t) (unpack_line1(tga_struct, line_begin, dst, (uint16_t) tga_struct->tga.img_spec_width) - line_begin);
+
+	if (fill_img_buf(tga_struct, nread))
+		return TRUE;
+	return FALSE;
 }
 
 
@@ -572,7 +722,7 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 		break;
 	case 32:							/* bbbbbbbbggggggggrrrrrrrraaaaaaaa */
 		tga_struct->cur_pos += (uint32_t)info->width << 2;
-		if (tga_struct->alphabits == 3)
+		if (tga_struct->alphabits)
 		{
 			for (x = 0; x < info->width; x++)
 			{
@@ -650,105 +800,9 @@ void __CDECL reader_quit(IMGINFO info)
 
 	if (tga_struct)
 	{
-		free(tga_struct->bmap);
-#if 0
 		free(tga_struct->img_buf);
-#endif
-		if (tga_struct->handle > 0)
-			Fclose(tga_struct->handle);
+		free(tga_struct->bmap);
 		free(tga_struct);
 		info->_priv_ptr = NULL;
-	}
-}
-
-
-
-boolean __CDECL encoder_init(const char *name, IMGINFO info)
-{
-	int16_t ohandle;
-	uint8_t *obmap;
-	uint32_t obw;
-	uint8_t hdr[HDR_LENGTH];
-	
-	static char const oid[] = "Created with zView (Atari ST)";
-
-	if ((ohandle = (int16_t) Fcreate(name, 0)) < 0)
-	{
-		return FALSE;
-	}
-
-	obw = (uint32_t) info->width * 3;
-	obmap = malloc(obw + 256L);			/* line buffer */
-	if (obmap == NULL)
-	{
-		Fclose(ohandle);
-		return FALSE;
-	}
-
-	hdr[HDR_IDLEN] = (uint8_t) sizeof(oid) - 1;	/* id length */
-	hdr[HDR_CMAP_TYPE] = 0;							/* no colormap */
-	hdr[HDR_IMAGE_TYPE] = TGA_IMG_UNC_TRUECOLOR;	/* image type */
-	hdr[HDR_CMAP_FIRST + 0] = hdr[HDR_CMAP_FIRST + 1] = 0;					/* first cmap entry */
-	hdr[HDR_CMAP_LENGTH + 0] = hdr[HDR_CMAP_LENGTH + 1] = 0;				/* last cmap entry */
-	hdr[HDR_CMAP_ENTRY_SIZE] = 0;					/* cmap entry size */
-	hdr[HDR_IMG_SPEC_XORIGIN + 0] = hdr[HDR_IMG_SPEC_XORIGIN + 1] = 0;					/* x origin */
-	hdr[HDR_IMG_SPEC_YORIGIN + 0] = hdr[HDR_IMG_SPEC_YORIGIN + 1] = 0;					/* y origin */
-	hdr[HDR_IMG_SPEC_WIDTH + 0] = info->width;			/* img width */
-	hdr[HDR_IMG_SPEC_WIDTH + 1] = info->width >> 8;
-	hdr[HDR_IMG_SPEC_HEIGHT + 0] = info->height;		/* img height */
-	hdr[HDR_IMG_SPEC_HEIGHT + 1] = info->height >> 8;
-	hdr[HDR_IMG_SPEC_PIX_DEPTH] = 24;					/* pixel depth */
-	hdr[HDR_IMG_SPEC_IMG_DESC] = TGA_UPPER_LEFT << 4;	/* %00100000 */
-
-	if (Fwrite(ohandle, HDR_LENGTH, hdr) != HDR_LENGTH ||
-		Fwrite(ohandle, sizeof(oid) - 1, oid) != sizeof(oid) - 1)
-	{
-		free(obmap);
-		Fclose(ohandle);
-		return FALSE;
-	}
-
-	info->planes = 24;
-	info->components = 3;
-	info->colors = 1L << 24;
-	info->orientation = UP_TO_DOWN;
-	info->memory_alloc = TT_RAM;
-	info->indexed_color = FALSE;
-	info->page = 1;
-	info->_priv_ptr = obmap;
-	info->_priv_var = ohandle;
-
-	return TRUE;
-}
-
-
-boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
-{
-	uint8_t *obmap = (uint8_t *)info->_priv_ptr;
-	uint16_t x;
-	uint16_t i = 0;
-
-	for (x = 0; x < info->width; x++)
-	{
-		obmap[i] = buffer[i + 2];		/* blue */
-		obmap[i + 1] = buffer[i + 1];	/* green as is */
-		obmap[i + 2] = buffer[i];		/* red */
-		i = i + 3;
-	}
-	if (Fwrite(info->_priv_var, i, obmap) != i)
-		return FALSE;
-
-	return TRUE;
-}
-
-
-void __CDECL encoder_quit(IMGINFO info)
-{
-	free(info->_priv_ptr);
-	info->_priv_ptr = NULL;
-	if (info->_priv_var > 0)
-	{
-		Fclose(info->_priv_var);
-		info->_priv_var = 0;
 	}
 }
