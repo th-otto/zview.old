@@ -8,7 +8,8 @@
 
 
 /* Global variable */
-int16 	plugins_nbr;
+int16_t plugins_nbr;
+int16_t encoder_plugins_nbr;
 CODEC *codecs[MAX_CODECS];
 
 
@@ -181,7 +182,6 @@ done:
  *==================================================================================*/
 int16 plugins_init( void)
 {
-	char 			*env_ldg = 0;
 	char plugin_dir[MAX_PATH];
 	DIR	 			*dir;
 	LDG_INFOS 		*cook = 0;
@@ -190,6 +190,7 @@ int16 plugins_init( void)
 	char  			extension[4];
 	char *name;
 	CODEC *codec;
+	int16_t i, j;
 	
 	strcpy( plugin_dir, zview_path);
 	strcat( plugin_dir, "codecs\\");
@@ -197,6 +198,8 @@ int16 plugins_init( void)
 	/* We try to find the zcodecs folder in zview directory... 	*/
 	if ((dir = opendir(plugin_dir)) == NULL)
 	{
+		char 			*env_ldg = 0;
+
 		shel_envrn( &env_ldg, "LDGPATH=");
 
 		/* ...if this directory doesn't exist, we try to find 
@@ -300,6 +303,22 @@ int16 plugins_init( void)
 		}
 		closedir(dir);
 	}
+
+	/*
+	 * now sort the encoders first, so we can use the same array when saving
+	 */
+	j = 0;
+	for (i = 0; i < plugins_nbr; i++)
+	{
+		if (codecs[i]->capabilities & CAN_ENCODE)
+		{
+			CODEC *tmp = codecs[i];
+			codecs[i] = codecs[j];
+			codecs[j] = tmp;
+			j++;
+		}
+	}
+	encoder_plugins_nbr = j;
 
 	return plugins_nbr;
 }

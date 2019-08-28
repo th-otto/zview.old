@@ -1,3 +1,4 @@
+(not yet released)
 =============================
 
  News:
@@ -9,6 +10,9 @@
  * TGA codec updated with fixes from Lonny's version,
    allowing to load paletted formats, and handle older TGA files 
  * TGA files can now be saved (uncompressed only)
+ * Maximum number of codecs increased to 200
+ * Different codecs which handle the same file extension are
+   now detected
 
  Bug Fixes:
  ----------

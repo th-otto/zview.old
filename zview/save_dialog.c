@@ -11,10 +11,6 @@
 #include "plugins/common/zvplugin.h"
 
 
-static int16 encoder_plugins_nbr = 0;
-static CODEC *encoder[MAX_CODECS];
-
-
 /* local variable */
 static int last_choice = -1;
 static const char *source_file;
@@ -54,7 +50,7 @@ unsigned int get_option_mask(CODEC *codec)
 
 static boolean encoder_plugin_setup( WINDOW *win, int encoder_selected, const char *name)
 {
-	CODEC *codec = encoder[encoder_selected];
+	CODEC *codec = codecs[encoder_selected];
 	OBJECT *tree = get_tree( SAVE_DIAL);
 	
 	curr_output_plugin = NULL;
@@ -141,7 +137,7 @@ static void format_popup( WINDOW *win, int obj_index)
 	
 	for( i = 0; i < encoder_plugins_nbr; i++)
 	{
-		format_type(encoder[i], items[i]);
+		format_type(codecs[i], items[i]);
 		items_ptr[i] = items[i];
 	}
 
@@ -185,7 +181,7 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 
 		case SAVE_DIAL_OPTIONS:
 			ObjcChange( OC_FORM, win, object, NORMAL, TRUE);
-			save_option_dialog(source_file, encoder[last_choice - 1]);
+			save_option_dialog(source_file, codecs[last_choice - 1]);
 			break;
 
 		case SAVE_DIAL_SAVE:
@@ -205,7 +201,7 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 			strcpy(target_file_name, source_file + source_path_len);
 	
 			/* copy the source's name in the target's name with the new extension for exemple ( "toto.gif" to "toto.jpg") */
-			zstrncpy( extension, encoder[last_choice - 1]->extensions, 4);
+			zstrncpy( extension, codecs[last_choice - 1]->extensions, 4);
 			str2lower( extension);
 			dot = strrchr(target_file_name, '.');
 			if (dot)
@@ -279,36 +275,7 @@ void save_dialog( const char *fullfilename)
 	CODEC *input;
 
 	if( !encoder_plugins_nbr)
-	{ 
-		for( i = 0; i < plugins_nbr; i++)
-		{
-			CODEC *codec = codecs[i];
-			switch (codec->type)
-			{
-			case CODEC_LDG:
-				if( ldg_find( "encoder_init", codec->c.ldg))
-				{
-					encoder[encoder_plugins_nbr] = codec;
-					encoder_plugins_nbr++;
-				}
-				break;
-			case CODEC_SLB:
-				{
-					long err;
-					err = plugin_get_option(&codec->c.slb, OPTION_CAPABILITIES);
-					if (err >= 0 && (err & CAN_ENCODE))
-					{
-						encoder[encoder_plugins_nbr] = codec;
-						encoder_plugins_nbr++;
-					}
-				}
-				break;
-			}
-		}
-		
-		if( !encoder_plugins_nbr)
-			return;
-	}
+		return;
 
 	source_file = fullfilename;
 
@@ -317,7 +284,7 @@ void save_dialog( const char *fullfilename)
 	if (last_choice <= 0 && (input = get_codec(source_file)) != NULL)
 	{
 		for (i = 0; i < encoder_plugins_nbr; i++)
-			if (input == encoder[i])
+			if (input == codecs[i])
 			{
 				char name[MAX_TYPENAME_LEN];
 				format_type(input, name);
