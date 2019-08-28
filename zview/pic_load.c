@@ -257,17 +257,19 @@ CODEC *get_codec( const char *file)
 	/* We check if a plug-ins can do the job */
 	for( i = 0; i < plugins_nbr; i++)
 	{
-		switch (codecs[i].type)
+		CODEC *codec = codecs[i];
+		
+		switch (codec->type)
 		{
 		case CODEC_LDG:
-			ldg = codecs[i].c.ldg;
+			ldg = codec->c.ldg;
 			match = FALSE;
-			if (codecs[i].num_extensions == 0)
+			if (codec->num_extensions == 0)
 			{
 				/*
 				 * newer plugin, with 0-terminated list
 				 */
-				p = codecs[i].extensions;
+				p = codec->extensions;
 				while (*p)
 				{
 					if (strcmp(extension, p) == 0)
@@ -281,11 +283,11 @@ CODEC *get_codec( const char *file)
 			{
 				c = 0;
 				/* old version, with exactly 3 chars per extension */
-				for( j = 0; j < codecs[i].num_extensions; j++)
+				for( j = 0; j < codec->num_extensions; j++)
 				{
-					plugin[0] = codecs[i].extensions[c++];
-					plugin[1] = codecs[i].extensions[c++];
-					plugin[2] = codecs[i].extensions[c++];
+					plugin[0] = codec->extensions[c++];
+					plugin[1] = codec->extensions[c++];
+					plugin[2] = codec->extensions[c++];
 		
 					if (strcmp(extension, plugin) == 0)
 					{
@@ -301,24 +303,24 @@ CODEC *get_codec( const char *file)
 				  || !( ldg_funcs.decoder_quit 	= ldg_find( "reader_quit", ldg))
 				  || !( ldg_funcs.decoder_get_txt = ldg_find( "reader_get_txt", ldg)))
 				{
-					errshow(codecs[i].extensions, LDG_ERR_BASE + ldg_error());
+					errshow(codec->extensions, LDG_ERR_BASE + ldg_error());
 					return NULL;
 				}				
 
 				/* decoder_get_page_size = ldg_find( "reader_get_page_size", ldg); */
 
-				return &codecs[i];
+				return codec;
 			}
 			break;
 		case CODEC_SLB:
 			match = FALSE;
-			p = codecs[i].extensions;
+			p = codec->extensions;
 			while (*p)
 			{
 				if (strcmp(extension, p) == 0)
 				{
-					curr_input_plugin = &codecs[i];
-					return &codecs[i];
+					curr_input_plugin = codec;
+					return codec;
 				}
 				p += strlen(p) + 1;
 			}

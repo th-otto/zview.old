@@ -8,8 +8,8 @@
 
 
 /* Global variable */
-int16 	plugins_nbr = 0;
-CODEC codecs[MAX_CODECS];
+int16 	plugins_nbr;
+CODEC *codecs[MAX_CODECS];
 
 
 /*==================================================================================*
@@ -22,24 +22,150 @@ CODEC codecs[MAX_CODECS];
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
+static void plugin_free(CODEC *codec)
+{
+	switch (codec->type)
+	{
+	case CODEC_LDG:
+		ldg_close(codec->c.ldg, ldg_global);
+		break;
+	case CODEC_SLB:
+		plugin_close(&codec->c.slb);
+		break;
+	}
+	free(codec->name);
+	free(codec);
+}
+
 void plugins_quit( void)
 {
 	int16 i;
 
 	for( i = 0; i < plugins_nbr; i++)
 	{
-		switch (codecs[i].type)
-		{
-		case CODEC_LDG:
-			ldg_close(codecs[i].c.ldg, ldg_global);
-			break;
-		case CODEC_SLB:
-			plugin_close(&codecs[i].c.slb);
-			break;
-		}
- 		codecs[i].type = CODEC_NONE;
+		plugin_free(codecs[i]);
 	}
 	plugins_nbr = 0;
+}
+
+
+static boolean warn_duplicates(CODEC *last_codec, const char *ext, CODEC *this_codec)
+{
+	char buf[256];
+	
+	sprintf(buf, get_string(AL_DUPLICATE), ext, last_codec->name, this_codec->name);
+	return FormAlert(1, buf);
+}
+
+
+static boolean check_duplicates(void)
+{
+	int16_t last = plugins_nbr;
+	int16_t i;
+	CODEC *last_codec = codecs[last];
+	CODEC *this_codec;
+	const char *p1;
+	const char *p2;
+	char ext1[4];
+	char ext2[4];
+	int16_t j, k;
+	int ret;
+	
+	ext1[3] = '\0';
+	ext2[3] = '\0';
+	for (i = 0; i < last; i++)
+	{
+		this_codec = codecs[i];
+		if (this_codec->num_extensions == 0)
+		{
+			if (last_codec->num_extensions == 0)
+			{
+				for (p1 = last_codec->extensions; *p1; p1 += strlen(p1) + 1)
+				{
+					for (p2 = this_codec->extensions; *p2; p2 += strlen(p2) + 1)
+					{
+						if (strcmp(p1, p2) == 0)
+						{
+							ret = warn_duplicates(last_codec, p1, this_codec);
+							goto done;
+						}
+					}
+				}
+			} else
+			{
+				for (p1 = last_codec->extensions, j = 0; j < (int16_t)last_codec->num_extensions; p1 += 3, j++)
+				{
+					ext1[0] = p1[0];
+					ext1[1] = p1[1];
+					ext1[2] = p1[2];
+					for (p2 = this_codec->extensions; *p2; p2 += strlen(p2) + 1)
+					{
+						if (strcmp(ext1, p2) == 0)
+						{
+							ret = warn_duplicates(last_codec, ext1, this_codec);
+							goto done;
+						}
+					}
+				}
+			}
+		} else
+		{
+			if (last_codec->num_extensions == 0)
+			{
+				for (p1 = last_codec->extensions; *p1; p1 += strlen(p1) + 1)
+				{
+					for (p2 = this_codec->extensions, j = 0; j < (int16_t)this_codec->num_extensions; p2 += 3, j++)
+					{
+						ext2[0] = p2[0];
+						ext2[1] = p2[1];
+						ext2[2] = p2[2];
+						if (strcmp(p1, ext2) == 0)
+						{
+							ret = warn_duplicates(last_codec, p1, this_codec);
+							goto done;
+						}
+					}
+				}
+			} else
+			{
+				for (p1 = last_codec->extensions, k = 0; k < (int16_t)last_codec->num_extensions; p1 += 3, k++)
+				{
+					ext1[0] = p1[0];
+					ext1[1] = p1[1];
+					ext1[2] = p1[2];
+					for (p2 = this_codec->extensions, j = 0; j < (int16_t)this_codec->num_extensions; p2 += 3, j++)
+					{
+						ext2[0] = p2[0];
+						ext2[1] = p2[1];
+						ext2[2] = p2[2];
+						if (strcmp(ext1, ext2) == 0)
+						{
+							ret = warn_duplicates(last_codec, ext1, this_codec);
+							goto done;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	plugins_nbr++;
+	return TRUE;
+
+done:
+	switch (ret)
+	{
+	case 1:
+		/* replace previous by current */
+		plugin_free(codecs[i]);
+		codecs[i] = last_codec;
+		return TRUE;
+	case 2:
+		/* ignore current */
+		plugin_free(last_codec);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 
@@ -63,6 +189,7 @@ int16 plugins_init( void)
 	int16			len;
 	char  			extension[4];
 	char *name;
+	CODEC *codec;
 	
 	strcpy( plugin_dir, zview_path);
 	strcat( plugin_dir, "codecs\\");
@@ -107,26 +234,34 @@ int16 plugins_init( void)
 
 			if (strcmp(extension, "ldg") == 0)
 			{
-				if ((codecs[plugins_nbr].c.ldg = ldg_open(plugin_dir, ldg_global)) != NULL)
+				codec = codecs[plugins_nbr] = (CODEC *)calloc(1, sizeof(CODEC));
+				if (codec == NULL)
+				{
+					errshow(NULL, -ENOMEM);
+					break;
+				}
+				if ((codec->c.ldg = ldg_open(plugin_dir, ldg_global)) != NULL)
 				{
 					void CDECL(*codec_init)(void);
 
-					if ((codec_init = ldg_find("plugin_init", codecs[plugins_nbr].c.ldg)) != NULL)
+					if ((codec_init = ldg_find("plugin_init", codec->c.ldg)) != NULL)
 					{
-						codecs[plugins_nbr].type = CODEC_LDG;
-						codecs[plugins_nbr].extensions = codecs[plugins_nbr].c.ldg->infos;
-						codecs[plugins_nbr].num_extensions = codecs[plugins_nbr].c.ldg->user_ext;
-						codecs[plugins_nbr].capabilities = 0;
-						if (ldg_find("reader_init", codecs[plugins_nbr].c.ldg) != 0)
-							codecs[plugins_nbr].capabilities |= CAN_DECODE;
-						if (ldg_find("encoder_init", codecs[plugins_nbr].c.ldg) != 0)
-							codecs[plugins_nbr].capabilities |= CAN_ENCODE;
+						codec->type = CODEC_LDG;
+						codec->extensions = codec->c.ldg->infos;
+						codec->num_extensions = codec->c.ldg->user_ext;
+						codec->capabilities = 0;
+						if (ldg_find("reader_init", codec->c.ldg) != 0)
+							codec->capabilities |= CAN_DECODE;
+						if (ldg_find("encoder_init", codec->c.ldg) != 0)
+							codec->capabilities |= CAN_ENCODE;
+						codec->name = strdup(de->d_name);
+						if (!check_duplicates())
+							break;
 						codec_init();
-						plugins_nbr++;
 					} else
 					{
 						errshow(de->d_name, LDG_ERR_BASE + ldg_error());
-						ldg_close( codecs[plugins_nbr].c.ldg, ldg_global);
+						plugin_free(codec);
 					}
 				} else
 				{
@@ -134,22 +269,32 @@ int16 plugins_init( void)
 				}
 			} else if (strcmp(extension, "slb") == 0)
 			{
-				SLB *slb = &codecs[plugins_nbr].c.slb;
+				SLB *slb;
 				long err;
 				
+				codec = codecs[plugins_nbr] = (CODEC *)calloc(1, sizeof(CODEC));
+				if (codec == NULL)
+				{
+					errshow(NULL, -ENOMEM);
+					break;
+				}
+				slb = &codec->c.slb;
 				*name = '\0';
 				if ((err = plugin_open(de->d_name, plugin_dir, slb)) >= 0)
 				{
-					codecs[plugins_nbr].type = CODEC_SLB;
-					codecs[plugins_nbr].extensions = (const char *)plugin_get_option(slb, OPTION_EXTENSIONS);
-					codecs[plugins_nbr].num_extensions = 0;
-					codecs[plugins_nbr].capabilities = plugin_get_option(slb, OPTION_CAPABILITIES);
-					if (codecs[plugins_nbr].capabilities < 0)
-						codecs[plugins_nbr].capabilities = 0;
-					plugins_nbr++;
+					codec->type = CODEC_SLB;
+					codec->extensions = (const char *)plugin_get_option(slb, OPTION_EXTENSIONS);
+					codec->num_extensions = 0;
+					codec->capabilities = plugin_get_option(slb, OPTION_CAPABILITIES);
+					if (codec->capabilities < 0)
+						codec->capabilities = 0;
+					codec->name = strdup(de->d_name);
+					if (!check_duplicates())
+						break;
 				} else
 				{
 					errshow(de->d_name, err);
+					free(codec);
 				}
 			}
 		}

@@ -282,22 +282,23 @@ void save_dialog( const char *fullfilename)
 	{ 
 		for( i = 0; i < plugins_nbr; i++)
 		{
-			switch (codecs[i].type)
+			CODEC *codec = codecs[i];
+			switch (codec->type)
 			{
 			case CODEC_LDG:
-				if( ldg_find( "encoder_init", codecs[i].c.ldg))
+				if( ldg_find( "encoder_init", codec->c.ldg))
 				{
-					encoder[encoder_plugins_nbr] = &codecs[i];
+					encoder[encoder_plugins_nbr] = codec;
 					encoder_plugins_nbr++;
 				}
 				break;
 			case CODEC_SLB:
 				{
 					long err;
-					err = plugin_get_option(&codecs[i].c.slb, OPTION_CAPABILITIES);
+					err = plugin_get_option(&codec->c.slb, OPTION_CAPABILITIES);
 					if (err >= 0 && (err & CAN_ENCODE))
 					{
-						encoder[encoder_plugins_nbr] = &codecs[i];
+						encoder[encoder_plugins_nbr] = codec;
 						encoder_plugins_nbr++;
 					}
 				}

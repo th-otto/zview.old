@@ -32,10 +32,11 @@ typedef struct {
 	long capabilities;
 	const char *extensions;
 	long num_extensions;
+	char *name;
 } CODEC;
 #define MAX_CODECS 100
 
-extern CODEC codecs[MAX_CODECS];
+extern CODEC *codecs[MAX_CODECS];
 extern int16 plugins_nbr;
 
 extern struct _ldg_funcs ldg_funcs;
