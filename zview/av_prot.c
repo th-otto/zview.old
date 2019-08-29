@@ -75,7 +75,7 @@ static char* ParseArgs( char* cmdline )
 
 
 /*==================================================================================*
- * void va_start:																	*
+ * void va_protokoll_start:															*
  *		Handle the VA_START message from the server.								*
  *----------------------------------------------------------------------------------*
  * input:																			*
@@ -85,7 +85,7 @@ static char* ParseArgs( char* cmdline )
  *      --																			*
  *==================================================================================*/
 
-void __CDECL va_start(WINDOW *win EVNT_BUFF_PARAM)
+void __CDECL va_protokoll_start(WINDOW *win EVNT_BUFF_PARAM)
 {
 	char **pp = (char **) &EVNT_BUFF[3];
 	char *p = *pp;

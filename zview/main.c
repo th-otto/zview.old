@@ -129,7 +129,7 @@ static void applinit( void)
 	RsrcXtype( RSRC_XTYPE, NULL, 0);
 
 	if( AvInit( "ZVIEW   ", A_START|A_QUOTE, 1000 ) >= 0)
-    	EvntAttach( NULL, VA_START, va_start);
+		EvntAttach( NULL, VA_START, va_protokoll_start);
 
 	/* Get the current path for the different file loading like icon, etc... */
 	{
