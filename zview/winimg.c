@@ -552,12 +552,13 @@ static void __CDECL WindViewClose( WINDOW *win EVNT_BUFF_PARAM)
 
 	delete_txt_data( img);
 	delete_mfdb( img->image, img->page);
+	img->image = NULL;
 
-	if( windata->icon.fd_addr != NULL)
-		free( windata->icon.fd_addr);
+	free( windata->icon.fd_addr);
+	windata->icon.fd_addr = NULL;
 
-	if( windata->zoom_picture.fd_addr != NULL)
-		free( windata->zoom_picture.fd_addr);
+	free( windata->zoom_picture.fd_addr);
+	windata->zoom_picture.fd_addr = NULL;
 
 	free( windata);
 

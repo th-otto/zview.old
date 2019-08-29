@@ -189,7 +189,7 @@ void *malloc(size_t s)
 	return get_slb_funcs()->p_malloc(s);
 }
 
-void free(void *p)
+void (free)(void *p)
 {
 	CHECK(free, return);
 	get_slb_funcs()->p_free(p);

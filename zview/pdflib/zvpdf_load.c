@@ -108,12 +108,14 @@ void __CDECL delete_bookmarks(WINDATA *windata)
 #define DBG_ALLOC 0
 
 #if DBG_ALLOC
+#include <mint/arch/nf_ops.h>
+
 struct alloc {
 	struct alloc *next;
 };
 static struct alloc *alloc_list;
 
-static void check_alloc(struct alloc *pptr)
+static int check_alloc(struct alloc *pptr, const char *where)
 {
 	struct alloc **p;
 	
@@ -121,16 +123,17 @@ static void check_alloc(struct alloc *pptr)
 	while (*p)
 	{
 		if (*p == pptr)
-			return;
+			return TRUE;
 		p = &(*p)->next;
 	}
 #if DBG_ALLOC >= 2
-	nf_debugprintf("ptr not on list: %08lx\n", (unsigned long)(pptr + 1));
+	nf_debugprintf("%s: ptr not on list: %08lx\n", where, (unsigned long)(pptr + 1));
 #endif
+	return FALSE;
 }
 
 
-static int remove_alloc(struct alloc *pptr)
+static int remove_alloc(struct alloc *pptr, const char *where)
 {
 	struct alloc **p;
 	
@@ -145,9 +148,9 @@ static int remove_alloc(struct alloc *pptr)
 		p = &(*p)->next;
 	}
 #if DBG_ALLOC >= 2
-	nf_debugprintf("ptr not on list: %08lx\n", (unsigned long)(pptr + 1));
+	nf_debugprintf("%s: ptr not on list: %08lx\n", where, (unsigned long)(pptr + 1));
 #endif
-	return 0;
+	return FALSE;
 }
 
 
@@ -174,24 +177,29 @@ static void *my_realloc(void *ptr, size_t len)
 	struct alloc *pptr;
 
 	pptr = ptr;
-	pptr--;
-	check_alloc(pptr);
+	if (pptr)
+	{
+		pptr--;
+		if (!check_alloc(pptr, "realloc"))
+			return NULL;
+	}
 	p = realloc(pptr, len + sizeof(struct alloc));
 	if (p)
 	{
 		if (p != pptr)
 		{
-			remove_alloc(pptr);
+			if (pptr)
+				remove_alloc(pptr, "realloc");
 			p->next = alloc_list;
 			alloc_list = p;
 		}
 		++p;
 	} else if (pptr)
 	{
-		remove_alloc(pptr);
+		remove_alloc(pptr, "realloc");
 	}
 #if DBG_ALLOC >= 3
-	nf_debugprintf("realloc %08lx %lu: %08lx\n", (unsigned long)(pptr + 1), len, (unsigned long)(p));
+	nf_debugprintf("realloc %08lx %lu: %08lx\n", (unsigned long)ptr, len, (unsigned long)(p));
 #endif
 	return p;
 }
@@ -199,12 +207,14 @@ static void *my_realloc(void *ptr, size_t len)
 static void my_free(void *p)
 {
 	struct alloc *pptr;
+	if (p == NULL)
+		return;
 	pptr = p;
 	pptr--;
 #if DBG_ALLOC >= 3
 	nf_debugprintf("free %08lx\n", (unsigned long)(pptr + 1));
 #endif
-	if (remove_alloc(pptr))
+	if (remove_alloc(pptr, "free"))
 		free(pptr);
 }
 #endif
