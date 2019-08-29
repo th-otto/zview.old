@@ -5,72 +5,66 @@
 
 
 /* taken from mxPlay - simplified version, takes only one argument */
-static char* ParseArgs( char* cmdline )
+static char *ParseArgs(const char *cmdline, char *all)
 {
-	int	inQuote = FALSE;
-	int		i = 0;
-	int		j = 0;
-	char	all[1023+1];
+	int inQuote = FALSE;
+	int i = 0;
+	int j = 0;
 
-	while( cmdline[i] != '\0' )
+	if (cmdline == NULL)
+		return NULL;
+	while (cmdline[i] != '\0' && j < 1024)
 	{
-		if( cmdline[i] != '\'' && cmdline[i] != ' ' && inQuote == FALSE )
+		if (cmdline[i] != '\'' && cmdline[i] != ' ' && inQuote == FALSE)
 		{
 			/* simple file (not in quotes) */
-			while( cmdline[i] != '\0' && cmdline[i] != ' ' )
+			while (cmdline[i] != '\0' && cmdline[i] != ' ' && j < 1024)
 			{
 				all[j++] = cmdline[i++];
 			}
-
-			all[j++] = '\0';
-			strcpy( cmdline, all );
-			return cmdline;
+			break;
 		}
 
-		switch( cmdline[i] )
+		switch (cmdline[i])
 		{
-			case '\'':
-				i++;
-				if( inQuote == TRUE )
+		case '\'':
+			i++;
+			if (inQuote)
+			{
+				if (cmdline[i] == '\'')	/* '' -> ' */
 				{
-					if( cmdline[i] == '\'' )					/* '' -> ' */
-					{
-						all[j++] = '\'';
-						i++;
-					}
-					else
-					{
-						inQuote = FALSE;
-						all[j++] = '\0';
-						strcpy( cmdline, all );
-						return cmdline;
-					}
-				}
-				else
-				{
-					inQuote = TRUE;
-				}
-				break;
-
-			case ' ':
-				if( inQuote == TRUE )
-				{
-					all[j++] = cmdline[i++];
-				}
-				else
-				{
+					all[j++] = '\'';
 					i++;
+				} else
+				{
+					inQuote = FALSE;
+					all[j] = '\0';
+					return all;
 				}
-				break;
+			} else
+			{
+				inQuote = TRUE;
+			}
+			break;
 
-			default:
+		case ' ':
+			if (inQuote)
+			{
 				all[j++] = cmdline[i++];
-				break;
+			} else
+			{
+				i++;
+			}
+			break;
 
+		default:
+			all[j++] = cmdline[i++];
+			break;
 		}
 	}
 
-	return cmdline;
+	all[j] = '\0';
+	return all;
 }
 
 
@@ -85,22 +79,19 @@ static char* ParseArgs( char* cmdline )
  *      --																			*
  *==================================================================================*/
 
-void __CDECL va_protokoll_start(WINDOW *win EVNT_BUFF_PARAM)
+void __CDECL va_protokoll_start(WINDOW * win EVNT_BUFF_PARAM)
 {
-	char **pp = (char **) &EVNT_BUFF[3];
-	char *p = *pp;
+	const char *const *pp = (const char *const *) &EVNT_BUFF[3];
+	const char *p = *pp;
+	char all[1023 + 1];
 
-	if( p)
-	{
-		p = ParseArgs( p );
+	p = ParseArgs(p, all);
 
-		/* yes, I know, it's strange to reput the menubar here
-		but if we don't do it, on MagiC, the menubar is not active after
-		a VA_START :( */
-		MenuBar( get_tree( MENU_BAR), 1);
+	/* yes, I know, it's strange to reput the menubar here
+	   but if we don't do it, on MagiC, the menubar is not active after
+	   a VA_START :( */
+	MenuBar(get_tree(MENU_BAR), 1);
 
-		if (*p)
-			WindView( p);
-		free( p);
-	}
+	if (p && *p)
+		WindView(p);
 }
