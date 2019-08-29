@@ -19,6 +19,7 @@ typedef long off_t;
 #endif
 
 
+/* values for img_info->memory_alloc; deprecated */
 #define ST_RAM			0
 #define TT_RAM			1
 
@@ -36,6 +37,7 @@ typedef enum
 } J_COLOR_SPACE;
 #endif
 
+/* values for img_info->orientation */
 #define UP_TO_DOWN 		0
 #define DOWN_TO_UP		1
 
@@ -104,7 +106,9 @@ typedef struct _img_info
 	uint16_t	max_comments_length;	/* The length of the greater line in the comment 			*/
 	int16_t		indexed_color;			/* Picture has a palette: 0) No 1) Yes						*/
 	int16_t		memory_alloc;			/* where to do the memory allocation for the reader_read
-										   function buffer, possible values are ST_RAM or TT_RAM	*/
+										   function buffer, possible values are ST_RAM or TT_RAM
+										   (deprecated, actually unused)
+										   */
 	COLOR_MAP	palette[256];			/* Palette in standard RGB format							*/
 
 

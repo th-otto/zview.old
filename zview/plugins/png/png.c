@@ -37,6 +37,7 @@ struct _mypng_info {
 	size_t input_rowbytes;
 	png_byte bit_depth;   /* bit depth of row (1, 2, 4, or 8) */
 	png_byte channels;    /* number of channels (1, 2, 3, or 4) */
+	png_byte bits_per_pixel;
 	png_byte interlace_type;
 	jmp_buf jmpbuf;
 };
@@ -123,6 +124,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	png_textp png_text_ptr;
 	int num_text;
 	struct _mypng_info *myinfo;
+	png_byte color_type;
 
 	if ((png_file = fopen(name, "rb")) == NULL)
 		return FALSE;
@@ -163,30 +165,63 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	png_read_info(myinfo->png_ptr, myinfo->info_ptr);
 	myinfo->channels = png_get_channels(myinfo->png_ptr, myinfo->info_ptr);
 	myinfo->bit_depth = png_get_bit_depth(myinfo->png_ptr, myinfo->info_ptr);
-	myinfo->interlace_type = png_get_interlace_type(myinfo->png_ptr, myinfo->info_ptr);
 
-	if (png_get_color_type(myinfo->png_ptr, myinfo->info_ptr) == PNG_COLOR_TYPE_PALETTE)
-		png_set_expand(myinfo->png_ptr);
-	if (png_get_color_type(myinfo->png_ptr, myinfo->info_ptr) == PNG_COLOR_TYPE_GRAY && myinfo->bit_depth < 8)
-		png_set_expand(myinfo->png_ptr);
-	if (png_get_valid(myinfo->png_ptr, myinfo->info_ptr, PNG_INFO_tRNS))
-		png_set_tRNS_to_alpha(myinfo->png_ptr);
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 	if (myinfo->bit_depth == 16)
+	{
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 		png_set_scale_16(myinfo->png_ptr);
 #else
 		png_set_strip_16(myinfo->png_ptr);
 #endif
+		myinfo->bit_depth = 8;
+	}
 #endif
-	if (png_get_color_type(myinfo->png_ptr, myinfo->info_ptr) == PNG_COLOR_TYPE_GRAY ||
-		png_get_color_type(myinfo->png_ptr, myinfo->info_ptr) == PNG_COLOR_TYPE_GRAY_ALPHA)
-		png_set_gray_to_rgb(myinfo->png_ptr);
+
+	myinfo->interlace_type = png_get_interlace_type(myinfo->png_ptr, myinfo->info_ptr);
+	color_type = png_get_color_type(myinfo->png_ptr, myinfo->info_ptr);
+	info->indexed_color = FALSE;
+
+	if (color_type == PNG_COLOR_TYPE_PALETTE && myinfo->bit_depth <= 8)
+	{
+		png_colorp palette;
+		png_int_t num_palette = 0;
+		png_int_t i;
+		
+		info->indexed_color = TRUE;
+		png_get_PLTE(myinfo->png_ptr, myinfo->info_ptr, &palette, &num_palette);
+		for (i = 0; i < num_palette; i++)
+		{
+			info->palette[i].red = palette[i].red;
+			info->palette[i].green = palette[i].green;
+			info->palette[i].blue = palette[i].blue;
+		}
+		png_set_packing(myinfo->png_ptr);
+	}
+	if ((color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_GRAY_ALPHA) && myinfo->bit_depth < 8)
+	{
+		png_set_expand_gray_1_2_4_to_8(myinfo->png_ptr);
+#if 0
+		if (myinfo->bit_depth > 1)
+			myinfo->bit_depth = 8;
+#endif
+	}
+	if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+	{
+		/* 2 channels currently not supported by display routines */
+		png_set_strip_alpha(myinfo->png_ptr);
+		myinfo->channels = 1;
+	}
+	
+	if (png_get_valid(myinfo->png_ptr, myinfo->info_ptr, PNG_INFO_tRNS))
+		png_set_tRNS_to_alpha(myinfo->png_ptr);
+
+	myinfo->bits_per_pixel = myinfo->channels * myinfo->bit_depth;
 
 	strcpy(info->info, "Portable Network Format");
 	strcpy(info->compression, "Defl");
 
-	if (myinfo->interlace_type == PNG_INTERLACE_ADAM7)
+	if (myinfo->interlace_type != PNG_INTERLACE_NONE)
 	{
 		strcat(info->info, " (Interlaced)");
 		myinfo->number_passes = png_set_interlace_handling(myinfo->png_ptr);
@@ -204,12 +239,11 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->real_height = info->height;
 	info->memory_alloc = TT_RAM;
 	info->components = myinfo->channels > 3 ? 3 : myinfo->channels;
-	info->planes = png_get_bit_depth(myinfo->png_ptr, myinfo->info_ptr);
+	info->planes = myinfo->bits_per_pixel;
 	info->colors = 1L << info->planes;
 	info->delay = 0;
 	info->orientation = UP_TO_DOWN;
 	info->page = 1;
-	info->indexed_color = FALSE;
 
 	if (myinfo->channels == 4 || myinfo->interlace_type)
 	{
@@ -326,7 +360,7 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 	if (setjmp(myinfo->jmpbuf))
 		return FALSE;
 
-	if (myinfo->interlace_type == PNG_INTERLACE_ADAM7)
+	if (myinfo->interlace_type != PNG_INTERLACE_NONE)
 	{
 		/* We make the first pass here and not before to avoid memory fragmentation */
 		if (myinfo->first_pass)
@@ -334,14 +368,9 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 			int16_t pass;
 			int16_t y = info->height;
 
-#ifndef PNG_READ_INTERLACING_SUPPORTED
-			if (passes == PNG_INTERLACE_ADAM7_PASSES)
-				y = PNG_PASS_ROWS(y, pass);
-#endif
-
-			png_start_read_image(myinfo->png_ptr);
-			
-			myinfo->png_image1 = (uint8_t *) malloc(myinfo->input_rowbytes * (info->height + 1));
+			myinfo->png_image1 = (uint8_t *) malloc((info->height + 1) * myinfo->input_rowbytes);
+			if (myinfo->png_image1 == NULL)
+				return FALSE;
 
 			myinfo->png_image_ptr = myinfo->png_image1;
 
@@ -350,7 +379,7 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 				for (i = 0; i < y; i++)
 				{
 					png_bytep row = myinfo->png_image1 + i * myinfo->input_rowbytes;
-					png_read_row(myinfo->png_ptr, myinfo->line_buffer, row);
+					png_read_row(myinfo->png_ptr, row, NULL);
 				}
 			}
 			myinfo->first_pass = FALSE;
