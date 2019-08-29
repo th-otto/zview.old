@@ -171,7 +171,7 @@ static inline void read_img ( IMAGE *img, IMGINFO info, DECDATA data)
 
 		info->page_wanted = i;
 
-		for( y = 1; y <= img_h; y++)
+		for( y = 1; y <= img_h && y_dst; y++)
 		{
 			if (curr_input_plugin)
 			{
@@ -406,6 +406,7 @@ boolean pic_load( const char *file, IMAGE *img, boolean quiet)
 		errshow(NULL, -ENOMEM);
 		quit_img( info, data);
 		delete_mfdb( img->image, img->page);
+		img->image = NULL;
 		win_progress_end();
 		return FALSE;
 	}
