@@ -330,7 +330,6 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	comment->lines 				= 0;
 	comment->max_lines_length 	= 0;
-	comment->txt[0] 			= NULL;
 
 	jpeg->err               = jpeg_std_error( jerr);
 	jpeg->err->emit_message = _jpeg_shutup;
@@ -418,7 +417,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	{
 		if( mark->marker == JPEG_COM)
 		{
-			if (!mark->data || !mark->data_length)
+			if (!mark->data || !mark->data_length || mark->data_length > 1024 || comment->lines >= MAX_TXT_DATA)
 	               continue;
 		
 			comment->txt[comment->lines] = ( int8_t*)malloc( mark->data_length + 1);
@@ -434,18 +433,19 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		{
 			int i, l, length;
 			char value[1024+256];
-			ExifData *exifData = exif_data_new_from_data(( char*)mark->data, mark->data_length);
-
-		    if( !exifData)
-				continue;
+			ExifData *exifData;
 
 #ifdef EXIF_SLB
 			if (get_slb_funcs()->p_slb_open(LIB_EXIF) < 0)
 			{
-				exif_data_unref( exifData);
 				continue;
 			}
 #endif
+			exifData = exif_data_new_from_data(( char*)mark->data, mark->data_length);
+
+		    if( !exifData)
+				continue;
+
 			for( i = 0; i < EXIF_IFD_COUNT; i++)
 			{
 				ExifContent* content = exifData->ifd[i];
@@ -453,11 +453,12 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				for ( l = 0; l < content->count; l++)
 				{
 					const char *tag;
+					ExifEntry *e;
 					
-					if( comment->lines > 253)
+					if( comment->lines >= MAX_TXT_DATA)
 						break;
 
-					ExifEntry *e = content->entries[l];
+					e = content->entries[l];
 
 					tag = exif_tag_get_name (e->tag);
 					if (tag)
@@ -469,7 +470,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 					length = strlen( value);
 
-					exif_entry_get_value( e, &value[length], sizeof(value) - length);
+					exif_entry_get_value( e, &value[length], sizeof(value) - length - 1);
+					value[sizeof(value) - 1] = '\0';
 
 					length = strlen( value);
 					
@@ -490,7 +492,8 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				int32_t size = exifData->size;
 
 				info->__priv_ptr_more = malloc( size + 1);
-				memcpy( info->__priv_ptr_more, exifData->data, size);
+				if (info->__priv_ptr_more != NULL)
+					memcpy( info->__priv_ptr_more, exifData->data, size);
 
 				exif_data_unref( exifData);
 
@@ -499,8 +502,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				free( jpeg->err);
 				free( jpeg);
 				fclose( jpeg_file);
+				jpeg_file = NULL;
 
-				if( decompress_thumbnail_image( info->__priv_ptr_more, size, info))
+				if( info->__priv_ptr_more && decompress_thumbnail_image( info->__priv_ptr_more, size, info))
 				{
 					info->num_comments			= comment->lines;
 					info->max_comments_length	= comment->max_lines_length;
@@ -514,6 +518,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				else /* We can't extract the thumbnail :/ */
 				{
 					free( info->__priv_ptr_more);
+					info->__priv_ptr_more = NULL;
 
 					if ( comment)
 					{
@@ -636,7 +641,8 @@ void __CDECL reader_quit( IMGINFO info)
 		{
 		        /* DSP decoder uses Mxalloc() */
 			Mfree( info->_priv_ptr);
-                }
+			info->_priv_ptr = 0;
+        }
 		return;
 	}
 
@@ -656,6 +662,7 @@ void __CDECL reader_quit( IMGINFO info)
 				free( comment->txt[i]);
 		}
 	 	free( comment);
+	 	info->_priv_ptr_more = NULL;
 	}
 
 	jpeg_finish_decompress( jpeg);
@@ -665,13 +672,14 @@ void __CDECL reader_quit( IMGINFO info)
 	free( jpeg);
 	
 	/* thumbnail mode? */	
-	if( info->__priv_ptr_more)
-	{
-		free( info->__priv_ptr_more);
-		return;
-	}
+	free( info->__priv_ptr_more);
+	info->__priv_ptr_more = NULL;
 
-	fclose( (FILE *)info->_priv_var);
+	if (info->_priv_var)
+	{
+		fclose( (FILE *)info->_priv_var);
+		info->_priv_var = 0;
+	}
 }
 
 
@@ -690,8 +698,8 @@ void __CDECL reader_quit( IMGINFO info)
  *==================================================================================*/
 boolean __CDECL encoder_init( const char *name, IMGINFO info)
 {
-	JPEG_ERR 	jerr = NULL;
-	JPEG_ENC 	jpeg = NULL;		   
+	JPEG_ERR 	jerr;
+	JPEG_ENC 	jpeg;		   
 	FILE* 		jpeg_file;
 	jmp_buf 	escape;
 	int16_t 		header = 0;
@@ -704,8 +712,8 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 
 	if ( jpeg == NULL || jerr == NULL) 
 	{
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
+		free( jerr);
+		free( jpeg);
 		fclose( jpeg_file);
 		return FALSE;
 	}
@@ -717,10 +725,8 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 
 		jpeg_destroy_compress( jpeg);
 
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
-		jerr 	= NULL;
-		jpeg 	= NULL;
+		free( jerr);
+		free( jpeg);
 		fclose( jpeg_file);
 		return FALSE;
 	}
@@ -785,7 +791,13 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
  *==================================================================================*/
 boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 {
-	( void)jpeg_write_scanlines( ( JPEG_ENC)info->_priv_ptr, ( JSAMPROW*)&buffer, 1);
+	JPEG_ENC jpeg = ( JPEG_ENC)info->_priv_ptr;
+	jmp_buf 	escape;
+
+	jpeg->client_data   	= &escape;
+	if (setjmp(escape) == 0)
+		( void)jpeg_write_scanlines( ( JPEG_ENC)info->_priv_ptr, ( JSAMPROW*)&buffer, 1);
+	jpeg->client_data  		= NULL;
 	return TRUE;
 }
 
@@ -807,11 +819,18 @@ void __CDECL encoder_quit( IMGINFO info)
 	JPEG_ENC jpeg = ( JPEG_ENC)info->_priv_ptr;
 	if( jpeg)
 	{
-		jpeg_finish_compress( jpeg);
-		jpeg_destroy_compress( jpeg);
+		jmp_buf 	escape;
+
+		jpeg->client_data   	= &escape;
+		if (setjmp(escape) == 0)
+		{
+			jpeg_finish_compress( jpeg);
+			jpeg_destroy_compress( jpeg);
+		}
 		free( jpeg->err);
 		free( jpeg);
 		fclose( (FILE *)info->_priv_var);
+		info->_priv_ptr = 0;
 	}
 }
 

@@ -21,6 +21,7 @@
  * PNG decoder does not try to display compressed text information
    fields any longer; they are not used to store information that
    should be displayed in the info box
+ * JPEG decoder also limits exif data to some reasonable length
 
  Known Bugs:
  ----------
