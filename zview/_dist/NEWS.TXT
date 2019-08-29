@@ -18,6 +18,9 @@
  ----------
  * TGA files with right-to-left orientation are now rejected;
    they are not handled by the decoder
+ * PNG decoder does not try to display compressed text information
+   fields any longer; they are not used to store information that
+   should be displayed in the info box
 
  Known Bugs:
  ----------
@@ -30,7 +33,8 @@
    are therefore not displayed
  * Images which have an alpha channel, will store pre-multiplied RGB
    when saving, and loose the alpha-channel
- 
+ * International text fields in PNG files are not handled correctly
+
 For a history of previous changes, see doc/history.txt
 
 

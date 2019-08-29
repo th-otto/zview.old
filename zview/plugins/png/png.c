@@ -121,7 +121,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
     png_color_16p image_background;
 #endif
 	png_textp png_text_ptr;
-	int num_text = 0;
+	int num_text;
 	struct _mypng_info *myinfo;
 
 	if ((png_file = fopen(name, "rb")) == NULL)
@@ -194,7 +194,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	png_read_update_info(myinfo->png_ptr, myinfo->info_ptr);
 
-	png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, &num_text);
+	num_text = png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, NULL);
 
 	myinfo->input_rowbytes = png_get_rowbytes(myinfo->png_ptr, myinfo->info_ptr);
 	
@@ -209,8 +209,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->delay = 0;
 	info->orientation = UP_TO_DOWN;
 	info->page = 1;
-	info->num_comments = num_text;
-	info->max_comments_length = 0;
 	info->indexed_color = FALSE;
 
 	if (myinfo->channels == 4 || myinfo->interlace_type)
@@ -224,16 +222,25 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		}
 	}
 
+	info->max_comments_length = 0;
 	if (num_text)
 	{
-		int16_t i;
-		uint16_t len;
+		int16_t i, j;
+		size_t len;
 
-		for (i = 0; i < num_text; i++)
+		for (i = j = 0; i < num_text && j < MAX_TXT_DATA; i++)
 		{
-			len = (uint16_t)(strlen(png_text_ptr[i].key) + strlen(png_text_ptr[i].text) + 2);
-			info->max_comments_length = MAX(info->max_comments_length, len);
+			if ((png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE ||
+				 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR) &&
+				png_text_ptr[i].text &&
+				png_text_ptr[i].text_length < 1024)
+			{
+				len = strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length + 2;
+				info->max_comments_length = MAX(info->max_comments_length, len);
+				j++;
+			}
 		}
+		info->num_comments = j;
 	}
 
 	return TRUE;
@@ -254,15 +261,43 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
  *==================================================================================*/
 void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 {
-	int16_t i;
+	int16_t i, j;
 	struct _mypng_info *myinfo = (struct _mypng_info *)info->_priv_ptr;
 	png_textp png_text_ptr;
 	int num_text;
 
-	png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, &num_text);
+	num_text = png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, NULL);
 
-	for (i = 0; i < txtdata->lines; i++)
-		sprintf(txtdata->txt[i], "%s: %s", png_text_ptr[i].key, png_text_ptr[i].text);
+	/*
+	 * for compatibilty, all text strings were allocated with max length in
+	 * init_txt_data(); stop that nonsense
+	 */
+#ifdef PLUGIN_SLB
+	for (j = 0; j < txtdata->lines; j++)
+	{
+		free(txtdata->txt[j]);
+		txtdata->txt[j] = NULL;
+	}
+#endif
+	for (i = j = 0; i < num_text && j < txtdata->lines; i++)
+	{
+		if ((png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE ||
+			 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR) &&
+			png_text_ptr[i].text &&
+			png_text_ptr[i].text_length < 1024)
+		{
+#ifdef PLUGIN_SLB
+			size_t len = strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length + 3;
+			txtdata->txt[j] = malloc(len);
+			if (txtdata->txt[j] != NULL)
+#endif
+			{
+				sprintf(txtdata->txt[j], "%s: %s", png_text_ptr[i].key, png_text_ptr[i].text);
+				j++;
+			}
+		}
+	}
+	txtdata->lines = j;
 }
 
 

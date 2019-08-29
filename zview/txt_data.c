@@ -61,6 +61,7 @@ int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 
 		if( !img->comments->txt[i])
 		{
+			img->comments->lines = i;
 			delete_txt_data( img);
 			return( 0);
 		}
