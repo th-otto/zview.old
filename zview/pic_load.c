@@ -61,7 +61,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		img->page = info->page;
 
 
-	if( ( img->image = ( MFDB *)malloc( sizeof( MFDB) *  img->page)) == NULL)
+	if( ( img->image = ( MFDB *)calloc(img->page, sizeof( MFDB))) == NULL)
 		return( 0);
 
 
