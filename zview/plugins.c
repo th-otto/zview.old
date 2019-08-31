@@ -50,12 +50,26 @@ void plugins_quit( void)
 }
 
 
-static boolean warn_duplicates(CODEC *last_codec, const char *ext, CODEC *this_codec)
+static boolean warn_duplicates(int16_t i, CODEC *last_codec, const char *ext, CODEC *this_codec)
 {
 	char buf[256];
-	
+	int ret;
+
 	sprintf(buf, get_string(AL_DUPLICATE), ext, last_codec->name, this_codec->name);
-	return FormAlert(1, buf);
+	ret = FormAlert(1, buf);
+	switch (ret)
+	{
+	case 1:
+		/* replace previous by current */
+		plugin_free(codecs[i]);
+		codecs[i] = last_codec;
+		return TRUE;
+	case 2:
+		/* ignore current */
+		plugin_free(last_codec);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 
@@ -70,7 +84,6 @@ static boolean check_duplicates(void)
 	char ext1[4];
 	char ext2[4];
 	int16_t j, k;
-	int ret;
 	
 	ext1[3] = '\0';
 	ext2[3] = '\0';
@@ -87,8 +100,7 @@ static boolean check_duplicates(void)
 					{
 						if (strcmp(p1, p2) == 0)
 						{
-							ret = warn_duplicates(last_codec, p1, this_codec);
-							goto done;
+							return warn_duplicates(i, last_codec, p1, this_codec);
 						}
 					}
 				}
@@ -103,8 +115,7 @@ static boolean check_duplicates(void)
 					{
 						if (strcmp(ext1, p2) == 0)
 						{
-							ret = warn_duplicates(last_codec, ext1, this_codec);
-							goto done;
+							return warn_duplicates(i,last_codec, ext1, this_codec);
 						}
 					}
 				}
@@ -122,8 +133,7 @@ static boolean check_duplicates(void)
 						ext2[2] = p2[2];
 						if (strcmp(p1, ext2) == 0)
 						{
-							ret = warn_duplicates(last_codec, p1, this_codec);
-							goto done;
+							return warn_duplicates(i, last_codec, p1, this_codec);
 						}
 					}
 				}
@@ -141,8 +151,7 @@ static boolean check_duplicates(void)
 						ext2[2] = p2[2];
 						if (strcmp(ext1, ext2) == 0)
 						{
-							ret = warn_duplicates(last_codec, ext1, this_codec);
-							goto done;
+							return warn_duplicates(i, last_codec, ext1, this_codec);
 						}
 					}
 				}
@@ -152,21 +161,6 @@ static boolean check_duplicates(void)
 
 	plugins_nbr++;
 	return TRUE;
-
-done:
-	switch (ret)
-	{
-	case 1:
-		/* replace previous by current */
-		plugin_free(codecs[i]);
-		codecs[i] = last_codec;
-		return TRUE;
-	case 2:
-		/* ignore current */
-		plugin_free(last_codec);
-		return TRUE;
-	}
-	return FALSE;
 }
 
 
@@ -296,6 +290,8 @@ int16 plugins_init( void)
 						break;
 				} else
 				{
+					if (err == -EINVAL)
+						err = PLUGIN_MISMATCH;
 					errshow(de->d_name, err);
 					free(codec);
 				}

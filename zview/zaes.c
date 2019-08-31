@@ -604,6 +604,7 @@ void errshow( const char *name, int16 error)
 		case NOZCODECS:
 		case NOICONS:
 		case NO_EDDI:
+		case PLUGIN_MISMATCH:
 			( void)FormAlert( 1 , get_string(error), name);
 			break;
 
