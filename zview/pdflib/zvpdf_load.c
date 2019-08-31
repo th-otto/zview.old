@@ -75,11 +75,13 @@ void __CDECL pdf_quit(IMAGE *img)
 }
 
 
+#if 0
 const char *__CDECL get_pdf_title(void)
 {
 	SLB *slb = &zvpdf;
 	return (const char *)slb->exec(slb->handle, 8, SLB_NARGS(0));
 }
+#endif
 
 
 void __CDECL pdf_build_bookmark(WINDATA *windata, WINDOW *win)

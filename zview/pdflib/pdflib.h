@@ -12,7 +12,6 @@ void __CDECL pdf_get_page_size(IMAGE *img, int page, uint16 *width, uint16 *heig
 void __CDECL pdf_decode_page(IMAGE *img, int page, double scale);
 uint32 *__CDECL pdf_get_page_addr(IMAGE *img);
 void __CDECL pdf_quit(IMAGE *img);
-const char *__CDECL get_pdf_title(void);
 void __CDECL pdf_build_bookmark(WINDATA *windata, WINDOW *win);
 void __CDECL pdf_get_info(IMAGE *img, txt_data *txtdata);
 void __CDECL delete_bookmarks(WINDATA *windata);

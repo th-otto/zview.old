@@ -35,8 +35,6 @@ static unsigned char const latin_to_atari[] = {
 	/* 0x00f8 */ 0xB3, 0x97, 0xA3, 0x96, 0x81, 0x79, 0x2A, 0x98
 };
 
-static char pdf_title[256];
-
 
 static void delete_bookmark_child( Bookmark *book)
 {
@@ -419,17 +417,17 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
   	PDFDoc *doc = ( PDFDoc*)img->_priv_ptr;
 	char text[256];
 
+	txtdata->txt[0][0] = '\0';
+	txtdata->txt[1][0] = '\0';
+	txtdata->txt[2][0] = '\0';
+	txtdata->txt[3][0] = '\0';
+	txtdata->txt[4][0] = '\0';
+	txtdata->txt[5][0] = '\0';
+	txtdata->txt[6][0] = '\0';
+	txtdata->txt[7][0] = '\0';
+
 	if (!( uMap = globalParams->getTextEncoding()))
 	{
-		pdf_title[0] = '\0';
-		txtdata->txt[0][0] = '\0';
-		txtdata->txt[1][0] = '\0';
-		txtdata->txt[2][0] = '\0';
-		txtdata->txt[3][0] = '\0';
-		txtdata->txt[4][0] = '\0';
-		txtdata->txt[5][0] = '\0';
-		txtdata->txt[6][0] = '\0';
-		txtdata->txt[7][0] = '\0';
 	    return;
 	}
 
@@ -439,7 +437,6 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
 	{
 		InfoString(info.getDict(), "Title", uMap, text);
 		sprintf( txtdata->txt[0] , "Title:  %s", text);
-		strcpy( pdf_title, text);
 		InfoString(info.getDict(), "Subject", uMap, text);
 		sprintf( txtdata->txt[1] , "Subject:  %s", text);
 		InfoString(info.getDict(), "Keywords", uMap, text);
@@ -457,18 +454,6 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
 		InfoDate(info.getDict(), "ModDate", text);
 		sprintf( txtdata->txt[7] , "Modification Date:  %s", text);
 	}
-	else
-	{
-		pdf_title[0] = '\0';
-		txtdata->txt[0][0] = '\0';
-		txtdata->txt[1][0] = '\0';
-		txtdata->txt[2][0] = '\0';
-		txtdata->txt[3][0] = '\0';
-		txtdata->txt[4][0] = '\0';
-		txtdata->txt[5][0] = '\0';
-		txtdata->txt[6][0] = '\0';
-		txtdata->txt[7][0] = '\0';
-	}
 
 	info.free();
 	uMap->decRefCnt();
@@ -483,11 +468,6 @@ void pdf_quit( IMAGE *img)
 	delete doc;
 	img->_priv_ptr = NULL;
 	img->_priv_ptr_more = NULL;
-}
-
-const char *get_pdf_title( void)
-{
-  	return pdf_title;
 }
 
 boolean pdf_init( const char *path)

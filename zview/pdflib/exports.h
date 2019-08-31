@@ -21,7 +21,7 @@
 /*   5 */ LIBFUNC(5, pdf_decode_page, 4)
 /*   6 */ LIBFUNC(6, pdf_get_page_addr, 1)
 /*   7 */ LIBFUNC(7, pdf_quit, 1)
-/*   8 */ LIBFUNC(8, get_pdf_title, 0)
+/*   8 */ NOFUNC /* was get_pdf_title */
 /*   9 */ LIBFUNC(9, pdf_build_bookmark, 2)
 /*  10 */ LIBFUNC(10, pdf_get_info, 2)
 /*  11 */ LIBFUNC(11, delete_bookmarks, 1)

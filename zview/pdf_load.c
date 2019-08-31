@@ -231,6 +231,9 @@ boolean pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 		return FALSE;
 	}
 
+	/*
+	 * FIXME: this magic numbers must match pdf_get_info()
+	 */
 	if( !init_txt_data( img, 8, 256))
 	{
 		pdf_quit( img);

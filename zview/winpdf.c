@@ -1400,7 +1400,18 @@ WINDOW *WindPdf( const char *filename)
 		return NULL;
 	}
 
-	strcpy( windata->title, get_pdf_title());
+	{
+		const char *title = strchr(img->comments->txt[0], ':');
+		if (title != NULL)
+		{
+			while (*++title == ' ')
+				;
+		} else
+		{
+			title = "";
+		}
+		strcpy( windata->title, title);
+	}
 	sprintf( windata->info, "zView - [%s]", fullpathname_to_filename( windata->name));
 
 	if( img->page > 1)
