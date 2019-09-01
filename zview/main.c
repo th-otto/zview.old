@@ -104,6 +104,8 @@ static void __CDECL evnt_applexit(WINDOW *win, short buff[8])
 
 static void applinit( void)
 {		
+	Pdomain(1);
+
 	ApplInit();
 	
 /*	is it unusefull ? */
@@ -123,8 +125,6 @@ static void applinit( void)
 		ApplExit();
 		exit(1);
 	}
-
-	Pdomain(1);
 
 	RsrcXtype( RSRC_XTYPE, NULL, 0);
 
@@ -227,7 +227,7 @@ int main( int argc, char *argv[])
 	applinit();
 
  	if ( argc > 1)
-		WindView( argv[argc - 1]);
+		WindView( argv[1]);
 
 	for(;;) 
 		EvntWindom( MU_MESAG|MU_TIMER|MU_KEYBD|MU_BUTTON);
