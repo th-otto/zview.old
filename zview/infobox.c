@@ -17,41 +17,6 @@ static	OBJECT	*infotext;
 static txt_data *exif_box;
 static OBJECT *slider_root;
 
-#ifndef VDI_INTINMAX
-#define VDI_CNTRLMAX     16		/* max size of vdi_control[] ; actually 15; use 16 to make it long aligned */
-#define VDI_INTINMAX   1024		/**< max size of vdi_intin[] */
-#define VDI_INTOUTMAX   256		/**< max size of vdi_intout[] */
-#define VDI_PTSINMAX    256		/**< max size of vdi_ptsin[] */
-#define VDI_PTSOUTMAX   256		/**< max size of vdi_ptsout[] */
-#endif
-
-static short vdi_intin[VDI_INTINMAX];
-static short vdi_intout[VDI_INTOUTMAX];
-static short vdi_ptsin[VDI_PTSINMAX];
-static short vdi_ptsout[VDI_PTSOUTMAX];
-static short vdi_control[VDI_CNTRLMAX];
-
-static VDIPB vdi_params = {
-        &vdi_control[0],
-        &vdi_intin[0],
-        &vdi_ptsin[0],
-        &vdi_intout[0],
-        &vdi_ptsout[0] 
-};
-
-static int my_vsl_color (short handle, short idx) {
-	vdi_intin[0] = idx;
-
-	vdi_control[0] = 17;
-	vdi_control[1] = vdi_control[5] = 0;
-	vdi_control[3] = 1;
-	vdi_control[6] = handle;
-
-	vdi (&vdi_params);
-
-	return ((int)vdi_intout[0]);
-}
-
 static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 {
 	exif_box = (txt_data *) data; 
@@ -61,8 +26,8 @@ static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[2] = xy[0] + pblk->pb_w - 2;
 	xy[3] = xy[1] + pblk->pb_h - 1;
 
-	vsf_color( WIN_GRAF_HANDLE(win), WHITE);
-	v_bar( WIN_GRAF_HANDLE(win), xy);
+	udef_vsf_color( WIN_GRAF_HANDLE(win), WHITE);
+	udef_v_bar( WIN_GRAF_HANDLE(win), xy);
 
 	xy[0] = pblk->pb_x + pblk->pb_w - 1;
 	xy[1] = pblk->pb_y;
@@ -73,17 +38,21 @@ static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[0];
 	xy[7] = xy[5];
 	
-	my_vsl_color( WIN_GRAF_HANDLE(win), BLACK);
-	v_pline( WIN_GRAF_HANDLE(win), 4, xy);
+	udef_vsl_color( WIN_GRAF_HANDLE(win), BLACK);
+	udef_v_pline( WIN_GRAF_HANDLE(win), 4, xy);
 
 	posy = pblk->pb_y;  
 
-	for ( dum = ypos; dum < exif_box->lines; dum++, posy += 12) 
+	for ( dum = ypos; dum < exif_box->lines; dum++)
 	{
 		if( posy >= ( pblk->pb_y + pblk->pb_h - 1))
 			break;
 
-		draw_text( WIN_GRAF_HANDLE(win), pblk->pb_x + 3, posy + 3, BLACK, exif_box->txt[dum]);
+		if (exif_box->txt[dum])
+		{
+			draw_text( WIN_GRAF_HANDLE(win), pblk->pb_x + 3, posy + 3, BLACK, exif_box->txt[dum]);
+			posy += 12;
+		}
 	}
 }
 

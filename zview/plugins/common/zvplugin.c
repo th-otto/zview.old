@@ -15,6 +15,7 @@
 #include "plugin.h"
 #include "plugver.h"
 #include "slbload.h"
+#include "../../unicodemap.h"
 
 static struct _zview_plugin_funcs zview_plugin_funcs;
 
@@ -475,6 +476,10 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	S(longjmp);
 
 	S(atof);
+	
+	S(utf8_to_ucs16);
+	S(ucs16_to_latin1);
+	S(latin1_to_atari);
 #undef S
 
 	ret = slb_load(name, path, PLUGIN_INTERFACE_VERSION, &slb->handle, &slb->exec);

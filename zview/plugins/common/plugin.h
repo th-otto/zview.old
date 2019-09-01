@@ -166,8 +166,12 @@ struct _zview_plugin_funcs {
 	
 	double __CDECL (*p_atof)(const char *);
 
+	unsigned short *__CDECL (*p_utf8_to_ucs16)(const char *s, size_t len);
+	char *__CDECL (*p_ucs16_to_latin1)(const unsigned short *u, size_t len);
+	void __CDECL (*p_latin1_to_atari)(char *text);
+
 	/* room for later extensions */
-	void *unused[31];
+	void *unused[28];
 };
 
 #ifdef PLUGIN_SLB
@@ -236,6 +240,10 @@ struct _zview_plugin_funcs {
 #undef longjmp
 
 #undef atof
+
+#undef utf8_to_ucs16
+#undef ucs16_to_latin1
+#undef latin1_to_atari
 
 struct _zview_plugin_funcs *get_slb_funcs(void);
 
@@ -311,6 +319,10 @@ void nf_debugprintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define longjmp get_slb_funcs()->p_longjmp
 
 #define atof(x) get_slb_funcs()->p_atof(x)
+
+#define utf8_to_ucs16 get_slb_funcs()->p_utf8_to_ucs16
+#define ucs16_to_latin1 get_slb_funcs()->p_ucs16_to_latin1
+#define latin1_to_atari get_slb_funcs()->p_latin1_to_atari
 
 #ifdef __PUREC__
 /* not implemented yet; needs format conversion */

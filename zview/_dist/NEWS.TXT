@@ -22,6 +22,11 @@
    fields any longer; they are not used to store information that
    should be displayed in the info box
  * JPEG decoder also limits exif data to some reasonable length
+ * International text fields in PNG files should now be displayed correctly
+   (as long as they can be represented with atari characterset;
+   don't expect Japanese or Chinese be displayed there ;)
+ * Non-Ascii meta-information in PDF files should now be displayed
+   correctly
 
  Known Bugs:
  ----------
@@ -34,7 +39,6 @@
    are therefore not displayed
  * Images which have an alpha channel, will store pre-multiplied RGB
    when saving, and loose the alpha-channel
- * International text fields in PNG files are not handled correctly
 
 For a history of previous changes, see doc/history.txt
 

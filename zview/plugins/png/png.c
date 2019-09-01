@@ -1,6 +1,7 @@
 #include "plugin.h"
 #include "zvplugin.h"
 #include <png.h>
+#include <wchar.h>
 
 #define VERSION 0x201
 #define AUTHOR "Zorro,Thorsten Otto"
@@ -42,6 +43,7 @@ struct _mypng_info {
 	jmp_buf jmpbuf;
 };
 
+static char const mod_time_prefix[] = "Modification time: ";
 
 
 static void mypng_error_handler(png_structp png_ptr, png_const_charp msg)
@@ -122,7 +124,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
     png_color_16p image_background;
 #endif
 	png_textp png_text_ptr;
-	int num_text;
+	png_int_t num_text;
 	struct _mypng_info *myinfo;
 	png_byte color_type;
 
@@ -257,27 +259,64 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	}
 
 	info->max_comments_length = 0;
+	info->num_comments = 0;
 	if (num_text)
 	{
-		int16_t i, j;
+		int16_t i;
 		size_t len;
 
-		for (i = j = 0; i < num_text && j < MAX_TXT_DATA; i++)
+		for (i = 0; i < num_text && info->num_comments < MAX_TXT_DATA; i++)
 		{
 			if ((png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE ||
-				 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR) &&
+				 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR ||
+				 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_zTXt) &&
 				png_text_ptr[i].text &&
-				png_text_ptr[i].text_length < 1024)
+				png_text_ptr[i].text_length < 1024 &&
+				strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
 			{
 				len = strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length + 2;
 				info->max_comments_length = MAX(info->max_comments_length, len);
-				j++;
+				info->num_comments++;
 			}
+#ifdef PLUGIN_SLB
+			else if ((png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_NONE ||
+				 png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_zTXt) &&
+				png_text_ptr[i].text &&
+				png_text_ptr[i].itxt_length < 1024 &&
+				strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
+			{
+				len = strlen(png_text_ptr[i].key) + png_text_ptr[i].itxt_length + 2;
+				info->max_comments_length = MAX(info->max_comments_length, len);
+				info->num_comments++;
+			}
+#endif
 		}
-		info->num_comments = j;
+	}
+	{
+		png_time *modtime;
+		char out[29];
+		size_t len;
+
+		if (info->num_comments < MAX_TXT_DATA &&
+			png_get_tIME(myinfo->png_ptr, myinfo->info_ptr, &modtime) &&
+			png_convert_to_rfc1123_buffer(out, modtime))
+		{
+			len = sizeof(mod_time_prefix) - 1 + strlen(out);
+			info->max_comments_length = MAX(info->max_comments_length, len);
+			info->num_comments++;
+		}
 	}
 
 	return TRUE;
+}
+
+
+size_t wcslen(const wchar_t *s)
+{
+	const wchar_t *a;
+	for (a = s; *s; s++)
+		;
+	return s - a;
 }
 
 
@@ -316,9 +355,11 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 	for (i = j = 0; i < num_text && j < txtdata->lines; i++)
 	{
 		if ((png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE ||
-			 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR) &&
+			 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE_WR ||
+			 png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_zTXt) &&
 			png_text_ptr[i].text &&
-			png_text_ptr[i].text_length < 1024)
+			png_text_ptr[i].text_length < 1024 &&
+			strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
 		{
 #ifdef PLUGIN_SLB
 			size_t len = strlen(png_text_ptr[i].key) + png_text_ptr[i].text_length + 3;
@@ -327,6 +368,57 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 #endif
 			{
 				sprintf(txtdata->txt[j], "%s: %s", png_text_ptr[i].key, png_text_ptr[i].text);
+				j++;
+			}
+		}
+#ifdef PLUGIN_SLB
+		else if ((png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_NONE ||
+			 png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_zTXt) &&
+			png_text_ptr[i].text &&
+			png_text_ptr[i].itxt_length < 1024 &&
+			strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
+		{
+			unsigned short *u;
+			char *s;
+			
+			u = utf8_to_ucs16(png_text_ptr[i].text, png_text_ptr[i].itxt_length);
+			if (u)
+			{
+				s = ucs16_to_latin1(u, wcslen(u));
+				if (s)
+				{
+					size_t len;
+					
+					latin1_to_atari(s);
+					len = strlen(png_text_ptr[i].key) + strlen(s) + 3;
+					txtdata->txt[j] = malloc(len);
+					if (txtdata->txt[j] != NULL)
+					{
+						sprintf(txtdata->txt[j], "%s: %s", png_text_ptr[i].key, s);
+						j++;
+					}
+					free(s);
+				}
+				free(u);
+			}
+		}
+#endif
+	}
+	{
+		png_time *modtime;
+		char out[29];
+
+		if (j < MAX_TXT_DATA &&
+			png_get_tIME(myinfo->png_ptr, myinfo->info_ptr, &modtime) &&
+			png_convert_to_rfc1123_buffer(out, modtime))
+		{
+#ifdef PLUGIN_SLB
+			size_t len = sizeof(mod_time_prefix) + strlen(out);
+			txtdata->txt[j] = malloc(len);
+			if (txtdata->txt[j] != NULL)
+#endif
+			{
+				sprintf(txtdata->txt[j], "%s%s", mod_time_prefix, out);
 				j++;
 			}
 		}

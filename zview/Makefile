@@ -30,7 +30,7 @@ CATALOG_OBJ			= catalog/catalog_slider.o catalog/catalog_size.o catalog/catalog_
 OBJ 				= $(CATALOG_OBJ) $(FILE_OBJ) $(EDIT_OBJ) $(VDI_OBJ) \
 				  custom_font.o infobox.o pref_dialog.o zaes.o wintimer.o av_prot.o chrono.o plugins.o mfdb.o 	\
 				  txt_data.o pdf_load.o pic_load.o pic_save.o pic_resize.o resample.o save_dialog.o menu.o prefs.o full_scr.o winpdf.o winimg.o	\
-				  debug.o progress.o ztext.o close_modal.o save_option_dialog.o main.o \
+				  debug.o progress.o ztext.o close_modal.o save_option_dialog.o main.o unicodemap.o \
 				  plugins/common/slbload.o plugins/common/slbexec.o plugins/common/zvplugin.o
 
 PROGRAM 			= zview.app
