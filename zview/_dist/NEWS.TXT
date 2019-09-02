@@ -29,6 +29,8 @@
    correctly
  * Fixed a bug in the coldfire version that prevented the PNG and
    JPEG plugins from being loaded
+ * Fixed a bug in the JPEG decoder that could cause it to crash
+   when extracting thumbnail images
 
  Known Bugs:
  ----------

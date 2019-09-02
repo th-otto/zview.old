@@ -1,11 +1,10 @@
 #include "zview.h"
 #include "imginfo.h"
 #include "jpgdh.h"
+#include "jpgdsp.h"
 #include "zvjpg.h"
 
 int16_t dsp_ram = 0;
-
-int16_t reader_dsp_init( const char *name, IMGINFO info);
 
 JPGDDRV_PTR jpgdrv = NULL;
 
@@ -14,11 +13,11 @@ static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDOpenDriver;
 	__asm__ volatile(
-	"	movl	%1,a0\n"
-	"	jsr		a1@\n"
+	"	movl	%[jpgd],a0\n"
+	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
-	:	"a"		(jpgd)		/* in */
-	,	"a"		(func)		/* in */
+	:	[jpgd]"a"		(jpgd)		/* in */
+	,	[func]"a"		(func)		/* in */
 	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
 	);
 	return retv;
@@ -29,11 +28,11 @@ static JPGD_ENUM JPGDCloseDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDCloseDriver;
 	__asm__ volatile(
-	"	movl	%1,a0\n"
-	"	jsr		a1@\n"
+	"	movl	%[jpgd],a0\n"
+	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
-	:	"a"		(jpgd)		/* in */
-	,	"a"		(func)	/* in */
+	:	[jpgd]"a"		(jpgd)		/* in */
+	,	[func]"a"		(func)	/* in */
 	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
 	);
 	return retv;
@@ -44,11 +43,11 @@ static JPGD_ENUM JPGDGetImageInfo(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageInfo;
 	__asm__ volatile(
-	"	movl	%1,a0\n"
-	"	jsr		a1@\n"
+	"	movl	%[jpgd],a0\n"
+	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
-	:	"a"		(jpgd)		/* in */
-	,	"a"		(func)		/* in */
+	:	[jpgd]"a"		(jpgd)		/* in */
+	,	[func]"a"		(func)		/* in */
 	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
 	);
 	return retv;
@@ -59,11 +58,11 @@ static JPGD_ENUM JPGDGetImageSize(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageSize;
 	__asm__ volatile(
-	"	movl	%1,a0\n"
-	"	jsr		a1@\n"
+	"	movl	%[jpgd],a0\n"
+	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
-	:	"a"		(jpgd)		/* in */
-	,	"a"		(func)		/* in */
+	:	[jpgd]"a"		(jpgd)		/* in */
+	,	[func]"a"		(func)		/* in */
 	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
 	);
 	return retv;
@@ -74,11 +73,11 @@ static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDDecodeImage;
 	__asm__ volatile(
-	"	movl	%1,a0\n"
-	"	jsr		a1@\n"
+	"	movl	%[jpgd],a0\n"
+	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
-	:	"a"		(jpgd)		/* in */
-	,	"a"		(func)	/* in */
+	:	[jpgd]"a"		(jpgd)		/* in */
+	,	[func]"a"		(func)	/* in */
 	:	__CLOBBER_RETURN("d0") "a0", "d1", "d2", "cc", "memory"
 	);
 	return retv;
@@ -98,7 +97,7 @@ static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
  *==================================================================================*/
 int16_t reader_dsp_init( const char *name, IMGINFO info)
 {
-	char		pad[] = { -1, -1, -1, -1, -1, -1, -1, -1, 0, 0 };
+	static char	const pad[] = { -1, -1, -1, -1, -1, -1, -1, -1, 0, 0 };
 	void		*src, *dst;
 	int16_t		jpeg_file;
 	int32_t		jpgdsize, jpeg_file_size;
@@ -130,7 +129,7 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 
 	jpgdsize = jpgdrv->JPGDGetStructSize();
 
-	if( jpgdsize < 1)
+	if( jpgdsize <= 0)
 	{
 		Mfree( src);
 		return DSP_ERROR;

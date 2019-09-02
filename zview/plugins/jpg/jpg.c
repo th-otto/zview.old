@@ -75,7 +75,7 @@ long __CDECL set_option(zv_int_t which, zv_int_t value)
 		return value;
 	case OPTION_PROGRESSIVE:
 		progressive = value != 0;
-		return value;
+		return progressive;
 	}
 	return -ENOSYS;
 }
@@ -191,8 +191,8 @@ static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO 
 
 	if ( jpeg == NULL || jerr == NULL) 
 	{		
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
+		free( jerr);
+		free( jpeg);
 		return FALSE;
 	}
 	
@@ -203,8 +203,8 @@ static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO 
 			jpeg_abort_decompress( jpeg);
 			
 		jpeg_destroy_decompress( jpeg);
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
+		free( jerr);
+		free( jpeg);
 		return FALSE;
 	}
 
@@ -260,7 +260,7 @@ static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO 
 
 	info->_priv_ptr				= ( void*)jpeg;			
 	info->_priv_var_more		= 1;
-	info->_priv_var				= -1;
+	info->_priv_var				= 0;
 	
 	jpeg->client_data   		= NULL;		
 
@@ -321,9 +321,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	if ( jpeg == NULL || jerr == NULL || comment == NULL) 
 	{
-		if ( comment) 	free( comment);		
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
+		free( comment);		
+		free( jerr);
+		free( jpeg);
 		fclose( jpeg_file);
 		return FALSE;
 	}
@@ -345,20 +345,19 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 		if ( comment)
 		{	
-			register int16_t i;			
+			int16_t i;			
 
 			for ( i = 0; i < comment->lines; i++) 
 			{
-				if( comment->txt[i])
-					free( comment->txt[i]);
+				free( comment->txt[i]);
 			}
 
 		 	free( comment);
 			comment	= NULL;	
 		}
 	
-		if ( jerr) 		free( jerr);
-		if ( jpeg) 		free( jpeg);
+		free( jerr);
+		free( jpeg);
 		fclose( jpeg_file);
 		return FALSE;
 	}
@@ -524,8 +523,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 					{
 						for ( i = 0; i < comment->lines; i++)
 						{
-							if( comment->txt[i])
-								free( comment->txt[i]);
+							free( comment->txt[i]);
 						}
 
 					 	free( comment);
@@ -576,7 +574,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
-	register int16_t 	i;
+	int16_t 	i;
 	txt_data 		*comment;
 
 	if( dsp_decoding)
@@ -602,6 +600,9 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  *==================================================================================*/
 boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
+	JPEG_DEC jpeg;
+	jmp_buf escape;
+
 	if( dsp_decoding)
 	{	
 		const void *source = ( uint8_t*)info->_priv_ptr + info->_priv_var_more;
@@ -612,9 +613,18 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 		return TRUE;
 	}
 
-	if( jpeg_read_scanlines(( JPEG_DEC)info->_priv_ptr, ( JSAMPROW*)&buffer, 1))
-		return TRUE;
-
+	jpeg = (JPEG_DEC)info->_priv_ptr;
+	jpeg->client_data = &escape;
+	if (setjmp(escape) == 0)
+	{
+		if( jpeg_read_scanlines(jpeg, ( JSAMPROW*)&buffer, 1))
+		{
+			jpeg->client_data = NULL;
+			return TRUE;
+		}
+	}
+	jpeg->client_data = NULL;
+	
 	return FALSE;
 }
 
@@ -654,12 +664,11 @@ void __CDECL reader_quit( IMGINFO info)
 
 	if( comment)
 	{
-		register int16_t i;
+		int16_t i;
 
 		for ( i = 0; i < comment->lines; i++)
 		{
-			if( comment->txt[i])
-				free( comment->txt[i]);
+			free( comment->txt[i]);
 		}
 	 	free( comment);
 	 	info->_priv_ptr_more = NULL;
@@ -670,6 +679,7 @@ void __CDECL reader_quit( IMGINFO info)
 	
 	free( jpeg->err);
 	free( jpeg);
+	info->_priv_ptr = NULL;
 	
 	/* thumbnail mode? */	
 	free( info->__priv_ptr_more);
