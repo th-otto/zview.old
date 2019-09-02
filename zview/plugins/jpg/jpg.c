@@ -5,6 +5,7 @@
 #else
 #include <jpeglib.h>
 #endif
+#include <wchar.h>
 
 #if defined(PLUGIN_SLB) && defined(EXIF_SLB)
 #include <slb/exif.h>
@@ -268,6 +269,15 @@ static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO 
 }
 
 
+size_t wcslen(const wchar_t *s)
+{
+	const wchar_t *a;
+	for (a = s; *s; s++)
+		;
+	return s - a;
+}
+
+
 /*==================================================================================*
  * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -418,7 +428,28 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		{
 			if (!mark->data || !mark->data_length || mark->data_length > 1024 || comment->lines >= MAX_TXT_DATA)
 	               continue;
-		
+#ifdef PLUGIN_SLB
+			{
+				unsigned short *u;
+				char *s;
+				size_t len;
+
+				u = utf8_to_ucs16(mark->data, mark->data_length);
+				if (u)
+				{
+					s = ucs16_to_latin1(u, wcslen(u));
+					if (s)
+					{
+						latin1_to_atari(s);
+						len = strlen(s);
+						comment->txt[comment->lines] = s;
+						comment->max_lines_length = MAX( comment->max_lines_length, len);
+						comment->lines++;
+					}
+					free(u);
+				}
+			}
+#else
 			comment->txt[comment->lines] = ( int8_t*)malloc( mark->data_length + 1);
 
 			if( comment->txt[comment->lines] == NULL)
@@ -427,6 +458,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 			memcpy( comment->txt[comment->lines], mark->data, mark->data_length);
 			comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)mark->data_length + 1);
 			comment->lines++;
+#endif
 		}
 		else if( mark->marker == M_EXIF)
 		{
@@ -468,12 +500,33 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 					strcat( value, ": ");
 
 					length = strlen( value);
-
+					
 					exif_entry_get_value( e, &value[length], sizeof(value) - length - 1);
 					value[sizeof(value) - 1] = '\0';
 
 					length = strlen( value);
 					
+#ifdef PLUGIN_SLB
+					{
+						unsigned short *u;
+						char *s;
+		
+						u = utf8_to_ucs16(value, length);
+						if (u)
+						{
+							s = ucs16_to_latin1(u, wcslen(u));
+							if (s)
+							{
+								latin1_to_atari(s);
+								length = strlen(s);
+								comment->txt[comment->lines] = s;
+								comment->max_lines_length = MAX( comment->max_lines_length, length);
+								comment->lines++;
+							}
+							free(u);
+						}
+					}
+#else
 					comment->txt[comment->lines] = ( int8_t*)malloc( length + 1);
 
 					if( comment->txt[comment->lines] == NULL)
@@ -483,6 +536,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 					comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)length);					
 					comment->lines++;
+#endif
 				}
 			}
 
@@ -582,8 +636,17 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 
 	comment = ( txt_data *)info->_priv_ptr_more;
 
+#ifdef PLUGIN_SLB
+	for (i = 0; i < txtdata->lines; i++)
+	{
+		free(txtdata->txt[i]);
+		txtdata->txt[i] = comment->txt[i];
+		comment->txt[i] = NULL;
+	}
+#else
 	for ( i = 0; i < txtdata->lines; i++) 
 		strcpy( txtdata->txt[i] , comment->txt[i]);
+#endif
 }
 
 

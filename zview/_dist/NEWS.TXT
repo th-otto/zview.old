@@ -31,6 +31,8 @@
    JPEG plugins from being loaded
  * Fixed a bug in the JPEG decoder that could cause it to crash
    when extracting thumbnail images
+ * Non-Ascii meta-information in JPEG files should now be displayed
+   correctly
 
  Known Bugs:
  ----------
@@ -43,8 +45,6 @@
    are therefore not displayed
  * Images which have an alpha channel, will store pre-multiplied RGB
    when saving, and loose the alpha-channel
-
-For a history of previous changes, see doc/history.txt
 
 
 25 August 2019: Version 1.0.2
@@ -81,3 +81,6 @@ First release made by me (Thorsten Otto)
  * The TIFF library per default only supports up to 16 bits/sample (that is,
    48 bits/pixel for RGB formats). Some images from their test archive
    are therefore not displayed
+
+
+For a history of previous changes, see doc/history.txt
