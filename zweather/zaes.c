@@ -36,7 +36,7 @@ void CDECL draw_boussole_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, &boussole, &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, &boussole, &screen);
 
 	xy[2] = pblk->pb_x + 23;
 	xy[3] = pblk->pb_y + 23;
@@ -154,7 +154,7 @@ void CDECL draw_boussole_icon( WINDOW *win, PARMBLK *pblk, void *data)
 			break;
 	}
 
-	v_pline( win->graf->handle, 2, xy);
+	v_pline( WIN_GRAF_HANDLE(win), 2, xy);
 }
 
 void CDECL draw_weather_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -167,7 +167,7 @@ void CDECL draw_weather_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, main_icon, &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, main_icon, &screen);
 }
 
 void CDECL draw_forecast1_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -180,7 +180,7 @@ void CDECL draw_forecast1_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, forecast_icon[0], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, forecast_icon[0], &screen);
 }
 
 
@@ -194,7 +194,7 @@ void CDECL draw_forecast2_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, forecast_icon[1], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, forecast_icon[1], &screen);
 }
 
 void CDECL draw_forecast3_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -207,7 +207,7 @@ void CDECL draw_forecast3_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, forecast_icon[2], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, forecast_icon[2], &screen);
 }
 
 void CDECL draw_forecast4_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -220,7 +220,7 @@ void CDECL draw_forecast4_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, forecast_icon[3], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, forecast_icon[3], &screen);
 }
 
 void CDECL draw_forecast5_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -233,7 +233,7 @@ void CDECL draw_forecast5_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 47;
 	xy[7] = xy[5] + 47;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, forecast_icon[4], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, forecast_icon[4], &screen);
 }
 
 void CDECL draw_forecast6_icon( WINDOW *win, PARMBLK *pblk, void *data)
@@ -246,7 +246,7 @@ void CDECL draw_forecast6_icon( WINDOW *win, PARMBLK *pblk, void *data)
 	xy[6] = xy[4] + 60;
 	xy[7] = xy[5] + 60;
 
-	vro_cpyfm( win->graf->handle, S_ONLY, xy, &logo->image[0], &screen);
+	vro_cpyfm( WIN_GRAF_HANDLE(win), S_ONLY, xy, &logo->image[0], &screen);
 }
 
 

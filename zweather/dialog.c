@@ -108,6 +108,6 @@ void weather_dialog( void)
 	ObjcAttachFormFunc( windialog, WEATHER_QUIT, weather_dialog_quit, NULL);
 	ObjcAttachFormFunc( windialog, WEATHER_CONTINENT, continent_popup, NULL);
 
-	vswr_mode( windialog->graf->handle, MD_TRANS);
-	vsl_color( windialog->graf->handle, RED);
+	vswr_mode( WIN_GRAF_HANDLE(windialog), MD_TRANS);
+	vsl_color( WIN_GRAF_HANDLE(windialog), RED);
 }

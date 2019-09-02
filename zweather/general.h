@@ -61,6 +61,36 @@
 	#define MAX_PATH	1024
 #endif
 
+#undef _AESapid
+#if __WINDOM_MAJOR__ >= 2
+#define WIN_GRAF_HANDLE(win) (win)->graf->handle
+#define APP_GRAF_HANDLE app.graf.handle
+#define WIN_GRAF_CLIP(win) &(win)->graf->clip
+#define WinClipOn(win, r) ClipOn((win)->graf, r)
+#define WinClipOff(win) ClipOff((win)->graf)
+#define _AESapid mt_AppAESapid(gl_appvar)
+#define EVNT_BUFF_PARAM , short buff[8]
+#define EVNT_BUFF_ARG , buff
+#define EVNT_BUFF_NULL , NULL
+#define EVNT_BUFF buff
+#else
+#define WIN_GRAF_HANDLE(win) (win)->graf.handle
+#define APP_GRAF_HANDLE app.handle
+#define WIN_GRAF_CLIP(win) &clip
+#define WinClipOn(win, r) rc_clip_on(WIN_GRAF_HANDLE(win), r)
+#define WinClipOff(win) rc_clip_off(WIN_GRAF_HANDLE(win))
+#define _AESapid app.id
+#define EVNT_BUFF_PARAM
+#define EVNT_BUFF_ARG
+#define EVNT_BUFF_NULL
+#define EVNT_BUFF evnt.buff
+
+#define ObjcAttachFormFunc(win, index, func, data) ObjcAttach(OC_FORM, win, index, BIND_FUNC, func)
+#define ObjcAttachMenuFunc(win, index, func, data) ObjcAttach(OC_MENU, win, index, BIND_FUNC, func)
+#define ObjcAttachVar(mode, win, index, var, val) ObjcAttach(OC_FORM, win, index, BIND_VAR, var)
+
+#endif
+
 extern int	use_sting;
 extern WINDOW *windialog;
 extern void timer_function( WINDOW *win, short buff[8]);
