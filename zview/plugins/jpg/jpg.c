@@ -289,7 +289,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	jmp_buf 				escape;
 	FILE* 					jpeg_file;
 	int16_t 				header = 0;
-	
+
 	/* If Brainstorm cookie is used, we try to decode with it*/
 	if( jpgdrv)
 	{

@@ -216,7 +216,6 @@ int16 pic_save( const char *in_file, const char *out_file)
 		free( out_info);
 		free( in_info);
 
-		graf_mouse( ARROW, NULL);			
 		errshow(NULL, -ENOMEM);		
 		return( 0);
 	}
@@ -233,7 +232,6 @@ int16 pic_save( const char *in_file, const char *out_file)
 	{
 		errshow(in_file, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);
-		graf_mouse( ARROW, NULL);
 		return ( 0);
 	}
 
@@ -252,7 +250,6 @@ int16 pic_save( const char *in_file, const char *out_file)
 		errshow(out_file, CANT_SAVE_IMG);
 		exit_pic_save( in_info, out_info, data);
 		win_progress_end();
-		graf_mouse( ARROW, NULL);
 		return ( 0);
 	}
 
@@ -262,7 +259,6 @@ int16 pic_save( const char *in_file, const char *out_file)
 		errshow(NULL, -ENOMEM);	
 		exit_pic_save( in_info, out_info, data);
 		win_progress_end();
-		graf_mouse( ARROW, NULL);
 		return ( 0);
 	}
 

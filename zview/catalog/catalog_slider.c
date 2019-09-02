@@ -67,7 +67,7 @@ void move_main_work( WINDOW *win, int16 xw, int16 yw, int16 ww, int16 hw, int16 
 		x += ( first_frame_width + border_width);
 		w -= ( first_frame_width + border_width);
 
-		while( !wind_update(BEG_UPDATE));
+		wind_update(BEG_UPDATE);
 		graf_mouse( M_OFF, 0L);		
 		rc_set( &rect, x, y, w, h);
 
@@ -203,7 +203,7 @@ void move_frame_work( WINDOW *win, int16 dy EVNT_BUFF_PARAM)
 		h--;
 		w = browser_frame_width - 16;
 
-		while( !wind_update(BEG_UPDATE));
+		wind_update(BEG_UPDATE);
 		graf_mouse( M_OFF, 0L);		
 		rc_set( &rect, x + 1, y, w, h);
 		wind_get_grect( 0, WF_CURRXYWH, &screen);

@@ -121,7 +121,7 @@ static void move_bookmark_work( WINDOW *win, int16 dy, WINDATA *windata EVNT_BUF
 		h--;
 		w = windata->frame_width - 16;
 
-		while( !wind_update(BEG_UPDATE));
+		wind_update(BEG_UPDATE);
 		graf_mouse( M_OFF, 0L);
 		rc_set( &rect, x + 1, y, w, h);
 		wind_get_grect( 0, WF_CURRXYWH, &screen);
@@ -369,7 +369,7 @@ static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 
 		graf_mouse( FLAT_HAND, NULL);
 
-		while( !wind_update( BEG_MCTRL));
+		wind_update( BEG_MCTRL);
 
 		graf_dragbox( windata->border_width, h, x + windata->frame_width, y, x + 100, y, w - ( 180), h, &last_mouse_x, &dum );
 
@@ -456,12 +456,9 @@ static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 						break;
 
 					case SLIDERS_MOVER:
-						if( app.aes4 & AES4_XGMOUSE)
-							graf_mouse( M_SAVE, 0L);
-
 						graf_mouse( FLAT_HAND, NULL);
 
-						while( !wind_update( BEG_MCTRL));
+						wind_update( BEG_MCTRL);
 
 						res = graf_slidebox( windata->frame_slider, SLIDERS_BACK, SLIDERS_MOVER, 1);
 
@@ -479,9 +476,6 @@ static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 						if( dy && ( old_ypos != windata->ypos))
 							move_bookmark_work( win, dy, windata EVNT_BUFF_ARG);
 
-						if( app.aes4 & AES4_XGMOUSE)
-							graf_mouse( M_RESTORE, 0L);
-
 						graf_mouse( ARROW,NULL);
 
 						break;
@@ -492,7 +486,7 @@ static void __CDECL WindPdfMouse( WINDOW *win EVNT_BUFF_PARAM)
 						dum  			= ( evnt.my < dy) ? WA_UPPAGE : WA_DNPAGE;
 						selected_object = ( evnt.my < dy) ? SLIDERS_UP : SLIDERS_DOWN;
 
-						while( !wind_update( BEG_MCTRL));
+						wind_update( BEG_MCTRL);
 
 						windata->frame_slider[selected_object].ob_state |= SELECTED;
 
@@ -1353,7 +1347,6 @@ WINDOW *WindPdf( const char *filename)
 
 	if ( ( windata = ( WINDATA*) calloc(1, sizeof( WINDATA))) == NULL)
 	{
-		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);
 		return NULL;
 	}
@@ -1384,7 +1377,6 @@ WINDOW *WindPdf( const char *filename)
 	{
 		free( windata);
 		errshow(NULL, ALERT_WINDOW);
-		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 
@@ -1486,7 +1478,6 @@ WINDOW *WindPdf( const char *filename)
 	{
 		WindPdfClose( winview EVNT_BUFF_NULL);
 		errshow(NULL, ALERT_WINDOW);
-		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 

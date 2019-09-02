@@ -520,6 +520,7 @@ void draw_window_iconified( WINDOW *win)
 
 void errshow( const char *name, int16 error)
 {
+	graf_mouse( ARROW, NULL);
   	switch( error)
   	{
 		case -ENAMETOOLONG:

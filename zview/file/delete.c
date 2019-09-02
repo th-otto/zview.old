@@ -69,7 +69,7 @@ static void delete_progress( WINDOW *win)
 	pxy[2] = pxy[0] + bar_width - 1;
 	pxy[3] = pxy[1] + form->root[OPERATION_DIAL_BAR].ob_height - 1;
 
-	while( !wind_update( BEG_UPDATE));
+	wind_update( BEG_UPDATE);
 	graf_mouse( M_OFF, 0L);
 	wind_get( win->handle, WF_FIRSTXYWH, &raes.g_x, &raes.g_y, &raes.g_w, &raes.g_h);
 

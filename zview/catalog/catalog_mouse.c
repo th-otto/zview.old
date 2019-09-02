@@ -208,7 +208,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 
 		graf_mouse( FLAT_HAND, NULL);		
 
-		while( !wind_update( BEG_MCTRL));
+		wind_update( BEG_MCTRL);
 
 		graf_dragbox( border_size, h, x + browser_frame_width, y, x + 100, y, w - ( 100 + win -> w_u), h, &last_mouse_x, &dum );
 			
@@ -320,12 +320,9 @@ void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 						break;
 
 					case SLIDERS_MOVER:
-						if( app.aes4 & AES4_XGMOUSE) 
-							graf_mouse( M_SAVE, 0L);
-						
 						graf_mouse( FLAT_HAND, NULL);
 						
-						while( !wind_update( BEG_MCTRL));
+						wind_update( BEG_MCTRL);
 						
 						res = graf_slidebox( frame_slider_root, SLIDERS_BACK, SLIDERS_MOVER, 1);
 						
@@ -343,9 +340,6 @@ void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 						if( dy && ( old_ypos != wicones->ypos)) 
 							move_frame_work( win, dy EVNT_BUFF_ARG);
 
-						if( app.aes4 & AES4_XGMOUSE)
-							graf_mouse( M_RESTORE, 0L);
-
 						graf_mouse( ARROW,NULL);
 
 						break;	
@@ -356,7 +350,7 @@ void __CDECL WinCatalog_Mouse( WINDOW *win EVNT_BUFF_PARAM)
 						dum  			= ( evnt.my < dy) ? WA_UPPAGE : WA_DNPAGE;
 						selected_object = ( evnt.my < dy) ? SLIDERS_UP : SLIDERS_DOWN;
 
-						while( !wind_update( BEG_MCTRL));
+						wind_update( BEG_MCTRL);
 
 						frame_slider_root[selected_object].ob_state |= SELECTED;
 

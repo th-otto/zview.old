@@ -135,7 +135,7 @@ static void slid_vmover( WINDOW *win, int obj_index, int mode, void *data)
 
 	graf_mouse( FLAT_HAND, NULL);
 
-	while( !wind_update( BEG_MCTRL));
+	wind_update( BEG_MCTRL);
 
 	res = graf_slidebox( slider_root, FILE_INFO_VBACK, FILE_INFO_VMOVER, 1);
 

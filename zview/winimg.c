@@ -509,7 +509,7 @@ static void WindViewAnim( WINDOW *win)
 	xy[3] = xy[1] + tmp - 1;
 	xy[7] = xy[5] + tmp - 1;
 
-	while( !wind_update(BEG_UPDATE));
+	wind_update(BEG_UPDATE);
 	graf_mouse( M_OFF, 0L);
 	rc_set( &rect, x, y, w, h);
 	wind_get( win -> handle, WF_FIRSTXYWH, &r1.g_x, &r1.g_y, &r1.g_w, &r1.g_h);
@@ -955,7 +955,6 @@ WINDOW *WindView( const char *filename)
 
 	if ( !icons_init())
 	{
-		graf_mouse( ARROW, NULL);
 		errshow(NULL, NOICONS);
 		applexit();
 	}
@@ -968,7 +967,6 @@ WINDOW *WindView( const char *filename)
 
 	if ( ( windata = ( WINDATA*) calloc(1, sizeof( WINDATA))) == NULL)
 	{
-		graf_mouse( ARROW, NULL);
 		errshow(NULL, -ENOMEM);
 		return NULL;
 	}
@@ -1008,7 +1006,6 @@ WINDOW *WindView( const char *filename)
 		delete_mfdb( img->image, img->page);
 		free( windata);
 		errshow(NULL, ALERT_WINDOW);
-		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 
@@ -1063,7 +1060,6 @@ WINDOW *WindView( const char *filename)
 	{
 		WindViewClose( winview EVNT_BUFF_NULL);
 		errshow(NULL, ALERT_WINDOW);
-		graf_mouse( ARROW, NULL);
 		return NULL;
 	}
 
