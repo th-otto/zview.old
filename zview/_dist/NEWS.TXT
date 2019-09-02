@@ -27,6 +27,8 @@
    don't expect Japanese or Chinese be displayed there ;)
  * Non-Ascii meta-information in PDF files should now be displayed
    correctly
+ * Fixed a bug in the coldfire version that prevented the PNG and
+   JPEG plugins from being loaded
 
  Known Bugs:
  ----------
