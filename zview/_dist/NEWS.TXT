@@ -17,6 +17,9 @@
    DSP decoder is in use
  * When passing a directory name on startup, zView now
    opens a browser window
+ * BMP codec updated with fixes from Lonny's version,
+   handling more input formats, and RLE compressed files
+ * BMP files can now be saved (uncompressed only)
 
  Bug Fixes:
  ----------

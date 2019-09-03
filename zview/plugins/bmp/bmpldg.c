@@ -20,11 +20,14 @@ static void __CDECL init( void)
 
 static PROC BMPFunc[] = 
 {
-	{ "plugin_init", 	"", init},
-	{ "reader_init", 	"", reader_init},
-	{ "reader_get_txt", "", reader_get_txt},
-	{ "reader_read", 	"", reader_read},
-	{ "reader_quit", 	"", reader_quit}
+	{ "plugin_init", 	"", init },
+	{ "reader_init", 	"", reader_init },
+	{ "reader_get_txt", "", reader_get_txt },
+	{ "reader_read", 	"", reader_read },
+	{ "reader_quit", 	"", reader_quit },
+	{ "encoder_init", 	"", encoder_init },
+	{ "encoder_write",	"", encoder_write },
+	{ "encoder_quit", 	"", encoder_quit }
 };
 
 
