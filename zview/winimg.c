@@ -1078,3 +1078,14 @@ WINDOW *WindView( const char *filename)
 
 	return winview;
 }
+
+
+void WindViewPath( const char *filename)
+{
+	struct stat st;
+	
+	if (stat(filename, &st) == 0 && S_ISDIR(st.st_mode))
+		WinCatalog(filename);
+	else
+		WindView(filename);
+}

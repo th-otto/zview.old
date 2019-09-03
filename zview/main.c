@@ -227,7 +227,7 @@ int main( int argc, char *argv[])
 	applinit();
 
  	if ( argc > 1)
-		WindView( argv[1]);
+		WindViewPath( argv[1]);
 
 	for(;;) 
 		EvntWindom( MU_MESAG|MU_TIMER|MU_KEYBD|MU_BUTTON);

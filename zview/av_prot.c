@@ -93,5 +93,5 @@ void __CDECL va_protokoll_start(WINDOW * win EVNT_BUFF_PARAM)
 	MenuBar(get_tree(MENU_BAR), 1);
 
 	if (p && *p)
-		WindView(p);
+		WindViewPath(p);
 }

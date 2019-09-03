@@ -59,3 +59,5 @@ extern void __CDECL Win_RightLine( WINDOW *win EVNT_BUFF_PARAM);
 extern void __CDECL Win_DownLine( WINDOW *win EVNT_BUFF_PARAM);
 extern void __CDECL Win_Arrow( WINDOW *win EVNT_BUFF_PARAM);
 void __CDECL WindViewTop( WINDOW *win EVNT_BUFF_PARAM);
+
+void WindViewPath( const char *filename);

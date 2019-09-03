@@ -15,6 +15,8 @@
    now detected
  * JPEG driver now always tries to extract meta-information, even if
    DSP decoder is in use
+ * When passing a directory name on startup, zView now
+   opens a browser window
 
  Bug Fixes:
  ----------

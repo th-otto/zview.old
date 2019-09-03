@@ -1,4 +1,5 @@
-extern int WinCatalog( void);
+extern int WinCatalog(const char *dirname);
+extern int WinCatalogDefault( void);
 extern void WinCatalog_Refresh( WINDOW *wind);
 extern void WindMakePreview( WINDOW *win);
 extern int WindMakePreview_needed( WINDOW *win);

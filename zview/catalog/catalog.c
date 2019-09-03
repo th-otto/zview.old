@@ -139,7 +139,7 @@ void WindMakePreview( WINDOW *win)
  *      '0' if error, else '1'.														*
  *==================================================================================*/
 
-int WinCatalog( void)
+int WinCatalog(const char *dirname)
 {
 	WINDICON 	*wicones;
 	OBJECT		*menu;
@@ -194,7 +194,7 @@ int WinCatalog( void)
 
 	check_mini_dir( wicones->nbr_child, wicones->root);
 
-	if( !scan_dir( win_catalog, "C:\\"))
+	if( !scan_dir( win_catalog, dirname))
 	{
 		zdebug( "can't scan the dir");
 		WinCatalog_Close( win_catalog EVNT_BUFF_NULL);
@@ -287,6 +287,11 @@ int WinCatalog( void)
 	}
 
 	return ( 1);
+}
+
+int WinCatalogDefault( void)
+{
+	return WinCatalog("C:\\");
 }
 
 /*==================================================================================*

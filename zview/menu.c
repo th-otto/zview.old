@@ -620,7 +620,7 @@ static void __CDECL menu_applexit(WINDOW *win, int item, int title, void *data)
 
 static void __CDECL menu_wincatalog(WINDOW *win, int item, int title, void *data)
 {
-	WinCatalog();
+	WinCatalogDefault();
 }
 
 
