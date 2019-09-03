@@ -3,6 +3,7 @@
 #include "jpgdh.h"
 #include "jpgdsp.h"
 #include "zvjpg.h"
+#include "plugin.h"
 
 int16_t dsp_ram = 0;
 
@@ -163,8 +164,15 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 		return DSP_ERROR;
 	}
 
-	jpgd->OutComponents = 3;
-	jpgd->OutPixelSize  = 3;
+	if (jpgd->InComponents == 1)
+	{
+		jpgd->OutComponents = 1;
+		jpgd->OutPixelSize  = 1;
+	} else
+	{
+		jpgd->OutComponents = 3;
+		jpgd->OutPixelSize  = 3;
+	}
 
 	if( JPGDGetImageSize( jpgd, jpgdrv) != 0)
 	{
@@ -195,26 +203,27 @@ int16_t reader_dsp_init( const char *name, IMGINFO info)
 		return DSP_ERROR;
 	}
 
-	info->components 			= 3;
+	info->components 			= jpgd->OutComponents;
 	info->width   				= jpgd->MFDBStruct.fd_w;
 	info->height  				= jpgd->MFDBStruct.fd_h;
 	info->real_width			= info->width;
 	info->real_height			= info->height;
 	info->memory_alloc 			= TT_RAM;
-	info->planes   				= 24;
+	info->planes   				= info->components << 3;
 	info->orientation 			= UP_TO_DOWN;
 	info->colors  				= 1uL << info->planes;
 	info->indexed_color 		= FALSE;
 	info->page	 				= 1;
 	info->delay		 			= 0;
 	info->num_comments			= 0;
-	info->max_comments_length	= 0;
 
 	info->_priv_ptr				= dst;	
 	info->_priv_var				= jpgd->MFDBStruct.fd_wdwidth << 1;
 	info->_priv_var_more		= info->_priv_var;
 
 	strcpy( info->info, "JPEG");
+	if (info->components == 1)
+		strcat( info->info, " Greyscale");
 	strcpy( info->compression, "JPG");	
 
 	JPGDCloseDriver( jpgd, jpgdrv);

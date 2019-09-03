@@ -256,11 +256,11 @@ static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO 
 	
 	info->width   				= jpeg->image_width;
 	info->height  				= jpeg->image_height;
-	info->planes   				= ( ( jpeg->out_color_space == JCS_RGB) ? 24 : 8);
-	info->colors  				= 1 << info->planes;
+	info->planes   				= info->components << 3;
+	info->colors  				= 1UL << info->planes;
 
 	info->_priv_ptr				= ( void*)jpeg;			
-	info->_priv_var_more		= 1;
+	info->_priv_var_more		= 0;
 	info->_priv_var				= 0;
 	
 	jpeg->client_data   		= NULL;		
@@ -299,7 +299,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	jmp_buf 				escape;
 	FILE* 					jpeg_file;
 	int16_t 				header = 0;
+	boolean ret = FALSE;
 
+	dsp_decoding = FALSE;
 	/* If Brainstorm cookie is used, we try to decode with it*/
 	if( jpgdrv)
 	{
@@ -308,22 +310,30 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		switch( dsp_result)
 		{
 			case GLOBAL_ERROR:
-				dsp_decoding = FALSE;
 				return FALSE;
 			
 			case DSP_ERROR:
 			case PROGRESSIVE_JPG:
-				dsp_decoding = FALSE;
 				break;
 
 			case ALL_OK:
 				dsp_decoding = TRUE;
-				return TRUE;
+				/*
+				 * FIXME: we shouldn't have used the DSP decoder
+				 * when we want a thumbnail only and there is one
+				 */
+				if (info->thumbnail)
+					return TRUE;
+				/* we have already decoded the image successfully,
+				   don't fail for just the meta info */
+				ret = TRUE;
+				/* continue reading to extract the metainfo */
+				break;
 		}
 	}
 
 	if ( ( jpeg_file = fopen( name, "rb")) == NULL)
-		return FALSE;
+		return ret;
 
 	jpeg 	= ( JPEG_DEC) malloc( sizeof( struct jpeg_decompress_struct));
 	jerr 	= ( JPEG_ERR) malloc( sizeof( struct jpeg_error_mgr));
@@ -335,7 +345,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		free( jerr);
 		free( jpeg);
 		fclose( jpeg_file);
-		return FALSE;
+		return ret;
 	}
 
 	comment->lines 				= 0;
@@ -369,7 +379,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		free( jerr);
 		free( jpeg);
 		fclose( jpeg_file);
-		return FALSE;
+		return ret;
 	}
 			
 	jpeg_create_decompress( jpeg);
@@ -389,37 +399,42 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		
 	jpeg->client_data = NULL;
 	
-	switch( jpeg->out_color_space) 
+	/* do not overwrite parameters from DSP decoder;
+	   they might be different
+	   (eg. it always convert greyscale to RGB)
+	   */
+	if (!dsp_decoding)
 	{
-		case JCS_RGB:
-			info->components = 3;
-			break;
-		case JCS_GRAYSCALE:
-			info->components = 1;
-			break;
-		default: 
-			jpeg->out_color_space = JCS_RGB;
-			info->components = jpeg->out_color_components = 3;
-			break;
+		switch( jpeg->out_color_space) 
+		{
+			case JCS_RGB:
+				info->components = 3;
+				break;
+			case JCS_GRAYSCALE:
+				info->components = 1;
+				break;
+			default: 
+				jpeg->out_color_space = JCS_RGB;
+				info->components = jpeg->out_color_components = 3;
+				break;
+		}
+
+		info->width 	    = jpeg->image_width;
+		info->height	    = jpeg->image_height;
+		info->real_width	= info->width;
+		info->real_height	= info->height;
+		info->planes   		= info->components << 3;
+		info->orientation 	= UP_TO_DOWN;
+		info->colors  		= 1UL << info->planes;
+		info->memory_alloc 	= TT_RAM;
+		info->indexed_color = FALSE;
+		info->page	 		= 1;
+		info->delay		 	= 0;
 	}
-
-	info->real_width 	= jpeg->image_width;
-	info->real_height	= jpeg->image_height;
-	info->width   		= info->real_width;
-	info->height  		= info->real_height;
-	info->planes   		= ( ( jpeg->out_color_space == JCS_RGB) ? 24 : 8);
-	info->orientation 	= UP_TO_DOWN;
-	info->colors  		= 1 << info->planes;
-	info->memory_alloc 	= TT_RAM;
-	info->indexed_color = FALSE;
-	info->page	 		= 1;
-	info->delay		 	= 0;
-
+	
 	strcpy( info->info, "JPEG");	
-
-	if( info->planes == 8)
+	if (info->components == 1)
 		strcat( info->info, " Greyscale");
-
 	strcpy( info->compression, "JPG");	
 	
     for ( mark = jpeg->marker_list; mark; mark = mark->next)
@@ -427,7 +442,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		if( mark->marker == JPEG_COM)
 		{
 			if (!mark->data || !mark->data_length || mark->data_length > 1024 || comment->lines >= MAX_TXT_DATA)
-	               continue;
+	            continue;
+	        if (info->thumbnail)
+	        	continue;
 #ifdef PLUGIN_SLB
 			{
 				unsigned short *u;
@@ -477,70 +494,73 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		    if( !exifData)
 				continue;
 
-			for( i = 0; i < EXIF_IFD_COUNT; i++)
+			if (!info->thumbnail)
 			{
-				ExifContent* content = exifData->ifd[i];
-
-				for ( l = 0; l < content->count; l++)
+				for( i = 0; i < EXIF_IFD_COUNT; i++)
 				{
-					const char *tag;
-					ExifEntry *e;
-					
-					if( comment->lines >= MAX_TXT_DATA)
-						break;
-
-					e = content->entries[l];
-
-					tag = exif_tag_get_name (e->tag);
-					if (tag)
-						strcpy( value, tag);
-					else
-						sprintf(value, "0x%x", e->tag);
-
-					strcat( value, ": ");
-
-					length = strlen( value);
-					
-					exif_entry_get_value( e, &value[length], sizeof(value) - length - 1);
-					value[sizeof(value) - 1] = '\0';
-
-					length = strlen( value);
-					
-#ifdef PLUGIN_SLB
+					ExifContent* content = exifData->ifd[i];
+	
+					for ( l = 0; l < content->count; l++)
 					{
-						unsigned short *u;
-						char *s;
-		
-						u = utf8_to_ucs16(value, length);
-						if (u)
+						const char *tag;
+						ExifEntry *e;
+						
+						if( comment->lines >= MAX_TXT_DATA)
+							break;
+	
+						e = content->entries[l];
+	
+						tag = exif_tag_get_name (e->tag);
+						if (tag)
+							strcpy( value, tag);
+						else
+							sprintf(value, "0x%x", e->tag);
+	
+						strcat( value, ": ");
+	
+						length = strlen( value);
+						
+						exif_entry_get_value( e, &value[length], sizeof(value) - length - 1);
+						value[sizeof(value) - 1] = '\0';
+	
+						length = strlen( value);
+						
+#ifdef PLUGIN_SLB
 						{
-							s = ucs16_to_latin1(u, wcslen(u));
-							if (s)
+							unsigned short *u;
+							char *s;
+			
+							u = utf8_to_ucs16(value, length);
+							if (u)
 							{
-								latin1_to_atari(s);
-								length = strlen(s);
-								comment->txt[comment->lines] = s;
-								comment->max_lines_length = MAX( comment->max_lines_length, length);
-								comment->lines++;
+								s = ucs16_to_latin1(u, wcslen(u));
+								if (s)
+								{
+									latin1_to_atari(s);
+									length = strlen(s);
+									comment->txt[comment->lines] = s;
+									comment->max_lines_length = MAX( comment->max_lines_length, length);
+									comment->lines++;
+								}
+								free(u);
 							}
-							free(u);
 						}
-					}
 #else
-					comment->txt[comment->lines] = ( int8_t*)malloc( length + 1);
-
-					if( comment->txt[comment->lines] == NULL)
-						break;
-
-					strcpy( comment->txt[comment->lines], value);
-
-					comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)length);					
-					comment->lines++;
+						comment->txt[comment->lines] = ( int8_t*)malloc( length + 1);
+	
+						if( comment->txt[comment->lines] == NULL)
+							break;
+	
+						strcpy( comment->txt[comment->lines], value);
+	
+						comment->max_lines_length = MAX( comment->max_lines_length, ( int16_t)length);					
+						comment->lines++;
 #endif
+					}
 				}
 			}
-
-			if(( exifData->data) && ( exifData->size > 0) && info->thumbnail)
+			
+			if (( exifData->data) && ( exifData->size > 0) && info->thumbnail && !dsp_decoding)
 			{
 				int32_t size = exifData->size;
 
@@ -600,16 +620,17 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 	info->num_comments			= comment->lines;
 	info->max_comments_length	= comment->max_lines_length;
-
-	
-	info->_priv_ptr				= ( void*)jpeg;			
 	info->_priv_ptr_more		= ( void*)comment;
-	info->__priv_ptr_more		= NULL;
-	info->_priv_var				= (int32_t)jpeg_file;		
-	info->_priv_var_more		= 0; /* 1 for exif thumbnail */
 
 	jpeg->client_data = NULL;
+	info->_priv_var_more = 0;
 	
+	if (!dsp_decoding)
+	{
+		info->_priv_ptr				= ( void*)jpeg;			
+		info->_priv_var				= (int32_t)jpeg_file;		
+	}
+
 	return TRUE;
 }
 
@@ -630,9 +651,6 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
 	int16_t 	i;
 	txt_data 		*comment;
-
-	if( dsp_decoding)
-		return;
 
 	comment = ( txt_data *)info->_priv_ptr_more;
 
@@ -708,22 +726,7 @@ void __CDECL reader_quit( IMGINFO info)
 	JPEG_DEC	jpeg;	
 	txt_data 	*comment;	
 	
-	if( dsp_decoding)
-	{
-		if( info->_priv_ptr)
-		{
-		        /* DSP decoder uses Mxalloc() */
-			Mfree( info->_priv_ptr);
-			info->_priv_ptr = 0;
-        }
-		return;
-	}
-
-	jpeg	= ( JPEG_DEC)info->_priv_ptr;
 	comment = ( txt_data *)info->_priv_ptr_more;
-
-	if( !jpeg)
-		return;
 
 	if( comment)
 	{
@@ -736,6 +739,22 @@ void __CDECL reader_quit( IMGINFO info)
 	 	free( comment);
 	 	info->_priv_ptr_more = NULL;
 	}
+
+	if( dsp_decoding)
+	{
+		if( info->_priv_ptr)
+		{
+		        /* DSP decoder uses Mxalloc() */
+			Mfree( info->_priv_ptr);
+			info->_priv_ptr = 0;
+        }
+		return;
+	}
+
+	jpeg	= ( JPEG_DEC)info->_priv_ptr;
+
+	if( !jpeg)
+		return;
 
 	jpeg_finish_decompress( jpeg);
 	jpeg_destroy_decompress( jpeg);
@@ -831,11 +850,11 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	header = 2;
 
 	info->planes   			= 24;
-	info->colors  			= 16777215L;
+	info->colors  			= 1L << info->planes;
 	info->orientation		= UP_TO_DOWN;
-	info->real_width			= info->width;
-	info->real_height			= info->height;
-	info->memory_alloc 			= TT_RAM;
+	info->real_width		= info->width;
+	info->real_height		= info->height;
+	info->memory_alloc 		= TT_RAM;
 	info->indexed_color	 	= FALSE;
 	info->page			 	= 1;
 	info->delay 		 	= 0;

@@ -13,6 +13,8 @@
  * Maximum number of codecs increased to 200
  * Different codecs which handle the same file extension are
    now detected
+ * JPEG driver now always tries to extract meta-information, even if
+   DSP decoder is in use
 
  Bug Fixes:
  ----------
@@ -33,6 +35,8 @@
    when extracting thumbnail images
  * Non-Ascii meta-information in JPEG files should now be displayed
    correctly
+ * Fix a bug in the JPEG DSP decoder that caused the first image line to
+   be skipped
 
  Known Bugs:
  ----------

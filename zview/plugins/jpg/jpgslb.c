@@ -17,6 +17,7 @@
 #include <string.h>
 #include "plugin.h"
 #include "zvplugin.h"
+#include "zvjpg.h"
 
 extern char const slb_header[];
 static const BASEPAGE *my_base;
@@ -98,6 +99,7 @@ long __CDECL slb_init(void)
 		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))
 		bp = (const BASEPAGE *)((const char *)bp - 228);
 	my_base = bp;
+	jpg_init();
 	return 0;
 }
 
