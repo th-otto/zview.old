@@ -484,14 +484,13 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 
 			x = (int16_t)ref->bps;
 			info->_priv_var += x;
-			x >>= 3;
 			bmap += pos;
 			do
 			{							/* 1-bit mono v1.00 */
 				p0 = *bmap++;
 				for (bit = 7; bit >= 0; bit--)
 				{
-					*buffer = (p0 >> bit) & 1;
+					*buffer++ = (p0 >> bit) & 1;
 				}
 			} while (--x > 0);
 		}

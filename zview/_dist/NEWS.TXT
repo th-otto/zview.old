@@ -39,6 +39,7 @@
    correctly
  * Fix a bug in the JPEG DSP decoder that caused the first image line to
    be skipped
+ * Fix a bug in decoding monochrome GEM images
 
  Known Bugs:
  ----------
