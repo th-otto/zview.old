@@ -6,6 +6,7 @@
 #include "menu.h"
 #include "plugins.h"
 #include "plugins/common/zvplugin.h"
+#include "close_modal.h"
 
 #define	    COMPRESSION_NONE		1		/* dump mode */
 #define	    COMPRESSION_PACKBITS	32773	/* Macintosh RLE */
@@ -129,7 +130,7 @@ static void __CDECL option_ok_event(WINDOW *win, int obj_index, int mode, void *
 	}
 
 	ObjcChange(OC_FORM, win, obj_index, NORMAL, TRUE);
-	ApplWrite(_AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+	close_win(win);
 }
 
 

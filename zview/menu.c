@@ -55,6 +55,7 @@ static void __CDECL Menu_about(WINDOW *win, int item, int title, void *data)
 	/* Set the window modal */
 	WindSet( winabout, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
 	/* New closer event function */
+	EvntAttach( winabout, WM_XKEYBD, close_on_esc);
 	EvntAttach( winabout, WM_CLOSED, close_modal);
 	/* Disable the desktop menu */
 	MenuDisable();

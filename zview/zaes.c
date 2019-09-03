@@ -6,6 +6,7 @@
 #include "custom_font.h"
 #include "catalog/catalog_icons.h"
 #include "catalog/catalog.h"
+#include "close_modal.h"
 
 /* the variable need to be global because this function is done by */ 
 /* the AES in supervisor mode.. it's safe. */
@@ -20,7 +21,7 @@ static WINDICON *wicones;
 void __CDECL generic_form_event( WINDOW *win EVNT_BUFF_PARAM)
 {
 	ObjcChange( OC_FORM, win, EVNT_BUFF[4], NORMAL, FALSE);
-	ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+	close_win(win);
 }
 
 

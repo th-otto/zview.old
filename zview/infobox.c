@@ -291,6 +291,7 @@ void infobox( void)
 
 	WindSet( wininfo, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
 
+	EvntAttach( wininfo, WM_XKEYBD, close_on_esc);
 	EvntAttach( wininfo, WM_CLOSED, close_modal);
 
 	if( img->comments)

@@ -252,7 +252,7 @@ static void __CDECL save_dialog_event( WINDOW *win EVNT_BUFF_PARAM)
 
 		case SAVE_DIAL_ABORT:
 			ObjcChange( OC_FORM, win, object, NORMAL, FALSE);
-			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			close_win(win);
 			break;
 	}
 }

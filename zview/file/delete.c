@@ -166,7 +166,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 	{	   
 		case OPERATION_DIAL_CANCEL:
 			ObjcChange( OC_FORM, win, OPERATION_DIAL_CANCEL, ~SELECTED, TRUE);
-			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			close_win(win);
 			break;
 
 		case OPERATION_DIAL_OK:
@@ -177,7 +177,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 	
 			if( !count_files( wicones, &file))
 			{
-				ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+				close_win(win);
 				errshow("", -errno);
 				return;
 			}

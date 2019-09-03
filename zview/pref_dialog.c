@@ -19,7 +19,7 @@ static int old_pdf_aa					= 0;
 static int old_smooth_thumbnail			= 0;
 
 static char *items[] = { "None", "Triangle", "Blackman", "Gaussian", "Quadratic", "Cubic", "Lanczos"};
-static int	drive[]  = { PREFS_A ,PREFS_B, PREFS_C, PREFS_D, PREFS_E, PREFS_F, PREFS_G, PREFS_H, PREFS_I, PREFS_J,
+static short const drive[]  = { PREFS_A ,PREFS_B, PREFS_C, PREFS_D, PREFS_E, PREFS_F, PREFS_G, PREFS_H, PREFS_I, PREFS_J,
 PREFS_K, PREFS_L, PREFS_M, PREFS_N, PREFS_O, PREFS_P, PREFS_Q, PREFS_R, PREFS_S, PREFS_T, PREFS_U, PREFS_V, PREFS_W,
 PREFS_X, PREFS_Y, PREFS_Z};
 static int i, drv;
@@ -101,12 +101,12 @@ static void __CDECL handle_preference( WINDOW *win EVNT_BUFF_PARAM)
 			pdf_aa					= old_pdf_aa;			
 
 			ObjcChange( OC_FORM, win, EVNT_BUFF[4], ~SELECTED, TRUE) ;
-			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			close_win(win);
 			break;
 
 		case PREFS_OK:
 			ObjcChange( OC_FORM, win, EVNT_BUFF[4], ~SELECTED, TRUE);
-			ApplWrite( _AESapid, WM_CLOSED, win->handle, 0, 0, 0, 0);
+			close_win(win);
 
 			skip_drive[0] = '\0';
 			
