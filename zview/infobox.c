@@ -176,6 +176,44 @@ static void slid_vmover( WINDOW *win, int obj_index, int mode, void *data)
 }
 
 
+static void objc_multiline(OBJECT *tree, long str, short first, short last)
+{
+	short i;
+	const char *p, *end;
+	char temp[40 + 1];
+
+	i = first;
+	if (str > 0)
+	{
+		p = (char *)str;
+		while (i <= last)
+		{
+			size_t len;
+			
+			end = strchr(p, '\n');
+			if (end == NULL)
+			{
+				ObjcStrnCpy(tree, i, p);
+				i++;
+				break;
+			}
+			++end;
+			len = end - p;
+			len = MIN(len, sizeof(temp));
+			zstrncpy(temp, p, len);
+			ObjcStrnCpy(tree, i, temp);
+			p = end;
+			i++;
+		}
+	}
+	while (i <= last)
+	{
+		ObjcStrnCpy(tree, i, "");
+		i++;
+	}
+}
+
+
 /*==================================================================================*
  * void infobox:																	*
  *		Show the infobox for a image or a file.										*
@@ -271,13 +309,11 @@ void infobox( void)
 	{
 		long ret;
 		SLB *slb;
-		short i;
-		char *p, *end;
 		
 		slb = &img->codec->c.slb;
 
 		ret = plugin_get_option(slb, INFO_NAME);
-		ObjcStrnCpy(infotext, FILE_CODEC_NAME, ret > 0 ? (const char *)ret : "");
+		objc_multiline(infotext, ret, FILE_CODEC_NAME_FIRST, FILE_CODEC_NAME_LAST);
 		ObjcStrnCpy(infotext, FILE_CODEC_FILENAME, img->codec->name);
 
 		ret = plugin_get_option(slb, INFO_VERSION);
@@ -294,35 +330,7 @@ void infobox( void)
 		ObjcStrnCpy(infotext, FILE_CODEC_AUTHOR, ret > 0 ? (const char *)ret : "");
 
 		ret = plugin_get_option(slb, INFO_MISC);
-		i = FILE_CODEC_INFO_FIRST;
-		if (ret > 0)
-		{
-			p = (char *)ret;
-			while (i <= FILE_CODEC_INFO_LAST)
-			{
-				size_t len;
-				
-				end = strchr(p, '\n');
-				if (end == NULL)
-				{
-					ObjcStrnCpy(infotext, i, p);
-					i++;
-					break;
-				}
-				++end;
-				len = end - p;
-				len = MIN(len, sizeof(temp));
-				zstrncpy(temp, p, len);
-				ObjcStrnCpy(infotext, i, temp);
-				p = end;
-				i++;
-			}
-		}
-		while (i <= FILE_CODEC_INFO_LAST)
-		{
-			ObjcStrnCpy(infotext, i, "");
-			i++;
-		}
+		objc_multiline(infotext, ret, FILE_CODEC_INFO_FIRST, FILE_CODEC_INFO_LAST);
 		
 		if (infotext[FILE_INFO_EXIF].ob_flags & HIDETREE)
 			infotext[FILE_INFO_CODEC].ob_x = infotext[FILE_INFO_IMAGE].ob_x + infotext[FILE_INFO_IMAGE].ob_width + 2;
