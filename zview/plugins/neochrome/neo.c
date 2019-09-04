@@ -12,8 +12,10 @@
   1.08 Code cleanup, optimizations
 */
 
-#define	VERSION		0x0107
-#define AUTHOR      "Zorro,Lonny Pursell"
+#define	VERSION		0x0108
+#define NAME        "NEOchrome"
+#define AUTHOR      "Zorro, Lonny Pursell"
+#define DATE     __DATE__ " " __TIME__
 
 #include <limits.h>
 #include "plugin.h"
@@ -28,6 +30,15 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long) ("NEO\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }

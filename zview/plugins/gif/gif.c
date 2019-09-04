@@ -1,3 +1,26 @@
+/*
+  2.00 initial port from zview archive v1.0.1, built with giflib 5.1.1
+  2.01 fixed snowy white backgrounds, transparent color issue
+  2.02 fixed animations not animating, added minimum default speed of 10ms
+  2.03 improved frame delay fix, removed debug code
+  2.04 updated build info
+  2.05 fixed animations with mixed interlaced and non-interlaced frames
+       added file version information
+  2.06 fixed animations where the 1st frame uses a transparent color
+       initial background color is passed in via zview
+  2.07 added file id check, put image size check back in (fixed typo)
+  2.08 firebee fixes
+  2.09 updated build info
+  2.10 fixed: animation delay out of sync with images
+  2.11 Code cleanup
+*/
+
+#define VERSION		0x0211
+#define NAME        "Graphics Interchange Format"
+#define AUTHOR      "Lonny Pursell, Thorsten Otto"
+#define DATE        __DATE__ " " __TIME__
+#define MISCINFO    "GIFLIB: " __STRINGIFY(GIFLIB_MAJOR) "." __STRINGIFY(GIFLIB_MINOR) "." __STRINGIFY(GIFLIB_RELEASE)
+
 #include <stdlib.h>
 #include <gif_lib.h>
 #include "plugin.h"
@@ -14,6 +37,17 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long) ("GIF\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
+	case INFO_MISC:
+		return (long)MISCINFO;
 	}
 	return -ENOSYS;
 }

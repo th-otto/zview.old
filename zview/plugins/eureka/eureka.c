@@ -3,7 +3,9 @@
 #include "colormap.h"
 
 #define VERSION 0x203
+#define NAME    "Eureka RAW"
 #define AUTHOR  "Zorro"
+#define DATE    __DATE__ " " __TIME__
 
 #ifdef PLUGIN_SLB
 long __CDECL get_option(zv_int_t which)
@@ -14,6 +16,15 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long)("RAW\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }

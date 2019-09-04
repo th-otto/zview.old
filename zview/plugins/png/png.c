@@ -4,7 +4,9 @@
 #include <wchar.h>
 
 #define VERSION 0x201
-#define AUTHOR "Zorro,Thorsten Otto"
+#define NAME    "Portable Network Graphics"
+#define AUTHOR  "Zorro, Thorsten Otto"
+#define DATE     __DATE__ " " __TIME__
 
 #ifdef PLUGIN_SLB
 long __CDECL get_option(zv_int_t which)
@@ -15,6 +17,15 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long) ("PNG\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }

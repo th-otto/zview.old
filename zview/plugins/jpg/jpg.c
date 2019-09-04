@@ -27,8 +27,13 @@ J_COLOR_SPACE color_space = JCS_RGB;
 boolean progressive = FALSE;
 
 #undef VERSION
-#define VERSION 0x200
-#define AUTHOR "Zorro"
+#undef NAME
+
+#define VERSION  0x200
+#define NAME     "Joint Photographic Experts Group"
+#define AUTHOR   "Zorro"
+#define DATE     __DATE__ " " __TIME__
+#define MISCINFO "Using " JPEG_SHAREDLIB_NAME
 
 
 #ifdef PLUGIN_SLB
@@ -39,13 +44,25 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE | CAN_ENCODE;
 	case OPTION_EXTENSIONS:
-		return (long)("JPG\0JPE\0JPEG\0");
+		return (long)("JPG\0" "JPE\0" "JPEG\0" "JIF\0" "JFIF\0" "JFI\0");
+
 	case OPTION_QUALITY:
 		return quality;
 	case OPTION_COLOR_SPACE:
 		return color_space;
 	case OPTION_PROGRESSIVE:
 		return progressive;
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
+	case INFO_MISC:
+		return (long)MISCINFO;
 	}
 	return -ENOSYS;
 }

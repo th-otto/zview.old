@@ -5,7 +5,10 @@
 #include "zvtiff.h"
 
 #define VERSION 0x200
-#define AUTHOR "Zorro"
+#define NAME    "Tagged Image File Format"
+#define AUTHOR  "Zorro"
+#define DATE     __DATE__ " " __TIME__
+#define MISCINFO "Using " TIFFLIB_VERSION_STR
 
 #define alpha_composite( composite, fg, alpha) {						\
     uint16_t temp = (( uint16_t)( fg) * ( uint16_t)( alpha) + ( uint16_t)128);	\
@@ -24,11 +27,23 @@ long __CDECL get_option(zv_int_t which)
 	case OPTION_CAPABILITIES:
 		return CAN_DECODE | CAN_ENCODE;
 	case OPTION_EXTENSIONS:
-		return (long)("TIF\0TIFF\0");
+		return (long)("TIF\0" "TIFF\0");
+
 	case OPTION_QUALITY:
 		return quality;
 	case OPTION_COMPRESSION:
 		return encode_compression;
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
+	case INFO_MISC:
+		return (long)MISCINFO;
 	}
 	return -ENOSYS;
 }

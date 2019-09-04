@@ -19,7 +19,9 @@
 #include "zvplugin.h"
 
 #define VERSION		0x0113
+#define NAME        "Degas/Degas Elite"
 #define AUTHOR      "Lonny Pursell"
+#define DATE        __DATE__ " " __TIME__
 
 #define DEGAS_SIZE	32034L
 #define ELITE_SIZE	32066L
@@ -42,6 +44,15 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long)("PI1\0" "PI2\0" "PI3\0" "PC1\0" "PC2\0" "PC3\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }

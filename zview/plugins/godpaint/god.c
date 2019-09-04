@@ -1,8 +1,10 @@
 #include "plugin.h"
 #include "zvplugin.h"
 
-#define VERSION 0x200
+#define VERSION 0x201
+#define NAME    "GodPaint"
 #define AUTHOR  "Zorro"
+#define DATE     __DATE__ " " __TIME__
 
 typedef struct 
 {
@@ -22,6 +24,15 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE | CAN_ENCODE;
 	case OPTION_EXTENSIONS:
 		return (long)("GOD\0");
+
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }
@@ -164,6 +175,7 @@ void __CDECL reader_quit( IMGINFO info)
 	GODHDR		*god	= ( GODHDR*)info->_priv_ptr;
 
 	free( god);
+	info->_priv_ptr = 0;
 }
 
 
@@ -272,5 +284,10 @@ void __CDECL encoder_quit( IMGINFO info)
 	uint8_t *buffer = ( uint8_t*)info->_priv_ptr;
 
 	free( buffer);
-	Fclose( info->_priv_var);
+	info->_priv_ptr = 0;
+	if (info->_priv_var > 0)
+	{
+		Fclose( info->_priv_var);
+		info->_priv_var = 0;
+	}
 }
