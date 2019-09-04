@@ -293,7 +293,7 @@ void delete_entry( WINDOW *win)
 
 	save_dialog = get_tree( OPERATION_DIAL);
 
-	zstrncpy( save_dialog[OPERATION_DIAL_INFO].ob_spec.tedinfo->te_ptext, get_string( DELETE_ASK), 48);
+	ObjcStrnCpy(save_dialog, OPERATION_DIAL_INFO, get_string( DELETE_ASK));
 	strcpy( save_dialog[OPERATION_DIAL_PROGRESS].ob_spec.tedinfo->te_ptext, "");
 
 	win_save_dialog = FormCreate( save_dialog, NAME|MOVER, delete_function, get_string( DELETE_TITLE), NULL, TRUE, FALSE);

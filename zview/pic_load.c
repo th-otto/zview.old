@@ -30,7 +30,7 @@ CODEC *curr_output_plugin;
 
 static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 {
-	int16   i, n_planes = ( ( info->planes == 1 && info->components == 1) ?  1: app.nplanes);
+	int16   i, n_planes = info->planes == 1 && info->components == 1 ? 1 : app.nplanes;
 	uint16	display_w, display_h;
 	double	precise_x, precise_y, factor;
 	size_t	src_line_size;
@@ -85,6 +85,7 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 	{
 		img->comments = NULL;
 	}
+	img->codec = curr_input_plugin;
 
 	/*
 	 * we assume that the pixel size is minimum 8 bits because some GNU libraries return 1 and 4 bits format like 8 bits ones.

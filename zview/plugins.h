@@ -30,6 +30,7 @@ typedef struct {
 		SLB slb;
 	} c;
 	long capabilities;
+#define HAS_INFO 0x80000000L
 	const char *extensions;
 	long num_extensions;
 	char *name;

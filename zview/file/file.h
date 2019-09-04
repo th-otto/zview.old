@@ -4,3 +4,4 @@ extern boolean scan_dir( WINDOW *win, const char *dirpath);
 extern boolean scan_mini_drv( WINDOW *win);
 extern void check_mini_dir( int16 nb_child, Mini_Entry *entry);
 extern boolean scan_mini_dir( WINDOW *win, Mini_Entry *parent);
+extern char *f_basename(const char *path);

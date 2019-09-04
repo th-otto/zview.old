@@ -27,6 +27,14 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE | CAN_ENCODE;
 	case OPTION_EXTENSIONS:
 		return (long) ("BMP\0");
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
 	}
 	return -ENOSYS;
 }

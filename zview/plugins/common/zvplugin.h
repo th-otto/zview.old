@@ -31,6 +31,16 @@ void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 #define OPTION_COMPRESSION  5
 
 /*
+ * below are only used to display codec information
+ */
+#define INFO_NAME           6	/* a single string */
+#define INFO_VERSION        7	/* should be a BCD encoded version, like 0x102 */
+#define INFO_AUTHOR         8	/* a single string */
+#define INFO_DATETIME       9	/* a single string, in the format produced by the __DATE__ macro, optionally also with time */
+#define INFO_MISC          10	/* other information, can be multiple lines separated by '\n' */
+
+
+/*
  * Flags for get_option(OPTION_CAPABILITIES)
  */
 #define CAN_DECODE 0x01

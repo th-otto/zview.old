@@ -1,8 +1,12 @@
 #include "plugin.h"
 #include "zvplugin.h"
 
-#define VERSION 0x200
-#define AUTHOR  "Thorsten Otto"
+#define VERSION  0x200
+#define NAME     "Dr. Doodle"
+#define AUTHOR   "Lonny Pursell, Thorsten Otto"
+#define DATE     __DATE__ " " __TIME__
+#define MISCINFO "Parts of code taken from St2BMP,\n" \
+                 "written by Hans Wessels"
 
 static uint16_t const medpal[4] = {
 	0x0fff, 0x0f00, 0x00f0, 0x0000
@@ -26,6 +30,16 @@ long __CDECL get_option(zv_int_t which)
 		return CAN_DECODE;
 	case OPTION_EXTENSIONS:
 		return (long)("DOO\0");
+	case INFO_NAME:
+		return (long)NAME;
+	case INFO_VERSION:
+		return VERSION;
+	case INFO_DATETIME:
+		return (long)DATE;
+	case INFO_AUTHOR:
+		return (long)AUTHOR;
+	case INFO_MISC:
+		return (long)MISCINFO;
 	}
 	return -ENOSYS;
 }

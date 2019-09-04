@@ -143,6 +143,7 @@ typedef enum
 } EntryType;
 
 #include "plugins/common/txt_data.h"
+#include "plugins.h"
 
 
 typedef struct
@@ -158,6 +159,7 @@ typedef struct
 	uint16		delay[1024];		/* Animation delay in millise. between each frame					*/
 
 	txt_data	*comments;	
+	CODEC *codec;
 
 	/* Private Data */
 	int16		view_mode;			/* preview or full size view? 			*/

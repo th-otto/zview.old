@@ -10,6 +10,7 @@
 #include "av_prot.h"
 #include "wintimer.h"
 #include "zvdi/vdi.h"
+#include "file/file.h"
 #include "catalog/catalog.h"
 #include "version.h"
 #include "version_date.h"
@@ -213,16 +214,8 @@ int main( int argc, char *argv[])
 {
 	if (argc > 0 && argv[0] && argv[0][0])
 	{
-		char *p1, *p2;
 		strcpy(zview_path, argv[0]);
-		p1 = strrchr(zview_path, '/');
-		p2 = strrchr(zview_path, '\\');
-		if (p1 == NULL || p2 > p1)
-			p1 = p2;
-		if (p1)
-			*++p1 = '\0';
-		else
-			zview_path[0] = '\0';
+		*f_basename(zview_path) = '\0';
 	}
 	applinit();
 

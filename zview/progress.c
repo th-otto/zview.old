@@ -20,11 +20,10 @@ WINDOW *win_read = NULL;
 void win_progress_begin( const char *string)
 {
 	OBJECT	*progress_bar = get_tree( SINGLE_PROGRESS);	
-	TEDINFO *ted = progress_bar[SINGLE_PROGRESS_TXT].ob_spec.tedinfo;
 	 
 //	wind_update( BEG_MCTRL);
 
-	zstrncpy( ted->te_ptext, string, ted->te_txtlen - 1);
+	ObjcStrnCpy(progress_bar, SINGLE_PROGRESS_TXT, string);
 
 	win_read = FormCreate( progress_bar, MOVER|NAME, NULL, "", NULL, 0, 0);
 

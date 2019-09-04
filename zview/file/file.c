@@ -173,7 +173,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		entry->next_selected 		   	= NULL;
 		entry->stat 				   	= file_stat;
 		strcpy( entry->name, de->d_name);
-		zstrncpy( entry->name_shown, de->d_name, 99);
+		zstrncpy( entry->name_shown, de->d_name, sizeof(entry->name_shown));
 
 		/* Get Size */
 		size_to_text( entry->size, ( float)file_stat.st_size);
@@ -400,4 +400,18 @@ abort:
 	parent->nbr_child = 0;		
 
 	return FALSE;
+}
+
+
+char *f_basename(const char *path)
+{
+	char *p1, *p2;
+
+	p1 = strrchr(path, '/');
+	p2 = strrchr(path, '\\');
+	if (p1 == NULL || p2 > p1)
+		p1 = p2;
+	if (p1)
+		return ++p1;
+	return (char *)path;
 }

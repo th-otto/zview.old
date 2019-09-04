@@ -6,20 +6,30 @@
 #include "pic_load.h"
 #include "winimg.h"
 #include "file/count.h"
+#include "file/file.h"
 #include "custom_font.h"
 #include <math.h>
+#include "plugins/common/zvplugin.h"
 
-static int16 dum, res;
-static int16 posy, xy[8], dum;
 static uint32 ypos_max, ypos;
-float slider_pos = 0.0, slider_step = 0.0;
-static	OBJECT	*infotext;
-static txt_data *exif_box;
+static float slider_pos = 0.0;
+static float slider_step = 0.0;
 static OBJECT *slider_root;
+
+
+void ObjcStrnCpy(OBJECT *tree, short idx, const char *str)
+{
+	TEDINFO *ted = tree[idx].ob_spec.tedinfo;
+	strncpy(ted->te_ptext, str, ted->te_txtlen - 1);
+}
+
 
 static void CDECL draw_exif_info( WINDOW *win, PARMBLK *pblk, void *data)
 {
-	exif_box = (txt_data *) data; 
+	int16 xy[8];
+	txt_data *exif_box = (txt_data *) data; 
+	int16 dum;
+	int16 posy;
 
 	xy[0] = pblk->pb_x;
 	xy[1] = pblk->pb_y;
@@ -82,6 +92,9 @@ static void calc_exif_slider( WINDOW *win)
 
 static void __CDECL slid_up( WINDOW *win, int obj_index, int mode, void *data)
 {
+	int16 dum;
+	int16 res;
+
 	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
 	
@@ -95,6 +108,7 @@ static void __CDECL slid_up( WINDOW *win, int obj_index, int mode, void *data)
 			slider_root[FILE_INFO_VMOVER].ob_y	= MAX( 0, ( int16)floor( slider_pos));
 			ObjcDraw( OC_FORM, win, FILE_INFO_VBACK, 2);
 		}
+		evnt_timer(50);
 		graf_mkstate( &dum, &dum, &res, &dum);
 
 	} while( res);
@@ -105,6 +119,9 @@ static void __CDECL slid_up( WINDOW *win, int obj_index, int mode, void *data)
 
 static void slid_down( WINDOW *win, int obj_index, int mode, void *data)
 {
+	int16 dum;
+	int16 res;
+
 	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
 
@@ -118,6 +135,7 @@ static void slid_down( WINDOW *win, int obj_index, int mode, void *data)
 			slider_root[FILE_INFO_VMOVER].ob_y	= ( int16)floor( slider_pos);
 			ObjcDraw( OC_FORM, win, FILE_INFO_VBACK, 2);
 		}
+		evnt_timer(50);
 		graf_mkstate( &dum, &dum, &res, &dum);
 
 	} while( res);
@@ -129,6 +147,7 @@ static void slid_down( WINDOW *win, int obj_index, int mode, void *data)
 static void slid_vmover( WINDOW *win, int obj_index, int mode, void *data)
 {
 	int32 old_ypos = ypos;
+	int16 res;
 
 	(void)data;
 	ObjcChange( mode, win, obj_index, SELECTED, TRUE);
@@ -173,12 +192,12 @@ void infobox( void)
 	WINDICON 		*wicones;
     WINDATA			*windata;
     IMAGE 			*img;
-	char 			temp[30];
 	float 			uncompressed_size;
 	int32			file_size;
-	int16			name_len;
-	int 			frms[] = { FILE_INFO_PANEL1, FILE_INFO_PANEL2, 	FILE_INFO_PANEL3};
-	int 			buts[] = { FILE_INFO_FILE,   FILE_INFO_IMAGE,   FILE_INFO_EXIF};
+	char temp[40 + 1];
+	static int const frms[] = { FILE_INFO_PANEL1, FILE_INFO_PANEL2,  FILE_INFO_PANEL3, FILE_INFO_PANEL4 };
+	static int const buts[] = { FILE_INFO_FILE,   FILE_INFO_IMAGE,   FILE_INFO_EXIF,   FILE_INFO_CODEC };
+	OBJECT *infotext;
 
 	infotext = get_tree( FILE_INFO);
 
@@ -191,13 +210,9 @@ void infobox( void)
 		if( wicones->edit)
 			exit_edit_mode( win_catalog, wicones->first_selected);
 		
-		name_len = MIN( 29, strlen( entry->name));
-
-		zstrncpy( temp, entry->name, name_len+1);
-
-		ObjcStrCpy( infotext, FILE_INFO_NAME, temp);
-		ObjcStrCpy( infotext, FILE_INFO_DATE, entry->date);
-		ObjcStrCpy( infotext, FILE_INFO_TIME, entry->time);  
+		ObjcStrnCpy( infotext, FILE_INFO_NAME, entry->name);
+		ObjcStrnCpy( infotext, FILE_INFO_DATE, entry->date);
+		ObjcStrnCpy( infotext, FILE_INFO_TIME, entry->time);  
 
 		if( entry->type == ET_DIR)
 		{
@@ -212,47 +227,36 @@ void infobox( void)
 			}
 
 			size_to_text( temp, ( float)file.size);
-			ObjcStrCpy( infotext, FILE_INFO_SIZE, temp);
+			ObjcStrnCpy( infotext, FILE_INFO_SIZE, temp);
 
 			graf_mouse( ARROW, NULL);
 		}
 		else
-			ObjcStrCpy( infotext, FILE_INFO_SIZE, entry->size);  
+			ObjcStrnCpy( infotext, FILE_INFO_SIZE, entry->size);  
 
 	}
 	else if(( windata = (WINDATA *)DataSearch( wglb.front, WD_DATA)))		/* See if the picture is in a "normal" window */
 	{   
 		struct stat		file_stat;
 	   	struct tm		*tmt;
-		int16			path_len, file_len;
-		int8			*fullname = windata->name; 
+		int8			*fullname = windata->name;
 
 		img 	 = &windata->img;
-		file_len = ( int16)strlen( fullname);
-		path_len = file_len;
-
-		while(( fullname[path_len] != '/') && ( fullname[path_len] != '\\'))
-			path_len--;
-
-		name_len = MIN( 29, file_len - path_len);
-
-		path_len++;
 		
-		zstrncpy( temp, &fullname[path_len], name_len+1);
-		ObjcStrCpy( infotext, FILE_INFO_NAME, temp);
+		ObjcStrnCpy( infotext, FILE_INFO_NAME, f_basename(fullname));
 
 		lstat( fullname, &file_stat);
 		file_size = file_stat.st_size;
 
 		size_to_text( temp, ( float)file_stat.st_size);
-		ObjcStrCpy( infotext, FILE_INFO_SIZE, temp);
+		ObjcStrnCpy( infotext, FILE_INFO_SIZE, temp);
 
 		tmt = localtime(&file_stat.st_mtime);
-		strftime( temp, 28, "%A %d %B %Y", tmt);
-		ObjcStrCpy( infotext, FILE_INFO_DATE, temp);
+		strftime( temp, sizeof(temp), "%A %d %B %Y", tmt);
+		ObjcStrnCpy( infotext, FILE_INFO_DATE, temp);
 
-		strftime( temp, 12, "%H:%M:%S", tmt);
-		ObjcStrCpy( infotext, FILE_INFO_TIME, temp);
+		strftime( temp, sizeof(temp), "%H:%M:%S", tmt);
+		ObjcStrnCpy( infotext, FILE_INFO_TIME, temp);
 	}	  
 	else 
 		return;	/* normally, never */	
@@ -261,7 +265,74 @@ void infobox( void)
 	if( img->comments)
 		infotext[FILE_INFO_EXIF].ob_flags &= ~HIDETREE;
 	else
-		infotext[FILE_INFO_EXIF].ob_flags |= HIDETREE; 
+		infotext[FILE_INFO_EXIF].ob_flags |= HIDETREE;
+
+	if( img->codec && (img->codec->capabilities & HAS_INFO))
+	{
+		long ret;
+		SLB *slb;
+		short i;
+		char *p, *end;
+		
+		slb = &img->codec->c.slb;
+
+		ret = plugin_get_option(slb, INFO_NAME);
+		ObjcStrnCpy(infotext, FILE_CODEC_NAME, ret > 0 ? (const char *)ret : "");
+		ObjcStrnCpy(infotext, FILE_CODEC_FILENAME, img->codec->name);
+
+		ret = plugin_get_option(slb, INFO_VERSION);
+		if (ret > 0)
+			sprintf(temp, "%ld.%02lx", ret >> 8, ret & 0xff);
+		else
+			*temp = '\0';
+		ObjcStrnCpy(infotext, FILE_CODEC_VERSION, temp);
+
+		ret = plugin_get_option(slb, INFO_DATETIME);
+		ObjcStrnCpy(infotext, FILE_CODEC_DATE, ret > 0 ? (const char *)ret : "");
+
+		ret = plugin_get_option(slb, INFO_AUTHOR);
+		ObjcStrnCpy(infotext, FILE_CODEC_AUTHOR, ret > 0 ? (const char *)ret : "");
+
+		ret = plugin_get_option(slb, INFO_MISC);
+		i = FILE_CODEC_INFO_FIRST;
+		if (ret > 0)
+		{
+			p = (char *)ret;
+			while (i <= FILE_CODEC_INFO_LAST)
+			{
+				size_t len;
+				
+				end = strchr(p, '\n');
+				if (end == NULL)
+				{
+					ObjcStrnCpy(infotext, i, p);
+					i++;
+					break;
+				}
+				++end;
+				len = end - p;
+				len = MIN(len, sizeof(temp));
+				zstrncpy(temp, p, len);
+				ObjcStrnCpy(infotext, i, temp);
+				p = end;
+				i++;
+			}
+		}
+		while (i <= FILE_CODEC_INFO_LAST)
+		{
+			ObjcStrnCpy(infotext, i, "");
+			i++;
+		}
+		
+		if (infotext[FILE_INFO_EXIF].ob_flags & HIDETREE)
+			infotext[FILE_INFO_CODEC].ob_x = infotext[FILE_INFO_IMAGE].ob_x + infotext[FILE_INFO_IMAGE].ob_width + 2;
+		else
+			infotext[FILE_INFO_CODEC].ob_x = infotext[FILE_INFO_EXIF].ob_x + infotext[FILE_INFO_EXIF].ob_width + 2;
+		infotext[FILE_INFO_CODEC].ob_flags &= ~HIDETREE;
+	} else
+	{
+		infotext[FILE_INFO_CODEC].ob_flags |= HIDETREE; 
+	}
 
 	if ( img->page)
 	{ 
@@ -272,9 +343,9 @@ void infobox( void)
 		sprintf( infotext[FILE_INFO_HEIGHT].ob_spec.tedinfo->te_ptext, 	"%d",  img->img_h);	
 		sprintf( infotext[FILE_INFO_PLANES].ob_spec.tedinfo->te_ptext,  "%d",  img->bits);	
 		sprintf( infotext[FILE_INFO_PAGE].ob_spec.tedinfo->te_ptext,  	"%d",  img->page);
-		ObjcStrCpy( infotext, FILE_INFO_DEC_TIME, img->working_time);
-		ObjcStrCpy( infotext, FILE_INFO_COMPRESSION, img->compression);
-		ObjcStrCpy( infotext, FILE_INFO_INFO, img->info);
+		ObjcStrnCpy( infotext, FILE_INFO_DEC_TIME, img->working_time);
+		ObjcStrnCpy( infotext, FILE_INFO_COMPRESSION, img->compression);
+		ObjcStrnCpy( infotext, FILE_INFO_INFO, img->info);
 		
 		/* Calculate the Image decompressed size */
 		uncompressed_size = (((( float)img->img_w / 8.0) + 1) * ( float)img->bits) * ( float)img->img_h;	
@@ -287,7 +358,7 @@ void infobox( void)
 		
 	wininfo = FormCreate( infotext, NAME|MOVER|CLOSER, NULL, "Information", NULL, TRUE, FALSE);
 
-	FormThumb( wininfo, frms, buts, 3);
+	FormThumb( wininfo, frms, buts, 4);
 
 	WindSet( wininfo, WF_BEVENT, BEVENT_MODAL, 0, 0, 0);
 
