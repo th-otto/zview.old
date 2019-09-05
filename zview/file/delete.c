@@ -49,7 +49,7 @@ static void delete_progress( WINDOW *win)
 	GRECT	rwin, raes;
 	W_FORM  *form 			= ( W_FORM *)DataSearch( win, WD_WFRM);
 
-	size_to_text( tmp, ( float)size_deleted);
+	size_to_text( tmp, size_deleted);
 
 	sprintf( save_dialog[OPERATION_DIAL_INFO].ob_spec.tedinfo->te_ptext, get_string( DELETE_INFO), item_to_delete - item_deleted);
 	sprintf( save_dialog[OPERATION_DIAL_PROGRESS].ob_spec.tedinfo->te_ptext, get_string( PROGRESS_TXT), tmp, size_to_delete);
@@ -187,7 +187,7 @@ static void __CDECL delete_function( WINDOW *win EVNT_BUFF_PARAM)
 			size_deleted = 0L;
 			item_deleted = 0L;
 
-			size_to_text( size_to_delete, ( float)file.size);
+			size_to_text( size_to_delete, file.size);
 
 			delete_progress( win);
 

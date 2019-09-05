@@ -176,7 +176,7 @@ boolean scan_dir( WINDOW *win, const char *dirpath)
 		zstrncpy( entry->name_shown, de->d_name, sizeof(entry->name_shown));
 
 		/* Get Size */
-		size_to_text( entry->size, ( float)file_stat.st_size);
+		size_to_text( entry->size, file_stat.st_size);
  		/* Get Time */
 		tmt = localtime(&file_stat.st_mtime);
 		strftime( entry->date, 28, "%A %d %B %Y", tmt);

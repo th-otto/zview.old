@@ -230,7 +230,7 @@ void infobox( void)
 	WINDICON 		*wicones;
     WINDATA			*windata;
     IMAGE 			*img;
-	float 			uncompressed_size;
+	uint32_t		uncompressed_size;
 	int32			file_size;
 	char temp[40 + 1];
 	static int const frms[] = { FILE_INFO_PANEL1, FILE_INFO_PANEL2,  FILE_INFO_PANEL3, FILE_INFO_PANEL4 };
@@ -264,7 +264,7 @@ void infobox( void)
 				return;
 			}
 
-			size_to_text( temp, ( float)file.size);
+			size_to_text( temp, file.size);
 			ObjcStrnCpy( infotext, FILE_INFO_SIZE, temp);
 
 			graf_mouse( ARROW, NULL);
@@ -286,7 +286,7 @@ void infobox( void)
 		lstat( fullname, &file_stat);
 		file_size = file_stat.st_size;
 
-		size_to_text( temp, ( float)file_stat.st_size);
+		size_to_text( temp, file_stat.st_size);
 		ObjcStrnCpy( infotext, FILE_INFO_SIZE, temp);
 
 		tmt = localtime(&file_stat.st_mtime);
@@ -356,7 +356,7 @@ void infobox( void)
 		ObjcStrnCpy( infotext, FILE_INFO_INFO, img->info);
 		
 		/* Calculate the Image decompressed size */
-		uncompressed_size = (((( float)img->img_w / 8.0) + 1) * ( float)img->bits) * ( float)img->img_h;	
+		uncompressed_size = ((img->img_w * img->bits + 7) >> 3) * img->img_h;	
 		size_to_text( infotext[FILE_INFO_MEM].ob_spec.tedinfo->te_ptext, uncompressed_size);
 			
 		sprintf( infotext[FILE_INFO_RATIO].ob_spec.tedinfo->te_ptext, "%.1f : 1", uncompressed_size / ( float)file_size);				

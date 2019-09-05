@@ -3,7 +3,7 @@
 
 
 /* Local variable */
-typedef struct 
+typedef struct
 {
 	char upper;
 	char lower;
@@ -20,8 +20,8 @@ static CUL c[] = { 	{'A', 'a'}, {'B', 'b'}, {'C', 'c'}, {'D', 'd'}, {'E', 'e'}, 
 /*==================================================================================*
  * zstrncpy:																		*
  * 		Copy <n> bytes from <src> to <dst>, including the terminating \0'-byte.		* 																	*
- *		If <src> is longer than <n-1>, it will be truncated with a '\0'-byte at		* 
- * 		position n-1.																* 
+ *		If <src> is longer than <n-1>, it will be truncated with a '\0'-byte at		*
+ * 		position n-1.																*
  *		Example: zstrncpy(b, "string", 1) would put a '\0'-byte at b[0] and 		*
  *		return. 																	*
  *		Basically, think of the <n> as a limiter on the number of bytes at <dst> 	*
@@ -64,7 +64,7 @@ char *zstrncpy( char *dst, const char *src, size_t n)
 char *fullpathname_to_filename( char *fullpathname)
 {
 		int16			path_len, file_len;
-		int8			*fullname = fullpathname; 
+		int8			*fullname = fullpathname;
 
 		file_len = ( int16)strlen( fullname);
 		path_len = file_len;
@@ -73,7 +73,7 @@ char *fullpathname_to_filename( char *fullpathname)
 			path_len--;
 
 		path_len++;
-		
+
 		return &fullname[path_len];
 }
 
@@ -87,26 +87,29 @@ char *fullpathname_to_filename( char *fullpathname)
  * 	size:			File size in byte.												*
  *==================================================================================*/
 
-void size_to_text( char *txt, float size)
+void size_to_text( char *txt, uint32 size)
 {
-	char format[10];
+	const char *format;
+	uint32 remain;
 
-	if ( size > 1023.0)
+	if ( size >= 1024)
 	{
-		size = size / 1024.0; 			
+		remain = size & 0x3ff;
+		size >>= 10;
 
-		if ( size > 1023.0)
+		if ( size >= 1024)
 		{
-			size = size / 1024.0; 			
-			sprintf( format, "MB");
+			remain = size & 0x3ff;
+			size >>= 10;
+			format = "MB";
 		}
 		else
-			sprintf( format, "KB");
-		
-		sprintf( txt, "%.1f %s", size, format);			   
+			format = "KB";
+
+		sprintf( txt, "%lu.%lu %s", (unsigned long)size, (unsigned long)(remain * 10) >> 10, format);
 	}
 	else
-		sprintf( txt, "%.0f bytes", size);		   
+		sprintf( txt, "%lu bytes", (unsigned long)size);
 }
 
 /*==================================================================================*
