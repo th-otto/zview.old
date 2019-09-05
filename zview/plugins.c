@@ -286,14 +286,14 @@ int16 plugins_init( void)
 					if (codec->capabilities < 0)
 						codec->capabilities = 0;
 					codec->name = strdup(de->d_name);
-					if (!check_duplicates())
-						break;
 					if (plugin_get_option(slb, INFO_NAME) > 0 ||
 						plugin_get_option(slb, INFO_VERSION) > 0 ||
 						plugin_get_option(slb, INFO_AUTHOR) > 0 ||
 						plugin_get_option(slb, INFO_DATETIME) > 0 ||
 						plugin_get_option(slb, INFO_MISC) > 0)
 						codec->capabilities |= HAS_INFO;
+					if (!check_duplicates())
+						break;
 				} else
 				{
 					if (err == -EINVAL)
