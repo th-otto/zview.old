@@ -1,0 +1,119 @@
+!begin_node Credits
+!html_name credits
+
+!begin_node Contact
+
+!begin_itemize
+!item Zorro (original author, Belgium)
+
+Write him if you like zView. Mail him at zorro270@@yahoo.fr.
+
+!item Miro Kropacek (also known as MiKRO, author of the new releases, 
+Slovakia)
+
+If you have questions concerning zView and the new releases, you 
+can mail him at miro.kropacek@@gmail.com.
+
+!item Sascha Uhlig (also known as AtFaCT, beta tester and author of this 
+hypertext, Germany)
+
+If you have any questions or comments regarding this hypertext 
+or any other Atari related stuff, you can contact me via e-mail: 
+atfact@@arcor.de.
+
+!end_itemize
+
+!end_node # Contact
+
+!begin_node Greetings
+
+Zorro, the original author of zView, would like to thank the 
+following persons who have assisted him in this project: 
+
+!begin_itemize !compressed
+!item Adam Klobukowski for the DEGAS format documentation.
+!item Didier M(!eacute)quignon for the DSP code.
+!item Dominique B(!eacute)r(!eacute)ziat and Arnaud Bercegeay for the WinDom library.
+!item Patrice Mandin for his work on ARAnyM.
+!item Sascha Uhlig for the documentation and the zView icon.
+!item Cyril Lefebvre for the French translation (old versions).
+!end_itemize
+
+
+And Sascha Uhlig, zView beta tester and author of this hypertext, 
+wants to say thank you to the following Atarians (this will be a long 
+list ;-):
+
+!begin_itemize !compressed
+!item Zorro (Belgium) for his Atari tools and applications, especially 
+his wonderful zView, and releasing them under the free software 
+license (!link [GPL] [General Public License (GPL!)]).
+!item Miro Kropacek (also known as MiKRO, Slovakia) for maintaining 
+zView, his great audio player mxPlay and other uncountable 
+projects for the Atari platform as well as his indefatigable 
+readiness to help.
+!item Ekkehard Flessa (also known as Ektus, Germany) for checking the 
+MagiC compatibility of zView BETA8.
+!item Lars Schmidbauer (also known as Latz, Germany) for the beta test 
+of zView BETA8 under TOS and MiNT and for his great home-made 
+CT60/63 JTAG download cable.
+!item The Unix/Linux and Atari open-source community. I would like to 
+thank all of you. Without the various libraries, it would have 
+taken much longer for Zorro and MiKRO, or even sometimes not 
+possible, to support so many formats and so accurately.
+!item The authors of many Wikipedia entries. These entries have been a 
+great help writing this hypertext. Large parts of the (!link [glossary] [Glossary]) are 
+based on them.
+!item Rodolphe Czuba (France) for his great Falcon accelerators CT2 and 
+CT60/63 as well as the CTPCI and for answering all my Falcon 
+questions.
+!item Didier M(!eacute)quignon (France) for his system software developments 
+(CT60/63 software archive and TOS PCI driver package) and the 
+media player Aniplayer.
+!item Henrik and Torbj(!oumlaut)rn Gild(!aring) (also known as the Nature brothers, 
+Sweden) for the EtherNat (ethernet/USB extension card, and hoping 
+that my board will be repaired this decade ;-) and the upcoming 
+SuperVidel (a Videl-compatible graphics card) for our beloved 
+Falcon CT60/63.
+!item Patrice Mandin (also known as PmData, France) for porting the SDL 
+library.
+!item Pawel Goralski (also known as Saulot, Poland) for supporting the 
+CTPCI/Radeon and porting GrafX2, a great bitmap paint program, 
+specialised in 256-colour drawing, inspired by the Amiga programs 
+Deluxe Paint and Brilliance.
+!item Jean-Fran(!ccedilla)ois Lemaire (Belgium) for writing new GEM software, 
+especially his fantastic clipboard manager GEMClip.
+!item George Nakos (also known as GGN, Greek) for his widespread support 
+of the Atari scene.
+!item Roger Burrows (Anodyne Software, Canada) for still developing and 
+selling the CD and DVD driver ExtenDOS and the CD Writer Suite.
+!item Gerhard Stoll (Germany) for taking over the HypView development 
+and for many other projects.
+!item Keith Scroggins (USA) for permanently maintaining the Atari port 
+of ScummVM (allows to run the famous LucasArts adventures such as 
+Indiana Jones or Monkey Island).
+!item Peter Persson (also known as PeP, Sweden) for his wonderful 
+emulator ports (SMSPlus, x128, PeNES and so on) and developing 
+system software for the SuperVidel.
+!item Uwe Seimet (Germany) for his up-to-date hard disk driver HDDriver 
+and releasing Outside and Diskus as freeware.
+!item Anders Eriksson (also known as Evil, Sweden) for his great Atari 
+website Dead Hackers Society.
+!item Klaus Hedrich (also known as Klapauzius or Klaz, German) for 
+patching Atari ST games to make them run on all kind of Atari 
+machines and emulators (with compatibility to hard disks, 
+multitasking operating systems, the popular Falcon accelerator 
+CT60/63, screen enhancers and graphics cards!).
+!item All Atarians I met at the German OFAM (Oberfr(!aumlaut)nkisches Atari 
+Meeting) 2012 and Christian Hellmuth (German) for organising this 
+great party since many years.
+!item William Wong (also known as WongCK, Republic of Singapore) for 
+creating fascinating new GEM software, like PH News Feed, and 
+making them compatible with MagiC and MagXNet.
+!item The FireBee team for developing a new Atari computer.
+!item And all other people who still support the Atari community.
+!end_itemize
+
+!end_node # Greetings
+
+!end_node # Credits

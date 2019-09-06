@@ -1,0 +1,277 @@
+!begin_node zView's Menus
+!html_name menu
+
+# ------------------------------------------------------
+
+!begin_node The 'zView' Menu
+
+!begin_node zView/About...
+
+This menu entry brings up a dialog that provides general 
+information about the program. You will find there the version 
+number, the copyright, the program's authors, their e-mail addresses 
+and the author of the documentation.
+
+!end_node
+
+!end_node #  The 'zView' Menu
+
+# ------------------------------------------------------
+
+!begin_node The 'File' Menu
+
+!begin_node File/Browser
+
+Shortcut: <Control>+<B>
+
+This menu entry opens the (!link [browser window] [Browser Window]). With it, you can browse 
+through drive directories while (!link [zView-compatible picture and] [Supported File Formats]) 
+(!link [animation files] [Supported File Formats]) are displayed in a handy previewable thumbnail format.
+
+See Browser Window for further information.
+
+!end_node # File/Browser
+
+!begin_node File/Open File...
+
+Shortcut: <Control>+<O>
+
+This menu entry opens the file selection dialog for loading a (!link [zView-] [Supported File Formats])
+(!link [compatible file] [Supported File Formats]).
+
+!end_node # File/Open File...
+
+!begin_node File/Information...
+
+Shortcut: <Control>+<I>
+
+Displays information about a selected file or folder.
+
+See Information Dialog for further information.
+
+!end_node # File/Information...
+
+!begin_node File/Save as...
+
+Shortcut: <Control>+<S>
+
+With it, you can save a file in another format.
+
+See Saving and Converting Pictures for further information.
+
+!end_node # File/Save as...
+
+!begin_node File/Print...
+
+Shortcut: <Control>+<P>
+
+Not yet available.
+
+!end_node # File/Print...
+
+!begin_node File/Close Window
+
+Shortcut: <Control>+<U>
+
+This menu entry closes the (!link [browser window] [Browser Window]) as well as (!link [picture windows] [Picture Window]) 
+and (!link [PDF windows] [PDF Window]) if they are the top window.
+
+!end_node # File/Close Window
+
+!begin_node File/Quit
+
+Shortcut: <Control>+<Q>
+
+As may be expected, this menu entry exits zView.
+
+!end_node # File/Quit
+
+!end_node # The 'File' Menu
+
+# ------------------------------------------------------
+
+!begin_node The 'Edit' Menu
+
+!begin_node Edit/Undo
+Shortcut: <Control>+<Z>
+
+Not yet available.
+!end_node # Edit/Undo
+
+!begin_node Edit/Copy
+Shortcut: <Control>+<C>
+
+Not yet available.
+
+!end_node # Edit/Copy
+
+!begin_node Edit/Cut
+Shortcut: <Control>+<X>
+
+Not yet available.
+!end_node # Edit/Cut
+
+!begin_node Edit/Paste
+Shortcut: <Control>+<V>
+
+Not yet available.
+!end_node # Edit/Paste
+
+!begin_node Edit/Delete
+Shortcut: <Delete>
+
+This menu entry deletes files and folders selected in the (!link [contents] [Contents List]) 
+(!link [list] [Contents List]) (use <Shift> to select more than one file/folder). By selecting 
+this entry, a dialog will appear and you will be asked if you want 
+to delete the selected file(s).
+
+Note that write-protected files and folders will also be deleted. 
+zView makes write-protected files/folders writable so that they can 
+be deleted without asking permission for it. This way, you will not 
+get those annyoing warnings that a file or folder cannot be deleted.
+!end_node # Edit/Delete
+
+!begin_node Edit/Select All
+Shortcut: <Control>+<A>
+
+This selects all objects in the (!link [contents list] [Contents List]). A click in an object-
+free area of the (!link [contents list] [Contents List]) deselects them again. And a click on 
+one of all selected objects deselects all but the object that has 
+been clicked on.
+!end_node # Edit/Select All
+
+!begin_node Edit/Preferences...
+Here, you can make some settings that, in particular, affect the 
+display of the (!link [directory list] [Directory List]) and the (!link [contents list] [Contents List]) of the (!link [browser] [Browser Window]) 
+(!link [window] [Browser Window]).
+
+See Preferences Dialog for further information.
+!end_node # Edit/Preferences...
+
+!end_node # The 'Edit' Menu
+
+# ------------------------------------------------------
+
+!begin_node The 'View' Menu
+
+!begin_node View/Sort by Name
+
+Shows files in the (!link [contents list] [Contents List]) sorted alphabetically by name.
+
+Please note that folders always appear sorted by name and are always 
+shown before files.
+
+All the entries in this portion of the menu have a tick in front of 
+them when active, and they are alternatives (selecting one 
+deactivates the current setting).
+
+!end_node # View/Sort by Name
+
+!begin_node View/Sort by Size
+This menu option shows files in the (!link [contents list] [Contents List]) sorted by their 
+size so that the longest file appears at the end of the list.
+
+Please note that folders always appear sorted by name and are always 
+shown before files.
+
+All the entries in this portion of the menu have a tick in front of 
+them when active, and they are alternatives (selecting one 
+deactivates the current setting).
+!end_node # View/Sort by Size
+
+!begin_node View/Sort by Date
+Shows files in the (!link [contents list] [Contents List]) sorted by the datestamp. The 
+'youngest' file is placed at the beginning. Files with the same 
+datestamp are sorted by their timestamps.
+
+Please note that folders always appear sorted by name and are always 
+shown before files.
+
+All the entries in this portion of the menu have a tick in front of 
+them when active, and they are alternatives (selecting one 
+deactivates the current setting).
+!end_node # View/Sort by Date
+
+!begin_node View/Show Directory List
+With this menu entry, you can determine whether the (!link [directory list] [Directory List]) is 
+displayed. When this is deactivated (not ticked), the (!link [contents list] [Contents List]) 
+use the entire (!link [browser window] [Browser Window]) to show the contents of a directory.
+!end_node # View/Show Directory List
+
+!begin_node View/Show Only Images
+With this menu entry, you can toggle on/off showing only (!link [zView-] [Supported File Formats]) 
+(!link [compatible picture and animation files] [Supported File Formats]) in the (!link [contents list] [Contents List]).
+
+If the menu entry is not ticked, folders and other files are also 
+listed. Folders are displayed, however, only if the option 'Show 
+unsupported files' (see Preferences Dialog, subchapter (!link [Index Card] [Index Card 'Browser']) 
+(!link ['Browser'] [Index Card 'Browser'])) is not active.
+!end_node # View/Show Only Images
+
+!begin_node View/4:3 Thumbnails
+With this menu entry, you can change the width/height ratio of the 
+area that icons or thumbnails take up in the (!link [contents list] [Contents List]) to 4:3. 
+The thumbnails will be scaled correspondingly.
+
+Both entries in this portion of the menu have a tick in front of them 
+when active, and they are alternatives (selecting one deactivates the 
+current setting).
+
+See Icon/Thumbnail Display Configuration for a more detailed 
+explanation.
+!end_node # View/4:3 Thumbnails
+
+!begin_node View/3:4 Thumbnails
+With this menu entry, you can change the width/height ratio of the 
+area that icons or thumbnails take up in the (!link [contents list] [Contents List]) to 3:4. 
+The thumbnails will be scaled correspondingly. 
+
+Both entries in this portion of the menu have a tick in front of them 
+when active, and they are alternatives (selecting one deactivates the 
+current setting).
+
+See Icon/Thumbnail Display Configuration for a more detailed 
+explanation.
+!end_node # View/3:4 Thumbnails
+
+!begin_node View/Full Screen
+Shortcut: <F10>
+
+This menu entry displays a picture/animation file (but not animated) 
+without disturbing GEM elements if a (!link [picture window] [Picture Window]) is opened and 
+topped. It produces a so-called full screen mode.
+
+If the picture/frame is bigger than the screen, it is resized 
+automatically. It will be reduced in such a way that it can be 
+completely displayed in the current screen resolution.
+
+With almost every key, apart from <Alternate>, <Shift>, <Control> and 
+<CapsLock>, you can switch to the normal display.
+!end_node # View/Full Screen
+
+!end_node # The 'View' Menu
+
+# ------------------------------------------------------
+
+!begin_node The 'Help' Menu
+
+!begin_node Help/Guide
+Shortcut: <Help>
+
+Selecting this menu entry, or pressing <Help>, opens ST-Guide, or a 
+compatible help system, loaded with zView's hypertext (providing the 
+help system is installed).
+
+For installing the hypertext, see Installation.
+!end_node # Help/Guide
+
+!begin_node Help/History
+Selecting this menu entry opens ST-Guide, or a compatible help 
+system, (providing it is installed) loaded with zView's history.
+!end_node # Help/History
+
+!end_node # The 'Help' Menu
+
+# ------------------------------------------------------
+
+!end_node # zView's Menus

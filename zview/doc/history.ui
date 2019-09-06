@@ -1,0 +1,443 @@
+!begin_node History
+!html_name history
+
+News and bug fixes:
+
+# ------------------------------------------------------
+
+!begin_node V1.0.1 (7th March 2013)
+
+Bug fixes
+
+!begin_itemize !compressed
+!item Updated instruction.
+!item NOEDDI is now hardcoded into source, as zview.rsc is not loaded yet.
+!end_itemize
+
+!end_node # V1.0.1 (7th March 2013)
+
+# ------------------------------------------------------
+
+!begin_node V1.0 (3rd March 2013)
+
+News
+
+!begin_itemize !compressed
+
+!item The options 'Show Non-Images' (menu entry) and 'Show common files' 
+(option in the (!link [index card 'Browser'] [Index Card 'Browser']) of the (!link [preferences dialog] [Preferences Dialog])) 
+were renamed to 'Show only Images' and 'Show unsupported files', 
+and they have a different meaning now. 'Show unsupported files' 
+differentiates now between displaying all kind of files and only 
+folders and (!link [zView-compatible files] [Supported File Formats]) in the (!link [contents list] [Contents List]) of the 
+browser. And enabling 'Show only Images' results in displaying 
+only thumbnails, that means just (!link [zView-compatible picture] [Supported File Formats]) and 
+animation files.
+!item PDF zoom level is remembered if the option 'Fit PDF to the window' 
+is not set.
+!item Updated documentation by Sascha Uhlig.
+!item Revised RSC file by Sascha Uhlig.
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item MagiC and TOS compatibility (BETA8 introduced one nasty bug in that
+matter).
+!item Fixed a crash when user clicked on the info icon while the main 
+window was in background.
+!item Umlauts in PDF navigation list (bookmarks).
+!item Fixed a bug in the GEM (X)IMG plugin.
+!item A hidden memory bug, apparently without noticeable effects, but 
+better have it fixed :-)
+!item Long-standing bugs in DSP/NF JPEG decoder fixed (no crash with 
+memory protection, JPEG export is not corrupted with DSP/NF 
+decoder).
+!item The option 'Show hidden files' in the (!link [index card 'Browser'] [Index Card 'Browser']) of the 
+(!link [preferences dialog] [Preferences Dialog]) also works with Unix hidden files (prefixed 
+with a dot).
+!item Scaling in full screen mode did not work properly (images that 
+take up the whole screen had a colourful line on the right or 
+lower side).
+!item Corrected the dimensions of the progress bars.
+!item Fixed a bug in the PNG plugin.
+!item Shortcut <Control>+<U> also works with (!link [PDF windows] [PDF Window]).
+!item Fixed strange closing window behaviour.
+!item In the (!link [contents list] [Contents List]) of the (!link [browser window] [Browser Window]), the first line of icon 
+frames does not touch the frame of the toolbar.
+!item AV protocol also accepts filenames with apostrophes.
+
+!end_itemize
+
+Known bugs
+
+!begin_itemize !compressed
+
+!item Umlauts in filenames in the (!link [contents list] [Contents List]) of the browser and in 
+extended information of a file (Exif or metadata), displayed in 
+the (!link [information dialog] [Information Dialog]), are not shown correctly.
+!item Background of some GIF animations is not redrawn correctly.
+
+!end_itemize
+
+!end_node # V1.0 (3rd March 2013)
+
+# ------------------------------------------------------
+
+!begin_node BETA8 (1st November 2011)
+
+News
+
+!begin_itemize !compressed
+
+!item First release after 6 years. Zorro seems to have left the Atari 
+platform. Recompilation of zView and all (!link [codecs] [Codec]) against the latest 
+libraries with the latest GCC 4 (compiled for 68020-60 + FPU). 
+Therefore, you get better compatibility, less crashes and a higher 
+speed.
+!item The Xpdf code was upgraded to version 3.03 (2011-aug-15). Thanks 
+to it, the latest Adobe Portable Document Format specifications 
+are supported now (PDF 1.6 and PDF 1.7).
+!item Mem.ldg is no longer needed. It has no real meaning for zView.
+!item The application is FireBee-ready. MiKRO did some test builds for 
+the guys of the Atari ColdFire Project ((!link [ACP] [FireBee])), and it did run!
+!item NFJPEG.prg and JPEGD.prg updated (maybe it helps, maybe not :-)
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Fixed some bugs in LDG and WinDom libraries to make zView work 
+under FreeMiNT with memory protection.
+
+!end_itemize
+
+Known bugs
+
+!begin_itemize !compressed
+
+!item On ARAnyM, with the DSP cookie installed, some strange problems 
+appear when saving a JPEG (and there is a crash with the memory 
+protection).
+
+!end_itemize
+
+!end_node # BETA8 (1st November 2011)
+
+# ------------------------------------------------------
+
+!begin_node BETA7a (25th December 2005)
+
+There is now a special version of zView compatible with the MagiC 
+operating system (see folder 'MagiC'). This is a version compiled 
+with the old GCC 2.95.3 because it seems that MagiC cannot launch the 
+C++ application compiled with GCC 3.x.
+
+!end_node # BETA7a (25th December 2005)
+
+# ------------------------------------------------------
+
+!begin_node BETA7 (24th December 2005)
+
+News
+
+!begin_itemize !compressed
+
+!item PDF:
+!begin_xlist [x] !compressed
+!item [(!arrowright)] Huge quality improvement in the PDF font rendering (Atari-
+  specific).
+!item [(!arrowright)] Zoom function added.
+!item [(!arrowright)] Code upgraded to Xpdf 3.01pl1 (2005-dec-01).
+!end_xlist
+!item Complete (!link [Exif specification] [Exif]) 2.1 support (and most from 2.2) for 
+JPEG images (now, you can see various useful information, like the 
+model of your camera, when the picture was taken, or if the flash 
+of your camera was fired or not).
+!item Now, zView can extract the thumbnails embedded inside JPEG images 
+created with a digital camera. This means that the thumbnail 
+creation is 20 times faster if the JPEG was created with a camera.
+!item New options in the (!link [preferences dialog] [Preferences Dialog]) added:
+!begin_xlist [x] !compressed
+!item [(!arrowright)] Skip Drive (preventing the CD-ROM drive, for example, being 
+  shown in the (!link [directory list] [Directory List]) speeds up opening the (!link [browser] [Browser Window]) 
+  (!link [window] [Browser Window])).
+!item [(!arrowright)] Smooth Thumbnails: now, you can smooth the thumbnails with 
+  various methods. This is very slow and only available in (!link [true-] [Colour Depth]) 
+  (!link [colour] [Colour Depth]) or near (!link [true-colour] [Colour Depth]) display, but the results are perfect 
+  (specially with the Lanczos computation).
+!item [(!arrowright)] PDF font antialiasing on/off.
+!item [(!arrowright)] Fit the PDF to the window.
+!end_xlist
+!item Utilisation of an embedded font to have the same look on any 
+computer.
+!item Animated interlaced (!link [GIFs] [GIF]) and (!link [animated GIFs] [GIF]) with transparency are 
+now supported.
+!item More zoom levels for the pictures (25, 50, 100, 150 and 200%; 
+previously: 50, 100 and 200%).
+!item More icons (function shortcuts) added to the toolbars. 
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Many bug fixes in the PDF code (rotated PDF, problems with some 
+fonts and so on).
+!item Missing horizontal slider computation in the PDF and image window.
+!item Little memory leak corrected in the multi-timer function.
+!item A memory block was not freed in the file rename function.
+!item Some redraw problems fixed (for example, PDF bookmarks).
+!item Other little bug fixed.
+
+!end_itemize
+
+Known bugs
+
+!begin_itemize !compressed
+
+!item On ARAnyM, with the DSP cookie installed, some strange problems 
+appear when saving a JPEG.
+
+!end_itemize
+
+!end_node # BETA7 (24th December 2005)
+
+# ------------------------------------------------------
+
+!begin_node BETA6 (7th August 2005)
+
+News
+
+!begin_itemize !compressed
+
+!item For compatibility with the PDF code, zView is now under (!link [GPL] [General Public License (GPL!)]) 
+license.
+!item Animation support added. The first format benefitting from that is 
+GIF (space bar for pause/resume).
+!item PDF read support (you will need a lot of memory to read a PDF).
+!item Reservoir Gods' GodPaint read and write support.
+!item Zoom available with the browser toolbar or <+> and <-> on the 
+numerical keyboard.
+!item Documentation and zView icon provided by Sascha Uhlig. Thanks to 
+him!
+!item French translation of the RSC by Cyril Lefebvre. Thanks to him!
+!item Now, zView can save from an interlaced picture.
+!item The scrolling in the (!link [picture window] [Picture Window]) and the redraw function are a 
+little bit faster.
+!item Custom font added for the (!link [index card 'Exif'] [Index Card 'Exif']) of the (!link [information] [Information Dialog]) 
+(!link [dialog] [Information Dialog]) to see more lines.
+!item VDI-Enhancer from the Behne brothers provided in the folder 
+'Goodies'. Install it if you use the standard Atari VDI instead 
+of, for example, NVDI or fVDI.
+!item Other little changes, like <Control>+<U> (standard) to close the 
+window instead of <Control>+<W>, menu bar deactivation when a 
+picture is loaded, or 'Out of memory' warning in the full screen 
+code.
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Unnecessary redraws of the menu bar when the window was being 
+scrolled.
+!item Double redraw of the (!link [browser window] [Browser Window]) when it was opened.
+!item When you open a selected folder in the (!link [contents list] [Contents List]) and you go 
+back again, the folder remains selected. The code was there, but 
+it was wrong.
+!item Static MFDB structures were fried in 'winimg' and the full screen 
+code!
+!item 1-(!link [plane] [Colour Depth]) pictures and icons were not correctly drawn in full screen 
+mode and in the browser toolbar.
+!item The progress bar was one pixel too wide and high.
+!item Problem with 1-bit DEGAS pictures corrected.
+!item Now, the background in full screen mode is always black.
+!item In the GIF (!link [codec] [Codec]), a crash occurred if textual information was 
+greater than 255 lines.
+!item Incorrect translation in the GUI (octets -> bytes, and so on).
+
+!end_itemize
+
+Known bugs
+
+!begin_itemize !compressed
+
+!item On ARAnyM, with the DSP cookie installed, some strange problems 
+appear when saving a JPEG.
+!item Various (!link [animated GIFs] [GIF]) are badly rendered.
+!item For some rare (!link [PDFs] [PDF]), the fonts are outlined.
+!item The decoding of (!link [PDFs] [PDF]) with big pictures inside is very slow (not 
+really a bug, but this code must be rewritten). 
+
+!end_itemize
+
+!end_node # BETA6 (7th August 2005)
+
+# ------------------------------------------------------
+
+!begin_node BETA5 (20th February 2005)
+
+News
+
+!begin_itemize !compressed
+
+!item Versions of the binaries and (!link [codecs] [Codec]) for 68020-60 systems, and 
+68000 and 68020 systems without FPU available.
+!item Full screen mode with automatic picture resize if the picture is 
+bigger than the screen (shortcut <F10>).
+!item Another cool feature: when a window is iconified, zView shows a 
+thumbnail of the picture inside the iconified window.
+!item With the latest ARAnyM from CVS, the JPEG pictures are decoded 
+natively with the host CPU! (In order to use this feature, put 
+NFJPEG.prg in your Auto folder before MiNT.) Many thanks to 
+Patrice Mandin for his work on ARAnyM!
+!item The DSP and the main JPEG (!link [codec] [Codec]) are merged in only one codec. If 
+the Brainstorm cookie is detected and you do not have a 68060, the 
+JPEG is decoded with the DSP, or else the CPU routine is used.
+!item Support of DEGAS compressed added (PC1, PC2, PC3).
+!item Other little changes, like recompilation of all (!link [codecs] [Codec]) with the 
+latest GCC, the possibility to move the about box with XaAES or 
+information about the license.
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Many problems with other operating systems than MiNT are 
+corrected. For example, the plugins were not loaded if these were 
+in the global folder (LDGPATH\(!link [Codecs] [Codec])) under TOS and MagiC.
+!item Problems with some DEGAS images fixed.
+!item With the DSP, JPEG pictures no multiple of 16 were badly decoded.
+!item In (!link [planes] [Colour Depth]) < 8 bits, the (!link [toolbar icons] [Toolbar Icons]) were not shown.
+!item VDI EdDI check at the start.
+!item zView saves the (!link [browser window] [Browser Window]) coordinates when you quit the 
+application. Now, these coordinates are not saved if this window 
+is iconified (in order to prevent bad (!link [browser window] [Browser Window]) coordinates 
+on next relaunch).
+!item Other little bug fixes, like problems with the menu bar handling 
+or error messages not correct.
+
+!end_itemize
+
+!end_node # BETA5 (20th February 2005)
+
+# ------------------------------------------------------
+
+!begin_node BETA4 (23rd December 2004)
+
+News
+
+!begin_itemize !compressed
+
+!item The plugins are now in the folder '(!link [Codecs] [Codec])'. This one must be 
+installed in C:\GEMSys\LDG\(!link [Codecs] [Codec]) because some applications will 
+use it.
+!item Read/write (!link [codec] [Codec]) for TIFF added (almost all variants supported!).
+!item Read (!link [codec] [Codec]) for fax added.
+!item Read (!link [codec] [Codec]) for Eureka RAW added.
+!item DEGAS (!link [codec] [Codec]) also reads uncompressed images by DEGAS Elite now 
+(thanks for the documentation Adam!).
+!item The encoder and decoder are now in the same plugin.
+!item (!link [Directory list] [Directory List]) scrolling optimised.
+!item Some internal changes in the picture-to-screen conversion.
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Extra check for reverse pixel byte added to support 15-, 16-, 24- 
+and 32-bit modes of some weird Hades VDI driver (also for Falcon 
+NOVA card).
+!item Pictures with four-character extensions (like *.jpeg or *.tiff) 
+are now handled correctly.
+
+!end_itemize
+
+!end_node # BETA4 (23rd December 2004)
+
+# ------------------------------------------------------
+
+!begin_node BETA3 (25th November 2004)
+
+News
+
+!begin_itemize !compressed
+
+!item zView goes (!link [GPL] [General Public License (GPL!)]).
+!item TGA read plugin added (15, 16, 24, 32 bits, normal and compressed).
+!item BMP read plugin added (1, 4, 8, 24 bits, non-compressed).
+!item JPEG read plugin with DSP support added (move JPG.ldg from \DSP
+to \Plugin\Decoder and install JPGD.prg in your Auto folder).
+!item Option panel for the JPEG encoder added. With this one you can set 
+the image quality wanted, progressive and greyscale mode.
+!item The (!link [picture window] [Picture Window]) now provides an infoline with basic 
+information, like resolution/(!link [planes] [Colour Depth]), (!link [number of colours] [Colour Depth]) and image 
+type.
+!item Delete function in the menu bar added.
+!item Mem.ldg from Dominique B(!eacute)r(!eacute)ziat is now used for memory allocation 
+(safer for MagiC system).
+!item The dithering routine is now better for 4- and 8-bit resolutions.
+!item Handling of multi-page image formats. First step for the fax and 
+PDF reading.
+!item Menu Help/History activated.
+!item JPEG files with the file extension *.jpe are now decoded with the 
+JPEG plugin, too.
+
+!end_itemize
+
+Bug fixes
+
+!begin_itemize !compressed
+
+!item Some (!link [(X)IMG] [GEM (X)IMG]) pictures from an old French application with non-
+standard data caused a crash under MagiC. Now, the line buffer is 
+greater to avoid overflowing.
+!item Bug fixes in the alpha code of the PNG plugin.
+!item The keys of the numerical keyboard were not usable for renaming 
+files.
+!item Redraw issue when the slider was used and a part of the window was 
+outside the screen area.
+!item The (!link [information dialog] [Information Dialog]) returned 0 colours for 24-bit (!link [(X)IMG] [GEM (X)IMG]) 
+pictures.
+!item Little bug fix in the rename function.
+!item When you renamed a folder, the change was not done in the 
+(!link [directory list] [Directory List]).
+!item The use of a specific MiNT function [Fxattr()] made that NEOchrome 
+and DEGAS pictures were not displayed under plain TOS.
+!item Fixed a little problem of text alignment in the (!link [directory list] [Directory List]) 
+when the font was changed.
+!item Fixed a bug that occurred when a folder was deleted in a very deep 
+folder. The change was not done in the (!link [directory list] [Directory List]).
+!item Fixed a bug in the (!link [information dialog] [Information Dialog]). The '/0' null character 
+was not put when the picture came from the file selection 
+dialog. Shame on me.
+
+!end_itemize
+
+!end_node # BETA3 (25th November 2004)
+
+# ------------------------------------------------------
+
+!begin_node BETA2 (28th October 2004)
+
+!begin_itemize !compressed
+
+!item First public release.
+
+!end_itemize
+
+!end_node # BETA2 (28th October 2004)
+
+# ------------------------------------------------------
+
+!end_node

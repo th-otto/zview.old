@@ -1,0 +1,12 @@
+!begin_node Note for Programmers
+!html_name notes
+
+There is a very useful GCC library to use zView's (!link [codecs] [Codec]). The library 
+enables you to load, convert to screen format and zoom a picture with 
+only one line. To use this library, you need GCC 2.95 or better (a 
+complete documentation is included).
+
+You can download it from the.zorro.free.fr./misc.html. Updated 
+versions of the source code can be found on z-tools.sourceforge.net.
+
+!end_node

@@ -1,0 +1,943 @@
+!begin_node Using zView
+!html_name using
+
+!begin_node Browser Window
+
+The browser window is the heart of zView. With it, you can browse 
+through drive directories to show their contents. In case of (!link [zView-] [Supported File Formats]) 
+(!link [compatible pictures] [Supported File Formats]), these are displayed in a handy previewable 
+thumbnail format. If it is a (!link [zView-compatible animation file] [Supported File Formats]), the 
+first frame of the animation is displayed.
+
+If you choose the browser option in the (!link [File menu] [The 'File' Menu]), a window divided 
+in three sections appears on the screen.
+
+!image (!picture_path)browser
+
+On the left is the graphical representation of the drive directories, 
+the so-called (!link [directory list] [Directory List]). On the right are the contents of a 
+selected subdirectory, called (!link [contents list] [Contents List]). The (!link [toolbar] [Browser Window Toolbar]) is located 
+above both lists.
+
+Between the (!link [directory list] [Directory List]) and the (!link [contents list] [Contents List]) is a split bar. You 
+can move the split bar by dragging it with the mouse in order to 
+reduce/enlarge the space that the lists take up within the browser 
+window.
+
+!end_node # Browser Window
+
+# ------------------------------------------------------
+
+!begin_node Directory List
+
+The directory list is on the left of the (!link [browser window] [Browser Window]). It is an 
+extendable tree directory. It enables you to browse through drive 
+directories. This technique is common to many Windows and Mac 
+applications.
+
+!begin_center
+!image (!picture_path)dirlist
+!end_center
+
+When a drive or folder contains folders, a right-facing triangle is 
+shown in front of the drive or folder icon. Clicking on it opens the 
+directory structure of that drive or folder below the drive or folder 
+name and changes the triangle to a downward-pointing triangle. A 
+click on the latter closes the drive or folder and hides its folders 
+again. But if you click on an icon of a drive or a folder, or on the 
+name of it, then the name of it is displayed in inverse video and the 
+content of the selected directory is shown in the (!link [contents list] [Contents List]) on 
+the right. With the first possibility, clicking on a right-facing 
+triangle, you can open the target folder directly, without having to 
+open and tediously redraw all the thumbnails in the (!link [contents list] [Contents List]) 
+beforehand.
+
+!end_node # Directory List
+
+# ------------------------------------------------------
+
+!begin_node Contents List
+
+The contents list on the right of the (!link [browser window] [Browser Window]) shows the 
+contents of a drive or folder selected in the (!link [directory list] [Directory List]).
+
+!begin_center
+!image (!picture_path)contents
+!end_center
+
+In the contents list, a selected directory is shown in form of icons 
+for folders and files with their corresponding names below the icons. 
+As long as 'Show file size' option in the preferences is active (see 
+Preferences Dialog, subchapter Index Card 'Browser'), the size of a 
+file is shown below the filename, too. There are icons for folders, 
+programs, (!link [zView-compatible picture/animation files] [Supported File Formats]), PDF files and a 
+standard file icon for the remaining files:
+
+!begin_center
+!image (!picture_path)icons
+!end_center
+
+Immediately after decoding the picture or animation files, these will 
+be displayed in a handy previewable thumbnail format instead of a 
+simple picture icon.
+
+!begin_node Navigation and Selection
+
+In the (!link [contents list] [Contents List]), icons and thumbnails can be selected by a 
+single mouse-click. A frame around an icon or a thumbnail shows the 
+selection. You can select more than one icon or thumbnail while 
+pressing <Shift>, but at the moment that can only be used if you want 
+to delete several files and/or folders.
+
+If a file or folder has been selected, you can
+
+!begin_itemize
+!item click on the file or folder name in order to change it (you can do 
+this directly, no dialog is needed!),
+
+!item delete the file or folder with the menu entry Edit/Delete or with 
+the (!link [delete file(s) button] [delete file(s) button]) in the toolbar,
+
+!item obtain some information about the file or folder (for details, see 
+Information Dialog), and,
+
+!item if it is a thumbnail, save the picture in JPEG, TIFF or GodPaint 
+format (see Saving and Converting Pictures).
+!end_itemize
+
+
+Double-clicking on a folder icon will open the subdirectory of that 
+folder in the (!link [contents list] [Contents List]). And a double-click on a thumbnail will 
+load and display the picture in its full size in a separate (!link [picture] [Picture Window]) 
+(!link [window] [Picture Window]); in case of an animation file, it will show the animation in 
+this window; and if it is a PDF file, the PDF will be opened in the 
+(!link [PDF window] [PDF Window]). If you want to see the directory above the present one in 
+the (!link [contents list] [Contents List]), you have to press the (!link [go back directory button] [Browser Window Toolbar])"go back directory button"} in 
+the toolbar.
+
+In addition, you can navigate through the (!link [contents list] [Contents List]) with the 
+keyboard:
+
+!begin_itemize
+!item The cursor keys move the selection frame.
+
+!item If a folder is selected, <Return> will show its subdirectory in 
+the (!link [contents list] [Contents List]).
+
+!item If a thumbnail is chosen, <Return> will open the (!link [picture window] [Picture Window]).
+
+!item If a PDF file is highlighted, <Return> will open the (!link [PDF window] [PDF Window]).
+
+!item To go back to the directory above the present one, you have to 
+press <ClrHome>.
+!end_itemize
+
+!end_node # Navigation and Selection
+
+!begin_node Icon/Thumbnail Display Configuration
+
+There are some options to alter the icon/thumbnail display in the 
+(!link [contents list] [Contents List]):
+
+!begin_itemize
+!item You can alter the space that icons and thumbnails take up in the 
+(!link [contents list] [Contents List]). By pressing the buttons with a magnifying glass in 
+the (!link [browser window toolbar] [Browser Window Toolbar]), you can display more or fewer icons 
+and thumbnails. With the left button, you can increase the space 
+and fewer icons and thumbnails can be shown per row and column in 
+the (!link [contents list] [Contents List]), but the thumbnails are larger. And, with the 
+right one, you can reduce the space, more icons are shown and the 
+thumbnails are smaller.
+
+!item The thumbnails display can be improved in (!link [high-colour] [Colour Depth]) and (!link [true-] [Colour Depth]) 
+(!link [colour] [Colour Depth]) display modes (16, 24 and 32 bits). In this case, you can 
+use one of many computation methods to smooth thumbnails. You can 
+select them in the (!link [index card 'Browser'] [Index Card 'Browser']) of the (!link [preferences] [Preferences Dialog]) 
+(!link [dialog] [Preferences Dialog]). But please note that the computation methods are very 
+slow, so that you had better choose them only if you have a really 
+fast computer.
+
+!item You can change the width/height ratio of the area that icons or 
+thumbnails take up in the (!link [contents list] [Contents List]) to 4:3 or to 3:4 by 
+selecting the menu entry View/4:3 Thumbnails or (!link [View/3:4] [View/3:4 Thumbnails]) 
+(!link [Thumbnails] [View/3:4 Thumbnails]). If such an entry has been selected, the thumbnails are 
+scaled in such a way that they can be completely displayed in the 
+area with the new aspect ratio.
+
+Select a width/height ratio of 4:3 if you look mainly at 
+horizontal pictures and a ratio of 3:4 in case you use mainly 
+vertical images.
+
+!item If you want that, besides folders, only (!link [zView-compatible files] [Supported File Formats]) 
+appear in the (!link [contents list] [Contents List]), deactivate 'Show unsupported files' 
+in the (!link [index card 'Browser'] [Index Card 'Browser']) of the (!link [preferences dialog] [Preferences Dialog]).
+
+!item In case only (!link [zView-compatible picture/animation files] [Supported File Formats]) should be 
+listed, that is to say, only thumbnails, set the check mark (tick) 
+in front of the menu entry View/Show Only Images.
+
+!item Files and folders with the attribute hidden (!link [[3!]] [[3!]]) can be set with 
+the file information box of your desktop (for example, with jinnee 
+or Thing). If you want to show them in the (!link [contents list] [Contents List]), activate 
+'Show hidden files' in the (!link [index card 'Browser'] [Index Card 'Browser']) of the (!link [preferences] [Preferences Dialog]) 
+(!link [dialog] [Preferences Dialog]).
+
+!item The files in the (!link [contents list] [Contents List]) can be shown sorted in various ways 
+that can be selected in the (!link [View menu] [The 'View' Menu]). The options are: (!link [View/Sort] [View/Sort by Name]) 
+(!link [by Name] [View/Sort by Name]), View/Sort by Size and View/Sort by Date. Please note 
+that, in any case, folders will appear sorted by name.
+
+!end_itemize
+
+!begin_pnode* [3]
+Hidden folders are not possible with all file
+systems, for example, FAT or VFAT.
+!end_node
+
+!end_node # Icon/Thumbnail Display Configuration
+
+!end_node # Contents List
+
+# ------------------------------------------------------
+
+!begin_node Toolbar Icons
+
+This chapter deals with the toolbars of the (!link [browser window] [Browser Window]), the 
+(!link [picture window] [Picture Window]) and the (!link [PDF window] [PDF Window]).
+
+!begin_node Browser Window Toolbar
+
+The toolbar of the (!link [browser window] [Browser Window]) is above the (!link [directory list] [Directory List]) and the 
+(!link [contents list] [Contents List]). It contains nine buttons:
+
+!begin_itemize !compressed
+
+!item  Open file button
+!image (!picture_path)file_open
+This button opens the file selection dialog for loading a (!link [zView-] [Supported File Formats]) 
+(!link [compatible file] [Supported File Formats]).
+
+!item  Save picture button
+!image (!picture_path)file_save
+With this button, you can save a picture in another format. See 
+Saving and Converting Pictures for details.
+
+!item File information button
+!image (!picture_path)file_info
+This button displays information about a selected file or folder 
+in the (!link [contents list] [Contents List]). For details, see Information Dialog.
+
+!label delete file(s) button
+!item Delete file(s) button
+!image (!picture_path)file_delete
+This button deletes files and folders selected in the contents 
+list (use <Shift> to select more than one file/folder). A dialog 
+will appear and you will be asked if you want to delete the 
+selected file(s).
+
+Note that write-protected files and folders will also be deleted. 
+This is a special feature of zView. This way, you will not get 
+those annyoing warnings that a file or folder cannot be deleted.
+
+!item Print picture/PDF button
+!image (!picture_path)file_print
+Not yet available. With this button, you will be able to print 
+pictures and PDF documents.
+
+!label go back directory button
+!item Go back directory button
+!image (!picture_path)dir_up
+This button switches to the contents of the directory above the 
+present one.
+
+!item Update directory button
+!image (!picture_path)dir_reload
+With this button, you can reload the contents of a directory. This 
+is useful when zView is showing a certain directory and, for 
+example, you are working with your desktop and you are going to 
+copy some files into that directory. In order to let zView display 
+the additional files in the (!link [contents list] [Contents List]) after copying, you must 
+press the update directory button.
+
+!item Enlarge and reduce thumbnail size buttons
+!image (!picture_path)big_small
+With this button, you can enlarge/reduce the space that thumbnails 
+or icons respectively take up in the (!link [contents list] [Contents List]). The thumbnails 
+will be scaled correspondingly. For a more detailed explanation, 
+see Icon/Thumbnail Display Configuration.
+
+!end_itemize
+
+!end_node # Browser Window Toolbar
+
+!begin_node Picture Window Toolbar
+
+The toolbar of the (!link [picture window] [Picture Window]) is below the infoline. It contains 
+seven buttons:
+
+!begin_itemize !compressed
+
+!item Open file button
+!image (!picture_path)file_open
+This button opens the file selection dialog for loading a (!link [zView-] [Supported File Formats]) 
+(!link [compatible file] [Supported File Formats]).
+
+!item Save picture button
+!image (!picture_path)file_save
+With this button, you can save a picture or the first frame of an 
+animation file in another format. See (!link [Saving and Converting] [Saving and Converting Pictures]) 
+(!link [Pictures] [Saving and Converting Pictures]) for details.
+
+!item Picture information button
+!image (!picture_path)file_info
+This button displays information about a picture/animation file. 
+For details, see Information Dialog.
+
+!item Print picture button
+!image (!picture_path)file_print
+Not yet available. With this button, you will be able to print a 
+picture or the first frame of an animation file.
+
+!label piczoom
+!index zoom(+) and zoom(-) buttons
+!item Zoom picture buttons
+!image (!picture_path)big_small
+With this buttons, you can zoom a picture. There are five zoom 
+levels: 25, 50, 100, 150 and 200%.
+
+!label full screen button
+!item Full screen button
+!image (!picture_path)fullscreen
+This button displays the picture/animation file (but not animated) 
+without disturbing GEM elements. It produces a so-called full 
+screen mode. If the picture/frame is bigger than the screen, it is 
+resized automatically. It will be reduced in such a way that it 
+can be completely displayed in the current screen resolution. With 
+almost every key, apart from <Alternate>, <Shift>, <Control> and 
+<CapsLock>, you can switch to the normal display.
+
+!end_itemize
+
+!end_node # Picture Window Toolbar
+
+!begin_node PDF Window Toolbar
+
+The toolbar of the (!link [PDF window] [PDF Window]) is below the infoline. It contains 
+eight buttons:
+
+!begin_itemize !compressed
+
+!item Open file button
+!image (!picture_path)file_open
+This button opens the file selection dialog for loading a (!link [zView-] [Supported File Formats]) 
+(!link [compatible file] [Supported File Formats]).
+
+!item PDF information button
+!image (!picture_path)file_info
+This button displays information about a PDF file. For details, 
+see Information Dialog.
+
+!item Print PDF button
+!image (!picture_path)file_print
+Not yet available. This button will print a PDF file.
+
+!item Find text button
+!image (!picture_path)file_search
+Not yet available. This button will call a dialog for finding 
+text strings in a PDF document.
+
+!label pdfzoom
+!index zoom(+) and zoom(-) buttons
+!item Zoom page buttons
+!image (!picture_path)zoom
+With this buttons, you can zoom a PDF page. There are five zoom 
+levels: 25, 50, 100, 150 and 200%.
+
+If the option 'Fit PDF to the window' in the (!link [index card 'PDF'] [Index Card 'PDF']) of 
+the (!link [preferences dialog] [Preferences Dialog]) is active, then another zoom level 
+(different from the mentioned levels) can be shown between the 
+zoom page buttons, because zView fits the whole page to the (!link [PDF] [PDF Window]) 
+(!link [window] [PDF Window]) when a PDF is opened.
+
+!label previous and next page buttons
+!item Previous and next page buttons
+!image (!picture_path)prevnext
+With these buttons, you can browse through all the pages of a PDF 
+file. Between the two buttons, you can see the page number of the 
+displayed page and the number of pages.
+
+If the option 'Fit PDF to the window' in the (!link [index card 'PDF'] [Index Card 'PDF']) of 
+the (!link [preferences dialog] [Preferences Dialog]) is deactivated, zView remembers the last 
+set zoom level.
+
+!end_itemize
+
+!end_node # PDF Window Toolbar
+
+!end_node # Toolbar Icons
+
+# ------------------------------------------------------
+
+!begin_node Information Dialog
+
+The information dialog displays some information about a file or 
+folder.
+
+An information dialog with one, two or three index cards is shown 
+by selecting the entry 'Information...' in the (!link [File menu] [The 'File' Menu])
+
+!begin_itemize
+!item if a file or folder in the (!link [contents list] [Contents List]) is selected, or
+
+!item if a (!link [picture window] [Picture Window]) or a (!link [PDF window] [PDF Window]) is the top window.
+!end_itemize
+
+By the way, you can also call the information dialog, if available, 
+with the file information button in the toolbars (see Toolbar Icons).
+
+In case of a folder or a (!link [zView-incompatible file] [Supported File Formats]), the information 
+dialog shows only the (!link [index card 'File'] [Index Card 'File']).
+
+!begin_node Index Card 'File'
+
+When the (!link [information dialog] [Information Dialog]) is displayed, you will see the index 
+card 'File' first.
+
+!begin_center
+!image (!picture_path)cardinfo
+!end_center
+
+In this index card, there is information about the name, the size and 
+the creation date/time-stamp of a selected file or folder.
+
+The size of a file is given in bytes, kilobytes (KB) or megabytes 
+(MB).
+
+!end_node # Index Card 'File'
+
+!begin_node Index Card 'Format'
+
+If a (!link [zView-compatible file] [Supported File Formats]) is selected/opened, there is a second 
+index card where you receive detailed information about the format.
+
+!begin_center
+!image (!picture_path)cardformat
+!end_center
+
+!begin_itemize
+!item (!B)Format(!b)
+
+Here, you can see the format of a file. This can be a picture 
+format, such as JPEG or the GEM standard format (!link [(X)IMG] [GEM (X)IMG]), an 
+animation format, such as GIF (as well a picture format), or the 
+document format PDF (see also Supported File Formats).
+
+!item (!B)Width(!b) and (!B)Height(!b)
+
+The width by height of a picture, animation or displayed PDF page 
+in pixels.
+
+!item (!B)Planes(!b) and (!B)Colours(!b)
+
+(!link [Colour depth] [Colour Depth]) describes the maximum (!link [number of colours] [Colour Depth]) in a picture 
+or animation. Please do not mix it up with the number of actually 
+used colours. Either the colours can be given straight away (for 
+example 256 colours) or in the form of the number of (!link [bit planes] [Colour Depth]), 
+or (!link [planes] [Colour Depth]) for short. For example, 8 planes mean 2^8 = 256 colours 
+and 24 (!link [planes] [Colour Depth]) mean 2^24 = 16,777,216 colours ((!link [true colour] [Colour Depth])).
+
+Note that (!link [RGB] [Colour Depth]) images with 32 (!link [planes] [Colour Depth]) actually refers to 24 planes 
+with the additional 8 (!link [planes] [Colour Depth]) either as empty padding space or to 
+represent an (!link [alpha channel] [Alpha Channel]), which is used for transparency data.
+
+For a far more detailed explanation, see Colour Depth in the 
+(!link [glossary] [Glossary]).
+
+Please note that the (!link [colour depth] [Colour Depth]) of PDF documents is not 
+displayed correctly in the current version.
+
+!item (!B)Compression Method(!b)
+
+Many picture and animation formats can pack an image to reduce 
+its file size. zView shows the used packing method here. Some 
+methods are reversible so that the original data can be 
+reconstructed, the so-called lossless compression methods, like 
+RLE or LZW. While others accept some loss of data in order to 
+achieve higher compression, called lossy compression methods, such 
+as JPEG.
+
+Please note that zView does not show the compression methods of a 
+PDF in the current version.
+
+!item (!B)Compression Ratio(!b)
+
+This is the ratio of the unpacked file size to the packed file 
+size. The larger the ratio is, that is, the larger the first 
+number is, the better is the compression.
+
+!item (!B)Decoding Time(!b)
+
+The time in seconds from opening to displaying the thumbnail in 
+the (!link [contents list] [Contents List]) of the (!link [browser window] [Browser Window]), or, if the (!link [picture window] [Picture Window]) 
+or (!link [PDF window] [PDF Window]) is opened, from opening to displaying the picture, 
+the first frame of an animation or the shown PDF page.
+
+!item (!B)Uncompressed Size(!b)
+
+The size of the depacked file in bytes, kilobytes (KB) or 
+megabytes (MB).
+
+!item (!B)Number of Pages/Frames(!b)
+
+Some picture formats can contain more than one image. They are 
+called multi-page formats. For example, TIFF defines support for 
+multiple images in a single file. Therefore, the number of 
+pictures or pages are shown here. If the selected file is a PDF 
+document, the number of pages are given. And in case of an 
+animation file, the number of frames are displayed.
+
+!end_itemize
+
+!end_node # Index Card 'Format'
+
+!begin_node Index Card 'Exif'
+
+The index card 'Exif' of the (!link [information dialog] [Information Dialog]) appears in case of 
+a file with extended information. This can be a picture, animation or 
+a PDF document that contains additional textual information about the 
+file.
+
+Note that, for PDF documents, the index card 'Exif', like the index 
+card 'Format', only appears when the PDF file has been loaded, that 
+is to say, when the (!link [PDF window] [PDF Window]) is opened.
+
+
+!begin_center
+!image (!picture_path)cardexif
+
+(!B)Figure.(!b) Extended information (textual metadata) of a PDF document
+!end_center
+
+
+But there is also a special standard for storing camera and image 
+information within file formats, the so-called (!link [Exif specification] [Exif]). 
+zView supports the complete (!link [Exif specification] [Exif]) 2.1 standard (and most 
+from 2.2) for JPEG images. This means that, for JPEG pictures, for 
+example, taken by a modern digital camera, you can see various useful 
+information, like the model of your camera, when the picture was 
+taken, or if the flash of your camera was fired or not.
+
+
+!begin_center
+!image (!picture_path)cardexif
+
+(!B)Figure.(!b) Exif data of a JPEG file taken by a modern digital camera
+!end_center
+
+!end_node # Index Card 'Exif'
+
+!end_node # Information Dialog
+
+# ------------------------------------------------------
+
+!begin_node Picture Window
+
+The picture window will appear
+
+!begin_itemize
+!item when you double-click on a thumbnail in the (!link [contents list] [Contents List]) of the 
+(!link [browser window] [Browser Window]) (if the thumbnail is highlighted, you can also 
+press <Return>),
+
+!item when you use the menu entry File/Open File... or press the open 
+file button in the toolbars (see Toolbar Icons) to choose a 
+picture with the file selection dialog, or
+
+!item when you double-click on a desktop icon of a (!link [zView-compatible] [Supported File Formats]) 
+(!link [picture/animation file] [Supported File Formats]), provided that, in your desktop, these 
+formats are assigned to zView (for details, see the manual of your 
+desktop).
+!end_itemize
+
+
+The picture window displays an image in its full size or shows an 
+animation in case of an animation file.
+
+!begin_center
+!image (!picture_path)picwin
+!end_center
+
+The infoline below the window title gives you some information about 
+the picture or animation file: the width by height in pixels, the 
+(!link [number of planes] [Colour Depth]), the (!link [number of colours] [Colour Depth]) and the picture or animation 
+format.
+
+If a picture window has been opened, you can
+
+!begin_itemize
+!item zoom a picture with the (!link [zoom(+) and zoom(-) buttons] [piczoom]) in the 
+toolbar below the infoline or press <+> and <-> on the numerical 
+keyboard,
+
+!item display the picture/animation file (but not animated) without 
+disturbing GEM elements by selecting the menu entry (!link [View/Full] [View/Full Screen]) 
+(!link [Screen] [View/Full Screen]), by clicking the (!link [full screen button] [full screen button]) or by pressing the 
+function key F10,
+
+!item pause and resume an animation with the space bar,
+
+!item iconify the picture window (clicking on the iconifier in the title 
+bar of the window) and zView will display the picture or a frame 
+of the animation as a thumbnail inside the iconified window,
+
+!item display some information about the picture/animation (see 
+Information Dialog), and
+
+!item save the picture or the first frame of an animation in JPEG, TIFF 
+or GodPaint format (see Saving and Converting Pictures).
+
+!end_itemize
+
+!end_node # Picture Window
+
+# ------------------------------------------------------
+
+!begin_node Saving and Converting Pictures
+
+zView can save picture files and convert them into another format. 
+You can choose whether a picture should be saved in JPEG, TIFF or 
+GodPaint format.
+
+Note that the first frame of an animation can also be saved as a 
+picture file and that, in the current version, you cannot convert a 
+page of a PDF document into an image file. Besides, please note that 
+Exif data (see also Index Card 'Exif') is lost when converting a file 
+with zView.
+
+The saving and converting dialog can be called by selecting the 
+entry 'Save as...' in the (!link [Edit menu] [The 'Edit' Menu]). The entry is only available
+
+!begin_itemize
+!item if a thumbnail is chosen (see Navigation and Selection), or
+
+!item if a (!link [picture window] [Picture Window]) is opened and it is the top window.
+!end_itemize
+
+By the way, you can also call the saving and converting dialog, if 
+available, with the save file button in the toolbars (see (!link [Toolbar] [Toolbar Icons]) 
+(!link [Icons] [Toolbar Icons])).
+
+!begin_center
+!image (!picture_path)savedlg
+!end_center
+
+Depending on which format has been chosen with the left popup button, 
+you can save a picture in the selected format by pressing the Save 
+button. A file selection dialog with the old filename and the 
+extension, given by the selected format, in the input field will 
+appear. There, you can enter a new name under which the picture is to 
+be saved and choose the path if required.
+
+If you want to convert an image file into the same picture format 
+(because, for example, you need a better compression for your JPEG 
+picture), you will have to change the filename, since the filename 
+including the extension will be identical and zView does not allow to 
+overwrite an original picture file with a converted file. zView does 
+not overwrite an original image because information can get lost. In 
+our example, the better compression of the image results in a loss, 
+because JPEG is a lossy compression method (also called JPEG), so 
+that the converted file contains an image with a worse quality. 
+Another reason for not overwriting an original file is that Exif data 
+could get lost since zView does not save this data.
+
+Note that if you delete the entire name with <Esc> in the input field 
+of the file selection dialog, you need not take care of the 
+extension because zView will append automatically the matching 
+characters; and if you use a wrong extension, zView will correct it.
+
+When you have selected the JPEG or TIFF format, an option panel for 
+the corresponding format will appear by clicking on the Options 
+button. With these option panels you can configure the settings for 
+saving in the corresponding format.
+
+!begin_node JPEG Options Dialog
+
+With the JPEG options dialog, you can set the image quality wanted, 
+the greyscale and the progressive mode.
+
+!begin_center
+!image (!picture_path)jpgpref
+!end_center
+
+!begin_itemize
+!item (!B)Quality(!b)
+
+JPEG pictures can have various degrees of compression. The lower 
+the compression is, the better is the quality, but the larger the 
+file becomes.
+
+You can set the quality level which ranges from 1 to 100. Values 
+above 95 are generally not useful, though. A quality of 90 
+produces excellent results, but in many cases it is possible to 
+set the quality substantially lower without noticeably degrading 
+the image. It is worth experimenting a little to help you make a 
+choice in any particular case. This will depend both on the 
+picture contents and on the purpose for which the picture is 
+intended, including its scale of display or reproduction. 
+
+Please note that a quality level of 100 does not mean a lossless 
+compression. Regardless of adjustments you make, JPEG is always 
+a lossy method of compression (for further information, see the 
+(!link [glossary] [Glossary]) entry JPEG, section (!link [JPEG Compression] [JPEG Compression])).
+
+!item (!B)Greyscale(!b)
+
+Using this mode, the picture will be saved as a greyscale image. 
+Such an image file is much smaller than the normal (!link [true-colour] [Colour Depth]) 
+version since it uses 256 different shades of grey instead of 16.7 
+million colours.
+
+!item (!B)Progressive(!b)
+
+The mode 'Progressive' allows to save a picture in special way. A 
+progressive JPEG will allow the user to get a good idea of what 
+the image will look like before even half of the image is loaded 
+and decoded. Unlike normal JPEG images, which are always displayed 
+one line at a time from top to bottom, progressive (!link [JPEGs] [JPEG]) may 
+produce, depending on which graphics viewer or web browser is 
+being used, a 'venetian blind' effect or a blurry or blocky image 
+that gradually sharpens. If a graphics viewer or browser does not 
+support progressive (!link [JPEGs] [JPEG]), it simply displays the image as a 
+normal JPEG.
+
+Note that zView can save progressive (!link [JPEGs] [JPEG]), but it displays them 
+like normal ones.
+
+!end_itemize
+
+!end_node # JPEG Options Dialog
+
+!begin_node TIFF Options Dialog
+
+With the TIFF options dialog, you can choose the packing method.
+
+!begin_center
+!image (!picture_path)tiffpref
+!end_center
+
+A major difference between most other image file formats and TIFF is 
+that TIFF allows a wide range of different compression schemes. Where 
+other file formats are often designed to suit a single compression 
+method, TIFF allows many schemes. Theoretically, you could even use 
+any compression method of your own, but, of course, this would result 
+in crippled portability.
+
+zView supports the simple Macintosh RLE (also known as PackBits), the 
+once infamous LZW (because there was a need for a license from Unisys 
+to use this method), the lossy JPEG (the picture format is called 
+JPEG, too) or the free-as-a-bird Deflate compression (also known as 
+Zip).
+
+Which compression scheme you select for saving space on the drive 
+depends on several factors. Here are some hints:
+
+!begin_itemize
+!item If you want to compress a continuous-tone image, such as a 
+photograph, and you do not care when the original cannot be 
+reconstructed exactly, then choose JPEG compression (a lossy 
+compression scheme). For setting the compression, or rather the 
+quality, see JPEG Options Dialog.
+
+!item If you need lossless data compression, use
+
+!begin_enumerate
+!item Macintosh RLE for a simple graphic image, such as an icon or 
+line drawing, and
+
+!item LZW, or better Deflate, for a continuous-tone image.
+!end_enumerate
+
+!item If you want many graphics programs to load your TIFF picture, use 
+LZW, but the best choice might be not to use a compression at all.
+
+!end_itemize
+
+By the way, zView saves TIFF pictures in (!link [RGB] [Colour Depth]) colour mode.
+
+!end_node # TIFF Options Dialog
+
+!end_node # Saving and Converting Pictures
+
+# ------------------------------------------------------
+
+!begin_node PDF Window
+
+The PDF window will appear
+
+!begin_itemize
+!item when you double-click on a PDF file in the (!link [contents list] [Contents List]) of the 
+(!link [browser window] [Browser Window]) (if the PDF icon is highlighted, you can also press 
+<Return>),
+
+!item when you use the menu entry File/Open File... to choose a picture 
+with the file selection dialog, or
+
+!item when you double-click on a desktop icon of a PDF document, 
+provided that, in your desktop, this format is assigned to zView 
+(for details, see the manual of your desktop).
+!end_itemize
+
+The PDF window displays the pages of a PDF document. If it contains 
+bookmarks, you will see a navigation list on the left of the window.
+
+!begin_center
+!image (!picture_path)pdfwin
+!end_center
+
+Between the navigation list and the page of a PDF document is a split 
+bar. You can move the split bar by dragging it with the mouse in 
+order to reduce/enlarge the space that the sections take up within 
+the (!link [browser window] [Browser Window]).
+
+The window title gives you information about the title of the 
+document, and the right part of the toolbar shows the zoom level as 
+well as the page number of the displayed page and the number of pages 
+(see PDF Window Toolbar for a detailed explanation of all buttons).
+
+If a PDF window has been opened, you can
+
+!begin_itemize
+!item zoom a page with the (!link [zoom(+) and zoom(-) buttons] [pdfzoom]), 
+
+!item browse through the pages with the (!link [previous and next page buttons] [previous and next page buttons])
+in the toolbar or, if present, by clicking on a bookmark in the 
+navigation list on the left (use the triangles to show the 
+substructure of a bookmark),
+
+!item display the page without disturbing GEM elements by clicking on 
+the menu entry View/Full Screen or by pressing the function key 
+F10,
+
+!item iconify the PDF window (clicking on the iconifier in the title bar 
+of the window) and zView will display the page as a thumbnail 
+inside the iconified window, and
+
+!item display some information about the PDF document (see (!link [Information] [Information Dialog]) 
+(!link [Dialog] [Information Dialog])).
+!end_itemize
+
+!end_node # PDF Window
+
+# ------------------------------------------------------
+
+!begin_node Preferences Dialog
+
+The entry 'Preferences...' in the (!link [Edit menu] [The 'Edit' Menu]) brings up the options 
+dialog with three index cards.
+
+!begin_node Index Card 'General'
+
+When the (!link [preferences dialog] [Preferences Dialog]) is displayed, you will see the index 
+card 'General' first.
+
+!begin_center
+!image (!picture_path)cardgeneral
+!end_center
+
+In this index card, you can configure some general settings.
+
+With the checkboxes (!B)Show read progress bar(!b) and (!B)Show write progress 
+bar(!b), you can switch off the growing bar showing the progress of the 
+read or write process taking some time to execute. On low-end 
+computers, this speeds up displaying pictures a little bit.
+
+!end_node # Index Card 'General'
+
+!begin_node Index Card 'Browser'
+
+The second index card 'Browser' of the (!link [preferences dialog] [Preferences Dialog]), in 
+particular, affect the display of the (!link [directory list] [Directory List]) and the (!link [contents] [Contents List]) 
+(!link [list] [Contents List]) of the (!link [browser window] [Browser Window]).
+
+!begin_center
+!image (!picture_path)cardbrowser
+!end_center
+
+You can alter the following settings:
+
+!begin_itemize
+!item For (!B)Show file size(!b), the size of a file will be displayed below 
+the filename in the (!link [contents list] [Contents List]).
+
+!item When the checkbox (!B)Show hidden files(!b) is active, hidden files and 
+folders (!link [[3!]] [[3!]]) are shown in the (!link [contents list] [Contents List]).
+
+With the information box of your desktop (for example, with jinnee 
+or Thing), you can modify file attributes. If the hidden attribute 
+of a file is set, generally, the file is not shown in the drive 
+contents window of your desktop, in the file selection dialog 
+and so on.
+
+!item With (!B)Show unsupported files(!b) active, in addition to folders, 
+picture/animation files (or thumbnails respectively) and PDF 
+files, other files are displayed in the (!link [contents list] [Contents List]), too; in 
+other words, files which cannot be viewed by zView are also shown 
+in the (!link [contents list] [Contents List]).
+
+Please pay attention that the menu entry View/Show Only Images is 
+not ticked. If so, regardless the 'Show unsupported files' option, 
+only (!link [zView-compatible picture and animation files] [Supported File Formats]) are listed.
+
+!item With the popup button (!B)Smooth Thumbnails(!b), you can select a 
+computation method to smooth thumbnails. This is very slow and 
+only available in (!link [true-colour] [Colour Depth]) (24 and 32 bits) or near true-colour 
+(16 bits, also called (!link [high-colour] [Colour Depth])) display modes, but the results 
+are perfect, specially with the Lanczos computation.
+
+!item In the (!B)Skip Drive(!b) section, you can choose which drives are not 
+shown in the (!link [directory list] [Directory List]) (skipped drives are displayed in 
+inverse video). This is useful for slow drives and/or drives with 
+removable media (like floppy drives, Iomega Zip drives, CD-ROMs) 
+and the pseudo-drive U: to speed up opening the (!link [browser window] [Browser Window]). 
+After a change, a restart is needed, that is to say, the (!link [browser] [Browser Window]) 
+(!link [window] [Browser Window]) have to be closed and opened.
+
+!end_itemize
+
+!end_node # Index Card 'Browser'
+
+!begin_node Index Card 'PDF'
+
+The third and last index card of the (!link [preferences dialog] [Preferences Dialog]) affects the 
+display of PDF pages in the (!link [PDF window] [PDF Window]).
+
+!begin_center
+!image (!picture_path)cardpdf
+!end_center
+
+Please note, if you have changed the settings in this index card, 
+then they only apply to (!link [PDF windows] [PDF Window]) which will be opened after 
+confirming the (!link [preferences dialog] [Preferences Dialog]).
+
+You can change the following settings:
+
+!begin_itemize
+
+!item When the checkbox (!B)Antialias fonts(!b) is active, an Atari-specific 
+font rendering is used. On the one hand, this improves the text 
+display a lot, but, on the other hand, it slows down the display 
+speed of a PDF page.
+
+!item For (!B)Fit PDF to the window(!b), the size of a PDF page will always be 
+adapted in such a way that it can completely displayed in the PDF 
+window.
+
+!end_itemize
+
+!end_node # Index Card 'PDF'
+
+!end_node # Preferences Dialog
+
+# ------------------------------------------------------
+
+!end_node # Using zView

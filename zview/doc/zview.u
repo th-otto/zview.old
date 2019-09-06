@@ -1,0 +1,66 @@
+!language english
+
+!include config.ui
+
+!ifdest [stg]
+!docinfo [title] The Hypertext for
+!else
+!docinfo [title] The documentation for
+!endif
+!docinfo [stgdatabase] zView Guide
+!docinfo [program]     zView
+!docinfo [address]     An Image and PDF Browser,
+!docinfo [address]     Viewer and Converter
+!docinfo [address]     
+!docinfo [address]     3rd Match 2013
+!docinfo [address]     Version 1.0
+!docinfo [address]
+!docinfo [address]     by
+!docinfo [address]     
+!docinfo [address]     Zorro
+!docinfo [address]     May 2004 - December 2005
+!docinfo [address]     the.zorro.free.fr
+!docinfo [address]     
+!docinfo [address]     MiKRO
+!docinfo [address]     October 2010 - March 2013
+!docinfo [address]     z-tools.sourceforge.net
+!docinfo [address]     
+!docinfo [address]     
+!docinfo [address]     Documentation by Sascha Uhlig
+
+!docinfo [programimage] (!picture_path)logo
+
+!html_merge_subsubnodes
+
+!begin_document
+
+!ifdest [tex]
+\documentstyle[11pt,german]{article}
+!endif
+!ifdest [stg]
+!begin_raw
+@options "+i +z -t4"
+@subject "Graphic"
+@author "Sascha Uhlig"
+@help "Help Page"
+@$VER: zView.hyp (@:"__DATE__")
+!end_raw
+!endif
+!maketitle
+!tableofcontents !depth 2 1
+
+!include intro.ui
+!include using.ui
+!include menu.ui
+!include credits.ui
+!include notes.ui
+
+!begin_appendix
+!include file_formats.ui
+!include faq.ui
+!include history.ui
+!include glossary.ui
+!include helppage.ui
+!end_appendix
+
+!end_document

@@ -1,0 +1,33 @@
+!begin_node* Help Page
+
+This hypertext represents the documentation for zView and describes 
+the function and use of it. It was written by Sascha Uhlig with the 
+help of some Wikipedia entries, several Atari forums, and other 
+websites and documents.
+
+The table of contents will help guide you around all available 
+functions. The trick is knowing which chapter to select and then 
+which subchapter.
+
+Please note the following information:
+
+!begin_itemize
+
+!item You can read the document from front to back like a book. If you 
+use the previous page button and the next page button, you will be 
+able to read all the pages without the danger of missing any. The 
+pages will be displayed in sequence so it is possible to start at 
+any chapter.
+
+!item When the index button is selected, your guide will display a page 
+that contains catchwords for all important references and terms of 
+the hypertext.
+
+!item References with a number enclosed in square brackets are links to 
+a pop-up-node. Those pop-ups are intended for additional 
+information and for tips and tricks without having to open a new 
+page for them. These are the only 'pages' that cannot be viewed 
+ with the previous page button and the next page button.
+!end_itemize
+
+!end_node

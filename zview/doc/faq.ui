@@ -1,0 +1,169 @@
+!begin_node FAQ (Frequently Asked Questions)
+!html_name faq
+
+This list of more or less frequently asked questions has been divided 
+into sections so that you can find answers to your questions more 
+easily.
+
+Questions Related to the Installation of zView
+!hline
+
+!begin_xlist [x]
+
+!item [(!arrowright)] zView does not work.
+
+This application is for high-end TOS computers. An Atari Falcon 
+with an FPU or an Atari TT is the MINIMUM to use this software. 
+Are you sure that your computer system follows the hardware and 
+software requirements (see chapter Requirements)?
+
+!item [(!arrowright)] Even though zView fulfills the hardware and software requirements, 
+it does not work.
+
+Maybe your zView archive is corrupted. Please download it again.
+
+!item [(!arrowright)] When I try to open the (!link [browser window] [Browser Window]), zView complains with the 
+alert 'zView can't load the icons' and exits.
+
+In your zView directory, there must be the folder 'Icons' with the 
+icons in GodPaint format (icons for the (!link [directory] [Directory List]) and (!link [contents] [Contents List]) 
+list of the (!link [browser window] [Browser Window]), as well as the icons for the toolbars 
+of the (!link [browser] [Browser Window]), (!link [picture] [Picture Window]) and (!link [PDF window] [PDF Window]); all small icons are 
+combined to one file). For some reason, this folder is missing, or 
+there is something wrong with the icon files. Another reason could 
+be that the GodPaint plugin is missing in the folder '(!link [Codecs] [Codec])' or 
+doesn't work.
+
+
+!item [(!arrowright)] Do I have to install the whole (!link [LDG system] [LDG System])?
+
+No, this is not neccessary. Actually, the installation of the LDG 
+system is almost useless for zView's LDG (!link [codecs] [Codec]) because they are 
+not shareable at the moment. Shareable means that, for example, 
+two programs use a (!link [codec] [Codec]), but only one copy is in memory. Of 
+course, other applications, such as zWeather, can use these (!link [codecs] [Codec]) 
+if installed in a global folder (see chapter Installation), they 
+are just not shareable. Later versions might support this feature.
+
+
+!item [(!arrowright)] Why are JPEG images not decoded with the installed JPEG DSP 
+decoder by Brainstorm if one has a Falcon with a CPU higher than 
+68030?
+
+It was a great decision by Atari to support the Falcon's 68030 
+with a DSP. The Atari Falcon was the only home computer with such 
+a chip. Nevertheless, a CPU higher than 68030 is faster for 
+decoding (!link [JPEGs] [JPEG]) than the DSP.
+
+
+!end_xlist
+
+
+Questions Related to Images
+!hline
+
+!begin_xlist [x]
+
+!item [(!arrowright)] zView crashes with some images. What can I do?
+
+Go to z-tools.sourceforge.net and write a bug report for zView.
+
+
+!item [(!arrowright)] Some images are not shown with a thumbnail (and cannot be viewed 
+in its full size).
+
+Although zView recognises an image by the file header instead of 
+the filename's extension (so that it is really the format which is 
+supported by zView), there are some pictures that cannot be 
+displayed. Sometimes, it is almost impossible to support all 
+variants and features of an image format. For example, TIFF is 
+very complex. Another reason for not displaying a picture: it 
+contains incorrect or incomplete image data.
+
+
+!item [(!arrowright)] The colours of my 16-colour (!link [GEM IMG] [GEM (X!)IMG]) picture are displayed 
+inaccurately.
+
+Your picture lacks included colour information. The original 
+(!link [GEM IMG] [GEM (X!)IMG]) file format has a serious defect as a colour format since 
+its specification made no allowance for colour (!link [palettes] [Colour Depth]). If you do 
+not use the same (!link [colour palette] [Colour Depth]) as while saving the image, the 
+picture colours are wrong. There were several attempts to correct 
+the omission of (!link [palette] [Colour Depth]) information, but the de facto standard is 
+(!link [XIMG] [GEM (X!)IMG]), for eXtended (!link [IMG] [GEM (X!)IMG]) format, defined in 1990. It stores the 
+(!link [colour palette] [Colour Depth]) in the file header and is supported by zView as 
+well as almost all not too old software that deals with (!link [GEM IMG] [GEM (X!)IMG]) 
+images.
+
+
+!item [(!arrowright)] I have a (!link [true-colour] [Colour Depth]) (!link [GEM IMG] [GEM (X!)IMG]) image and it can be displayed, but 
+its image content is distorted.
+
+It seems that your image is in PixArt TC (!link [XIMG] [GEM (X!)IMG]) format. zView can 
+only display GEM-View TC (!link [XIMG] [GEM (X!)IMG]) pictures correctly. Unfortunately, 
+there is no way of distinguishing between PixArt TC (!link [XIMG] [GEM (X!)IMG]) and GEM-
+View TC (!link [XIMG] [GEM (X!)IMG]) images.
+
+
+!item [(!arrowright)] The Atari graphics application True Paint by HiSoft can save true-
+colour (!link [IMG] [GEM (X!)IMG]) files; however, zView cannot read them.
+
+True Paint is the one of the rare examples that saves (!link [true-colour] [Colour Depth]) 
+(!link [IMG] [GEM (X!)IMG]) files in 16-bit instead of 24-bit (!link [colour depth] [Colour Depth]), at least on 
+the Falcon. Like zView, most other programs cannot read them.
+
+
+!item [(!arrowright)] Altough zView supports JPEG-compressed TIFF pictures, they are not 
+displayed.
+
+Your images probably use a very old JPEG-in-TIFF encapsulation. 
+There were serious problems with TIFF 6.0's design for embedding 
+JPEG-compressed data in TIFF (Section 22 of the TIFF 6.0 
+specification of 3 June 1992). Therefore a different scheme 
+described in TIFF Technical Note #2 was defined in 1995. The old 
+JPEG encapsulation is now totally obsolete and deprecated for new 
+applications and images.
+
+!end_xlist
+
+
+Questions Related to PDF Files
+!hline
+
+!begin_xlist [x]
+
+!item [(!arrowright)] Can zView display all kinds of PDF files?
+
+First of all, zView can display (!link [PDFs] [PDF]) up to the latest PDF 
+specification 1.7. Like many other readers, though, zView cannot 
+deal with video, sound, completable form fields, JavaScript and so 
+on. You can open such a PDF, but the embedded video, for example, 
+cannot be played.
+
+!item [(!arrowright)] When I browse a PDF file, zView does not remember the last set 
+zoom level for a page. Can this be changed?
+
+If the option 'Fit PDF to the window' in the (!link [index card 'PDF'] [Index Card 'PDF']) of 
+the (!link [preferences dialog] [Preferences Dialog]) is enabled, zView always fits the size of 
+a new page to your window. You have to disbale this option.
+
+!end_xlist
+
+
+Questions Related to the Development of zView
+!hline
+
+!begin_xlist [x]
+
+!item [(!arrowright)] I would like to make some suggestions for zView.
+
+Zorro and MiKRO have made a great effort that everyone with some 
+knowledge of GEM programming can compile and update zView. If you 
+are no coder at all, you can go to z-tools.sourceforge.net and 
+write feature requests for zView. There might be a programmer who 
+like implementing your ideas. Or you can e-mail Zorro or MiKRO 
+(see chapter Contact).
+
+!end_xlist
+
+!end_node

@@ -1,0 +1,57 @@
+!use_nodes_inside_index  [stg,html]
+!use_label_inside_index  [stg,html]
+
+!use_udo_index [html]
+
+!use_compressed_tocs [all]
+!use_auto_subtocs    [stg,html]
+!use_auto_subsubtocs [stg,html]
+!no_effects          [asc]
+
+!html_ignore_8bit
+!html_img_suffix .bmp
+!hh_img_suffix .bmp
+!parwidth 75
+
+!code_source [tos]
+
+!ifdest [stg]
+!code_target [tos]
+!else
+!code_target [utf-8]
+!endif
+
+!define picture_path images/
+
+!table_alignment left
+
+
+!ifdest [html,hh]
+!define bullet &#x2022;
+!define arrowright &#x21e8;
+!define eacute &#x00e9;
+!define aumlaut &#x00e4;
+!define oumlaut &#x00f6;
+!define uumlaut &#x00fc;
+!define Aumlaut &#x00c4;
+!define Oumlaut &#x00d6;
+!define Uumlaut &#x00dc;
+!define sharps &#x00df;
+!define aring &#x00e5;
+!define ccedilla &#x00e7;
+!else
+!define bullet ˘
+!macro arrowright (!raw [stg] [])
+!define eacute Ç
+!define aumlaut Ñ
+!define oumlaut î
+!define uumlaut Å
+!define Aumlaut é
+!define Oumlaut ô
+!define Uumlaut ö
+!define sharps û
+!define aring Ü
+!define ccedilla á
+!endif
+
+!define hash #

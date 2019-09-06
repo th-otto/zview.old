@@ -1,0 +1,87 @@
+!begin_node Supported File Formats
+!html_name file_formats
+
+zView can load ten picture formats, one picture/animation format 
+(GIF) and one document format (PDF). The following table shows the 
+supported features of the formats.
+
+!begin_table [llllll]
+(!B)Format(!b) !! (!B)File(!b)      !! (!B)Picture(!b) !! (!B)Colour(!b) !! (!B)Packing(!b) !! (!B)Misc(!b)
+               !! (!B)Extension(!b) !! (!B)Size(!b)    !! (!B)Depth(!b)  !! (!B)Method(!b)
+!hline
+ BMP           !! .bmp              !! Any             !! 1/4/8/24/32    !! None/RLE        !!
+!hline
+ DEGAS         !! .pi1/.pc1         !! 320x200         !! 4              !! None/RLE
+               !! .pi2/.pc2         !! 640x200         !! 2              !! None/RLE        !!
+               !! .pi3/.pc3         !! 640x400         !! 1              !! None/RLE        !! 
+!hline
+ Eureka RAW    !! .raw              !! Any             !! 8              !! None            !!
+!hline
+ GEM (X)IMG    !! .img              !! Any             !! 1/2/4/8/24     !! None/RLE        !!
+!hline
+ GIF           !! .gif              !! Any             !! 1-8            !! LZW             !! Transparency
+               !!                   !!                 !!                !!                 !! Animation
+               !!                   !!                 !!                !!                 !! Textual data
+!hline
+ GodPaint      !! .god              !! Any             !! 16             !! None            !! 
+!hline
+ JPEG          !! .jpg              !! Any             !! 8/24           !! JPEG            !! Lossy compression
+               !! .jpe              !!                 !!                !!                 !! Thumbnail
+               !! .jpeg             !!                 !!                !!                 !! Textual data
+               !!                   !!                 !!                !!                 !! Exif data
+!hline
+ NEOchrome     !! .neo              !! 320x200         !! 4              !! None            !! 
+               !!                   !! 640x200         !! 2              !!                 !! 
+               !!                   !! 640x400         !! 1              !!                 !! 
+!hline
+ PDF           !! .pdf              !! Any             !! Any            !! Many            !! Bookmarks
+!hline
+ PNG           !! .png              !! Any             !! 1/2/4/8/       !! Deflate         !! Alpha Channel
+                                    !! 16/24/32        !!                !!                 !! Textual data
+!hline
+ TGA           !! .tga              !! Any             !! 16/24/32       !! None/RLE        !! Alpha Channel
+!hline
+ TIFF          !! .tif              !! Any             !! 1-8/16/        !! None/RLE/       !! Colour Models
+               !! .tiff             !!                 !! 24/32          !! LZW/JPEG/       !! Textual data
+               !!                   !!                 !!                !! Deflate/        !! 
+               !!                   !!                 !!                !! CCITT           !! 
+               !!                   !!                 !!                !! Group 3         !! 
+               !!                   !!                 !!                !! and 4 (!link [[4!]] [[4!]]) !!
+!hline
+
+!end_table
+
+zView is able to save a loaded picture in JPEG, TIFF or GodPaint 
+format. The next table shows the options for saving.
+
+!begin_table [ll]
+ (!B)Format !! Options(!b)
+!hline
+ GodPaint   !! None
+!hline
+ JPEG       !! Infinitely variable compression
+            !! Saving as greyscale picture
+            !! Saving in progressive mode
+!hline
+ TIFF       !! Five different compression methods
+            !! (no compression, Macintosh RLE, LZW, JPEG, Deflate)
+!hline
+
+~
+
+!end_table
+
+!begin_pnode* [4]
+In addition, zView supports some rare
+compression algorithms:
+!begin_itemize !compressed
+!item NeXT RLE 2-bit
+!item ThunderScan RLE 4-bit
+!item Pixar companded 11-bit Zip
+!item PKZIP-style Deflate (experimental)
+!item SGI Log Luminance RLE 32-bit (experimental)
+!item SGI Log Luminance RLE 24-bit (experimental)
+!end_itemize
+!end_node
+
+!end_node

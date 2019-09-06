@@ -1,0 +1,2264 @@
+!begin_node Glossary
+!html_name glossary
+
+!begin_node Alpha Channel
+
+A (!link [RGB] [Colour Depth]) (!link [true-colour] [Colour Depth]) image uses three (!link [channels] [Colour Depth]): one for red, green and 
+blue. Each (!link [channel] [Colour Depth]) has a size of 8 bits (256 variants). So a 24-bit 
+picture has 256 x 256 x 256 = 16,777,216 colours (for a far more 
+detailed explanation see Colour Depth). (!link [RGB] [Colour Depth]) images with 32 bits have 
+an additional (!link [channel] [Colour Depth]) which is called alpha channel. It is used to 
+determine the pixels' translucency levels. The more transparent a 
+pixel, the less it hides the background against which the image is 
+presented. The degree of pixel transparency for an 8-bit alpha value 
+ranges from 0 (the pixel is completely invisible or transparent) to 
+255 (the pixel is completely visible or opaque).
+
+Note that the picture format PNG even supports alpha values for 1-,
+2-, 4- and 8-bit colour and 8-bit greyscale pictures. For further 
+details, see PNG.
+
+Old programs do not deal with the transparency layer. They treat only 
+the first three (!link [channels] [Colour Depth]) like standard 24-bit images. In contrast to 
+them, zView can use the alpha (!link [channel] [Colour Depth]) of pictures for displaying them.
+
+
+!begin_center
+!image (!picture_path)alpha
+
+(!B)Figure.(!b) On the left an old program and
+on the right zView, both displaying
+a picture with an alpha (!link [channel] [Colour Depth])
+!end_center
+
+
+Even some years ago, when support of true 32-bit rendering was not 
+common to PC and Mac shareware and freeware, zView handled correctly 
+32-bit pictures.
+
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node ARAnyM
+
+ARAnyM is an acronym: Atari Running on Any Machine. It is a virtual 
+machine software designed and developed for running 32-bit Atari ST/
+TT/Falcon operating systems (TOS, FreeMiNT, MagiC and others) and TOS/
+GEM applications on any kind of hardware, be it a PC, an Apple, a 
+Unix server, a graphics workstation or even a portable computer.
+
+ARAnyM is not meant as an emulator of the Atari Falcon (even though 
+it has a rather high Falcon software compatibility and includes most 
+of the Falcon custom chips, including Videl and DSP). Since ARAnyM is 
+is not tied to the specification of any existing Atari machine, the 
+most complete CPU (68040 with MMU) and FPU (68882) could be selected, 
+loads of RAM (up to 4 GB) added, host accelerated graphics (even with 
+OpenGL) and direct access to various host resources including sound, 
+disk drives, optical storage devices (CD/DVD-ROMs), parallel port and 
+more.
+
+ARAnyM is not yet another TOS clone similar to Medusa, Hades or 
+Milan, but actually much cheaper (because it is free software) and 
+way more powerful (because the host hardware gets faster every day). 
+One of the goals, to create a distribution installable from a CD that 
+would turn any PC machine into full-featured Atari power machine, can 
+be tested with the ARAnyM/AFROS Live CD.
+
+(!arrowright) For further information, see (!url [aranym.org] [https://aranym.github.io/]).
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node BMP
+
+!begin_table [|l|l] !hline
+ Format            !! BMP
+!hline
+ Proper Name       !! Microsoft Windows Bitmap format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.bmp
+ MIME Media Type   !! image/bmp
+ Colour Depth      !! 1/4/8/16/24/32 bits
+ Size              !! Maximum 2Gx2G pixels (from BMP Version 3)
+ Compression       !! None / RLE (4- and 8-bit images)
+ Special Features  !! BMP Version 3 (Microsoft Windows 3.x), which is
+                   !! used by almost all graphics programs:
+                   !! - 1-, 4-, 8- and 24-bit
+                   !! BMP Version 3 (Microsoft Windows NT):
+                   !! - 16- and 32-bit (not all bits are used)
+                   !! BMP Version 4 (Microsoft Windows 95), which is 
+                   !! hardly supported by applications and mainly used 
+                   !! as an internal format:
+                   !! - (!link [Alpha channel] [Alpha Channel])
+                   !! - Different (!link [colour models] [Colour Depth])
+                   !! - Gamma correction
+                   !! BMP Version 5 (Microsoft Windows 98), which is 
+                   !! hardly supported by applications and mainly used 
+                   !! as an internal format:
+                   !! - ICC colour profiles
+                   !! - Container format for PNG and JPEG
+!hline
+ Developer         !! Microsoft
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+BMP is the standard picture format of Microsoft Windows (like (!link [(X!)IMG] [GEM (X!)IMG]) 
+for GEM) and is used as an internal format to store virtually any 
+type of bitmap data. BMP is also very popular in the MS-DOS operating 
+system. And IBM's OS/2 operating system (version 1.x and 2.x) uses 
+variants of the Windows Bitmap format as standard picture file format.
+
+Usage
+!hline
+The files are usually not compressed, so they are typically much 
+larger than compressed picture file formats for the same image. 
+Nevertheless, the simplicity of BMP and its widespread familiarity in 
+Windows and elsewhere, as well as the fact that this format is well 
+documented and free of patents, makes it a very common format that 
+image processing programs from many operating systems can read and 
+write.
+
+Compression
+!hline
+The Windows BMP format supports a byte-wise RLE compression scheme 
+for compressing 4-bit and 8-bit bitmap data. 1-, 16-, 24-, and 32-bit 
+bitmaps cannot be compressed using this kind of RLE scheme due to the 
+typical lack of long runs of bytes with identical values in these 
+types of data. Furthermore, RLE is unsuitable for complex images.
+
+Bottom-Up Bitmaps
+!hline
+Unlike other file formats, which store image data from top to bottom, 
+the BMP format can store image data from bottom to top. Almost all 
+BMP images are stored in this way, so-called bottom-up bitmaps. This 
+means that if memory is tight, these BMP graphics will sometimes 
+appear drawn from bottom to top.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node Codec
+
+Definition 1: Codec is short for compressor/decompressor. It is a 
+software, hardware or a combination of both that compresses and 
+decompresses audio and video data streams. The purpose of a codec is 
+to reduce the size of digital audio samples and video frames in order 
+to speed up transmission and save storage space. The goal of all 
+codec designers is to maintain audio and video quality while 
+compressing the binary data further. Lossy methods are widely used, 
+which actually discard bits that most people cannot hear or see. Some 
+popular codecs for computer video include MPEG, Indeo and Cinepak; 
+well-known audio codecs are MP3 and Ogg Vorbis.
+
+Definition 2: Codec is short for either compressor/decompressor or 
+coder/decoder, which describes a software, hardware or a combination 
+of both, capable of performing transformations on a data stream or 
+signal. Codecs can both put the stream or signal into an encoded form 
+(often for transmission, storage or encryption) and retrieve, or 
+decode that form for viewing or manipulation in a format more 
+appropriate for these operations.
+
+The second and more general definition reveals why zView's plugins 
+for reading and saving picture/animation formats are called codecs, 
+too: The plugins can decode these formats and decompress the picture/
+animation data in order for viewing them. In addition, some plugins 
+are able to compress and encode picture data in order to save them in 
+the corresponding picture format.
+
+By the way, zView's picture/animation codecs can be used as well by 
+other applications (see Note for Programmers).
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node Colour Depth
+
+Colour depth is the number of distinct colours available in the 
+current picture or screen resolution. Colour depth is often referred 
+to as bit depth, because it is directly related to the number of bits 
+used for each pixel. For example, a 24-bit colour (or 24-bit for 
+short) video adapter has a colour depth of 2 to the 24th power (about 
+16.7 million colours). One would say that its colour depth is 24 bits 
+per pixel (24 bpp). But instead of the unit bits per pixel (bpp), one 
+often uses the less accurate unit bits.
+
+Sometimes colour depth is given in bit planes, or planes for short. 
+A bit plane can be explained as follows. An 1-bit colour resolution 
+is either black or white in display. The memory used to represent an 
+entire screen at 1-bit resolution is called a bit plane. Additional 
+colour is added to the display through the use of additional bit 
+planes. Luckily, the number of bits per pixel is identical to the 
+number of bit planes.
+
+Colour depths can be divided into different types of colours or 
+colour modes: index colour and direct colour.
+
+!begin_description
+!item (!B)Indexed Colour(!b)
+
+Indexed colour means that the colour of each pixel is represented 
+by an index number, and each number corresponds to a colour in a 
+table or palette (note that all pixels with the same colour have 
+the same index number). This palette is then used to map colour to 
+pixels. In the case of images, the palette is attached to the 
+picture.
+
+Indexed colour is used when colours do not exceed 256 colours. For 
+more colours, the palette becomes too large, and a direct-colour 
+method is preferred.
+
+Common colour depths with indexed colour:
+!begin_itemize !compressed
+!item 1-bit colour (2^1 = 2 colours; monochrome, often black and white),
+!item 2-bit colour (2^2 = 4 colours),
+!item 4-bit colour (2^4 = 16 colours) and
+!item 8-bit colour (2^8 = 256 colours).
+!end_itemize
+
+!item (!B)Direct Colour(!b)
+
+In higher colour depths, the colour value typically DIRECTLY 
+encodes relative brightnesses of a primary colour to specify a 
+colour in a special colour model. In other words, pixels of non-
+indexed images or screen resolutions store actual colour values 
+instead of index numbers. Each pixel consists of components, also 
+known as channels. Greyscale formats have only one channel. RGB 
+formats have three channels: red, green and blue. CMYK formats 
+have four channels: cyan, magenta, yellow and black (K = black 
+because B is already used for blue).
+
+!begin_enumerate
+!item 5(6) Bits Per Channel RGB (High Colour)
+
+15- and 16-bit colour depths are called high colour. They are 
+considered sufficient to provide life-like colours:
+
+15-bit colour uses 5 bits to represent red, 5 bits to represent 
+blue and 5 bits to represent green. 2^5 = 32 levels of each of 
+these three colour can therefore be combined to give a total of 
+32,768 mixed colours (32 x 32 x 32 = 32,768).
+
+16-bit colour uses 5 bits to represent red, 5 bits to represent 
+blue, but uses, since the human eye is more sensitive to the 
+colour, 6 bits to represent 64 levels of green. These can 
+therefore be combined to give 65,536 mixed colours (32 x 32 x 
+64 = 65,536).
+
+!item 8 Bits Per Channel (8-/16-bit Greyscale, True Colour)
+
+There are the following kinds of greyscale, RGB and CYMK 8-bit 
+per channel pixel formats:
+!begin_itemize !compressed
+!item 8-bit greyscale,
+!item 24-bit RGB,
+!item 32-bit CMYK,
+!item 16-bit greyscale + alpha,
+!item 32-bit RGBA (RGB + alpha) and
+!item 32-bit RGB (without alpha, extra byte is not used).
+!end_itemize
+
+24- and 32-bit colour formats are known as true colour. Each 
+pixel is defined in terms of its actual RGB or CMYK values. 
+Every pixel in a true-colour format has 2^8 = 256 possible 
+values for each of its red, green or blue components (in the 
+RGB model) or cyan, magenta, yellow and black (in the CMYK 
+model). Since there are 256 possible values for each RGB or 
+CMYK component, then RGB true colour would have a 24-bit colour 
+depth and CMYK true colour would have a 32-bit colour depth. 
+These colour depths allow to represent as much colour hues as 
+human eye can recognise. That is why they are called true 
+colour.
+
+Even though there are more bits per pixel in the CMYK model, it 
+has, in reality, not more colours than RGB (256 x 256 x 256 = 
+16,777,216 colours) because the black component is only extra 
+since a mix of 100% each of cyan, magenta and yellow already 
+produces black. The black component is added because the CMYK 
+model is used for printing. Due to difficulties to produce 
+pigments that will produce black, a separate black ink is often 
+used.
+
+16- and 32-bit pixel formats (16-bit greyscale + alpha or 32-
+bit RGBA) can contain an extra component called (!link [alpha channel] [Alpha Channel]). 
+It does not contain any colour information, it specifies the 
+degree of pixel opacity when it is overlayed on another image. 
+The less alpha value is, the more transparent is the pixel.
+
+You can see now why '32-bit colour' is a misnomer when 
+regarding display colour depth. In reality, 32-bit colour 
+actually refers to 24-bit colour (true colour) with or without 
+an (!link [alpha channel] [Alpha Channel]).
+
+!item 16 Bits Per Channel
+
+It may seem strange, why we need more than 8 bits per channel 
+if our eye will not notice the difference. The problem is when 
+we apply some operations on an 8-bit per channel image (for 
+example, tone adjustment or colour enhancement), some colour 
+information can be lost or distorted due roundoff errors. It is 
+especially noticeable when we apply these operation several 
+times. To avoid this problem, we should increase colour depth. 
+That is why most scanners produces 48-bit images instead of 24-
+bit.
+
+Note that zView does not support currently 16-bit per channel 
+images.
+
+!end_enumerate
+!end_description
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node CT60/63
+
+The CT60 is an accelerator for the Atari Falcon 030. It has the 
+following features:
+
+!begin_xlist [x]
+!item [(!arrowright)] Socketed 060 (with FPU and PMMU) or LC (no FPU) or EC (no FPU and 
+PMMU) at 66 MHz (upgradable to 100 MHz).
+!item [(!arrowright)] CT60 bus at 66 MHz (upgradable to 100 MHz): SDRAM and 060 bus 
+accesses.
+!item [(!arrowright)] SDRAM PC100/133 (CL2) at 66 MHz (upgradable to 100 MHz) with burst 
+accesses and page hit on open banks.
+!item [(!arrowright)] 1 SDRAM PC100/133 socket for 64 MB to 512 MB.
+
+!item [(!arrowright)] Flash of 1 MB with BOOT, 060 INIT, TOS 4.04 + patches, flash can 
+be updated easily.
+
+!item [(!arrowright)] 060 bus slot for adding a daughter card, such as EtherNat 
+(ethernet + USB), SuperVidel (graphics card) and CTPCI (PCI 
+expansion card).
+
+!item [(!arrowright)] Switch to commute between 060 and 030 mode of the Falcon.
+!item [(!arrowright)] 030 mode 100% compatible with the original Falcon (the 68882 is 
+available in 030 mode).
+!item [(!arrowright)] Option to boost the Falcon mainboard with 6 wires to be soldered: 
+DSP and Videl at 50 MHz, bus at 25 MHz.
+
+!item [(!arrowright)] Easy fitting without solders in the original Falcon case, without 
+the Falcon power supply that is replaced by an external standard 
+ATX power supply.
+!end_xlist
+
+
+!begin_center
+!image (!picture_path)ct60
+
+      (!B)Figure.(!b) The CT60 accelerator board by Rodolphe Czuba
+!end_center
+
+
+The CT63 is the cheaper successor of the CT60 with the following 
+changes:
+
+!begin_xlist [x] !compressed
+!item [(!arrowright)] No Falcon motherboard boost.
+!item [(!arrowright)] No CPU temperature.
+!item [(!arrowright)] No socket for the CPU, it is soldered.
+!item [(!arrowright)] The oscillator is replaced by the CTCM, programmable clock module 
+from 33 to 110 MHz.
+!end_xlist
+
+If you are a Falcon user or want to become one and you have any 
+chance to get this accelerator, buy it! You will get the most 
+powerful original Atari computer!
+
+(!arrowright) For more details, see (!url [www.powerphenix.com] [http://www.powerphenix.com]).
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node DEGAS
+
+!begin_table [|l|l] !hline
+ Format            !! DEGAS
+!hline
+ Proper Name       !! DEGAS format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.pi[1-6], *.pc[1-6]
+!hline
+ MIME Media Type   !! None
+!hline
+ Colour Depth      !! 1/2/4/8 bits
+!hline
+ Size              !! 320x200x4, 640x200x2, 640x400x1,
+                   !! 320x480x8, 640x480x4, 1280x960x1 pixels
+!hline
+ Compression       !! None/RLE
+!hline
+ Special Features  !! Colour animation effects (PC[1-6])
+!hline
+ Developer         !! Tom Hudson
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+The DEGAS format was originally developed as a proprietary format for 
+the painting program of the same name (later upgraded to DEGAS 
+Elite), but has since become a common image format on ST computers. 
+Most Atari ST painting programs read DEGAS images in addition to 
+other formats.
+
+
+DEGAS, the Painting Program
+!hline
+DEGAS was one of the first painting packages to arrive on the Atari 
+ST (released in 1986) and one of the biggest-selling ST programs at 
+that time. DEGAS, an contrived acronym for Design & Entertainment 
+Graphic Arts System and the impressionist Edgar Degas, was created by 
+Tom Hudson for Batteries Included, Canada. A lot of classic ST 
+graphics have been made with it. 
+
+
+!begin_center
+!image (!picture_path)degas
+
+                  (!B)Figure.(!b) DEGAS user interface
+!end_center
+
+DEGAS Format
+!hline
+The resolutions supported by DEGAS are those of the ST: 320x200 
+pixels in 16 colours (PI1), 640x200 in 4 colours (PI2) and 640x400 
+monochrome (PI3). Thus, DEGAS is a fixed-size format which cannot 
+display images which are larger (or smaller) than an ST screen.
+
+!begin_center
+!image (!picture_path)degas_format
+
+          (!B)Figure.(!b) Sample DEGAS painting by Tom Hudson
+!end_center
+
+DEGAS Elite Format
+!hline
+With the introduction of the successor program, DEGAS Elite, by the 
+same author, a new version of the DEGAS format was defined (PC1, PC2, 
+PC3). It supports compression, and animation effects by changing the 
+values in the (!link [palette] [Colour Depth]). And through the resolutions available on the 
+TT, further screen sizes were supported: 320x480 pixels in 256 
+colours (PI4/PC4), 640x480 in 16 colours (PI5/PC5) and 1280x960 
+monochrome (PI6/PC6).
+
+!begin_center
+!image (!picture_path)degas_elite
+
+     (!B)Figure.(!b) In contrast to DEGAS, DEGAS Elite has a GEM menu
+!end_center
+
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node DSP
+
+The microprocessor of the Atari Falcon is supported by a Digital 
+Signal Processor (DSP), a Motorola DSP56001 clocked at 32 MHz 
+performing no less than 16 million instructions per second. Although 
+it is oriented to sound processing (it is directly connected to the 
+RAM and AD/DA converter via an interconnection matrix), it is also 
+capable of graphics processing, such as calculation of fractals, 
+deformations, 3D projections and JPEG decompression. It can even, 
+jointly with the 68030, play MP3 files in real-time.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node Eureka RAW
+
+!begin_table [|l|l] !hline
+ Format            Eureka RAW
+!hline
+ Proper Name       Eureka RAW format
+!hline
+ Type              Bitmap
+!hline
+ File Extension    *.raw
+!hline
+ MIME Media Type   None
+!hline
+ Colour Depth      8 bits
+!hline
+ Size              No limitation
+!hline
+ Compression       None
+!hline
+ Special Features  Raw data with no other information
+!hline
+ Developer         Fran(!ccedilla)ois Le Coat
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+Eureka is a Atari GEM trace program. It permits to visualise graphics 
+from mathematical functions.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node Exif
+
+Exchangeable Image File Format (official abbreviation is Exif, not 
+EXIF) is a standard that specifies the formats for images, sound, and 
+ancillary information fields (tags) used by digital cameras 
+(including smartphones), scanners and other systems handling image 
+and sound files recorded by digital cameras. The specification uses 
+the following existing file formats with the addition of specific 
+metadata tags: JPEG DCT for compressed image files, TIFF Rev. 6.0 
+((!link [RGB] [Colour Depth]) or YCbCr) for uncompressed image files, and RIFF WAV for audio 
+files (Linear PCM or u-Law PCM for uncompressed audio data, and IMA-
+ADPCM for compressed audio data). It is not supported in the JPEG 
+successor JPEG2000 (which is, by the way, not widely supported), or 
+in PNG and GIF.
+
+This standard consists of the Exif image file specification and the 
+Exif audio file specification.
+
+Since Exif inserts data to images in conformity to the image format 
+specification, you can view image files with Exif data by any web 
+browser, graphics viewer and so on.
+
+Background and History of the Exif Standard
+!hline
+Exif was created by the Japan Electronic Industries Development 
+Association (JEIDA). The latest version 2.3, dated April 2010, was 
+jointly formulated by the Japan Electronics and Information 
+Technology Industries Association (JEITA) and Camera Imaging Products 
+Association (CIPA). Though the specification is not currently 
+maintained by any industry or standards organisation, its use by 
+camera manufacturers is nearly universal.
+
+The following list provides information about the history of the Exif 
+standard.
+
+!begin_table [l|l|l]
+ (!B)Version(!b)  !! (!B)Date(!b)            !! (!B)Description(!b)
+!hline
+ 1.0              !! October 1995            !! Defined the structure, consisting of an 
+                  !!                         !!  image data format and attribute information 
+                  !!                         !! (tags) and basic tag definitions
+!hline
+ 1.1              !! May 1997                !! Added tags
+!hline
+ 2.0              !! November 1997           !! Added sRGB (!link [colour space] [Colour Depth]), GPS, compressed 
+                  !!                         !! thumbnails and audio files
+!hline
+ 2.1              !! December 1998           !! Added DCF (!link [[5!]] [[5!]]) interoperability tags
+!hline
+ 2.2              !! April 2002              !! Added tags for improving print quality, and 
+                  !!                         !! tags pertaining to positioning and GPS
+!hline
+ 2.21             !! September 2003          !! Added optional (!link [colour space] [Colour Depth]) (Adobe (!link [RGB] [Colour Depth]))
+!hline
+ Unified          !! September 2009          !! Amendment of Exif Ver 2.2, which was a
+ Version          !!                         !! separate volume having additional parts and
+ 2.21             !!                         !! modifications, was merged into Exif Ver 2.2 
+                  !!                         !! as a unified version
+!hline
+ 2.3              !! April 2010              !! Added and revised tags (sensivity-related 
+                  !!                         !! tags, GPS information, camera and lens 
+                  !!                         !! information, items pertaining to sound 
+                  !!                         !! files, and light-source colour)
+!hline
+ 2.31             !! April 2016              !! Added and revised tags (time difference to
+                  !!                         !! UTC, shooting situation)
+!hline
+ 2.32             !! May 2019                !! Added 3 tags relating to composite image
+!hline
+!end_table
+
+Exif Data
+!hline
+The metadata tags defined in the Exif standard cover a broad spectrum:
+!begin_itemize !compressed
+!item Date and time information. Digital cameras will record the current 
+date and time and save this in the metadata.
+!item Camera settings. This includes static information such as the 
+camera model and make, and information that varies with each 
+image, such as the orientation (rotation), the aperture, the 
+shutter speed, the lens used and the ISO speed setting.
+!item A thumbnail for previewing the picture on the camera's LCD screen 
+or in computer programs.
+!item Descriptions and copyright information.
+!end_itemize
+
+Furthermore, the standard allows to store so-called maker notes, 
+which allows camera manufacturers to place any custom format 
+information in the file. This is used increasingly by camera 
+manufacturers to store myriad camera settings not listed in the Exif 
+standard, such as shooting modes, post-processing settings, serial 
+number and focusing modes. As this maker note format is proprietary 
+and manufacturer-specific, it can be prohibitively difficult to 
+retrieve this information from an image. Some manufacturers encrypt 
+portions of the information.
+
+Drawbacks
+!hline
+Apart from not being a maintained standard, the Exif format has a 
+number of drawbacks, mostly relating to its use of legacy file 
+structures. Here are some examples:
+
+!begin_itemize
+!item The derivation of Exif from the TIFF file structure using offset 
+pointers in the files means that data can be spread anywhere 
+within a file, which means that software is likely to corrupt any 
+pointers or corresponding data that it does not decode/encode. For 
+this reason most image editors damage or remove the Exif metadata 
+to some extent upon saving.
+
+!item The standard only allows TIFF or JPEG files, and thus there is no 
+provision for a 'raw' file type which would be a direct data dump 
+from the sensor device. This has caused camera manufacturers to 
+invent many proprietary, incompatible 'raw' file formats.
+
+!item Photo manipulation software sometimes fails to update the embedded 
+thumbnail after an editing operation, possibly causing the user to 
+inadvertently publish compromising information.
+
+!item Exif metadata are restricted in size to 64 KB in JPEG images. This 
+has prompted some camera manufacturers to develop non-standard 
+techniques for storing the large preview images used by some 
+digital cameras for LCD review. These non-standard extensions are 
+commonly lost if a user re-saves the image using image editor 
+software, possibly rendering the image incompatible with the 
+original camera that created it.
+
+!item There is no way to record time-zone information along with the 
+time, thus rendering the stored time ambiguous.
+
+!item Since the Exif tag contains information about the photo, it can 
+pose a privacy issue. For example, a photo taken with a GPS-
+enabled camera can reveal the exact location it was taken, which 
+is undesirable in some situations.
+!end_itemize
+
+Exif Support by zView
+!hline
+zView can display Exif data of JPEG images. The complete Exif 
+specification 2.1 standard (and most from 2.2) is supported. Many 
+maker notes from Canon, Casio, Epson, Fuji, Nikon, Olympus, Pentax 
+and Sanyo cameras are also supported.
+
+!begin_pnode* [5]
+Design rule for Camera File system (DCF) is a
+JEITA specification which defines a file
+system for digital cameras, including the
+directory structure, file naming method,
+character set, file format and metadata
+format. It is currently the de facto industry
+standard for digital still cameras. The file
+format of DCF conforms to the Exif
+specification, but the DCF specification also
+allows use of any other file formats.
+!end_node
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node FireBee
+
+The Atari ColdFire Project (ACP) is building a new, fast and modern 
+Atari clone: the FireBee. It uses the ColdFire processor which is the 
+fastest and most compatible hardware to the 68k processor family. 
+
+ACP is a project of people from the community for the community 
+without of financial interests of any kind. It is a project that is 
+being worked upon by many persons in their spare time and without 
+payment.
+
+
+!begin_center
+!image (!picture_path)firebee
+
+                    (!B)Figure.(!b) The FireBee logo
+!end_center
+
+
+The aims of the project are:
+
+!begin_itemize
+!item Develop a new Atari-compatible computer to offer available 
+hardware to the Atari community and other interested people.
+
+!item Find a well-balanced and doable solution between compatibility to 
+original Atari hardware and a reasonable price.
+
+!item Build a computer which will be the fastest available GEM hardware, 
+and which can use every 'clean' GEM program right from the start.
+
+!item Create a computer which has the possibility to expand and - as a 
+long-time goal - to become compatible to any 16/32-bit Atari that 
+has ever been built.
+
+!item Develop a machine which has enough power and potential to 
+implement further developments like a DSP, DVD-decoder and more 
+with VHDL.
+
+!item Build an Atari-compatible computer that uses as many free licenses 
+as possible to make way for later developments.
+
+!item An open project for everyone who wants to participate and help. A 
+complete computer, which should be as far as possible open source. 
+Not only the software, even the hardware shall be open.
+!end_itemize
+
+At the Atari Coldfire Project, there are many persons involved, in 
+one or another way. There are also two companies on board: Medusa 
+Computer Systems (Fredi Aschwanden), and Milan Computer (Kassian A. 
+Goukassian). Both companies have no commercial interest and give 
+their knowledge for free. Medusa Computer Systems from Switzerland is 
+producing the hardware, will grant the warranty and so on.
+
+(!arrowright) For the latest news, see (!url [acp.atari.org] [http://acp.atari.org/]).
+
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node GEM (X)IMG
+
+!begin_table [|l|l] !hline
+ File Format       !! GEM (X)IMG
+!hline
+ Proper Name       !! GEM (Extended) Image format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.img
+!hline
+ MIME Media Type   !! None
+!hline
+ Colour Depth      !! 1/2/4/8/24 bits
+!hline
+ Size              !! Maximum 64Kx64K pixels
+!hline
+ Compression       !! None/RLE
+!hline
+ Special Features  !! Different (!link [colour models] [Colour Depth]) for XIMG
+!hline
+ Developer         !! Digital Research, now part of Novell
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+The GEM IMG file format, IMG for short, is an image file format used 
+to store bitmap digital images the Graphical Environment Manager 
+(GEM), developed and marketed by Digital Research. On Atari GEM, the 
+original GEM IMG format was extended to store (!link [colour palette] [Colour Depth]) 
+information with the file. Additionally, some time later, (!link [true-colour] [Colour Depth]) 
+versions of the format were developed.
+
+To distinguish between the GEM vector graphics file format GEM 
+Metafile and this bitmap format, GEM IMG is sometimes also referred 
+to as GEM Bitmap or GEM Raster.
+
+History
+!hline
+GEM made its way into the market through OEM bundling deals, special 
+run-time versions bound to products, and as the native operating 
+environment of at least one system, the Atari ST computer family. GEM 
+image files were important in the PC desktop publishing community due 
+to the bundling deal between Digital Research and the creators of 
+Ventura Publisher, a widely used desktop publishing application. 
+
+The GEM IMG file format was designed to support raster images with a 
+varying (!link [number of planes] [Colour Depth]). In the beginning, almost all IMG files 
+available were simple black and white single (!link [plane] [Colour Depth]) images because the 
+original file format did not specify a method of storing (!link [palette] [Colour Depth]) 
+information with the file. A second problem is that there is no way 
+of distinguishing between colour images and greyscale images.
+
+To solve the omission of a (!link [colour palette] [Colour Depth]), several unofficial 
+extensions to the format were put into use (some of which were 
+incorrectly implemented by applications supporting them).
+
+However, one approach became popular, known as XIMG, for eXtended IMG 
+format. In 1990, this version had been published by the German Gei(!sharps) 
+brothers in their legendary book 'Vom Anf(!aumlaut)nger zum GEM-Profi' ('From 
+Beginner to GEM Professional'). Some years later, it became the de 
+facto standard for coloured GEM IMG files. In addition to storing the 
+(!link [colour palette] [Colour Depth]) in the file header, four different (!link [colour] [Colour Depth]) 
+(!link [models] [Colour Depth])  are possible, namely (!link [RGB] [Colour Depth]), CMY, HLS and Pantone; but virtually 
+all XIMGs are (!link [RGB] [Colour Depth]) pictures.
+
+
+True-Colour IMG Files
+!hline
+Since this was not enough for some programmers, XIMG was extended by 
+the capability of saving (!link [true-colour] [Colour Depth]) images. There were two 
+programmers at a time, who developed this extension, each without 
+knowing of the other, and so there are two incompatible (!link [true-colour] [Colour Depth]) 
+XIMG formats, the PixArt TC XIMG and the GEM-View TC XIMG. 
+Unfortunately, these varieties are not distinguishable for a program.
+
+When everything calmed down a little, Guido Vollbeding released 
+suggestions for extension of the IMG compression routines in 1994 and 
+defined the TIMG format. However, only very few programs support 
+this format.
+
+zView reads GEM-View TC XIMG files. They can be saved, for example, 
+with the picture viewers and converters Imagecopy (the option 'Word-
+align (!link [true-colour] [Colour Depth]) IMG' should be disabled) and, of course, GEM-
+View, and the graphics applications PixArt (saved as '(!link [RGB] [Colour Depth])') and 
+Smurf. Even (!link [true-colour] [Colour Depth]) IMG files created by the media player 
+Aniplayer can be viewed although they are not XIMGs.
+
+File Extension
+!hline
+GEM (X)IMG files are saved with the file extension *.img. However, so 
+are many other file formats, so you cannot assume that any file 
+ending *.img is one of these; it might not be a graphics file at all. 
+A fact that causes confusion in some applications designed to read 
+only GEM (X)IMG files.
+
+Compression
+!hline
+Actually, the original GEM IMG format is pretty simple. However, it 
+is not easy to read since four types of RLE compression algorithms 
+are applied to the pixel data of an image: Literal Run, Pattern Run, 
+Solid Run and Vertical Replication Count, depending on the sequence 
+of data values. Nevertheless, RLE compression is not efficient for 
+complex images.
+
+In practice, some programs write IMG files that are not compressed, 
+and others create IMGs without compressing them properly. Imagecopy, 
+for example, can reduce IMG files considerably in size.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node GIF
+
+!begin_table [|l|l] !hline
+ Format            !! GIF
+!hline
+ Proper Name       !! Graphics Interchange Format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.gif
+!hline
+ MIME Media Type   !! image/gif
+!hline
+ Colour Depth      !! 1 to 8 bits
+!hline
+ Size              !! Maximum 64Kx64K pixels
+!hline
+ Compression       !! LZW
+!hline
+ Special Features  !! GIF87a:
+                   !! - Platform-independent format
+                   !! - Streamable format
+                   !! - Interlacing (four-pass scheme)
+                   !! - Multiple images (animation)
+                   !! - Background colour
+                   !! - Pixel aspect ratio
+                   !! GIF89a (additionally):
+                   !! - Transparency
+                   !! - Better animation support
+                   !! - Textual metadata
+                   !! - Application-specific information
+                   !! - Textual data with parameters for rendering as a 
+                   !!   graphic
+!hline
+ Developer         !! CompuServe
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+The Graphics Interchange Format (GIF) is a bitmap image format that 
+was introduced by CompuServe in 1987 and has since come into 
+widespread usage on the internet due to its wide support and 
+portability.
+
+The format supports up to 8-bit colour thus allowing a single image 
+to reference a (!link [palette] [Colour Depth]) of up to 256 distinct colours. The colours are 
+chosen from the 24-bit (!link [RGB] [Colour Depth]) (!link [colour space] [Colour Depth]). It also supports animations 
+and allows a separate (!link [palette] [Colour Depth]) of 256 colours for each frame. The 
+colour limitation makes the GIF format unsuitable for reproducing 
+colour photographs and other images with continuous colour, but it is 
+well-suited for simpler images such as graphics or logos with solid 
+areas of colour.
+
+GIF images are compressed using the Lempel-Ziv-Welch (LZW) lossless 
+data compression technique to reduce the file size without degrading 
+the visual quality. This compression technique was patented in 1985. 
+Controversy over the licensing agreement between the patent holder, 
+Unisys, and CompuServe in 1994 spurred the development of the 
+Portable Network Graphics (PNG) standard; since then all the relevant 
+patents have expired. 
+
+Pronunciation
+!hline
+The creators of the format pronounced GIF with a soft 'G', as in 
+'gin'. An alternative pronunciation uses a hard 'G', as in 
+'graphics', reflecting the expanded acronym. Both pronunciations are 
+given as correct by the Oxford English Dictionary and the American 
+Heritage Dictionary.
+
+According to Steve Wilhite, the creator of the GIF format, the 
+original pronunciation deliberately echoes the American peanut butter 
+brand, Jif, and the employees of CompuServe would often say 'Choosy 
+developers choose GIF', spoofing this brand's television 
+commercials.
+
+History
+!hline
+The CompuServe GIF was created to upload documents to the CompuServe 
+Information Service and to pass documents between other types of 
+computers. One of the ideas behind designing GIF files was to create 
+the smallest possible image file for uploading and downloading from 
+electronic Bulletin Board Systems (BBS), thus producing a highly 
+compressed format that minimises file transfer time over phone lines. 
+The compression is accomplished by using the LZW method for (!link [palette] [Colour Depth]) 
+tables.
+
+The original version of the GIF format was called 87a. In 1989, 
+CompuServe devised an enhanced version, called 89a, which added 
+transparency (allows you to specify transparent areas in the image so 
+that the background on which the image is placed will come through), 
+support for animation delays (multiple images in a stream were 
+already supported in 87a), and storage of textual and application-
+specific metadata. The 89a specification also supports rendering 
+textual data with some parameters as a graphic, in a simple form, but 
+as there is little control over display fonts, this feature is not 
+widely used. The two versions can be distinguished by looking at the 
+first six bytes of the file (the 'magic number' or 'signature'), 
+which, when interpreted as ASCII, read 'GIF87a' and 'GIF89a', 
+respectively.
+
+Stream-Based Format
+!hline
+GIF was also designed as an image communications protocol used for 
+the interactive viewing of online images. Therefore, GIF is different 
+from many other common picture formats: it is stream-based. That 
+means that a communication program (for BBSs and the internet) can 
+download GIF files and view them from top to bottom as they are being 
+downloaded.
+
+Interlacing
+!hline
+Another feature of GIF allows the user to get a good idea of what the 
+image will look like before even half of the image is decoded. GIF 
+may use an optional encoding method referred to as interlacing. When 
+an image is saved by using four passes instead of just one, it is 
+called interlacing. On each pass, certain lines of the image are 
+saved to the file. If the program decoding a GIF file displays the 
+image as it is decoded, the user will be able to see the four passes 
+of the decoding cycle. If the user does not like the image, the 
+download can be aborted.
+
+Animation
+!hline
+The feature of storing multiple images in one file, accompanied by 
+control data, is used extensively on the web to produce simple 
+animations.
+
+GIF makes animations possible which repeats continually, or 
+animations which run once or several times and stop at the last frame.
+
+Graphics Applications
+!hline
+Both the 87a and 89a specifications allow (!link [palette] [Colour Depth]) or colour tables of 
+2^n colours for any n from 1 through 8. A small colour table may 
+suffice for small images, and keeping the colour table small allows 
+the file to be downloaded faster. Most graphics applications will 
+read and display GIF images with any of these table sizes, but some 
+do not support all sizes when creating images. Tables of 2, 16 and 
+256 colours are widely supported.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node GodPaint
+
+!begin_table [|l|l] !hline
+ Format            GodPaint
+!hline
+ Proper Name       GodPaint format
+!hline
+ Type              Bitmap
+!hline
+ File Extension    *.god
+!hline
+ MIME Media Type   None
+!hline
+ Colour Depth      16 bits
+!hline
+ Size              Maximum 64Kx64K pixels
+!hline
+ Compression       None
+!hline
+ Special Features  None
+!hline
+ Developer         Leon O'Reilly (Mr Pink / Reservoir Gods)
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+The GodPaint picture format was originally developed for the Atari 
+Falcon painting program of the same name. This format is limited to 
+65,536 colours, and the image data is always uncompressed.
+
+GodPaint, the Painting Program
+!hline
+Frustrated with the speed and reliability of the existing art 
+packages for the (!link [high-colour] [Colour Depth]) mode (65,536 colours) of the Falcon, Mr 
+Pink of the scene group Reservoir Gods wrote GodPaint.
+
+In 1994, Reservoir Gods were formed as a software team developing 
+products for Atari computers. They created an incredible amount of 
+high-quality shareware and freeware games. There releases included 
+the games Double Bobble 2000, Chu Chu Rocket, SuperFly and Clogged 
+Up. They used GodPaint to create all the graphics on all their 
+productions; and it was used by other groups, such as Avena in the 
+creation of such demos as Sonolumineszenz.
+
+!begin_center
+!image (!picture_path)godpaint
+
+   (!B)Figure.(!b) The (!link [high-colour] [Colour Depth]) graphics for the Atari Falcon game
+       Double Bobble 2000, a remake of the classic Taito
+       coin-op Bubble Bobble, were created with GodPaint
+!end_center
+
+
+GodPaint was written in 100% 68030 assembly language and has its own 
+custom WIMP (window, icon, menu and pointing device) environment, 
+dispensing with the sluggishness of GEM. It supports full 16-bit (!link [high-colour] [Colour Depth])
+mode with all 64 green levels, and features all the standard 
+drawing tools, multiple zoom windows, interpolative shading, 
+automatic anti-aliasing as well as support for a large number of 
+Falcon and ST file formats.
+
+
+!begin_center
+!image (!picture_path)godpaint2
+
+    (!B)Figure.(!b) GodPaint also has some unnecessary fun features
+                   (such as fractal drawing)
+!end_center
+
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node JPEG
+
+!begin_table [|l|l] !hline
+ Format            !! JPEG/JFIF and JPEG/Exif
+!hline
+ Proper Name       !! JPEG File Interchange Format
+                   !! JPEG Exchangeable Image File Format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.jpg, *.jpe, *.jpeg, *.jfi, *.jfif
+!hline
+ MIME Media Type   !! image/jpeg
+!hline
+ Colour Depth      !! 8 (greyscale) / 24 bits
+!hline
+ Size              !! Maximum 64Kx64K pixels
+!hline
+ Compression       !! JPEG
+!hline
+ Special Features  !! Platform-independent format
+                   !! Streamable format
+                   !! Thumbnail
+                   !! Baseline JPEG specification:
+                   !! - Lossy compression
+                   !! - Textual metadata
+                   !! Extensions:
+                   !! - Progressive image buildup
+                   !! - Arithmetic encoding
+                   !! - Lossless JPEG compression
+!hline
+ Developer         !! Joint Photographic Experts Group (compression)
+                   !! C-Cube Microsystems (JFIF)
+                   !! JEITA, JEIDA, CIPA (Exif)
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+JPEG, pronounced as 'jay - peg', is a commonly used method of lossy 
+compression for digital photography (image). The degree of 
+compression can be adjusted, allowing a selectable trade off between 
+storage size and image quality. JPEG typically achieves 10:1 
+compression with little perceptible loss in image quality.
+
+JPEG compression is used in a number of image file formats. JPEG/Exif 
+is the most common image format used by digital cameras and other 
+photographic image capture devices; along with JPEG/JFIF, it is the 
+most common format for storing and transmitting photographic images 
+on the internet. These format variations are often not distinguished, 
+and are simply called JPEG.
+
+JPEG stands for Joint Photographic Experts Group, the name of the 
+committee that created the JPEG standard and other standards. The 
+group was organised in 1986 and issued the first JPEG standard in 
+1992.
+
+The JPEG standard specifies the (!link [codec] [Codec]), which defines how an image is 
+compressed into a stream of bytes and decompressed back into an 
+image, but not the file format used to contain that stream. The JFIF 
+and Exif standards define the commonly used file formats for 
+interchange of JPEG-compressed images.
+
+JPEG Files
+!hline
+
+The file format known as JPEG Interchange Format (JIF) is specified 
+in Annex B of the JPEG standard. However, this 'pure' file format is 
+rarely used, primarily because of the difficulty of programming 
+encoders and decoders that fully implement all aspects of the 
+standard and because of certain shortcomings of the standard.
+
+For example, JIF does not define which colour encoding is to be used 
+for images. JFIF defines the (!link [colour model] [Colour Depth]) to be used: either Y for 
+greyscale, or YCbCr. Since this is not an absolute (!link [colour space] [Colour Depth]) - 
+unless an ICC profile, (!link [colour space] [Colour Depth]) metadata, or an sRGB tag is 
+provided and interpreted - a decoded JFIF image will be in a device-
+dependent (!link [RGB] [Colour Depth]) (!link [colour space] [Colour Depth]). Hence, JFIF does not by itself provide a 
+mechanism for accurately transporting colour-managed images across 
+the internet.
+
+Other details that are unspecified by JIF: component sub-sampling 
+registration, and resolution or aspect ratio definition.
+
+Several additional standards have evolved to address these issues. 
+The first of these, released in 1992, was JPEG File Interchange 
+Format (or JFIF), followed in recent years by Exchangeable Image File 
+Format (Exif) and ICC colour profiles. Both of these formats use the 
+actual JIF byte layout, consisting of different markers, but in 
+addition employ one of the JIF standard's extension points, namely 
+the application markers: JFIF use APP0, while Exif use APP1. Within 
+these segments of the file, that were left for future use in the JIF 
+standard and are not read by it, these standards add specific 
+metadata.
+
+Thus, in some ways JFIF is a cut-down version of the JIF standard in 
+that it specifies certain constraints (such as not allowing all the 
+different encoding modes), while in other ways it is an extension of 
+JIF due to the added metadata. The documentation for the original 
+JFIF standard states:
+
+!begin_quote
+ 'JPEG File Interchange Format is a minimal file format which enables 
+ JPEG bitstreams to be exchanged between a wide variety of platforms 
+ and applications. This minimal format does not include any of the 
+ advanced features found in the TIFF JPEG specification or any 
+ application specific file format. Nor should it, for the only 
+ purpose of this simplified format is to allow the exchange of JPEG 
+ compressed images.'
+!end_quote
+
+Image files that employ JPEG compression are commonly called 'JPEG 
+files', and are stored in variants of the JIF image format. Most 
+image capture devices (such as digital cameras) that output JPEG are 
+actually creating files in the Exif format, the format that the 
+camera industry has standardised on for metadata interchange. On the 
+other hand, since the Exif standard does not allow colour profiles, 
+most image editing software stores JPEG in JFIF format, and also 
+include the APP1 segment from the Exif file to include the metadata 
+in an almost-compliant way; the JFIF standard is interpreted somewhat 
+flexibly.
+
+Formally, the JFIF and Exif standards are incompatible because they 
+each specify that their marker segment (APP0 or APP1, respectively) 
+appears first. In practice, many programs and digital cameras produce 
+files with both application segments included. This will not affect 
+the image decoding for most decoders, but poorly designed JFIF or 
+Exif parsers may not recognise the file properly. Since most JPEG 
+files contain a JFIF marker segment that precedes the Exif header, 
+this allows older readers to correctly handle the older format JFIF 
+segment, while newer readers also decode the following Exif segment, 
+being less strict about requiring it to appear first.
+
+Many JPEG files embed an ICC colour profile. Commonly used colour 
+profiles include sRGB and Adobe (!link [RGB] [Colour Depth]). However, many applications are 
+not able to deal with JPEG colour profiles and simply ignore them.
+
+Both the JFIF and Exif standards allow a thumbnail of the main image 
+to be embedded inside the file.
+
+
+Typical Usage
+!hline
+The JPEG compression algorithm is at its best on photographs and 
+paintings of realistic scenes with smooth variations of tone and 
+colour. For web usage, where the amount of data used for an image is 
+important, JPEG is very popular. JPEG/Exif is also the most common 
+format saved by digital cameras.
+
+On the other hand, JPEG may not be as well suited for line drawings 
+and other textual or iconic graphics, where the sharp contrasts 
+between adjacent pixels can cause noticeable artifacts. Such images 
+may be better saved in a lossless graphics format such as TIFF, GIF, 
+PNG, or a raw image format. The JPEG standard actually includes a 
+lossless coding mode, but that mode is not supported in most 
+products.
+
+As the typical use of JPEG is a lossy compression method, which 
+somewhat reduces the image fidelity, it should not be used in 
+scenarios where the exact reproduction of the data is required (such 
+as some scientific and medical imaging applications and certain 
+technical image processing work).
+
+JPEG is also not well suited to files that will undergo multiple 
+edits, as some image quality will usually be lost each time the image 
+is decompressed and recompressed, particularly if the image is 
+cropped or shifted, or if encoding parameters are changed. To avoid 
+this, an image that is being modified or may be modified in the 
+future can be saved in a lossless format, with a copy exported as 
+JPEG for distribution.
+
+!label JPEG Compression
+JPEG Compression
+!hline
+JPEG is different in that it is primarily a lossy method of 
+compression. Most popular image format compression schemes, such as 
+RLE, LZW, or the CCITT standards, are lossless compression methods. 
+That is, they do not discard any data during the encoding process. An 
+image compressed using a lossless method is guaranteed to be 
+identical to the original image when uncompressed. Lossy schemes, on 
+the other hand, throw useless data away during encoding. This is, in 
+fact, how lossy schemes manage to obtain superior compression ratios 
+over most lossless schemes. JPEG was designed specifically to discard 
+information that the human eye cannot easily see. Slight changes in 
+colour are not perceived well by the human eye, while slight changes 
+in intensity (light and dark) are. Therefore, JPEG's lossy encoding 
+tends to be more frugal with the greyscale part of an image and to be 
+more frivolous with the colour.
+
+The amount of compression achieved depends upon the content of the 
+image data. A typical photographic-quality image may be compressed 
+from 20:1 to 25:1 without experiencing any noticeable degradation in 
+quality. Higher compression ratios will result in image files that 
+differ noticeably from the original image but still have an overall 
+good image quality. And achieving a 20:1 or better compression ratio 
+in many cases not only saves disk space but also reduces transmission 
+time across data networks and phone lines. Therefore, along with GIF, 
+JPEG is one of the two standard image file formats used on web pages.
+
+An end user can 'tune' the quality of a JPEG encoder using a 
+parameter sometimes called a 'quality setting' or a 'Q factor'. 
+Although different implementations have varying scales of Q factors, 
+a range of 1 to 100 is typical. A factor of 1 produces the smallest, 
+worst quality images; a factor of 100 produces the largest, best 
+quality images. The optimal Q factor depends on the image content and 
+is therefore different for every image. The exact threshold at which 
+errors become visible also depends on your viewing conditions. The 
+smaller an individual pixel, the harder it is to see an error; so 
+errors are more visible on a computer screen (at 70 or so dots/inch) 
+than on a high-quality colour printout (300 or more dots/inch). Thus, 
+a higher-resolution image can tolerate more compression which is 
+fortunate considering it is much bigger to start with. The art of 
+JPEG compression is finding the lowest Q factor that produces an 
+image that is visibly acceptable, and preferably as close to the 
+original as possible.
+
+A question that commonly arises is 'At what Q factor does JPEG become 
+lossless?' The answer is 'Never.' Baseline JPEG is a lossy method of 
+compression regardless of adjustments you may make in the parameters. 
+In fact, DCT-based encoders are always lossy, because roundoff errors 
+are inevitable in the colour transformation and DCT steps (see 
+section Encoding and Decoding Process, below). You can suppress 
+deliberate information loss in the downsampling and quantisation 
+steps, but you still will not get an exact recreation of the original 
+bits. Further, this minimum-loss setting is a very inefficient way to 
+use lossy JPEG.
+
+Compression Artifacts
+!hline
+Those who use the internet may be familiar with the irregularities 
+known as compression artifacts that appear in JPEG images, which may 
+take the form of noise around contrasting edges (especially curves 
+and corners), or blocky images, commonly known as 'jaggies'. They are 
+especially noticeable around sharp corners between contrasting 
+colours (text is a good example as it contains many such corners). 
+The analogous artifacts in MPEG video are referred to as mosquito 
+noise as the resulting 'edge busyness' and spurious dots, which 
+change over time, resemble mosquitoes swarming around the object.
+
+Baseline Specification
+!hline
+The JPEG specification defines a minimal subset of the standard 
+called baseline JPEG, which all JPEG-aware applications are required 
+to support. This baseline uses an encoding scheme based on the 
+Discrete Cosine Transform (DCT) to achieve compression. DCT is a 
+generic name for a class of operations identified and published some 
+time ago. DCT-based algorithms have since made their way into various 
+compression methods.
+
+DCT algorithms are capable of achieving a high degree of compression 
+with only minimal loss of data. This scheme is effective only for 
+compressing continuous-tone images in which the differences between 
+adjacent pixels are usually small. In practice, JPEG works well only 
+on images with depths of at least four or five bits per (!link [colour] [Colour Depth]) 
+(!link [channel] [Colour Depth]). The baseline standard actually specifies 8 bits per input 
+(!link [channel] [Colour Depth]). Data of lesser bit depth can be handled by scaling it up to 
+8 bits per (!link [channel] [Colour Depth]), but the results will be bad for low-bit-depth 
+source data, because of the large jumps between adjacent pixel 
+values. For similar reasons, (!link [colour-mapped] [Colour Depth]) source data does not work 
+very well, especially if the image has been dithered.
+
+Encoding and Decoding Process
+!hline
+Here is a brief description of the encoding process that consists of 
+several steps:
+!begin_itemize
+!item (!link [Colour space] [Colour Depth]) transformation: The representation of the colours in 
+the image is converted from (!link [RGB] [Colour Depth]) to YCbCr, consisting of one luma 
+component (Y), representing brightness, and two chroma components 
+(Cb and Cr), representing colour. However, some JPEG 
+implementations in 'highest quality' mode do not apply this step 
+and instead keep the colour information in the (!link [RGB] [Colour Depth]) (!link [colour model] [Colour Depth]).
+!item Downsampling: The resolution of the chroma data is reduced, 
+usually by a factor of 2. This reflects the fact that the eye is 
+less sensitive to fine colour details than to fine brightness 
+details. Remarkably, this 50 percent reduction in data volume has 
+almost no effect on the perceived quality of most images.
+!item Block splitting: The image is split into blocks of 8x8 pixels
+!item DCT: For each block, each of the Y, Cb, and Cr data undergoes a 
+Discrete Cosine Transform. It is similar to a Fourier transform in 
+the sense that it produces a kind of spatial frequency spectrum. 
+The DCT step itself is lossless except for roundoff errors.
+!item Quantisation: The amplitudes of the frequency components are 
+quantised. Human vision is much more sensitive to small variations 
+in colour or brightness over large areas than to the strength of 
+high-frequency brightness variations. Therefore, the magnitudes of 
+the high-frequency components are stored with a lower accuracy 
+than the low-frequency components. The quality setting of the 
+encoder (for example, 50 or 95 on a scale of 0-100 in the 
+Independent JPEG Group's library; this library is used by zView) 
+affects to what extent the resolution of each frequency component 
+is reduced. If an excessively low quality setting is used, the 
+high-frequency components are discarded altogether.
+!item Additional compression: The resulting data for all 8x8 blocks is 
+further compressed with a lossless algorithm, a variant of Huffman 
+encoding.
+!end_itemize
+
+
+The decoding process reverses these steps, except the downsampling 
+and quantisation steps because they are irreversible (information 
+loss in that steps).
+
+Extensions to the Specification
+!hline
+Only the baseline specification for JPEG have been examined thus far. 
+A number of extensions have been defined in Part 1 of the JPEG 
+specification that provide progressive image buildup (see next 
+section), improved compression ratios using arithmetic encoding 
+(slower and you need a license) and a lossless compression scheme. 
+These features are beyond the needs of most JPEG implementations and 
+have therefore been defined as 'not required to be supported' 
+extensions to the JPEG standard.
+
+Progressive JPEG
+!hline
+Progressive image buildup is ideal for large images that will be 
+displayed while downloading over a slow connection, allowing a 
+reasonable preview after receiving only a portion of the data. A 
+baseline JPEG image can be displayed only after all of the image data 
+has been received and decoded. Using a conventional compression 
+method, this means displaying the first few scan lines of the image 
+as it is decoded. In this case, even if the scan lines were 
+interlaced, you would need at least 50 percent of the image data to 
+get a good clue as to the content of the image. The progressive 
+buildup extension of JPEG offers a better solution.
+
+Progressive buildup allows an image to be sent in layers rather than 
+scan lines. But instead of transmitting each (!link [bit plane] [Colour Depth]) or (!link [colour] [Colour Depth]) 
+(!link [channel] [Colour Depth]) in sequence (which would not be very useful), a succession of 
+images built up from approximations of the original image are sent. 
+The first scan provides a low-accuracy representation of the entire 
+image - in effect, a very low-quality JPEG compressed image. 
+Subsequent scans gradually refine the image by increasing the 
+effective quality factor. If the data is displayed on the fly, you 
+would first see a crude, but recognisable, rendering of the whole 
+image. This would appear very quickly because only a small amount of 
+data would need to be transmitted to produce it. Each subsequent scan 
+would improve the displayed image's quality one block at a time. Of 
+course, this means that each scan of a progressive JPEG takes 
+essentially a full JPEG decompression cycle to display.
+
+However, progressive JPEGs are not as widely supported, and even some 
+software which does support them (such as some versions of 
+Microsoft's web browser Internet Explorer for Windows) only displays 
+the image once it has been completely downloaded.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node LDG System
+
+In French, LDG stands for Librairies Dynamiques GEM or, in English, 
+GEM Dynamical Libraries. It is a protocol allowing GEM applications 
+to load and share libraries (or plugins if you prefer). The goal of 
+LDG is to provide some useful functions to GEM applications like the 
+WinDeath DDL. These libraries are dynamical, for example, they are 
+loaded when the application need it and unloaded when they are 
+unused. These libraries may be shared with several clients. Libraries 
+can have special rights, such as unshareable, memory resident or 
+locked. The LDG works with all TOS-compatible computers, and TOS-
+compatible operating systems such as MagiC, Geneva, MiNT or plain TOS.
+
+LDG has several advantages compared to MagiC Shared Libraries (SLB):
+
+!begin_itemize
+!item LDG libraries are dynamical. They can be loaded or unloaded 
+dynamically. Magic loads SLB libraries while booting: unused 
+libraries can decrease free memory dramatically. However, FreeMiNT 
+since version 1.15(?) handles SLB dynamically.
+
+!item LDG libraries can be shared, duplicated or not. SLB libraries are 
+always shared.
+
+!item An LDG library is easy to create compared to an SLB library, no 
+assembler is required.
+
+!item LDG works currently on any TOS-based system.
+
+!item LDG can work without any system extension. SLB can only be used 
+using an SLB driver (MagiC, FreeMiNT, and plain TOS with MetaDOS 
+extension). For example, the LDG installer works perfectly with 
+plain TOS although it uses the FileUtil LDG library.
+
+!end_itemize
+
+You can download the LDG system extension from (!url [ldg.sourceforge.net] [http://ldg.sourceforge.net/]).
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node NEOchrome
+
+!begin_table [|l|l] !hline
+ Format            !! NEOchrome
+!hline
+ Proper Name       !! NEOchrome format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.neo, *.ani
+!hline
+ MIME Media Type   !! None
+!hline
+ Colour Depth      !! 1/2/4 bits
+!hline
+ Size              !! 320x200x4, 640x200x2, 640x400x1 pixels
+!hline
+ Compression       !! None
+!hline
+ Special Features  !! Colour animation effects (NEO)
+                   !! Real animation format (ANI)
+!hline
+ Developer         Dave Staugas
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+The NEOchrome format was originally developed for use with the 
+painting program of the same name. It is limited in that it can only 
+represent ST screen-sized images with 2, 4, or 16 colours. Images are 
+always uncompressed.
+
+NEOchrome, the Painting Program
+!hline
+The NEOchrome picture format was a product of the Atari ST painting 
+program NEOchrome. It was an early bitmap graphics editor for the 
+Atari ST computer family and was written by Dave Staugas, a system 
+programmer at Atari and co-author of the ST's operating system. Along 
+with the first Amiga versions of Deluxe Paint, NEOchrome was one of 
+the earliest mainstream bitmap editors to use the then-novel 
+graphical user interface.
+
+
+!begin_center
+!image (!picture_path)neochrome
+
+  (!B)Figure.(!b) NEOchrome v1.0 with the famous image of a waterfall.
+          This can be used to demonstrate NEOchrome's
+               colour cycling animation facility
+!end_center
+
+
+An early sampler version (v0.5) was released as part of the system 
+disks of the first STs. A 'proper' version 1.0 arrived later, and was 
+bundled with several versions of the ST. Although not officially 
+public domain, this version was often treated as such, and was never 
+actually sold. As a result of this, NEOchrome enjoyed a relatively 
+high level of popularity within the ST community, even in the face of 
+more advanced packages such as DEGAS Elite and Deluxe Paint.
+
+Although there were no further official versions, an unofficial 
+revision called NEOchrome Master was released in the early 1990s by 
+Chaos, Inc. of the demo group The Delta Force. NEOchrome Master was 
+built by reassembling the binary program NEOchrome 1.0. This allowed 
+the author to extend the program. Many extensions were built into the 
+program, and various versions were released to the public.
+
+
+!begin_center
+!image (!picture_path)neochrome_master
+
+      (!B)Figure.(!b) NEOchrome Master features many enhancements,
+        for example, some powerful raster functions and
+         real-time zooming (as well as static zooming)
+!end_center
+
+
+NEOchrome Format
+!hline
+The only supported resolutions by NEOchrome are those of the Atari 
+ST: 320x200 pixels in 16 colours, 640x200 in 4 colours and 640x400 
+monochrome. The format is uncompressed and supports animation effects 
+by changing the values in the (!link [palette] [Colour Depth]). In addition, there is a 
+NEOchrome Animation format (ANI), which contains one or more frames 
+of animation data stored in their playback order. The file extension 
+is *.ani.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node PDF
+
+!begin_table [|l|l] !hline
+ Format            !! PDF
+!hline
+ Proper Name       !! Portable Document Format
+!hline
+ Type              !! Document
+!hline
+ File Extension    !! *.pdf
+!hline
+ MIME Media Type   !! application/pdf
+!hline
+ Colour Depth      !! Any
+!hline
+ Size              !! Maximum size of a page is 1.14x1.14 m (up to
+                   !! PDF 1.3), 5.08x5.08 m (up to 1.6) or 381x381 km 
+                   !! (since 1.7)
+!hline
+ Compression       !! Many compression schemes
+!hline
+ Special Features  !! Independent of the original design application
+                   !! Platform- and resolution-independent
+                   !! Open standard
+                   !! Text search features
+                   !! Textual metadata
+                   !! Bookmark navigation
+                   !! Text with links
+                   !! Completable forms
+                   !! Annotating
+                   !! JavaScript actions
+                   !! Multimedia elements
+                   !! And much more
+!hline
+ Developer         !! Adobe Systems
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+Portable Document Format (PDF) is an open standard for document 
+exchange. This file format created by Adobe Systems in 1993 is used 
+for representing documents in a manner that is independent of the 
+original application software, hardware and operating systems. Each 
+PDF file encapsulates a complete description of a fixed-layout flat 
+document, including the text, fonts, graphics and other information 
+needed to display it.
+
+
+!begin_center
+!image (!picture_path)adobe
+
+                   (!B)Figure.(!b) The Adobe PDF logo
+!end_center
+
+
+While the PDF specification was available for free since at least 
+2001, PDF was originally a proprietary format controlled by Adobe, 
+and was officially released as an open standard in 2008 and published 
+by the International Organization for Standardization as ISO
+32000-1:2008. Also in 2008, Adobe published a Public Patent License 
+to ISO 32000-1 granting a royalty-free rights for all patents owned 
+by Adobe that are necessary to make, use, sell and distribute PDF 
+compliant implementations.
+
+History
+!hline
+PDF's adoption in the early days of the format's history was slow. 
+Adobe Acrobat, Adobe's suite for reading and creating PDF files, was 
+not freely available; early versions of PDF had no support for 
+external hyperlinks, reducing its usefulness on the internet; the 
+larger size of a PDF document compared to plain text required longer 
+download times over the slower modems common at the time; and 
+rendering PDF files was slow on the less powerful machines of the 
+day. Additionally, there were competing formats such as DjVu (still 
+developing), Envoy, Common Ground Digital Paper, Farallon Replica and 
+even Adobe's own PostScript format (*.ps); in those early years, 
+PDF was popular mainly in desktop publishing workflows.
+
+Adobe soon started distributing its Acrobat Reader (now Adobe Reader) 
+program at no cost, and continued supporting the original PDF, which 
+eventually became the de facto standard for printable documents on 
+the web (a standard web document).
+
+
+Adobe's PDF Specifications
+!hline
+Adobe changed the PDF specification several times and continues to 
+develop new specifications with new versions of Adobe Acrobat. There 
+have been nine versions of PDF with corresponding Acrobat 
+releases:
+!begin_itemize !compressed
+!item 1993 (!arrowright) PDF 1.0 / Acrobat 1.0
+!item 1994 (!arrowright) PDF 1.1 / Acrobat 2.0
+!item 1996 (!arrowright) PDF 1.2 / Acrobat 3.0
+!item 1999 (!arrowright) PDF 1.3 / Acrobat 4.0
+!item 2001 (!arrowright) PDF 1.4 / Acrobat 5.0
+!item 2003 (!arrowright) PDF 1.5 / Acrobat 6.0
+!item 2005 (!arrowright) PDF 1.6 / Acrobat 7.0
+!item 2006 (!arrowright) PDF 1.7 / Acrobat 8.0
+!item 2006 (!arrowright) PDF 1.7 / Acrobat 8.2
+!item 2008 (!arrowright) PDF 1.7, Adobe Extension Level 3 / Acrobat 9.0
+!item 2009 (!arrowright) PDF 1.7, Adobe Extension Level 5 / Acrobat 9.1
+!end_itemize
+
+
+The ISO standard ISO 32000-1:2008 and Adobe PDF 1.7 are technically 
+consistent. Adobe declared that it is not producing a PDF 1.8 
+Reference. The future versions of the PDF specification will be 
+produced by ISO technical committees. However, Adobe published 
+documents specifying what extended features for PDF, beyond ISO 32000-
+1 (PDF 1.7), are supported in its newly released products. This makes 
+use of the extensibility features of PDF as documented in ISO 32000-1 
+in Annex E. Adobe declared all extended features in Adobe Extension 
+Level 3 and 5 have been accepted for a new proposal of ISO 32000-2 
+(also known as PDF 2.0).
+
+The specifications for PDF are backward inclusive. The PDF 1.7 
+specification includes all of the functionality previously documented 
+in the Adobe PDF Specifications for versions 1.0 through 1.6. Where 
+Adobe removed certain features of PDF from their standard, they too 
+are not contained in ISO 32000-1.
+
+PDF documents conforming to ISO 32000-1 carry the PDF version number 
+1.7. Documents containing Adobe extended features still carry the PDF 
+base version number 1.7 but also contain an indication of which 
+extension was followed during document creation.
+
+Content
+!hline
+A PDF file is often a combination of vector graphics, text and bitmap 
+graphics. The basic types of content in a PDF are:
+!begin_itemize !compressed
+!item text stored as content streams (this means not as text),
+!item vector graphics for illustrations and designs that consist 
+of shapes and lines, and
+!item raster graphics (bitmaps) for photographs and other types of image.
+!end_itemize
+
+
+In later PDF revisions, a PDF document also allows interactive 
+elements, such as bookmarks (they appear on the left side of a PDF 
+document and take the reader to a specific page), links (in-text 
+clickable links directly to a page inside the document, to another 
+file or to a web page), annotations (annotate, highlight, and add 
+notes to already created PDF files), completable form fields and its 
+programming with JavaScript (initially available as plugin for 
+Acrobat 3.0), or any other types of embedded contents that can be 
+handled using plugins.
+
+File Size
+!hline
+Two PDF files that look similar on a computer screen may be of very 
+different sizes. For example, a high resolution raster image takes 
+more space than a low resolution one. Typically higher resolution is 
+needed for printing documents than for displaying them on screen. 
+Other things that may increase the size of a file is embedding full 
+fonts, especially for Asiatic scripts and storing text as graphics.
+
+Usage Restrictions
+!hline
+
+A PDF file may be encrypted for security. The standard security 
+provided by Acrobat PDF consists of two different methods and two 
+different passwords, 'user password' and 'owner password'. A PDF 
+document may be protected by password to open (user password) and the 
+document may also specify operations that should be restricted even 
+when the document is decrypted: printing, copying text and graphics 
+out of the document, modifying the document, or adding or modifying 
+text notes and form fields (using owner password). However, if only a 
+owner password is used, all operations which are restricted by this 
+password are trivially circumvented by many commonly available 'PDF 
+cracking' software and even freely online, and if circumvented these 
+restrictions no longer let the author control what can and cannot be 
+done with the PDF file once distributed.
+
+Even without removing the password, most freeware or open source PDF 
+readers will ignore the permission 'protections' and will allow the 
+user to print or make copy of excerpts of the text as if the document 
+were not limited by password protection.
+
+Technical Foundations
+!hline
+PDF is primarily the combination of three technologies:
+!begin_itemize !compressed
+!item a cut-down form of PostScript for generating the layout and 
+graphics,
+!item a font-embedding/replacement system to allow fonts to travel with 
+the documents, and
+!item a structured storage system to bundle these elements into a single 
+file, with data compression where appropriate.
+!end_itemize
+
+Fonts
+!hline
+A font object in PDF is a description of a digital typeface. It may 
+either describe the characteristics of a typeface, or it may include 
+an embedded font file. The latter case is called an embedded font 
+while the former is called an unembedded font. The font files that 
+may be embedded are based on widely used standard digital font 
+formats: Type 1 (and its compressed variant CFF), TrueType and 
+(beginning with PDF 1.6) OpenType. Additionally PDF supports the Type 
+3 variant in which the components of the font are described by PDF 
+graphic operators.
+
+There are fourteen Type 1 fonts known as 'standard 14 fonts' that 
+have a special significance to PDF documents:
+!begin_itemize !compressed
+!item Times (v3) (in regular, italic, bold and bold italic)
+!item Courier (in regular, oblique, bold and bold oblique)
+!item Helvetica (v3) (in regular, oblique, bold and bold oblique)
+!item Symbol
+!item Zapf Dingbats
+!end_itemize
+
+These fonts are sometimes also referred to as the 'base fourteen 
+fonts'. These fonts, or suitable substitute fonts with the same 
+metrics, must always be available in all PDF readers and so need not 
+be embedded in a PDF. PDF viewers must know about the metrics of 
+these fonts. Other fonts may be substituted if they are not embedded 
+in a PDF.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node PNG
+
+!begin_table [|l|l] !hline
+ Format            !! PNG
+!hline
+ Proper Name       !! Portable Network Graphics format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.png
+!hline
+ MIME Media Type   !! image/png
+!hline
+ Colour Depth      !! (!link [Indexed colour] [Colour Depth]): 1/2/4/8 bits
+                   !! Greyscale:      1/2/4/8(16)/16(32) bits
+                   !! (!link [True colour] [Colour Depth]):    24(32)/48(64) bits
+                   !! ((!link [Colour depth] [Colour Depth]) in brackets = incl. (!link [alpha channel] [Alpha Channel]))
+!hline
+ Size              !! Maximum 2Gx2G pixels
+!hline
+ Compression       !! Deflate (Zip) with special preprocessing filters
+!hline
+ Special Features  !! Platform-independent format
+                   !! Streamable format
+                   !! Open standard
+                   !! (!link [RGB] [Colour Depth]) (!link [true-colour] [Colour Depth]) images with 8- and 16-bit (!link [channels] [Colour Depth])
+                   !! Greyscale images up to 16-bit
+                   !! 8- and 16-bit (!link [alpha channel] [Alpha Channel])
+                   !! 8-bit alpha value for (!link [indexed-colour] [Colour Depth]) images
+                   !! Transparency (for images without (!link [alpha channel] [Alpha Channel]))
+                   !! Interlacing (seven-pass scheme: Adam7)
+                   !! CRC method for data stream corruption detection
+                   !! Background colour
+                   !! Colour correction
+                   !! Gamma correction
+                   !! Textual metadata
+!hline
+ Developer         !! PNG Development Group (donated to W3C)
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+PNG, sometimes pronounced as 'ping', is a bitmapped image format that 
+employs lossless data compression. PNG was largely developed to deal 
+with some of the shortcomings of the GIF format and allows storage of 
+images with greater (!link [colour depth] [Colour Depth]) and other important information. The 
+initialism PNG can also be interpreted as a recursive initialism for 
+'PNG's Not GIF'.
+
+PNG supports (!link [palette-based] [Colour Depth]) images (with (!link [palettes] [Colour Depth]) of 24-bit (!link [RGB] [Colour Depth]) or 32-
+bit (!link [RGBA] [Colour Depth]) colours), greyscale images (with or without (!link [alpha channel] [Alpha Channel])), 
+and (!link [RGB[A!]] [Colour Depth]) images (with or without (!link [alpha channel] [Alpha Channel])). PNG was designed 
+for transferring images on the internet, not for professional-quality 
+print graphics, and therefore does not support non-(!link [RGB] [Colour Depth]) (!link [colour spaces] [Colour Depth]) 
+such as CMYK.
+
+In 2004, PNG was published as an ISO/IEC standard.
+
+History
+!hline
+The motivation for creating the PNG format came in early 1995, after 
+Unisys announced that it would be enforcing software patents on the 
+LZW data compression algorithm used for GIF (in 2003 the patent 
+expired). There were also other problems with the GIF format which 
+made a replacement desirable, notably its limitation to 256 colours 
+at a time when computers capable of displaying far more than 256 
+colours were becoming common. Although GIF allows for animation, it 
+was decided that PNG should be a single-image format. A companion 
+format called Multiple-image Network Graphics (MNG) has been defined 
+for animation, whereas a competing format, Animated Portable Network 
+Graphics (APNG), supports backward-compatibility with PNG (which MNG 
+does not). PNG gained some additional popularity in August 1999, 
+after Unisys terminated its royalty-free patent licenses to 
+developers of free software and non-commercial software.
+
+
+Compression
+!hline
+PNG uses a non-patented lossless data compression method known as 
+Deflate. This method is combined with prediction, where for each 
+image line, a filter method is chosen that predicts the colour of 
+each pixel based on the colours of previous pixels and subtracts the 
+predicted colour of the pixel from the actual colour. An image line 
+filtered in this way is often more compressible than the raw image 
+line would be. On most images, PNG can achieve greater compression 
+than GIF, but some implementations make poor choices of filter 
+methods and therefore produce unnecessarily large PNG files.
+
+Transparency
+!hline
+The GIF file format has allowed portions of images to be transparent, 
+allowing them to appear to have a shape that is not rectangular. 
+However, the GIF method was considered to be insufficient because it 
+only allowed individual pixels to be fully transparent or fully 
+opaque. The PNG format allows three different styles of transparency: 
+one for (!link [indexed-colour] [Colour Depth]) images and two for greyscale or (!link [true-colour] [Colour Depth]) 
+images. For (!link [indexed-colour] [Colour Depth]) images, a table of 8-bit alpha values 
+(numeric values representing levels of partial transparency from 
+fully transparent to fully opaque) for (!link [palette] [Colour Depth]) entries is stored. Any 
+(!link [palette] [Colour Depth]) entries that do not have a corresponding alpha value are 
+considered to be fully opaque. For greyscale and (!link [true-colour] [Colour Depth]) images, 
+either a single colour value can be set as transparent, or an (!link [alpha] [Alpha Channel]) 
+(!link [channel] [Colour Depth]) of the same bit depth as the main (!link [channels] [Colour Depth]) can be added to 
+the image. It should be noted that an (!link [alpha channel] [Alpha Channel]) cannot be used 
+with a 1-, 2- or 4-bit greyscale image though such an image could be 
+stored in a PNG by defining it as paletted and putting the alpha 
+values into the (!link [palette] [Colour Depth]).
+
+Interlacing
+!hline
+PNG image data is typically stored as a series of scan lines starting 
+with the first line at the top of the image and progressing 
+sequentially to the last line at the bottom of the image. PNG image 
+data may also be stored in a specific interlace pattern to allow a 
+progressive display of the image data from a low resolution to a full 
+resolution display.
+
+Progressive display is most useful when receiving a PNG file over a 
+slow transmission link (like the one that connects your web browser 
+to the internet). The gradual 'fade in' effect typically allows a 
+user to discern the content of the image before it has displayed in 
+its entirety. This feature is very useful if the image is a menu on a 
+web page or a picture that you do not wish to waste the time 
+downloading. It is also a requirement that all PNG readers be able to 
+interpret interlaced image data, although PNG viewers need not 
+support the ability to perform a progressive display.
+
+A typical interlace scheme, such as that used by GIF, simply 
+rearranges the order in which the scan lines are stored. For example, 
+rather than storing lines sequentially as 0, 1, 2, 3, 4, 5, 6, ..., 
+an interlace scheme might store scan lines as 0, 8, 4, 9, 2, 10, 5, 
+... in the file. GIF uses this type of interlacing scheme and stores 
+(or transmits) image data in four passes of 1/8, 1/8, 1/4 and 1/2. 
+PNG takes a somewhat different approach by interlacing images using a 
+seven-pass scheme known as Adam7, after its inventor Adam M. 
+Costello. Adam7 uses the first six passes to build up all even-
+numbered scan lines (0, 2, 4, 6, ...) and the final (seventh) pass to 
+fill in the remaining odd-numbered scan lines (1, 3, 5, 7, ...) in 
+the image. Rather than containing the pixels for entire scan lines, 
+the initial six passes contain specific pixels of only every other 
+scan line. The first two passes each contain 1/64th of the pixels in 
+the image. The third pass contains 1/32nd, the fourth pass 1/16th, 
+the fifth pass 1/8th, the sixth pass 1/4th and the seventh (final) 
+pass 1/2 of the image data. The image itself is built up on the 
+display, first as 8x8 squares, then 4x8 rectangles, then 4x4 squares, 
+then 2x4 rectangles, then 2x2 squares and then 1x2 rectangles. The 
+final pass fills in the pixels of the odd-numbered scan lines.
+
+Adam7 interlacing allows the progressive buildup of pixels to appear 
+much more quickly on the display than it would if entire scan lines 
+were displayed. The pixels in the image are also displayed in a more 
+dispersed pattern, allowing the human eye to discern the typical 
+interlaced PNG image after only 20 to 30 percent of the image data 
+has been received, compared with the 50 percent or more needed from 
+the GIF interlacing scheme. Note, however, that PNG's interlacing 
+method does trade off a bit of size for speed. The GIF interlacing 
+scheme simply rearranges the storage order of scan lines and does not 
+have much impact on the storage space per scan line. In the PNG 
+scheme, each pass except the last carries non-adjacent pixels; for 
+example, pass 1 contains every 8th pixel from every 8th line. On the 
+average, there is less correlation between such pixels than there is 
+between adjacent pixels. This means that compression is less 
+effective on the interlaced data than it is on sequentially presented 
+data, so the resulting file is bigger. Typically, an interlaced file 
+will be up to 10 percent larger than an equivalent non-interlaced 
+file. For most applications where interlacing is useful, this price 
+is well worth paying in exchange for faster buildup of a useful image.
+
+
+Web Browser Support for PNG
+!hline
+Despite calls by the Free Software Foundation and the World Wide Web 
+Consortium (W3C), tools such as gif2png, and campaigns such as Burn 
+All (!link [GIFs] [GIF]), PNG adoption on websites has been fairly slow due to late 
+and buggy support in Microsoft's web browser Internet Explorer 
+(Windows). Versions below 9.0 have numerous problems which prevent it 
+from correctly rendering PNG images.
+
+GIF is found to be in use more than PNG for further reasons:
+!begin_itemize !compressed
+!item PNG images are less widely supported (for example, older web 
+browsers and office software).
+!item GIF intrinsically supports animated images, whereas PNG supports 
+animation only via unofficial extensions (see section History, 
+above).
+!end_itemize
+
+Image Editing Software
+!hline
+Image editing software varies in its treatment of PNGs.
+
+Because GIF is limited to 256 colours, image editors must 
+automatically reduce the (!link [colour depth] [Colour Depth]) when saving an image in GIF 
+format. Often, when people save the same (!link [true-colour] [Colour Depth]) image as PNG and 
+GIF, they see that the GIF is smaller, and do not realise that this 
+is due to the (!link [colour depth] [Colour Depth]) reduction, and that it is possible to 
+create a 256-colour PNG that has identical quality to the GIF with a 
+smaller file size. Further, some tools may automatically create PNG 
+files as 24-bit, even if the source image is 8-bit, bloating the 
+file. This leads to the misconception that PNG files are larger than 
+equivalent GIF files.
+
+Some versions of Adobe Photoshop, CorelDRAW and MS Paint provide poor 
+PNG compression effort, further fueling the idea that PNG is larger 
+than GIF. Many PC and Mac graphics programs save PNGs with large 
+amounts of metadata as well as gamma- and colour-correction data that 
+are generally unnecessary for web viewing.
+
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node TGA
+
+!begin_table [|l|l] !hline
+ Format            !! TGA
+!hline
+ Proper Name       !! Truevision Graphics Adapter format
+                   !! TARGA (Graphics Adapter) format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.tga (*.tpic on Mac systems)
+!hline
+ MIME Media Type   !! image/x-tga
+!hline
+ Colour Depth      !! 8/15(16)/16/24/24(32) bits
+                   !! ((!link [Colour depth] [Colour Depth]) in brackets = incl. overlay bit or 
+                   !! (!link [alpha channel] [Alpha Channel]))
+!hline
+ Size              !! Maximum 64Kx64K pixels
+!hline
+ Compression       !! None / Macintosh RLE (Packbits)
+!hline
+ Special Features  !! TGA Version 1.0:
+                   !! - (!link [Alpha channel] [Alpha Channel])
+                   !! TGA Version 2.0:
+                   !! - Postage stamp (better known as thumbnail)
+                   !! - Colour correction
+                   !! - Gamma correction
+                   !! - Background colour
+                   !! - Textual metadata
+                   !! - Pixel aspect ratio
+                   !! - Developer-definable data
+!hline
+ Developer         !! Truevision
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+Truevision TGA, often referred to as TARGA, is a raster graphics 
+(bitmap) file format created by Truevision Inc. (now acquired by Avid 
+Technology) that was introduced in 1984. It was the native format of 
+TARGA and VISTA boards, which were the first graphics cards for IBM-
+compatible PCs to support (!link [high-colour] [Colour Depth])/(!link [true-colour] [Colour Depth]) display. This 
+family of graphics cards was intended for professional computer image 
+synthesis and video editing with PCs; for this reason, usual 
+resolutions of TGA image files match those of the NTSC and PAL video 
+formats.
+
+TARGA is an acronym for Truevision Advanced Raster Graphics Adapter; 
+TGA is an initialism for Truevision Graphics Adapter.
+
+The format can store image data with 8, 16, 24, or 32 bits - the 
+maximum 24 bits of (!link [RGB] [Colour Depth]) and an extra 8-bit (!link [alpha channel] [Alpha Channel]). Colour data 
+can be (!link [colour-mapped] [Colour Depth]), or in (!link [direct-colour] [Colour Depth]) or (!link [true-colour] [Colour Depth]) format.
+
+TGA files are in widespread use due to their simplicity and ease of 
+implementation and lack of encumbering patents.
+
+
+Old and New TGA Format
+!hline
+In 1989, the TGA format was revised, and Truevision has chosen to 
+designate the old and new formats as original TGA format and new TGA 
+format, respectively. The original TGA format is very simple in 
+design and quite easy to implement in code. This makes it an 
+appealing format for developers to work with. As the available 
+hardware technology has become more complex, however, additional file 
+format features, such as the storage of gamma- and colour-correction 
+information and pixel-aspect-ratio data, have become necessary. The 
+new TGA format was created as a wrapper around the original TGA 
+format to add functionality without sacrificing backwards 
+compatibility with older applications.
+
+Usage
+!hline
+At the time, another technically superior file format called TIFF 
+also appeared, but its use for (!link [true-colour] [Colour Depth]) images was very limited as 
+the implementation and sharing of files between applications 
+supporting the TIFF specification was rather difficult and involved. 
+The TGA file format's simplistic nature and portability between 
+platforms is the main reason for its widespread adoption and its 
+continued success in a wide variety of applications worldwide to this 
+day.
+
+
+Compression
+!hline
+Image data may be stored raw, or optionally, a lossless Macintosh RLE 
+(also known as PackBits) compression can be employed. This method 
+performs poorly when compressing images with many colour variations, 
+such as digital photos, but works well for textures and simpler 
+images.
+
+!end_node
+
+# ------------------------------------------------------
+
+!begin_node TIFF
+
+!begin_table [|l|l] !hline
+ Format            !! TIFF
+!hline
+ Proper Name       !! Tag(ged) Image File Format
+!hline
+ Type              !! Bitmap
+!hline
+ File Extension    !! *.tif, *.tiff
+!hline
+ MIME Media Type   !! image/tiff
+!hline
+ Colour Depth      !! 1-8/16/24/32 bits
+!hline
+ Size              !! Maximum 2Gx2G pixels
+!hline
+ Compression       !! None / Macintosh RLE (PackBits) / CCITT 1D
+                   !! (Huffman) / CCITT Group 3 / CCITT Group 4 / LZW / 
+                   !! Deflate (Zip) / JPEG / other schemes by user-
+                   !! defined tags
+!hline
+ Special Features  !! Platform-independent format
+                   !! Different (!link [colour models] [Colour Depth])
+                   !! Multiple images
+                   !! Layers
+                   !! Transparency
+                   !! Colorimetry calibration, gamut tables and so on
+                   !! Textual metadata
+                   !! Flexible set of information fields (tags)
+!hline
+ Developer         !! Aldus, now Adobe Systems
+!hline
+!end_table
+
+For the features supported by zView, see Supported File Formats.
+
+TIFF is a file format for storing images, popular among graphic 
+artists, the publishing industry, and both amateur and professional 
+photographers in general. As of 2009, it is under the control of 
+Adobe Systems. Originally created by the company Aldus for use with 
+desktop publishing, the TIFF format is widely supported by image-
+manipulation applications, desktop publishing, scanning, faxing, word 
+processing, optical character recognition and other applications. 
+Adobe Systems, which acquired Aldus, now holds the copyright to the 
+TIFF specification. TIFF has not had a major update since 1992, 
+although two supplements have been published with minor extensions to 
+the format and several other specifications have been based on the 
+TIFF 6.0 specification, like the electronic photography format 
+TIFF/EP (which, by the way, has not been adopted by most camera 
+manufacturers).
+
+History
+!hline
+TIFF was originally created as an attempt to get desktop scanner 
+vendors of the mid-1980s to agree on a common scanned image file 
+format, rather than have each company promote its own proprietary 
+format. In the beginning, TIFF was only a binary image format (only 
+two possible values for each pixel), because that was all that 
+desktop scanners could handle. As scanners became more powerful, and 
+as desktop computer disk space became more plentiful, TIFF grew to 
+accommodate greyscale images, then colour images. Today, TIFF is a 
+popular format for (!link [true-colour] [Colour Depth]) images, along with JPEG and PNG.
+
+The first version of the TIFF specification was published by Aldus 
+Corporation in the autumn of 1986 after two major earlier draft 
+releases. It can be labelled as Revision 3.0. It was published after 
+a series of meetings with various scanner manufacturers and software 
+developers. In April 1987, Revision 4.0 was released and it contained 
+mostly minor enhancements. In October 1988, Revision 5.0 was 
+released, and it added support for (!link [palette-colour] [Colour Depth]) images and LZW 
+compression.
+
+Differences Between TIFF and Other Formats
+!hline
+Many picture formats have an image header with fixed fields 
+containing information, such as image dimensions or (!link [colour model] [Colour Depth]) 
+specification. The TIFF file format is different in that it allows 
+for a flexible set of information fields. There exists a 
+specification for many of these information fields, called tags, 
+ranging from the most fundamental, like image dimensions, over the 
+most luxurious, like copyright information, up to so-called private 
+tags or custom tags that you can define to hold your own application 
+specific information. The TIFF specification defines a framework for 
+an image header called Image File Directory (IFD) that is essentially 
+a flexible set of specifically those tags that the TIFF writer 
+software wishes to specify.
+
+The clear benefit of this scheme is that almost any information can 
+accompany an image, while little information is absolutely needed, 
+and image headers remain as lean as possible; there is little 
+overhead and enough flexibility to suit any need.
+
+Another major difference between most other picture formats and TIFF, 
+is that TIFF allows for a wide range of different compression schemes 
+and (!link [colour models] [Colour Depth]). These are specified in dedicated tags. Where other 
+file formats are often designed to suit a single compression method, 
+TIFF allows for JPEG, the infamous LZW or the free-as-a-bird Deflate 
+compression, amongst many others. The same goes for (!link [colour models] [Colour Depth]). 
+Theoretically, you could even use any compression method and (!link [colour] [Colour Depth]) 
+(!link [model] [Colour Depth])  of your own, but, of course, this would result in crippled 
+portability. Unless restricted by the nature of the chosen 
+compression algorithm, any (!link [colour model] [Colour Depth]) and any (!link [colour depth] [Colour Depth]) can be 
+combined with any compression scheme.
+
+And the same goes for bit depths and data types, too. One of the 
+powerful TIFF features is support for a wide range of data types. You 
+can store signed or unsigned integers, floating point values and even 
+complex data in the TIFF file. Combined with the possibility to store 
+an arbitrary number of (!link [image channels] [Colour Depth]), this makes TIFF a very useful 
+format to store scientific data.
+
+One final important difference between TIFF and most other image file 
+formats is that TIFF defines support for multiple images in a single 
+file. Such a file is then called multi-page TIFF. Thus, the TIFF 
+format is very well suited to, for example, store the many pages of a 
+single fax in a single file.
+
+Baseline TIFF
+!hline
+When TIFF was introduced, its extensibility provoked compatibility 
+problems and gave rise to the joke that TIFF stands for 'Thousands of 
+Incompatible File Formats'. The flexibility in encoding makes it very 
+easy to write a TIFF writer, but very difficult to create a fully 
+TIFF-compliant reader. To avoid compatibility problems, every TIFF 
+reader was required to read 'Baseline TIFF'. The Baseline TIFF does 
+not include layers, or compression with JPEG or LZW.
+
+The following is an incomplete list of required Baseline TIFF 
+features:
+!begin_itemize !compressed
+!item Multiple images (although the TIFF reader is not required to do 
+anything with images after the first one).
+!item Compression schemes: no compression, CCITT 1D (Huffman) and 
+Macintosh RLE (PackBits).
+!item Image types: monochrome, greyscale, (!link [palette-colour] [Colour Depth]) and RGB
+full-colour images.
+!end_itemize
+
+TIFF readers are required to ignore tags that they do not recognise, 
+and a registered developer's private tags are guaranteed not to clash 
+with anyone else's tags or with the standard set of tags defined in 
+the specification.
+
+Drawbacks
+!hline
+Theoretically, TIFF is as flexible and suitable for a variety of 
+applications as very advanced formats like PSD (Adobe's Photoshop 
+Document format). In fact, the clean simplicity as well as openness 
+of the format is a major plus over a format like PSD. The TIFF format 
+is owned by the same company that also owns PSD, though, and as such, 
+it is not very surprising that it has not had a major update since 
+1992. That is probably the single most important drawback of TIFF: it 
+lacks standardised support for advanced imaging features that were 
+developed over the years. For instance, there is no standardised way 
+to specify multi-layer relationships of different TIFF pages, even 
+though a dedicated tag definition would be very feasible and very 
+suitable. Neither is there a standardised tag for vector or text 
+drawings.
+
+One other drawback of TIFF, that it shares with the majority of other 
+file formats, is its size limitation. The format uses 32-bit offsets, 
+and as such, it is limited to 4 GB.
+
+!end_node # TIFF
+
+# ------------------------------------------------------
+
+!end_node # Glossary
