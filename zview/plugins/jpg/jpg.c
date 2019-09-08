@@ -463,6 +463,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	        if (info->thumbnail)
 	        	continue;
 #ifdef PLUGIN_SLB
+			if (utf8_to_ucs16 &&
+				ucs16_to_latin1 &&
+				latin1_to_atari)
 			{
 				unsigned short *u;
 				char *s;

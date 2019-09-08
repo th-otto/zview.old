@@ -20,7 +20,9 @@
 #if defined(__PUREC__) && !defined(_COMPILER_H)
 #define __CDECL cdecl
 #endif
+#ifndef __SLB_H
 #include <mint/slb.h>
+#endif
 #ifdef __GNUC__
 #include <unistd.h>
 #endif
@@ -152,8 +154,8 @@ struct _zview_plugin_funcs {
 	zv_int_t __CDECL (*p_rand)(void);
 	void __CDECL (*p_srand)(zv_uint_t seed);
 
-	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
-	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, zv_int_t (*compar)(const void *, const void *));
+	void __CDECL (*p_qsort)(void *base, size_t nmemb, size_t size, zv_int_t __CDECL (*compar)(const void *, const void *));
+	void *__CDECL (*p_bsearch)(const void *key, const void *base, size_t nmemb, size_t size, zv_int_t __CDECL (*compar)(const void *, const void *));
                      
 	time_t __CDECL (*p_time)(time_t *tloc);
 	struct tm *__CDECL (*p_localtime)(const time_t *timep);
@@ -166,6 +168,11 @@ struct _zview_plugin_funcs {
 	
 	double __CDECL (*p_atof)(const char *);
 
+	/*
+	 * new in 1.0.3:
+	 * functions to convert meta-information in UTF-8 encoding
+	 * to atarist
+	 */
 	unsigned short *__CDECL (*p_utf8_to_ucs16)(const char *s, size_t len);
 	char *__CDECL (*p_ucs16_to_latin1)(const unsigned short *u, size_t len);
 	void __CDECL (*p_latin1_to_atari)(char *text);

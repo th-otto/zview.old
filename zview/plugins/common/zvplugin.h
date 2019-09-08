@@ -1,8 +1,13 @@
 /*
  * functions that are called by the application
  */
+#ifndef __SLB_H
 #include <mint/slb.h>
+#endif
 #include "imginfo.h"
+#if defined(__PUREC__) && !defined(_COMPILER_H)
+#define __CDECL cdecl
+#endif
 
 extern char *zview_slb_dir;
 extern char *zview_slb_dir_end;
@@ -52,7 +57,7 @@ long __CDECL plugin_set_option(SLB *slb, zv_int_t which, zv_int_t value);
 /*
  * internal functions used while loading libraries
  */
-long __CDECL plugin_slb_control(SLB *slb, long fn, void *arg);
+long plugin_slb_control(SLB *slb, long fn, void *arg);
 
 #define plugin_compile_flags(slb) plugin_slb_control(slb, 0, 0)
 #define plugin_set_imports(slb, f) plugin_slb_control(slb, 1, f)

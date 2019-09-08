@@ -387,7 +387,10 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 			 png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_zTXt) &&
 			png_text_ptr[i].text &&
 			png_text_ptr[i].itxt_length < 1024 &&
-			strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
+			strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0 &&
+			utf8_to_ucs16 &&
+			ucs16_to_latin1 &&
+			latin1_to_atari)
 		{
 			unsigned short *u;
 			char *s;
