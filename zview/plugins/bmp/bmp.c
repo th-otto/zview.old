@@ -436,7 +436,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		Fclose(handle);
 		return FALSE;
 	}
-	Fseek(hdrsize - sizeof(header), handle, SEEK_CUR);
+	Fseek(hdrsize + 14 - sizeof(header), handle, SEEK_CUR);
 
 	if (colors_used == 0 && info->planes <= 8)
 	{
