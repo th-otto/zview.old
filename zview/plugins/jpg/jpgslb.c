@@ -1,5 +1,5 @@
 /*
- * godslb.c - initialization code for the shared library
+ * jpgslb.c - initialization code for the shared library
  *
  * Copyright (C) 2019 Thorsten Otto
  *

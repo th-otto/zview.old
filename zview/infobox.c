@@ -309,7 +309,9 @@ void infobox( void)
 	{
 		long ret;
 		SLB *slb;
-		
+		char extensions[50 + 2];
+		char *p;
+		const char *src;
 		slb = &img->codec->c.slb;
 
 		ret = plugin_get_option(slb, INFO_NAME);
@@ -332,10 +334,40 @@ void infobox( void)
 		ret = plugin_get_option(slb, INFO_MISC);
 		objc_multiline(infotext, ret, FILE_CODEC_INFO_FIRST, FILE_CODEC_INFO_LAST);
 		
+		p = extensions;
+		src = img->codec->extensions;
+		if (img->codec->type == CODEC_SLB || img->codec->num_extensions == 0)
+		{
+			while (*src)
+			{
+				size_t len = strlen(src) + 1;
+				strcpy(p, src);
+				p += len;
+				p[-1] = ' ';
+				src += len;
+			}
+		} else
+		{
+			int j, num_extensions = (int)img->codec->num_extensions;
+			for (j = 0; j < num_extensions; j++)
+			{
+				*p = *src++;
+				if (*p) p++;
+				*p = *src++;
+				if (*p) p++;
+				*p = *src++;
+				if (*p) p++;
+				*p++ = ' ';
+			}
+		}
+		*p = '\0';
+		ObjcStrnCpy(infotext, FILE_CODEC_EXTENSIONS, extensions);
+		
 		if (infotext[FILE_INFO_EXIF].ob_flags & HIDETREE)
 			infotext[FILE_INFO_CODEC].ob_x = infotext[FILE_INFO_IMAGE].ob_x + infotext[FILE_INFO_IMAGE].ob_width + 2;
 		else
 			infotext[FILE_INFO_CODEC].ob_x = infotext[FILE_INFO_EXIF].ob_x + infotext[FILE_INFO_EXIF].ob_width + 2;
+			
 		infotext[FILE_INFO_CODEC].ob_flags &= ~HIDETREE;
 	} else
 	{

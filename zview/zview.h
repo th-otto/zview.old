@@ -5,19 +5,19 @@
  */
 
 /*
- * Number of Strings:        363
+ * Number of Strings:        366
  * Number of Bitblks:        2
  * Number of Iconblks:       0
  * Number of Color Iconblks: 9
  * Number of Color Icons:    15
- * Number of Tedinfos:       51
+ * Number of Tedinfos:       52
  * Number of Free Strings:   47
  * Number of Free Images:    0
- * Number of Objects:        255
+ * Number of Objects:        256
  * Number of Trees:          14
  * Number of Userblks:       0
  * Number of Images:         2
- * Total file size:          19472
+ * Total file size:          19586
  */
 
 #undef RSC_NAME
@@ -35,7 +35,7 @@
 # define RSC_STATIC_FILE 0
 #endif
 #if !RSC_STATIC_FILE
-#define NUM_STRINGS 363
+#define NUM_STRINGS 366
 #define NUM_FRSTR 47
 #define NUM_UD 0
 #define NUM_IMAGES 2
@@ -43,8 +43,8 @@
 #define NUM_FRIMG 0
 #define NUM_IB 0
 #define NUM_CIB 9
-#define NUM_TI 51
-#define NUM_OBS 255
+#define NUM_TI 52
+#define NUM_OBS 256
 #define NUM_TREE 14
 #endif
 
@@ -153,11 +153,12 @@
 #define FILE_CODEC_FILENAME               44 /* TEXT in tree FILE_INFO */ /* max len 40 */
 #define FILE_CODEC_NAME_FIRST             46 /* TEXT in tree FILE_INFO */ /* max len 40 */
 #define FILE_CODEC_NAME_LAST              47 /* TEXT in tree FILE_INFO */ /* max len 40 */
-#define FILE_CODEC_VERSION                49 /* TEXT in tree FILE_INFO */ /* max len 40 */
-#define FILE_CODEC_DATE                   51 /* TEXT in tree FILE_INFO */ /* max len 40 */
-#define FILE_CODEC_AUTHOR                 53 /* TEXT in tree FILE_INFO */ /* max len 40 */
-#define FILE_CODEC_INFO_FIRST             55 /* TEXT in tree FILE_INFO */ /* max len 40 */
-#define FILE_CODEC_INFO_LAST              61 /* TEXT in tree FILE_INFO */ /* max len 40 */
+#define FILE_CODEC_EXTENSIONS             48 /* TEXT in tree FILE_INFO */ /* max len 50 */
+#define FILE_CODEC_VERSION                50 /* TEXT in tree FILE_INFO */ /* max len 40 */
+#define FILE_CODEC_DATE                   52 /* TEXT in tree FILE_INFO */ /* max len 40 */
+#define FILE_CODEC_AUTHOR                 54 /* TEXT in tree FILE_INFO */ /* max len 40 */
+#define FILE_CODEC_INFO_FIRST             56 /* TEXT in tree FILE_INFO */ /* max len 40 */
+#define FILE_CODEC_INFO_LAST              62 /* TEXT in tree FILE_INFO */ /* max len 40 */
 
 #define HSLIDERS                           9 /* form/dialog */
 #define HSLIDERS_LEFT                      2 /* CICON in tree HSLIDERS */ /* max len 0 */
