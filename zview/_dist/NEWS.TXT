@@ -45,12 +45,12 @@
  * Fix a bug in the JPEG DSP decoder that caused the first image line to
    be skipped
  * Fix a bug in decoding monochrome GEM images
+ * TIFF module no longer prints messages to the screen
 
  Known Bugs:
  ----------
  * There are still some animated GIFs that are not displayed correctly
  * Some bugs that were reported on Zorro's site (https://sourceforge.net/p/z-tools/bugs/)
- * The TIFF library sometimes prints warnings on the console
  * The TIFF library per default only supports up to 16 bits/sample (that is,
    48 bits/pixel for RGB formats). Some images from their test archive
    are therefore not displayed

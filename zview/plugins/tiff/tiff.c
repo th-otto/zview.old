@@ -89,6 +89,48 @@ static long init_tiff_slb(void)
 #endif
 
 
+static void TIFF_CALLBACK my_errorhandler(const char *module, const char *format, va_list ap)
+{
+	(void)module;
+	(void)format;
+	(void)ap;
+}
+
+
+static void TIFF_CALLBACK my_errorhandler_ext(thandle_t clientdata, const char *module, const char *format, va_list ap)
+{
+	(void)clientdata;
+	(void)module;
+	(void)format;
+	(void)ap;
+}
+
+
+static void TIFF_CALLBACK my_warninghandler(const char *module, const char *format, va_list ap)
+{
+	(void)module;
+	(void)format;
+	(void)ap;
+}
+
+
+static void TIFF_CALLBACK my_warninghandler_ext(thandle_t clientdata, const char *module, const char *format, va_list ap)
+{
+	(void)clientdata;
+	(void)module;
+	(void)format;
+	(void)ap;
+#if 0
+	printf("zvtiff: ");
+	if (module != NULL)
+		printf("%s: ", module);
+	printf("Warning: ");
+	vfprintf(stderr, format, ap);
+	printf("\n");
+#endif
+}
+
+
 /*==================================================================================*
  * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -111,6 +153,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	if (init_tiff_slb() < 0)
 		return FALSE;
 #endif
+
+	TIFFSetErrorHandler(my_errorhandler);
+	TIFFSetErrorHandlerExt(my_errorhandler_ext);
+	TIFFSetWarningHandler(my_warninghandler);
+	TIFFSetWarningHandlerExt(my_warninghandler_ext);
 
 	if(( tif = TIFFOpen( name, "r")) == NULL)
 	{
