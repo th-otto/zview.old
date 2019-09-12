@@ -51,6 +51,14 @@ void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 #define CAN_DECODE 0x01
 #define CAN_ENCODE 0x02
 
+
+/*
+ * bitmasks returned by plugin_compile_flags()
+ */
+#define SLB_M68020   (1L << 16)  /* was compiled for m68020 or better */
+#define SLB_COLDFIRE (1L << 17)  /* was compiled for ColdFire */
+
+
 long __CDECL plugin_get_option(SLB *slb, zv_int_t which);
 long __CDECL plugin_set_option(SLB *slb, zv_int_t which, zv_int_t value);
 

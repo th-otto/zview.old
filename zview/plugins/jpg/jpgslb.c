@@ -178,10 +178,10 @@ static long slb_compile_flags(void)
 {
 	long flags = 0;
 #if defined(__mc68020__) || defined(__mc68030__) || defined(__mc68040__) || defined(__mc68060__) || defined(__mc68080__) || defined(__apollo__)
-    flags |= (1L << 16);
+    flags |= SLB_M68020;
 #endif
 #if defined(__mcoldfire__)
-    flags |= (1L << 17);
+    flags |= SLB_COLDFIRE;
 #endif
 	return flags;
 }

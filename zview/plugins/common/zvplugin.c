@@ -500,7 +500,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 		/* should be able to use a 000 library, anyways */
 	} else
 	{
-		if (flags & (1L << 16))
+		if (flags & SLB_M68020)
 		{
 			/* cpu is not 020+, but library was compiled for it */
 			plugin_close(slb);
@@ -509,10 +509,10 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	}
 #if defined(__mcoldfire__)
 	/* if cpu is cf, but library was not compiled for it... */
-	if (!(flags & (1L << 17)))
+	if (!(flags & SLB_COLDFIRE))
 #else
 	/* if cpu is not cf, but library was compiled for it... */
-	if (flags & (1L << 17))
+	if (flags & SLB_COLDFIRE)
 #endif
 	{
 		plugin_close(slb);
