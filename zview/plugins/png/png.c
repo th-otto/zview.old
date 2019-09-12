@@ -113,6 +113,25 @@ static void mypng_warning_handler(png_structp png_ptr, png_const_charp msg)
 
 
 
+#ifdef PLUGIN_SLB
+static long init_png_slb(void)
+{
+	struct _zview_plugin_funcs *funcs;
+	SLB *slb;
+	long ret;
+
+	funcs = get_slb_funcs();
+	slb = get_slb_funcs()->p_slb_get(LIB_PNG);
+	if (slb->handle == 0)
+	{
+		if ((ret = funcs->p_slb_open(LIB_PNG)) < 0)
+			return ret;
+	}
+	return 0;
+}
+#endif
+
+
 /*==================================================================================*
  * boolean __CDECL reader_init:														*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -138,6 +157,11 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	png_int_t num_text;
 	struct _mypng_info *myinfo;
 	png_byte color_type;
+
+#ifdef PLUGIN_SLB
+	if (init_png_slb() < 0)
+		return FALSE;
+#endif
 
 	if ((png_file = fopen(name, "rb")) == NULL)
 		return FALSE;

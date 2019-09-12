@@ -97,6 +97,23 @@ long __CDECL set_option(zv_int_t which, zv_int_t value)
 	}
 	return -ENOSYS;
 }
+
+
+static long init_jpeg_slb(void)
+{
+	struct _zview_plugin_funcs *funcs;
+	SLB *slb;
+	long ret;
+
+	funcs = get_slb_funcs();
+	slb = get_slb_funcs()->p_slb_get(LIB_JPEG);
+	if (slb->handle == 0)
+	{
+		if ((ret = funcs->p_slb_open(LIB_JPEG)) < 0)
+			return ret;
+	}
+	return 0;
+}
 #endif
 
 
@@ -348,6 +365,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				break;
 		}
 	}
+
+#ifdef PLUGIN_SLB
+	if (init_jpeg_slb() < 0)
+		return ret;
+#endif
 
 	if ( ( jpeg_file = fopen( name, "rb")) == NULL)
 		return ret;
@@ -815,6 +837,13 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	FILE* 		jpeg_file;
 	jmp_buf 	escape;
 	int16_t 		header = 0;
+
+#ifdef JPEG_SLB
+	{
+		if (init_jpeg_slb() < 0)
+			return FALSE;
+	}
+#endif
 
 	if ( ( jpeg_file = fopen( name, "wb")) == NULL)
 		return FALSE;

@@ -158,12 +158,6 @@ static long set_imports(struct _zview_plugin_funcs *funcs)
 		return -ERANGE;
 	proc->funcs = funcs;
 
-	{
-		long ret;
-		if ((ret = funcs->p_slb_open(LIB_PNG)) < 0)
-			return ret;
-	}
-
 	return 0;
 }
 

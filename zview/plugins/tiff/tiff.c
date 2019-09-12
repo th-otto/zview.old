@@ -69,6 +69,23 @@ long __CDECL set_option(zv_int_t which, zv_int_t value)
 	}
 	return -ENOSYS;
 }
+
+
+static long init_tiff_slb(void)
+{
+	struct _zview_plugin_funcs *funcs;
+	SLB *slb;
+	long ret;
+
+	funcs = get_slb_funcs();
+	slb = get_slb_funcs()->p_slb_get(LIB_TIFF);
+	if (slb->handle == 0)
+	{
+		if ((ret = funcs->p_slb_open(LIB_TIFF)) < 0)
+			return ret;
+	}
+	return 0;
+}
 #endif
 
 
@@ -89,6 +106,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	TIFF *tif;
 	uint32_t w, h, *raster;
 	uint16_t compression, bitpersample, samplesperpixel, planes;
+
+#ifdef PLUGIN_SLB
+	if (init_tiff_slb() < 0)
+		return FALSE;
+#endif
 
 	if(( tif = TIFFOpen( name, "r")) == NULL)
 	{
