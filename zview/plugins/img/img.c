@@ -247,13 +247,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->width = hdr.width;
 	info->height = hdr.height;
 	info->components = info->planes == 1 ? 1 : 3;
-	if (hdr.planes == 32)
-	{
-		info->colors = 1L << 24;
-	} else
-	{
-		info->colors = 1L << info->planes;
-	}
+	info->colors = 1L << MIN(info->planes, 24);
 	info->real_width = info->width;
 	info->real_height = info->height;
 	info->memory_alloc = TT_RAM;

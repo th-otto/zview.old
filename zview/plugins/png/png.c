@@ -277,7 +277,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->memory_alloc = TT_RAM;
 	info->components = myinfo->channels > 3 ? 3 : myinfo->channels;
 	info->planes = myinfo->bits_per_pixel;
-	info->colors = 1L << info->planes;
+	info->colors = 1L << MIN(info->planes, 24);
 	info->delay = 0;
 	info->orientation = UP_TO_DOWN;
 	info->page = 1;

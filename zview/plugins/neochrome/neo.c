@@ -210,7 +210,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	}
 
 	info->components = 3;
-	info->colors = 1L << info->planes;
+	info->colors = 1L << MIN(info->planes, 24);
 	info->real_width = info->width;
 	info->real_height = info->height;
 	info->memory_alloc = TT_RAM;

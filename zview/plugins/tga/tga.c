@@ -403,8 +403,8 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->real_height = info->height;
 	info->memory_alloc = TT_RAM;
 	info->components = TGA_TRUECOLOR_24;
-	info->planes = MIN(tga_struct->tga.img_spec_pix_depth, 24);
-	info->colors = 1L << info->planes;
+	info->planes = tga_struct->tga.img_spec_pix_depth;
+	info->colors = 1L << MIN(info->planes, 24);
 	info->page = 1;
 	info->delay = 0;
 	info->num_comments = 0;
