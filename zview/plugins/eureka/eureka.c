@@ -112,7 +112,11 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	{
 		int16_t i;
 
-		Fread( handle, 3072, palette);
+		if (Fread( handle, 3072, palette) != 3072)
+		{
+			Fclose( handle);
+			return FALSE;	
+		}
 
 		for ( i = 0; i < info->colors; i++)
 		{
@@ -136,8 +140,6 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	}
 
 	img_buffer 				= ( uint8_t*)malloc( file_size);
-	info->_priv_ptr			= ( void*)img_buffer;
-	info->_priv_ptr_more	= ( void*)img_buffer;
 
 	if( img_buffer == NULL)
 	{
@@ -159,6 +161,9 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 			for( j = 0; j < w; j++)
 				swap( &img_buffer[(uint32_t)info->width * (uint32_t)i + (uint32_t)j], &img_buffer[(uint32_t)info->width * (uint32_t)i + (uint32_t)info->width - 1L - (uint32_t)j]);
 	}
+
+	info->_priv_ptr			= ( void*)img_buffer;
+	info->_priv_ptr_more	= ( void*)img_buffer;
 
 	return TRUE;
 }
