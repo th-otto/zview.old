@@ -46,6 +46,8 @@
    be skipped
  * Fix a bug in decoding monochrome GEM images
  * TIFF module no longer prints messages to the screen
+ * Fix a bug in the TIFF codec that caused it to crash when loading
+   images with embedded old jpeg files
 
  Known Bugs:
  ----------
