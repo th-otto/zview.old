@@ -147,7 +147,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
 	TIFF *tif;
 	uint32_t w, h, *raster;
-	uint16_t compression, bitpersample, samplesperpixel, planes;
+	uint16_t compression, bitspersample, samplesperpixel, planes;
 
 #ifdef PLUGIN_SLB
 	if (init_tiff_slb() < 0)
@@ -174,10 +174,10 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
     TIFFGetField( tif, TIFFTAG_IMAGEWIDTH, &w);
     TIFFGetField( tif, TIFFTAG_IMAGELENGTH, &h);
     TIFFGetField( tif, TIFFTAG_COMPRESSION, &compression);
-    TIFFGetField( tif, TIFFTAG_BITSPERSAMPLE, &bitpersample);
+    TIFFGetField( tif, TIFFTAG_BITSPERSAMPLE, &bitspersample);
     TIFFGetField( tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 
-	planes = bitpersample * samplesperpixel;
+	planes = bitspersample * samplesperpixel;
 
 	info->width 				= ( uint16_t)w;
 	info->height 				= ( uint16_t)h;
@@ -217,16 +217,18 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		case COMPRESSION_LZW: /* Lempel-Ziv  & Welch */
 			strcpy( info->compression, "LZW");	
 			break;
-		case COMPRESSION_OJPEG: /* Old JPG, no supported ! */
-			TIFFClose( tif);
-			return FALSE;	
+		case COMPRESSION_OJPEG: /* Old JPG */
+			strcpy(info->compression, "OJPG");	
+			break;
 		case COMPRESSION_JPEG: /* JPEG DCT compression */
-			strcpy( info->compression, "JPEG");	
+			strcpy( info->compression, "JPEG");
 			break;
 		case COMPRESSION_T85: /* TIFF/FX T.85 JBIG compression */
+			strcpy(info->compression, "T85");
+			break;
 		case COMPRESSION_T43: /* !TIFF/FX T.43 colour by layered JBIG compression */
-			TIFFClose( tif);
-			return FALSE;	
+			strcpy(info->compression, "T43");
+			break;
 		case COMPRESSION_NEXT: /* NeXT 2-bit RLE */
 			strcpy( info->compression, "NeXT");	
 			break;
@@ -297,13 +299,13 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 		return FALSE;	
 	}
 
-	info->_priv_ptr				= ( void*)raster;
-	info->_priv_ptr_more		= ( void*)raster;	
-	info->__priv_ptr_more 		= ( void*)tif;
-
 	if( TIFFReadRGBAImageOriented( tif, w, h, raster, ORIENTATION_TOPLEFT, 0))
+	{
+		info->_priv_ptr				= ( void*)raster;
+		info->_priv_ptr_more		= ( void*)raster;	
+		info->__priv_ptr_more 		= ( void*)tif;
 		return TRUE;
-	
+	}
 	free( raster);
 	TIFFClose( tif);
 	return FALSE;	
@@ -380,7 +382,9 @@ void __CDECL reader_quit( IMGINFO info)
 	TIFF 	*tif = ( TIFF*)info->__priv_ptr_more;
 
 	free(info->_priv_ptr);
+	info->_priv_ptr = 0;
 	TIFFClose( tif);
+	info->__priv_ptr_more = 0;
 }
 
 
@@ -408,18 +412,18 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	
 	TIFFSetField( tif, TIFFTAG_IMAGEWIDTH,		info->width);
 	TIFFSetField( tif, TIFFTAG_IMAGELENGTH,		info->height);
-	TIFFSetField( tif, TIFFTAG_ORIENTATION,		ORIENTATION_TOPLEFT);
-	TIFFSetField( tif, TIFFTAG_SAMPLESPERPIXEL, 3);
-	TIFFSetField( tif, TIFFTAG_BITSPERSAMPLE,	8);
-	TIFFSetField( tif, TIFFTAG_PLANARCONFIG,	PLANARCONFIG_CONTIG);
-	TIFFSetField( tif, TIFFTAG_PHOTOMETRIC,		PHOTOMETRIC_RGB);
-	TIFFSetField( tif, TIFFTAG_SAMPLEFORMAT,	SAMPLEFORMAT_UINT);
-	TIFFSetField( tif, TIFFTAG_COMPRESSION,		encode_compression);
+	TIFFSetField( tif, TIFFTAG_ORIENTATION,		(tiff_int_t)ORIENTATION_TOPLEFT);
+	TIFFSetField( tif, TIFFTAG_SAMPLESPERPIXEL, (tiff_int_t)3);
+	TIFFSetField( tif, TIFFTAG_BITSPERSAMPLE,	(tiff_int_t)8);
+	TIFFSetField( tif, TIFFTAG_PLANARCONFIG,	(tiff_int_t)PLANARCONFIG_CONTIG);
+	TIFFSetField( tif, TIFFTAG_PHOTOMETRIC,		(tiff_int_t)PHOTOMETRIC_RGB);
+	TIFFSetField( tif, TIFFTAG_SAMPLEFORMAT,	(tiff_int_t)SAMPLEFORMAT_UINT);
+	TIFFSetField( tif, TIFFTAG_COMPRESSION,		(tiff_uint_t)encode_compression);
 
 	if( encode_compression == COMPRESSION_JPEG)
 	{
-		TIFFSetField( tif, TIFFTAG_JPEGQUALITY,		quality);
-		TIFFSetField( tif, TIFFTAG_JPEGCOLORMODE,	JPEGCOLORMODE_RGB);
+		TIFFSetField( tif, TIFFTAG_JPEGQUALITY,		(tiff_int_t)quality);
+		TIFFSetField( tif, TIFFTAG_JPEGCOLORMODE,	(tiff_int_t)JPEGCOLORMODE_RGB);
     }
 
 	TIFFSetField( tif, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize( tif, 0));
