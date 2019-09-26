@@ -497,11 +497,13 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	print(("type=%i\n", tga_struct->tga.image_type));
 
+#ifndef PLUGIN_SLB
 	if (tga_struct->id[0])
 	{
 		info->num_comments = 1;
 		info->max_comments_length = (uint16_t) strlen(tga_struct->id);
 	}
+#endif
 
 	tga_struct->cur_pos = 0;						/* reset - y pos */
 
@@ -628,7 +630,7 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 {
 	tga_pic *tga_struct = (tga_pic *) info->_priv_ptr;
 
-	if (info->num_comments)
+	if (tga_struct->id[0])
 	{
 		int i;
 
@@ -639,7 +641,18 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 				tga_struct->id[i] = 32;
 			}
 		}
+#ifdef PLUGIN_SLB
+		txtdata->lines = 0;
+		free(txtdata->txt[txtdata->lines]);
+		txtdata->txt[txtdata->lines] = malloc(i + 1);
+		if (txtdata->txt[txtdata->lines])
+		{
+			strcpy(txtdata->txt[txtdata->lines], tga_struct->id);
+			txtdata->lines++;
+		}
+#else
 		strcpy(txtdata->txt[0], tga_struct->id);
+#endif
 	}
 }
 

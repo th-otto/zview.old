@@ -234,7 +234,7 @@ boolean pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 	/*
 	 * FIXME: this magic numbers must match pdf_get_info()
 	 */
-	if( !init_txt_data( img, 8, 256))
+	if( !init_txt_data( img, 0, 0))
 	{
 		pdf_quit( img);
 		delete_mfdb( img->image, img->page);
@@ -242,6 +242,8 @@ boolean pdf_load( const char *file, IMAGE *img, uint16 width, uint16 height)
 	}
 		
 	pdf_get_info( img, img->comments);
+	if (img->comments->lines == 0)
+		delete_txt_data(img);
 
 	return TRUE;
 }

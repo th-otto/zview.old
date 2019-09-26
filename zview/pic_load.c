@@ -68,22 +68,30 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 	for ( i = 0 ; i < img->page ; i++)	
 	{
 		if ( !init_mfdb( &img->image[i], display_w, display_h, n_planes))
-			return( 0);
+			return FALSE;
 	}
 
-	if( info->num_comments)
-	{
-		/* 	we initialise the txt_data struct...  */
-		if( !init_txt_data( img, info->num_comments, info->max_comments_length))
-			return ( 0);
+	/* 	we initialise the txt_data struct...  */
+	if( !init_txt_data( img, info->num_comments, info->max_comments_length))
+		return ( 0);
 		
-		if (curr_input_plugin)
-			plugin_reader_get_txt(&curr_input_plugin->c.slb, info, img->comments);
-		else
-			ldg_funcs.decoder_get_txt(info, img->comments);
-	} else
+	if (curr_input_plugin)
 	{
-		img->comments = NULL;
+		/*
+		 * SLB plugins can allocate the strings through callbacks,
+		 * and may not have set up the num_comments member until now
+		 */
+		plugin_reader_get_txt(&curr_input_plugin->c.slb, info, img->comments);
+		info->num_comments = img->comments->lines;
+		if (img->comments->lines == 0)
+			delete_txt_data(img);
+	} else if (info->num_comments > 0)
+	{
+		/*
+		 * LDG plugins need the strings preallocated, so we must only
+		 * call decoder_get_txt if there are actually infos
+		 */
+		ldg_funcs.decoder_get_txt(info, img->comments);
 	}
 	img->codec = curr_input_plugin;
 

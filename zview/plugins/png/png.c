@@ -153,8 +153,10 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	png_color_16 my_background = { 0,0xFFFF,0xFFFF,0xFFFF,0xFFFF };
     png_color_16p image_background;
 #endif
+#ifndef PLUGIN_SLB
 	png_textp png_text_ptr;
 	png_int_t num_text;
+#endif
 	struct _mypng_info *myinfo;
 	png_byte color_type;
 
@@ -266,8 +268,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	png_read_update_info(myinfo->png_ptr, myinfo->info_ptr);
 
-	num_text = png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, NULL);
-
 	myinfo->input_rowbytes = png_get_rowbytes(myinfo->png_ptr, myinfo->info_ptr);
 	
 	info->width = png_get_image_width(myinfo->png_ptr, myinfo->info_ptr);
@@ -295,6 +295,12 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	info->max_comments_length = 0;
 	info->num_comments = 0;
+
+#ifndef PLUGIN_SLB
+	/*
+	 * older LDG interface: need to pre-calculate number of comment lines
+	 */
+	num_text = png_get_text(myinfo->png_ptr, myinfo->info_ptr, &png_text_ptr, NULL);
 	if (num_text)
 	{
 		int16_t i;
@@ -313,18 +319,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				info->max_comments_length = MAX(info->max_comments_length, len);
 				info->num_comments++;
 			}
-#ifdef PLUGIN_SLB
-			else if ((png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_NONE ||
-				 png_text_ptr[i].compression == PNG_ITXT_COMPRESSION_zTXt) &&
-				png_text_ptr[i].text &&
-				png_text_ptr[i].itxt_length < 1024 &&
-				strncmp(png_text_ptr[i].key, "Raw profile", 11) != 0)
-			{
-				len = strlen(png_text_ptr[i].key) + png_text_ptr[i].itxt_length + 2;
-				info->max_comments_length = MAX(info->max_comments_length, len);
-				info->num_comments++;
-			}
-#endif
 		}
 	}
 	{
@@ -341,6 +335,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 			info->num_comments++;
 		}
 	}
+#endif
 
 	return TRUE;
 }
@@ -380,13 +375,6 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 	 * for compatibilty, all text strings were allocated with max length in
 	 * init_txt_data(); stop that nonsense
 	 */
-#ifdef PLUGIN_SLB
-	for (j = 0; j < txtdata->lines; j++)
-	{
-		free(txtdata->txt[j]);
-		txtdata->txt[j] = NULL;
-	}
-#endif
 	for (i = j = 0; i < num_text && j < txtdata->lines; i++)
 	{
 		if ((png_text_ptr[i].compression == PNG_TEXT_COMPRESSION_NONE ||

@@ -451,7 +451,15 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data * txtdata)
 	if (comment)
 	{
 		for (i = 0; i < comment->lines; i++)
+		{
+#ifdef PLUGIN_SLB
+			free(txtdata->txt[i]);
+			txtdata->txt[i] = comment->txt[i];
+			comment->txt[i] = NULL;
+#else
 			strcpy(txtdata->txt[i], comment->txt[i]);
+#endif
+		}
 	}
 }
 

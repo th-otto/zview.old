@@ -400,21 +400,31 @@ static void InfoDate(Dict *infoDict, const char *key, char *text)
   	obj.free();
 }
 
+
+static char *info_string(Object &info, 	UnicodeMap *uMap, const char *tag, const char *prefix, bool isdate = false)
+{
+	char text[256];
+	char *str;
+
+	if (isdate)
+		InfoDate(info.getDict(), tag, text);
+	else
+		InfoString(info.getDict(), tag, uMap, text);
+	if (*text == '\0')
+		return NULL;
+	conv_latin1_to_atari(text);
+	str = (char *)malloc(strlen(prefix) + 3 + strlen(text) + 1);
+	if (str != NULL)
+		strcat(strcat(strcpy(str, prefix), ":  "), text);
+	return str;
+}
+
 void pdf_get_info( IMAGE *img, txt_data *txtdata)
 {
 	Object info;
 	UnicodeMap *uMap;
   	PDFDoc *doc = ( PDFDoc*)img->_priv_ptr;
-	char text[256];
-
-	txtdata->txt[0][0] = '\0';
-	txtdata->txt[1][0] = '\0';
-	txtdata->txt[2][0] = '\0';
-	txtdata->txt[3][0] = '\0';
-	txtdata->txt[4][0] = '\0';
-	txtdata->txt[5][0] = '\0';
-	txtdata->txt[6][0] = '\0';
-	txtdata->txt[7][0] = '\0';
+	int num_comments = 0;
 
 	if (!( uMap = globalParams->getTextEncoding()))
 	{
@@ -425,40 +435,27 @@ void pdf_get_info( IMAGE *img, txt_data *txtdata)
 
 	if (info.isDict())
 	{
-		InfoString(info.getDict(), "Title", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[0] , "Title:  %s", text);
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Title", "Title")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Subject", "Subject")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Keywords", "Keywords")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Author", "Author")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Creator", "Creator")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "Producer", "Producer")) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "CreationDate", "Creation Date", true)) != NULL)
+			num_comments++;
+		if ((txtdata->txt[num_comments] = info_string(info, uMap, "ModDate", "Modification Date", true)) != NULL)
+			num_comments++;
 
-		InfoString(info.getDict(), "Subject", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[1] , "Subject:  %s", text);
+//		sprintf( txtdata->txt[num_comments++] , "PDF version:       %.1f", doc->getPDFVersion());
 
-		InfoString(info.getDict(), "Keywords", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[2] , "Keywords:  %s", text);
-
-		InfoString(info.getDict(), "Author", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[3] , "Author:  %s", text);
-
-		InfoString(info.getDict(), "Creator", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[4] , "Creator:  %s", text);
-
-		InfoString(info.getDict(), "Producer", uMap, text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[5] , "Producer:  %s", text);
-
-//		sprintf( txtdata->txt[6] , "PDF version:       %.1f", doc->getPDFVersion());
-
-		InfoDate(info.getDict(), "CreationDate", text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[6] , "Creation Date:  %s", text);
-
-		InfoDate(info.getDict(), "ModDate", text);
-		conv_latin1_to_atari(text);
-		sprintf( txtdata->txt[7] , "Modification Date:  %s", text);
 	}
+	txtdata->lines = num_comments;
 
 	info.free();
 	uMap->decRefCnt();

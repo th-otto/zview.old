@@ -42,12 +42,15 @@ void delete_txt_data( IMAGE *img)
 int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 {
 	int16 	i;
-	size_t	line_size = max_lines_length + 1;
+	size_t	line_size;
 
-	img->comments = malloc( sizeof( txt_data));
+	img->comments = calloc(1, sizeof( txt_data));
 
 	if( !img->comments)
-		return( 0);
+		return FALSE;
+	if (lines == 0 || max_lines_length == 0)
+		return TRUE;
+	line_size = max_lines_length + 1;
 
 	if( lines > MAX_TXT_DATA)
 		lines	= MAX_TXT_DATA;
@@ -67,5 +70,5 @@ int16 init_txt_data( IMAGE *img, int16 lines, int16 max_lines_length)
 		}
 	}
 
-	return( 1);
+	return TRUE;
 }
