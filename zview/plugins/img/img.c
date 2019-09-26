@@ -153,14 +153,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	{
 		Fread(handle, (uint32_t) eh, head);
 	}
-	temp = malloc(cd + 256L);
-	if (temp == NULL)
-	{
-		Fclose(handle);
-		return FALSE;
-	}
-	Fread(handle, cd, temp);
-	Fclose(handle);
 
 	/* hack - ventura publisher 24-bit */
 	cf = 0;
@@ -192,6 +184,118 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		printf("bpp=%lu\n", (unsigned long)ref->bpp);
 	}
 #endif
+
+	/* determine palette type */
+	vdi = xbios = skip = flip = vent = 0;
+	if (hdr.length == 8)
+	{
+		if (hdr.planes == 1)
+		{
+			strcat(info->info, " (Standard)");
+		} else
+		{
+			strcat(info->info, " (Ventura Publisher)");
+#if DEBUG
+			if (pflg)
+				printf("ventura8\n");
+#endif
+			vent = 1;
+		}
+	} else if (hdr.length == 9)
+	{
+		strcat(info->info, " (Ventura Publisher)");
+		skip = 2;
+		vent = 1;
+	} else
+	{
+		if (head[0] == 'X' && head[1] == 'I' && head[2] == 'M' && head[3] == 'G')
+		{								/* ximg? */
+			int16_t type = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
+
+#if DEBUG
+			if (pflg)
+				printf("ximg type=%i\n", 0);
+#endif
+			if (type)
+			{							/* profibuch page 1267 -> 0=rgb 1=cmy 2=pantone */
+#if DEBUG
+				if (pflg)
+					printf("XIMG type not rgb=%i\n", type);
+#endif
+				free(ref);
+				Fclose(handle);
+				return FALSE;
+			}
+			strcat(info->info, " (XIMG)");
+			skip = 4 + 2;				/* skip id + pal type flag */
+			vdi = 1;
+		} else if (head[0] == 'S' && head[1] == 'T' && head[2] == 'T' && head[3] == 'T')
+		{								/* sttt? */
+#if DEBUG
+			if (pflg)
+			{
+				int16_t count = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
+
+				printf("sttt count=%i\n", count);
+			}
+#endif
+			strcat(info->info, " (STTT)");
+			skip = 4 + 2;				/* skip id + color count */
+			xbios = 1;
+		} else if (head[0] == 'T' && head[1] == 'I' && head[2] == 'M' && head[3] == 'G')
+		{								/* timg? */
+#if DEBUG
+			if (pflg)
+				printf("TIMG err\n");
+#endif
+			free(ref);
+			Fclose(handle);
+			return FALSE;
+		} else if (head[0] == 0x00 && head[1] == 0x80)
+		{								/* hyperpaint? */
+			int16_t c0 = ((uint16_t) head[2] << 8) | (uint16_t) head[3];
+			int16_t c1 = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
+
+			if (c0 == c1)
+			{
+				flip = 1;
+			}
+			strcat(info->info, " (Hyper Paint)");
+			skip = 2;					/* skip id */
+			xbios = 1;
+		} else
+		{
+			strcat(info->info, " (Unknown)");
+#if DEBUG
+			if (pflg)
+				printf("unknown header type\n");
+#endif
+			if (eh == 4 * 2 || eh == 16 * 2 || eh == 256 * 2)
+			{							/* assume xbios palette */
+				skip = 0;
+				xbios = 1;
+			} else if (eh == 4 * 6 || eh == 16 * 6 || eh == 256 * 6)
+			{
+				skip = 0;
+				vdi = 1;
+			}
+		}
+	}
+
+#if DEBUG
+	if (pflg)
+		printf("vdi=%i xbios=%i vent=%i\n", vdi, xbios, vent);
+#endif
+
+	temp = malloc(cd + 256L);
+	if (temp == NULL)
+	{
+		free(ref);
+		Fclose(handle);
+		return FALSE;
+	}
+	Fread(handle, cd, temp);
+	Fclose(handle);
 
 	ref->bmap = malloc(bms + 256L);
 	if (ref->bmap == NULL)
@@ -257,108 +361,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	strcpy(info->info, "GEM Bitmap");
 	strcpy(info->compression, "RLE");
-
-	/* detemine palette type */
-	vdi = xbios = skip = flip = vent = 0;
-	if (hdr.length == 8)
-	{
-		if (hdr.planes == 1)
-		{
-			strcat(info->info, " (Standard)");
-		} else
-		{
-			strcat(info->info, " (Ventura Publisher)");
-#if DEBUG
-			if (pflg)
-				printf("ventura8\n");
-#endif
-			vent = 1;
-		}
-	} else if (hdr.length == 9)
-	{
-		strcat(info->info, " (Ventura Publisher)");
-		skip = 2;
-		vent = 1;
-	} else
-	{
-		if (head[0] == 'X' && head[1] == 'I' && head[2] == 'M' && head[3] == 'G')
-		{								/* ximg? */
-			int16_t type = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
-
-#if DEBUG
-			if (pflg)
-				printf("ximg type=%i\n", 0);
-#endif
-			if (type)
-			{							/* profibuch page 1267 -> 0=rgb 1=cmy 2=pantone */
-#if DEBUG
-				if (pflg)
-					printf("XIMG type not rgb=%i\n", type);
-#endif
-				free(ref->bmap);
-				free(ref);
-				return FALSE;
-			}
-			strcat(info->info, " (XIMG)");
-			skip = 4 + 2;				/* skip id + pal type flag */
-			vdi = 1;
-		} else if (head[0] == 'S' && head[1] == 'T' && head[2] == 'T' && head[3] == 'T')
-		{								/* sttt? */
-#if DEBUG
-			if (pflg)
-			{
-				int16_t count = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
-
-				printf("sttt count=%i\n", count);
-			}
-#endif
-			strcat(info->info, " (STTT)");
-			skip = 4 + 2;				/* skip id + color count */
-			xbios = 1;
-		} else if (head[0] == 'T' && head[1] == 'I' && head[2] == 'M' && head[3] == 'G')
-		{								/* timg? */
-#if DEBUG
-			if (pflg)
-				printf("TIMG err\n");
-#endif
-			free(ref->bmap);
-			free(ref);
-			return FALSE;
-		} else if (head[0] == 0x00 && head[1] == 0x80)
-		{								/* hyperpaint? */
-			int16_t c0 = ((uint16_t) head[2] << 8) | (uint16_t) head[3];
-			int16_t c1 = ((uint16_t) head[4] << 8) | (uint16_t) head[5];
-
-			if (c0 == c1)
-			{
-				flip = 1;
-			}
-			strcat(info->info, " (Hyper Paint)");
-			skip = 2;					/* skip id */
-			xbios = 1;
-		} else
-		{
-			strcat(info->info, " (Unknown)");
-#if DEBUG
-			if (pflg)
-				printf("unknown header type\n");
-#endif
-			if (eh == 4 * 2 || eh == 16 * 2 || eh == 256 * 2)
-			{							/* assume xbios palette */
-				skip = 0;
-				xbios = 1;
-			} else if (eh == 4 * 6 || eh == 16 * 6 || eh == 256 * 6)
-			{
-				skip = 0;
-				vdi = 1;
-			}
-		}
-	}
-
-#if DEBUG
-	if (pflg)
-		printf("vdi=%i xbios=%i vent=%i\n", vdi, xbios, vent);
-#endif
 
 	/* process palette */
 	if (info->indexed_color)
