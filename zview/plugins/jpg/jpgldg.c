@@ -64,10 +64,14 @@ static LDGLIB plugin =
 	0x200, 			/* Plugin version */
 	sizeof(LibFunc) / sizeof(LibFunc[0]),					/* Number of plugin's functions */
 	LibFunc,			/* List of functions */
+#if 0
 	"JPG\0JPE\0JPEG\0",		/* File's type Handled */
+#else
+	"JPGJPE\0",		/* File's type Handled */
+#endif
 	LDG_NOT_SHARED, 	/* The flags NOT_SHARED is used here.. */
 	0,
-	0					/* Howmany file type are supported by this plugin */
+	2					/* Howmany file type are supported by this plugin */
 };
 
 /*==================================================================================*

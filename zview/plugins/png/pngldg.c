@@ -36,7 +36,7 @@ static LDGLIB png_plugin = {
 										   and are shareable, we must use this flags because we don't know if the
 										   user has ldg.prg deamon installed on his computer */
 	0,									/* Function called when the plugin is unloaded */
-	0									/* Howmany file type are supported by this plugin */
+	1									/* Howmany file type are supported by this plugin */
 };
 
 /*==================================================================================*
