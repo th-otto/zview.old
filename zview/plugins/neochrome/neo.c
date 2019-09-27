@@ -336,8 +336,8 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 			int16_t ndx;
 			int16_t pln;
 			uint16_t rgb;
-			uint16_t i = 0;;
-			uint16_t *pal = (int16_t *)info->_priv_ptr_more;
+			uint16_t i = 0;
+			uint16_t *pal = (uint16_t *)info->_priv_ptr_more;
 			
 			x = 0;
 			do

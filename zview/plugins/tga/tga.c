@@ -80,7 +80,8 @@ long __CDECL get_option(zv_int_t which)
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static inline void tga_write_pixel_to_mem(uint8_t *dst, uint8_t orientation, uint16_t pixel_position, uint16_t width, uint8_t *rgb)
+#if 0
+static void tga_write_pixel_to_mem(uint8_t *dst, uint8_t orientation, uint16_t pixel_position, uint16_t width, uint8_t *rgb)
 {
 	uint16_t x;
 	uint16_t addy;
@@ -105,6 +106,7 @@ static inline void tga_write_pixel_to_mem(uint8_t *dst, uint8_t orientation, uin
 	dst[addy++] = rgb[1];
 	dst[addy] = rgb[2];
 }
+#endif
 
 
 static uint32_t decode_tga(uint8_t *data, uint8_t *bmap, uint32_t bms, uint16_t bytes_per_pix)
@@ -642,7 +644,6 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 			}
 		}
 #ifdef PLUGIN_SLB
-		txtdata->lines = 0;
 		free(txtdata->txt[txtdata->lines]);
 		txtdata->txt[txtdata->lines] = malloc(i + 1);
 		if (txtdata->txt[txtdata->lines])
@@ -653,6 +654,7 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data *txtdata)
 #else
 		strcpy(txtdata->txt[0], tga_struct->id);
 #endif
+		txtdata->lines = 1;
 	}
 }
 
@@ -759,7 +761,7 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 		obmap[i + 2] = buffer[i];		/* red */
 		i = i + 3;
 	}
-	if (Fwrite(info->_priv_var, i, obmap) != i)
+	if (Fwrite((int)info->_priv_var, i, obmap) != i)
 		return FALSE;
 
 	return TRUE;
@@ -772,7 +774,7 @@ void __CDECL encoder_quit(IMGINFO info)
 	info->_priv_ptr = NULL;
 	if (info->_priv_var > 0)
 	{
-		Fclose(info->_priv_var);
+		Fclose((int)info->_priv_var);
 		info->_priv_var = 0;
 	}
 }

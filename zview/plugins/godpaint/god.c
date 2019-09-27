@@ -156,6 +156,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
+	(void)info;
+	(void)txtdata;
 }
 
 
@@ -195,9 +197,9 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 {	
 	uint16_t 		*line_buffer = NULL;		   
 	int8_t		header_id[2] = "G4";
-	int32_t 		file;
+	int 		file;
 
-	if ( ( file = Fcreate( name, 0)) < 0)
+	if ( ( file = (int)Fcreate( name, 0)) < 0)
 		return FALSE;
 
 	line_buffer	= ( uint16_t*) malloc( ( info->width + 1) << 1);
@@ -260,7 +262,7 @@ boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 		source[i] = (((uint16_t)rgb[0] & 0xF8) << 8) | (((uint16_t)rgb[1] & 0xFC) << 3) | ( rgb[2] >> 3);
 	}
 
-	if( Fwrite( info->_priv_var, byte_to_write, ( uint8_t*)source) != byte_to_write)
+	if( Fwrite( (int)info->_priv_var, byte_to_write, ( uint8_t*)source) != byte_to_write)
 		return FALSE;
 
 	return TRUE;
@@ -287,7 +289,7 @@ void __CDECL encoder_quit( IMGINFO info)
 	info->_priv_ptr = 0;
 	if (info->_priv_var > 0)
 	{
-		Fclose( info->_priv_var);
+		Fclose( (int)info->_priv_var);
 		info->_priv_var = 0;
 	}
 }

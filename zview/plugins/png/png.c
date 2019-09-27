@@ -148,7 +148,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 {
 	FILE *png_file;
 	char header[8];
-	int header_size = sizeof(header);
+	int header_size = (int)sizeof(header);
 #if 0
 	png_color_16 my_background = { 0,0xFFFF,0xFFFF,0xFFFF,0xFFFF };
     png_color_16p image_background;

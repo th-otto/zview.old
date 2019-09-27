@@ -239,7 +239,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 				} else
 				{
 					/* 1st frame, force it to the background color */
-					memset(img_buffer, info->background_color, line_size * gif->SHeight);
+					memset(img_buffer, (int)info->background_color, line_size * gif->SHeight);
 				}
 
 				if (gif->Image.Interlace)
@@ -450,16 +450,20 @@ void __CDECL reader_get_txt(IMGINFO info, txt_data * txtdata)
 
 	if (comment)
 	{
+#ifdef PLUGIN_SLB
 		for (i = 0; i < comment->lines; i++)
 		{
-#ifdef PLUGIN_SLB
 			free(txtdata->txt[i]);
 			txtdata->txt[i] = comment->txt[i];
 			comment->txt[i] = NULL;
-#else
-			strcpy(txtdata->txt[i], comment->txt[i]);
-#endif
 		}
+#else
+		for (i = 0; i < comment->lines; i++)
+		{
+			strcpy(txtdata->txt[i], comment->txt[i]);
+		}
+#endif
+		txtdata->lines = comment->lines;
 	}
 }
 

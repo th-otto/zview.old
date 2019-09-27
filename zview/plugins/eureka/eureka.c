@@ -203,6 +203,8 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
  *==================================================================================*/
 void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 {
+	(void)info;
+	(void)txtdata;
 }
 
 

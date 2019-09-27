@@ -835,6 +835,7 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
 		Fclose(handle);
 		return FALSE;
 	}
+	(void)ret;
 	
 	info->planes = 24;
 	info->components = 3;

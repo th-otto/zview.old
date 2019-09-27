@@ -8,15 +8,11 @@
 #define VOID_PTR	void *
 #define UCHAR_PTR	unsigned char *
 #define FUNC_PTR(x,y)	short (*x)(y)
-#define _LONG		long
-#define _ULONG		unsigned long
 #else
 /* otherwise in emulator */
 #define	VOID_PTR	uint32_t
 #define	UCHAR_PTR	uint32_t
 #define FUNC_PTR(x,y)	uint32_t x
-#define _LONG		int32_t
-#define _ULONG		uint32_t
 #endif
 
 typedef struct _JPGD_STRUCT JPGD_STRUCT;
@@ -25,8 +21,8 @@ typedef JPGD_STRUCT	*JPGD_PTR;
 struct _JPGD_STRUCT {
 	VOID_PTR	InPointer;							/* JPEG Image Pointer */
 	VOID_PTR	OutPointer;							/* Output Buffer/Filename Pointer (see OutFlag) */
-	_LONG	InSize;									/* JPEG Image Size (Bytes) */
-	_LONG	OutSize;								/* Output Image Size (Bytes) */
+	int32_t	InSize;									/* JPEG Image Size (Bytes) */
+	int32_t	OutSize;								/* Output Image Size (Bytes) */
 	short	InComponents;							/* JPEG Image Components Number (1->4) */
 	short	OutComponents;							/* Output Components Number (1->4) */
 	short	OutPixelSize;							/* Output Pixel Size (1->4) */
@@ -45,7 +41,7 @@ struct _JPGD_STRUCT {
 	VOID_PTR	OutTmpPointer;						/* Current OutPointer / Temporary Disk Buffer Pointer (see OutFlag) */
 	short	MCUsCounter;							/* Number of MCUs not Decoded */
 	short	OutTmpHeight;							/* Number of Lines in OutTmpPointer */
-	_LONG	User[2];								/* Free, Available for User */
+	int32_t	User[2];								/* Free, Available for User */
 	short	OutHandle;								/* 0 / Output File Handle (see OutFlag) */
 	MFDB	MFDBStruct;								/* Output Image MFDB */
 
@@ -101,6 +97,12 @@ enum _JPGD_ENUM {
 };
 typedef	long	JPGD_ENUM;
 
+/*
+ * Note: all this functions use Pure-C calling convention:
+ * - jpeg structure pointer passed in a0
+ * - return value in d0
+ * - d1-d2/a0-a1 are clobbered
+ */
 typedef struct {
 	long		JPGDVersion;
 	JPGD_ENUM	(*JPGDOpenDriver)(JPGD_PTR);

@@ -1,22 +1,35 @@
 #include <stdlib.h>
 #include <stdio.h>
+#define boolean jpg_boolean
 #if defined(PLUGIN_SLB) && defined(JPEG_SLB)
 #include <slb/jpeg.h>
 #else
 #include <jpeglib.h>
 #endif
+#undef EXTERN
+#undef LOCAL
+#undef GLOBAL
+#undef boolean
+#define boolean zv_boolean
 #include <wchar.h>
 
 #if defined(PLUGIN_SLB) && defined(EXIF_SLB)
 #include <slb/exif.h>
 #else
+#ifdef __PUREC__
+#include <libexif/exifdata.h>
+#else
 #include <libexif/exif-data.h>
+#endif
 #endif
 
 #include "plugin.h"
 #include "zvplugin.h"
 #include "zvjpg.h"
 #include <gem.h>
+#undef EXTERN
+#undef LOCAL
+#undef GLOBAL
 #include <mint/cookie.h>
 #include "jpgdh.h"
 #include "jpgdsp.h"
@@ -24,7 +37,7 @@
 /* Options*/
 int	quality = 90; /* quality 0 -> 100 % */
 J_COLOR_SPACE color_space = JCS_RGB;
-boolean progressive = FALSE;
+zv_boolean progressive = FALSE;
 
 #undef VERSION
 #undef NAME
@@ -121,12 +134,12 @@ typedef struct
 {
 	struct	jpeg_source_mgr pub;   /* public fields */
 	uint8_t	*buffer;
-	int		size;
+	size_t	size;
 	JOCTET	terminal[2];
 } my_source_mgr;
 
 /* Brainstorm DSP driver cookie pointer */
-static boolean dsp_decoding = FALSE;
+static zv_boolean dsp_decoding = FALSE;
 
 typedef struct jpeg_decompress_struct 	*JPEG_DEC;
 typedef struct jpeg_error_mgr         	*JPEG_ERR;
@@ -187,10 +200,11 @@ static void _jpeg_errjmp( j_common_ptr cinfo)
 
 static void init_source (j_decompress_ptr cinfo)
 {
+	(void)cinfo;
 }
 
 
-static boolean fill_input_buffer (j_decompress_ptr cinfo)
+static jpg_boolean fill_input_buffer (j_decompress_ptr cinfo)
 {
 	my_src_ptr src = (my_src_ptr) cinfo->src;
 
@@ -210,10 +224,11 @@ static void skip_input_data( j_decompress_ptr cinfo, long num_bytes)
 
 static void term_source (j_decompress_ptr cinfo)
 {
+	(void)cinfo;
 }
 
 
-static boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO info)
+static jpg_boolean decompress_thumbnail_image( void *source, uint32_t size, IMGINFO info)
 {
 	int 		header = 0;
 	jmp_buf 	escape;
@@ -324,7 +339,7 @@ size_t wcslen(const wchar_t *s)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_init( const char *name, IMGINFO info)
+zv_boolean __CDECL reader_init( const char *name, IMGINFO info)
 {
 	JPEG_ERR 				jerr;
 	JPEG_DEC 				jpeg;		   
@@ -333,7 +348,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	jmp_buf 				escape;
 	FILE* 					jpeg_file;
 	int16_t 				header = 0;
-	boolean ret = FALSE;
+	zv_boolean ret = FALSE;
 
 	dsp_decoding = FALSE;
 	/* If Brainstorm cookie is used, we try to decode with it*/
@@ -509,7 +524,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 				}
 			}
 #else
-			comment->txt[comment->lines] = ( int8_t*)malloc( mark->data_length + 1);
+			comment->txt[comment->lines] = (char*)malloc( mark->data_length + 1);
 
 			if( comment->txt[comment->lines] == NULL)
 				continue;
@@ -560,12 +575,12 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 	
 						strcat( value, ": ");
 	
-						length = strlen( value);
+						length = (int)strlen( value);
 						
 						exif_entry_get_value( e, &value[length], sizeof(value) - length - 1);
 						value[sizeof(value) - 1] = '\0';
 	
-						length = strlen( value);
+						length = (int)strlen( value);
 						
 #ifdef PLUGIN_SLB
 						{
@@ -588,7 +603,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 							}
 						}
 #else
-						comment->txt[comment->lines] = ( int8_t*)malloc( length + 1);
+						comment->txt[comment->lines] = ( char*)malloc( length + 1);
 	
 						if( comment->txt[comment->lines] == NULL)
 							break;
@@ -678,7 +693,7 @@ boolean __CDECL reader_init( const char *name, IMGINFO info)
 
 
 /*==================================================================================*
- * boolean __CDECL reader_get_txt													*
+ * void __CDECL reader_get_txt													*
  *		This function , like other function mus be always present.					*
  *		It fills txtdata struct. with the text present in the picture ( if any).	*
  *----------------------------------------------------------------------------------*
@@ -697,16 +712,17 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
 	comment = ( txt_data *)info->_priv_ptr_more;
 
 #ifdef PLUGIN_SLB
-	for (i = 0; i < txtdata->lines; i++)
+	for (i = 0; i < comment->lines; i++)
 	{
 		free(txtdata->txt[i]);
 		txtdata->txt[i] = comment->txt[i];
 		comment->txt[i] = NULL;
 	}
 #else
-	for ( i = 0; i < txtdata->lines; i++) 
+	for (i = 0; i < comment->lines; i++) 
 		strcpy( txtdata->txt[i] , comment->txt[i]);
 #endif
+	txtdata->lines = comment->lines;
 }
 
 
@@ -721,7 +737,7 @@ void __CDECL reader_get_txt( IMGINFO info, txt_data *txtdata)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
+zv_boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 {
 	JPEG_DEC jpeg;
 	jmp_buf escape;
@@ -753,7 +769,7 @@ boolean __CDECL reader_read( IMGINFO info, uint8_t *buffer)
 
 
 /*==================================================================================*
- * boolean __CDECL reader_quit:														*
+ * void __CDECL reader_quit:														*
  *		This function makes the last job like close the file handler and free the	*
  *		allocated memory.															*
  *----------------------------------------------------------------------------------*
@@ -830,7 +846,7 @@ void __CDECL reader_quit( IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL encoder_init( const char *name, IMGINFO info)
+zv_boolean __CDECL encoder_init( const char *name, IMGINFO info)
 {
 	JPEG_ERR 	jerr;
 	JPEG_ENC 	jpeg;		   
@@ -890,7 +906,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 	
 /*	jpeg->num_components 	= ( color_space == JCS_RGB ? 3 : 1);
 	jpeg->jpeg_color_space 	= color_space;
-*/	jpeg->progressive_mode	= progressive;
+*/	jpeg->progressive_mode	= (jpg_boolean)progressive;
 
 	jpeg_set_quality( jpeg, quality, TRUE);
 
@@ -930,7 +946,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
  * return:	 																		*
  *      TRUE if all ok else FALSE.													*
  *==================================================================================*/
-boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
+zv_boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 {
 	JPEG_ENC jpeg = ( JPEG_ENC)info->_priv_ptr;
 	jmp_buf 	escape;
@@ -945,7 +961,7 @@ boolean __CDECL encoder_write( IMGINFO info, uint8_t *buffer)
 
 
 /*==================================================================================*
- * boolean __CDECL encoder_quit:													*
+ * void __CDECL encoder_quit:													*
  *		This function makes the last job like close the file handler and free the	*
  *		allocated memory.															*
  *----------------------------------------------------------------------------------*
@@ -978,7 +994,7 @@ void __CDECL encoder_quit( IMGINFO info)
 
 
 /*==================================================================================*
- * boolean __CDECL init:															*
+ * void init:															    *
  *		First function called from zview, in this one, you can make some internal	*
  *		initialisation.																*
  *----------------------------------------------------------------------------------*

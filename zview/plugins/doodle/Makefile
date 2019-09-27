@@ -2,7 +2,6 @@ top_srcdir=../../..
 include $(top_srcdir)/configvars
 
 LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgcook.o ../../ldglib/ldgutil.o
-LIB       = ../libshare/libshare.a
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
@@ -12,7 +11,7 @@ all:: doodle.ldg zvdoodle.slb
 
 include $(top_srcdir)/rules
 
-doodle.ldg: doodleldg.o doodle.o $(LDGOBJS)
+doodle.ldg: doodlldg.o doodle.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvdoodle.slb: header.lo doodleslb.lo doodle.lo

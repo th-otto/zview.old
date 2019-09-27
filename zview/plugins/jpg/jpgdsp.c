@@ -1,14 +1,18 @@
-#include "zview.h"
-#include "imginfo.h"
+#include "plugin.h"
+#include "zvplugin.h"
+#include <gem.h>
+#undef EXTERN
+#undef LOCAL
+#undef GLOBAL
 #include "jpgdh.h"
 #include "jpgdsp.h"
 #include "zvjpg.h"
-#include "plugin.h"
 
 int16_t dsp_ram = 0;
 
 JPGDDRV_PTR jpgdrv = NULL;
 
+#ifdef __GNUC__
 static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 {
 	register int32_t retv __asm__("d0");
@@ -83,6 +87,16 @@ static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	);
 	return retv;
 }
+#endif /* __GNUC__ */
+
+#ifdef __PUREC__
+#define JPGDOpenDriver(jpgd, drv) drv->JPGDOpenDriver(jpgd)
+#define JPGDCloseDriver(jpgd, drv) drv->JPGDCloseDriver(jpgd)
+/* #define JPGDGetStructSize(drv) drv->JPGDGetStructSize() */
+#define JPGDGetImageInfo(jpgd, drv) drv->JPGDGetImageInfo(jpgd)
+#define JPGDGetImageSize(jpgd, drv) drv->JPGDGetImageSize(jpgd)
+#define JPGDDecodeImage(jpgd, drv) drv->JPGDDecodeImage(jpgd)
+#endif
 
 /*==================================================================================*
  * boolean CDECL reader_init:														*

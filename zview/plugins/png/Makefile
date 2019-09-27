@@ -2,7 +2,7 @@ top_srcdir=../../..
 include $(top_srcdir)/configvars
 
 LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgcook.o ../../ldglib/ldgutil.o
-LIB       = ../libshare/libshare.a -lpng -lz -lm
+LIB       = -lpng -lz -lm
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..

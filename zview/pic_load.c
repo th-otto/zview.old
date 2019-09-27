@@ -83,8 +83,6 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		 */
 		plugin_reader_get_txt(&curr_input_plugin->c.slb, info, img->comments);
 		info->num_comments = img->comments->lines;
-		if (img->comments->lines == 0)
-			delete_txt_data(img);
 	} else if (info->num_comments > 0)
 	{
 		/*
@@ -93,6 +91,8 @@ static int16 setup ( IMAGE *img, IMGINFO info, DECDATA data)
 		 */
 		ldg_funcs.decoder_get_txt(info, img->comments);
 	}
+	if (img->comments && img->comments->lines == 0)
+		delete_txt_data(img);
 	img->codec = curr_input_plugin;
 
 	/*

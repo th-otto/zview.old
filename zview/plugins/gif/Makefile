@@ -3,7 +3,7 @@ include $(top_srcdir)/configvars
 
 LDGOBJS = ../../ldglib/ldglib.o ../../ldglib/ldgcook.o ../../ldglib/ldgutil.o
 GIFLIB = -lgif
-LIB       = ../libshare/libshare.a $(GIFLIB)
+LIB       = $(GIFLIB)
 STACKSIZE = 64k
 
 CPPFLAGS		+= -I../../../common -I../common -I../..
