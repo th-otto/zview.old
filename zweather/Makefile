@@ -17,7 +17,7 @@ PROGRAM 		= zweather.app
 all:: $(PROGRAM)
 
 $(PROGRAM): $(OBJ) $(ZCODECLIB)
-	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
+	$(CXX) $(CPU_CFLAGS) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 	: cp $(PROGRAM) _dist/$(PROGRAM)
 	$(COMPRESS) $(PROGRAM)
 

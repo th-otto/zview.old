@@ -20,7 +20,7 @@ ARCHIVES=
 
 cd zview
 for flavour in 000 v4e 020; do
-	eval CPU=\${CPU_CFLAGS_$flavour}
+	: eval CPU=\${CPU_CFLAGS_$flavour}
 	make clean
 	make CPU=$CPU || exit 1
 	make CPU=$CPU dist || exit 1

@@ -13,7 +13,7 @@ PROGRAM 		= ztask.app
 all:: $(PROGRAM)
 
 $(PROGRAM): $(OBJ)
-	$(CC) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
+	$(CC) $(CPU_CFLAGS) $(OPTIMISATION) -o $@ $(OBJ) $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 	: cp $(PROGRAM) _dist/$(PROGRAM)
 	$(COMPRESS) $(PROGRAM)
 

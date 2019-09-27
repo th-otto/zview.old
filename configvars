@@ -7,20 +7,23 @@ STRIP				= $(CROSS_PREFIX)strip
 
 COMPRESS			= : upx -9
 
-#CPU				= -mcpu=5475
-#CPU				= -m68000
-CPU				= -m68020-60
-ifeq ($(CPU),-m68020-60)
+#CPU				= v4e
+#CPU				= 000
+CPU				= 020
+ifeq ($(CPU),020)
 CPU_SUBDIR                      = m68020-60/
 SLB_SUBDIR                      = 020/
+CPU_CFLAGS                      = -m68020-60
 endif
-ifeq ($(CPU),-m68000)
+ifeq ($(CPU),000)
 CPU_SUBDIR                      = 
 SLB_SUBDIR                      = 000/
+CPU_CFLAGS                      = -m68000
 endif
-ifeq ($(CPU),-mcpu=5475)
+ifeq ($(CPU),v4e)
 CPU_SUBDIR                      = m5475/
 SLB_SUBDIR                      = v4e/
+CPU_CFLAGS                      = -mcpu=5475
 endif
 OPTIMISATION			= -O2 -fomit-frame-pointer
 DEBUG				= # -DDEBUG
@@ -35,8 +38,8 @@ else
 WINDOM_LIBS=-lwindom1
 endif
 
-CFLAGS   = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
-CXXFLAGS = $(DEBUG) $(CPU) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror -fno-exceptions
+CFLAGS   = $(DEBUG) $(CPU_CFLAGS) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Wno-pointer-sign -Wstrict-prototypes -Wmissing-prototypes -Werror
+CXXFLAGS = $(DEBUG) $(CPU_CFLAGS) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -Wall -Wshadow -Werror -fno-exceptions
 LDFLAGS  = -s
 ARFLAGS  = rcs
 

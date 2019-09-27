@@ -92,7 +92,7 @@ xpdf/config.status: xpdf/configure
 	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
-	CFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint || \
+	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint || \
 		{ test "$$TRAVIS_REPO_SLUG" != "" && cat config.log; exit 1; }
 
 xpdf/configure: xpdf/configure.ac xpdf/Makefile.am
@@ -122,10 +122,10 @@ ldglib/libldg.a: ldglib/ldgapp.o ldglib/ldgload.o ldglib/ldgutil.o ldglib/ldgcoo
 
 ifeq ($(ZVPDF_SLB),1)
 $(PROGRAM): $(OBJ) pdflib/zvpdf_load.o slb/$(SLB_SUBDIR)zvpdf.slb ldglib/libldg.a
-	$(CC) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/zvpdf_load.o ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -lm -Wl,-Map,zview.map
+	$(CC) $(CPU_CFLAGS) $(OPTIMISATION) -o $@ $(OBJ) pdflib/zvpdf_load.o ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -lm -Wl,-Map,zview.map
 else
 $(PROGRAM): $(OBJ) pdflib/pdflib.o libpdf.a ldglib/libldg.a
-	$(CXX) $(CPU) $(OPTIMISATION) -o $@ $(OBJ) pdflib/pdflib.o libpdf.a ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -Wl,-Map,zview.map
+	$(CXX) $(CPU_CFLAGS) $(OPTIMISATION) -o $@ $(OBJ) pdflib/pdflib.o libpdf.a ldglib/libldg.a $(LDFLAGS) -Wl,--stack,512k $(LIB) -Wl,-Map,zview.map
 endif
 	$(COMPRESS) $(PROGRAM)
 
