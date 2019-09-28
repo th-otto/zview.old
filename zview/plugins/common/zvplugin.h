@@ -13,7 +13,7 @@ extern char *zview_slb_dir;
 extern char *zview_slb_dir_end;
 
 long plugin_open(const char *name, const char *path, SLB *slb);
-void plugin_close(SLB *slb);
+void plugin_close(SLB *slb, boolean waitpid);
 
 boolean __CDECL plugin_reader_init(SLB *slb, const char *name, IMGINFO info);
 boolean __CDECL plugin_reader_read(SLB *slb, IMGINFO info, uint8_t *buffer);

@@ -503,7 +503,7 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 		if (flags & SLB_M68020)
 		{
 			/* cpu is not 020+, but library was compiled for it */
-			plugin_close(slb);
+			plugin_close(slb, FALSE);
 			return -EINVAL;
 		}
 	}
@@ -515,14 +515,14 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 	if (flags & SLB_COLDFIRE)
 #endif
 	{
-		plugin_close(slb);
+		plugin_close(slb, FALSE);
 		return -EINVAL;
 	}
 	
 	ret = plugin_set_imports(slb, &zview_plugin_funcs);
 	if (ret < 0)
 	{
-		plugin_close(slb);
+		plugin_close(slb, FALSE);
 		return ret;
 	}
 	
@@ -530,11 +530,19 @@ long plugin_open(const char *name, const char *path, SLB *slb)
 }
 
 
-void plugin_close(SLB *slb)
+void plugin_close(SLB *slb, boolean waitpid)
 {
 	if (!slb || !slb->handle)
 		return;
 	slb_unload(slb->handle);
 	slb->handle = 0;
 	slb->exec = 0;
+	if (waitpid)
+	{
+		/*
+		 * MiNT has a bug, leaving the unloaded library behind as a zombie
+		 */
+		Syield();
+		Pwaitpid(-1, 3, NULL);
+	}
 }

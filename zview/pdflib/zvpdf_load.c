@@ -342,7 +342,7 @@ long zvpdf_open(void)
 		if (flags & SLB_M68020)
 		{
 			/* cpu is not 020+, but library was compiled for it */
-			plugin_close(slb);
+			plugin_close(slb, FALSE);
 			return -EINVAL;
 		}
 	}
@@ -354,14 +354,14 @@ long zvpdf_open(void)
 	if (flags & SLB_COLDFIRE)
 #endif
 	{
-		plugin_close(slb);
+		plugin_close(slb, FALSE);
 		return -EINVAL;
 	}
 	
 	ret = plugin_set_imports(slb, &zvpdf_funcs);
 	if (ret < 0)
 	{
-		plugin_close(slb);
+		plugin_close(slb, FALSE);
 		return ret;
 	}
 	
@@ -382,5 +382,5 @@ void zvpdf_close(void)
 		}
 	}
 #endif
-	plugin_close(slb);
+	plugin_close(slb, FALSE);
 }

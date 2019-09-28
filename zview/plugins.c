@@ -23,7 +23,7 @@ CODEC *codecs[MAX_CODECS];
  * returns: 																		*
  *      --																			*
  *==================================================================================*/
-static void plugin_free(CODEC *codec)
+static void plugin_free(CODEC *codec, boolean waitpid)
 {
 	switch (codec->type)
 	{
@@ -31,7 +31,7 @@ static void plugin_free(CODEC *codec)
 		ldg_close(codec->c.ldg, ldg_global);
 		break;
 	case CODEC_SLB:
-		plugin_close(&codec->c.slb);
+		plugin_close(&codec->c.slb, waitpid);
 		break;
 	}
 	free(codec->name);
@@ -44,7 +44,7 @@ void plugins_quit( void)
 
 	for( i = 0; i < plugins_nbr; i++)
 	{
-		plugin_free(codecs[i]);
+		plugin_free(codecs[i], FALSE);
 	}
 	plugins_nbr = 0;
 }
@@ -61,12 +61,12 @@ static boolean warn_duplicates(int16_t i, CODEC *last_codec, const char *ext, CO
 	{
 	case 1:
 		/* replace previous by current */
-		plugin_free(codecs[i]);
+		plugin_free(codecs[i], TRUE);
 		codecs[i] = last_codec;
 		return TRUE;
 	case 2:
 		/* ignore current */
-		plugin_free(last_codec);
+		plugin_free(last_codec, TRUE);
 		return TRUE;
 	}
 	return FALSE;
@@ -258,7 +258,7 @@ int16 plugins_init( void)
 					} else
 					{
 						errshow(de->d_name, LDG_ERR_BASE + ldg_error());
-						plugin_free(codec);
+						plugin_free(codec, TRUE);
 					}
 				} else
 				{
