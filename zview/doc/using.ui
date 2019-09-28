@@ -536,6 +536,20 @@ taken, or if the flash of your camera was fired or not.
 
 !end_node # Index Card 'Exif'
 
+!begin_node Index Card 'Codec'
+
+There is now also an additional card that will display some information
+about the codec (converter module) that was used to load the image:
+
+!begin_center
+!image (!picture_path)cardcodec
+
+(!B)Figure.(!b) Codec information of the degas converter
+!end_center
+
+!end_node # Index Card 'Codec'
+
+
 !end_node # Information Dialog
 
 # ------------------------------------------------------
