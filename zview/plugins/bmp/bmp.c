@@ -7,9 +7,10 @@
   1.04 optimized intel i/o, firebee fixes (patched purec library)
   1.05 made array global, better error handling, fixed encoder conflict
   1.06 code cleanup
+  1.07 Fix a bug in rle4 decoder
 */
 
-#define VERSION		0x0106
+#define VERSION		0x0107
 #define NAME        "Windows Bitmap, OS/2 Bitmap"
 #define AUTHOR      "Lonny Pursell, Thorsten Otto"
 #define DATE        __DATE__ " " __TIME__
@@ -110,6 +111,62 @@ typedef struct {
 } BMP_HEADER;
 
 
+#if 0
+#pragma GCC optimize "-fomit-frame-pointer"
+
+static long __attribute__((noinline)) __CDECL _nf_get_id(const char *feature_name)
+{
+	register long ret __asm__ ("d0");
+	(void)(feature_name);
+	__asm__ volatile(
+		"\t.word 0x7300\n"
+	: "=g"(ret)  /* outputs */
+	: /* inputs  */
+	: __CLOBBER_RETURN("d0") "d1", "cc" AND_MEMORY /* clobbered regs */
+	);
+	return ret;
+}
+
+static long __attribute__((noinline)) __CDECL _nf_call(long id, ...)
+{
+	register long ret __asm__ ("d0");
+	(void)(id);
+	__asm__ volatile(
+		"\t.word 0x7301\n"
+	: "=g"(ret)  /* outputs */
+	: /* inputs  */
+	: __CLOBBER_RETURN("d0") "d1", "cc" AND_MEMORY /* clobbered regs */
+	);
+	return ret;
+}
+
+struct {
+	long __CDECL (*nf_get_id)(const char *feature_name);
+	long __CDECL (*nf_call)(long id, ...);
+} ops = {
+	_nf_get_id,
+	_nf_call
+};
+
+
+__attribute__((format(__printf__, 1, 2)))
+static void nf_debugprintf(const char *format, ...)
+{
+	long nf_stderr = ops.nf_get_id("NF_STDERR");
+	va_list args;
+	char buf[1024];
+	
+	va_start(args, format);
+	vsnprintf(buf, sizeof(buf), format, args);
+	va_end(args);
+	ops.nf_call(nf_stderr | 0, buf);
+}
+#else
+#define nf_debugprintf(format, ...)
+#endif
+
+
+
 static void outw(uint8_t *p, uint16_t d)
 {
 	*p++ = d;
@@ -161,7 +218,7 @@ static uint16_t ToS(const uint8_t *puffer)
 }
 
 
-static void decode_rle8(int16_t handle, uint8_t *bmap, uint32_t line_size)
+static void decode_rle8(int16_t handle, IMGINFO info, uint8_t *bmap, uint32_t line_size)
 {
 	uint8_t buff[2];
 	uint32_t x = 0;
@@ -171,14 +228,21 @@ static void decode_rle8(int16_t handle, uint8_t *bmap, uint32_t line_size)
 	uint8_t command_byte;
 	uint8_t second_byte;
 	uint8_t input;
+	uint32_t xmargin;
 
+	xmargin = info->width;
+	
 	for (;;)
 	{
 		if (Fread(handle, 1, &status_byte) != 1)
 			break;
 		if (status_byte == RLE_COMMAND)
 		{						/* get control byte */
-			Fread(handle, 1, &command_byte);
+			if (Fread(handle, 1, &command_byte) != 1)
+			{
+				/* corrupted */
+				break;
+			}
 			if (command_byte == RLE_ENDOFLINE)
 			{					/* end of row? */
 				y++;
@@ -187,26 +251,51 @@ static void decode_rle8(int16_t handle, uint8_t *bmap, uint32_t line_size)
 			{					/* end of bitmap? */
 				break;
 			} else if (command_byte == RLE_DELTA)
-			{					/* deleta offset? */
-				Fread(handle, 2, buff);
+			{					/* delta offset? */
+				if (Fread(handle, 2, buff) != 2)
+				{
+					/* corrupted */
+					break;
+				}
 				x += buff[0];
 				y += buff[1];
 			} else
 			{					/* literal group? */
+				if ((x + command_byte) > xmargin || y >= info->height)
+				{
+					/* corrupted */
+					nf_debugprintf("corrupted\n");
+					break;
+				}
 				for (i = 0; i < command_byte; i++)
 				{
-					Fread(handle, 1, &input);
+					if (Fread(handle, 1, &input) != 1)
+					{
+						/* corrupted */
+						break;
+					}
 					bmap[(y * line_size) + x] = input;
 					x++;
 				}
 				if (command_byte & 1)
 				{				/* odd? */
+					/* pad to word boundary */
 					Fread(handle, 1, &input);
 				}
 			}
 		} else
 		{						/* repeating group? */
-			Fread(handle, 1, &second_byte);
+			if ((x + status_byte) > xmargin || y >= info->height)
+			{
+				/* corrupted */
+				nf_debugprintf("corrupted\n");
+				break;
+			}
+			if (Fread(handle, 1, &second_byte) != 1)
+			{
+				/* corrupted */
+				break;
+			}
 			for (i = 0; i < status_byte; i++)
 			{
 				bmap[(y * line_size) + x] = second_byte;
@@ -217,68 +306,124 @@ static void decode_rle8(int16_t handle, uint8_t *bmap, uint32_t line_size)
 }
 
 
-static void decode_rle4(int16_t handle, uint8_t *bmap, uint32_t line_size)
+static void decode_rle4(int16_t handle, IMGINFO info, uint8_t *bmap, uint32_t line_size)
 {
 	uint8_t buff[2];
 	uint32_t x = 0;
 	uint32_t y = 0;
-	uint32_t xx;
 	uint16_t i;
 	uint8_t status_byte;
 	uint8_t command_byte;
 	uint8_t second_byte;
-	uint8_t input;
-
+	uint32_t xmargin;
+	
+	xmargin = info->width + (info->width & 1);
+	
 	for (;;)
 	{
 		if (Fread(handle, 1, &status_byte) != 1)
 			break;
+		nf_debugprintf("status_byte $%02x, x=%u\n", status_byte, x);
 		if (status_byte == 0)
 		{						/* get control byte */
-			Fread(handle, 1, &command_byte);
+			if (Fread(handle, 1, &command_byte) != 1)
+			{
+				/* corrupted */
+				nf_debugprintf("corrupted\n");
+				break;
+			}
 			if (command_byte == RLE_COMMAND)
 			{					/* end of row? */
+				nf_debugprintf("end of row, x=%u, y=%u\n", x, y);
 				y++;
 				x = 0;
 			} else if (command_byte == RLE_ENDOFBITMAP)
 			{					/* end of bitmap? */
+				nf_debugprintf("end of bitmap\n");
 				break;
 			} else if (command_byte == RLE_DELTA)
 			{					/* delta offset? */
-				Fread(handle, 2, buff);
+				if (Fread(handle, 2, buff) != 2)
+				{
+					/* corrupted */
+					nf_debugprintf("corrupted\n");
+					break;
+				}
 				x += buff[0];
 				y += buff[1];
+				nf_debugprintf("delta x=%u y=%u -> x=%u, y=%u\n", buff[0], buff[1], x, y);
 			} else
 			{					/* literal group? */
-				xx = x;
-				for (i = 0; i < (command_byte >> 1) + 1u; i++)
+				if ((x + command_byte) > xmargin || y >= info->height)
 				{
-					Fread(handle, 1, &second_byte);
-					bmap[(y * line_size) + xx] = second_byte;
-					xx++;
+					/* corrupted */
+					nf_debugprintf("corrupted\n");
+					break;
 				}
-				x += command_byte;
+				nf_debugprintf("literal %u\n", command_byte);
+				for (i = 0; i < (command_byte >> 1); i++)
+				{
+					if (Fread(handle, 1, &second_byte) != 1)
+					{
+						/* corrupted */
+						nf_debugprintf("corrupted\n");
+						break;
+					}
+					bmap[(y * line_size) + x] = second_byte >> 4;
+					x++;
+					bmap[(y * line_size) + x] = second_byte & 0x0f;
+					x++;
+				}
 				if (command_byte & 1)
 				{				/* odd? */
-					Fread(handle, 1, &input);
+					if (Fread(handle, 1, &second_byte) != 1)
+					{
+						/* corrupted */
+						nf_debugprintf("corrupted\n");
+						break;
+					}
+					bmap[(y * line_size) + x] = second_byte >> 4;
+					x++;
+				}
+				if ((command_byte & 3) == 1 || (command_byte & 3) == 2)
+				{
+					/* pad to word boundary */
+					Fread(handle, 1, &second_byte);
 				}
 			}
 		} else
 		{						/* repeating group? */
-			Fread(handle, 1, &second_byte);
-			xx = x;
-			for (i = 0; i < (status_byte >> 1) + 1u; i++)
+			if ((x + status_byte) > xmargin || y >= info->height)
 			{
-				bmap[(y * line_size) + xx] = second_byte >> 4;
-				xx++;
+				/* corrupted */
+				nf_debugprintf("corrupted\n");
+				break;
 			}
-			x += status_byte;
+			if (Fread(handle, 1, &second_byte) != 1)
+			{
+				/* corrupted */
+				nf_debugprintf("corrupted\n");
+				break;
+			}
+			nf_debugprintf("repeat %u $%02x\n", status_byte, second_byte);
+			for (i = 0; i < (status_byte >> 1); i++)
+			{
+				bmap[(y * line_size) + x] = second_byte >> 4;
+				x++;
+				bmap[(y * line_size) + x] = second_byte & 0x0f;
+				x++;
+			}
+			if (status_byte & 1)
+			{
+				bmap[(y * line_size) + x] = second_byte >> 4;
+				x++;
+			}
 		}
 	}
 }
 
 
-static void decode_rle24(int16_t handle, uint8_t *bmap, uint32_t line_size)
+static void decode_rle24(int16_t handle, IMGINFO info, uint8_t *bmap, uint32_t line_size)
 {
 	uint8_t buff[4];
 	uint32_t x = 0;
@@ -287,14 +432,21 @@ static void decode_rle24(int16_t handle, uint8_t *bmap, uint32_t line_size)
 	uint8_t status_byte;
 	uint8_t command_byte;
 	uint8_t input;
+	uint32_t xmargin;
 
+	xmargin = info->width;
+	
 	for (;;)
 	{
 		if (Fread(handle, 1, &status_byte) != 1)
 			break;
 		if (status_byte == RLE_COMMAND)
 		{						/* get control byte */
-			Fread(handle, 1, &command_byte);
+			if (Fread(handle, 1, &command_byte) != 1)
+			{
+				/* corrupted */
+				break;
+			}
 			if (command_byte == RLE_ENDOFLINE)
 			{					/* end of row? */
 				y++;
@@ -303,28 +455,53 @@ static void decode_rle24(int16_t handle, uint8_t *bmap, uint32_t line_size)
 			{					/* end of bitmap? */
 				break;
 			} else if (command_byte == RLE_DELTA)
-			{					/* deleta offset? */
-				Fread(handle, 2, buff);
+			{					/* delta offset? */
+				if (Fread(handle, 2, buff) != 2)
+				{
+					/* corrupted */
+					break;
+				}
 				x += buff[0];
 				y += buff[1];
 			} else
 			{					/* literal group? */
+				if ((x + command_byte) > xmargin || y >= info->height)
+				{
+					/* corrupted */
+					nf_debugprintf("corrupted\n");
+					break;
+				}
 				for (i = 0; i < command_byte; i++)
 				{
-					Fread(handle, 3, buff);
+					if (Fread(handle, 3, buff) != 3)
+					{
+						/* corrupted */
+						break;
+					}
 					bmap[(y * line_size) + (x * 3) + 0] = buff[2];
 					bmap[(y * line_size) + (x * 3) + 1] = buff[1];
 					bmap[(y * line_size) + (x * 3) + 2] = buff[0];
 					x++;
 				}
-				if (command_byte & 1)
+				if ((command_byte & 1) != 0)
 				{				/* odd? */
+					/* pad to word boundary */
 					Fread(handle, 1, &input);
 				}
 			}
 		} else
 		{						/* repeating group? */
-			Fread(handle, 3, buff);
+			if ((x + status_byte) > xmargin || y >= info->height)
+			{
+				/* corrupted */
+				nf_debugprintf("corrupted\n");
+				break;
+			}
+			if (Fread(handle, 3, buff) != 3)
+			{
+				/* corrupted */
+				break;
+			}
 			for (i = 0; i < status_byte; i++)
 			{
 				bmap[(y * line_size) + (x * 3) + 0] = buff[2];
@@ -410,7 +587,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	case 64: /* OS/2 BITMAPINFOHEADER2 */
 	case 108: /* BITMAPV4HEADER */
 	case 124: /* BITMAPV5HEADER */
-		strcpy(info->info, "Windows BitMaP v3");
 		info->width = (uint16_t) ToL(header.bmp_info_header.bitmapinfoheader.width);
 		info->height = (uint16_t) ToL(header.bmp_info_header.bitmapinfoheader.height);
 		info->planes = ToS(header.bmp_info_header.bitmapinfoheader.bitcount);
@@ -430,6 +606,12 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 			strcpy(info->info, "Windows BitMaP v5");
 		else if (hdrsize >= 108)
 			strcpy(info->info, "Windows BitMaP v4");
+		else if (hdrsize >= 56)
+			strcpy(info->info, "Windows BitMaP v3");
+		else if (hdrsize >= 52)
+			strcpy(info->info, "Windows BitMaP v2");
+		else
+			strcpy(info->info, "Windows BitMaP v1");
 		break;
 	default:
 		db("invalid header size", 0);
@@ -449,18 +631,49 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	switch (info->planes)
 	{
 	case 1:
+		if (compressed != BMP_RGB)
+		{
+			/* unsupported */
+			Fclose(handle);
+			return FALSE;
+		}
 		line_size = (info->width >> 3) + ((info->width & 7) ? 1 : 0);
 		info->indexed_color = FALSE;
 		break;
 	case 4:
-		line_size = (info->width + 1) >> 1;
+		if (compressed == BMP_RLE4)
+		{
+			/* decompression will write 1 byte per pixel */
+			line_size = info->width;
+		} else if (compressed == BMP_RGB)
+		{
+			/* uncompressed: */
+			line_size = (info->width + 1) >> 1;
+		} else
+		{
+			/* unsupported */
+			Fclose(handle);
+			return FALSE;
+		}
 		info->indexed_color = TRUE;
 		break;
 	case 8:
+		if (compressed != BMP_RGB && compressed != BMP_RLE8)
+		{
+			/* unsupported */
+			Fclose(handle);
+			return FALSE;
+		}
 		line_size = info->width;
 		info->indexed_color = TRUE;
 		break;
 	case 16:
+		if (compressed != BMP_RGB && compressed != BMP_BITFIELDS)
+		{
+			/* unsupported */
+			Fclose(handle);
+			return FALSE;
+		}
 		line_size = info->width * 2;
 		info->indexed_color = FALSE;
 		break;
@@ -484,7 +697,9 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		info->orientation = UP_TO_DOWN;
 	}
 
+	nf_debugprintf("line_size1: %u %u\n", line_size, compressed);
 	line_size += fill4B(line_size);
+	nf_debugprintf("line_size2: %u\n", line_size);
 	datasize = line_size * info->height;
 	bmap = malloc(datasize + 256L);
 	if (bmap == NULL)
@@ -507,7 +722,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 		for (i = 0; i < (int16_t)colors_used; i++)
 		{
-			if (hdrsize == 12)
+			if (hdrsize == 12 || hdrsize == 64)
 				Fread(handle, 3, buff);							/* os/2 v1 */
 			else
 				Fread(handle, 4, buff);
@@ -517,9 +732,10 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		}
 	}
 
-	/* sane defualts */
+	/* sane defaults */
 	if (info->planes == 16)
 	{
+		/* default masks for RGB555 */
 		rmask = 0x7c00;
 		gmask = 0x03e0;
 		bmask = 0x001f;
@@ -538,7 +754,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	{
 		if ((info->planes == 16 || info->planes == 32) && hdrsize >= 52)
 		{
-			strcpy(info->info, "Windows BitMaP v3 (NT)");
 			rmask = ToL(header.bmp_info_header.bitmapinfoheader.RedMask);
 			gmask = ToL(header.bmp_info_header.bitmapinfoheader.GreenMask);
 			bmask = ToL(header.bmp_info_header.bitmapinfoheader.BlueMask);
@@ -548,12 +763,13 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	if (offbits != 0)
 		Fseek(offbits, handle, SEEK_SET);
+	offbits = Fseek(0, handle, SEEK_CUR);
 
 #if 0
 	db("rmask=%lu",rmask);
 	db("gmask=%lu",gmask);
 	db("bmask=%lu",bmask);
-	db("mask=%lu",mask);
+	db("pixelmask=%lu",pixelmask);
 #endif
 
 	switch (compressed)
@@ -589,13 +805,13 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	case BMP_RLE8:					/* 8-bit rle (RLE8) */
 		strcpy(info->compression, "RLE8");
 		memset(bmap, 0, datasize);
-		decode_rle8(handle, bmap, line_size);
+		decode_rle8(handle, info, bmap, line_size);
 		break;
 
 	case BMP_RLE4:						/* 4-bit rle (RLE4) !! converted to 8 planes !! */
 		strcpy(info->compression, "RLE4");
 		memset(bmap, 0, datasize);
-		decode_rle4(handle, bmap, line_size);
+		decode_rle4(handle, info, bmap, line_size);
 		break;
 
 	case BMP_BITFIELDS:					/* huffman 1d/bf */
@@ -615,7 +831,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	case BMP_JPEG:							/* 24-bit rle (RLE24) !! untested !! */
 		strcpy(info->compression, "RLE");
 		memset(bmap, 0, datasize);
-		decode_rle24(handle, bmap, line_size);
+		decode_rle24(handle, info, bmap, line_size);
 		break;
 
 	default:							/* compression not supported? */
@@ -627,6 +843,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	Fclose(handle);
 
 	info->_priv_ptr = bmap;
+	info->_priv_var = compressed;
 	info->_priv_var_more = 0;				/* y offset */
 	info->_priv_ptr_more = (void *)line_size;
 	info->__priv_ptr_more = (void *)pixelmask;
@@ -680,12 +897,23 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 		break;
 	case 4:
 		x = 0;
-		do
+		if (info->_priv_var)
 		{
-			b = bmap[pos++];
-			buffer[x++] = b >> 4;
-			buffer[x++] = b & 0xF;
-		} while (x < info->width);
+			/* decompression already wrote 1 byte per pixel */
+			do
+			{
+				b = bmap[pos++];
+				buffer[x++] = b;
+			} while (x < info->width);
+		} else
+		{
+			do
+			{
+				b = bmap[pos++];
+				buffer[x++] = b >> 4;
+				buffer[x++] = b & 0xF;
+			} while (x < info->width);
+		}
 		break;
 	case 8:
 		for (x = 0; x < info->width; x++)
@@ -729,11 +957,13 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 		{
 			if (pixelmask == 16777215uL)
 			{							/* bgra */
+				/* bbbbbbbb gggggggg rrrrrrrr xxxxxxxx */
 				buffer[i++] = bmap[pos + 2];
 				buffer[i++] = bmap[pos + 1];
 				buffer[i++] = bmap[pos + 0];
 			} else
 			{
+				/* xxrrrrrr rrrrgggg ggggggbb bbbbbbbb */
 				uint32_t rgbx =
 					((uint32_t) bmap[pos + 3] << 24) | ((uint32_t) bmap[pos + 2] << 16) | ((uint32_t) bmap[pos + 1] << 8) |
 					(uint32_t) bmap[pos];
