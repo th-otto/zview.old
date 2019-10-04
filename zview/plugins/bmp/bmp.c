@@ -509,10 +509,6 @@ static void decode_rle24(int16_t handle, IMGINFO info, uint8_t *bmap, uint32_t l
 				bmap[(y * line_size) + (x * 3) + 2] = buff[0];
 				x++;
 			}
-			if (status_byte & 1)
-			{
-				Fread(handle, 1, &input);
-			}
 		}
 	}
 }
