@@ -90,10 +90,12 @@ $(PDF_OBJ): xpdf/config.status
 
 xpdf/config.status: xpdf/configure
 	test -d xpdf || exit 1 && \
+	TARGET=$(CROSS_PREFIX) && \
+	TARGET=$${TARGET%-} && \
 	cd xpdf && \
-	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
-	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
-	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --disable-multithreaded --disable-exceptions --host=m68k-atari-mint || \
+	export PKG_CONFIG_LIBDIR=/usr/$${TARGET}/lib/pkgconfig && \
+	export PKG_CONFIG_PATH=/usr/$${TARGET}/lib/pkgconfig && \
+	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --disable-multithreaded --disable-exceptions --host=$${TARGET} || \
 		{ test "$$TRAVIS_REPO_SLUG" != "" && cat config.log; exit 1; }
 
 xpdf/configure: xpdf/configure.ac xpdf/Makefile.am
