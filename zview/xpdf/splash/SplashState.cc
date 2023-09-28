@@ -126,7 +126,10 @@ SplashState::SplashState(int width, int height, GBool vectorAntialias,
 }
 
 SplashState::SplashState(SplashState *state) {
-  memcpy(matrix, state->matrix, 6 * sizeof(SplashCoord));
+  int i;
+  
+  for (i = 0; i < 6; i++)
+    matrix[i] = state->matrix[i];
   strokePattern = state->strokePattern->copy();
   fillPattern = state->fillPattern->copy();
   screen = state->screen->copy();

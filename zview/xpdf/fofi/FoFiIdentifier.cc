@@ -802,7 +802,7 @@ static GList *getDfontFontList(FILE *f) {
   Guchar *resMap;
   int fileLength, resMapOffset, resMapLength;
   int resTypeListOffset, resNameListOffset, nTypes;
-  int refListOffset, nFonts, nameOffset, nameLen;
+  int refListOffset = 0, nFonts = 0, nameOffset, nameLen;
   int offset, i;
   GList *ret;
 

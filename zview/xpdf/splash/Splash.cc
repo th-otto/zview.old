@@ -2144,7 +2144,9 @@ GBool Splash::getInKnockoutGroup() {
 //------------------------------------------------------------------------
 
 void Splash::setMatrix(SplashCoord *matrix) {
-  memcpy(state->matrix, matrix, 6 * sizeof(SplashCoord));
+  int i;
+  for (i = 0; i < 6; i++)
+    state->matrix[i] = matrix[i];
 }
 
 void Splash::setStrokePattern(SplashPattern *strokePattern) {

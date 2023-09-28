@@ -155,7 +155,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 #endif
 #ifndef PLUGIN_SLB
 	png_textp png_text_ptr;
-	png_int_t num_text;
+	int num_text;
 #endif
 	struct _mypng_info *myinfo;
 	png_byte color_type;
@@ -224,8 +224,8 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	if (color_type == PNG_COLOR_TYPE_PALETTE && myinfo->bit_depth <= 8)
 	{
 		png_colorp palette;
-		png_int_t num_palette = 0;
-		png_int_t i;
+		int num_palette = 0;
+		int i;
 		
 		info->indexed_color = TRUE;
 		png_get_PLTE(myinfo->png_ptr, myinfo->info_ptr, &palette, &num_palette);

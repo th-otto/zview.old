@@ -5,6 +5,7 @@
 #include "symbols.h"
 #include <slb/png.h>
 #include <slb/zlib.h>
+#undef INT16
 #include <slb/jpeg.h>
 #include <slb/tiff.h>
 #include <slb/lzma.h>

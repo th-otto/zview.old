@@ -84,6 +84,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void)
  * to zero in the header, even if they
  * currently don't do anything
  */
+#pragma GCC diagnostic ignored "-Warray-bounds"
 long __CDECL slb_init(void)
 {
 	const BASEPAGE *bp;
@@ -97,6 +98,7 @@ long __CDECL slb_init(void)
 	my_base = bp;
 	return 0;
 }
+#pragma GCC diagnostic warning "-Warray-bounds"
 
 
 void __CDECL slb_exit(void)

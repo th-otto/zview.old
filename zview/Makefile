@@ -83,7 +83,8 @@ endif
 
 xpdf-${XPDF_VERSION}.tar.gz:
 	: wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
-	wget https://xpdfreader-dl.s3.amazonaws.com/old/xpdf-${XPDF_VERSION}.tar.gz
+	: wget https://xpdfreader-dl.s3.amazonaws.com/old/xpdf-${XPDF_VERSION}.tar.gz
+	wget https://dl.xpdfreader.com/old/xpdf-${XPDF_VERSION}.tar.gz
 
 $(PDF_OBJ): xpdf/config.status
 
@@ -92,7 +93,7 @@ xpdf/config.status: xpdf/configure
 	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/m68k-atari-mint/lib/pkgconfig && \
 	export PKG_CONFIG_PATH=/usr/m68k-atari-mint/lib/pkgconfig && \
-	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --host=m68k-atari-mint || \
+	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --disable-multithreaded --disable-exceptions --host=m68k-atari-mint || \
 		{ test "$$TRAVIS_REPO_SLUG" != "" && cat config.log; exit 1; }
 
 xpdf/configure: xpdf/configure.ac xpdf/Makefile.am

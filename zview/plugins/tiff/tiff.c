@@ -89,6 +89,16 @@ static long init_tiff_slb(void)
 #endif
 
 
+#ifndef TIFF_CALLBACK
+# define TIFF_CALLBACK __CDECL
+#endif
+#ifndef tiff_enum
+typedef int tiff_int_t;
+typedef unsigned int tiff_uint_t;
+typedef unsigned short tiff_uint16_t;
+#define tiff_enum(x) x
+#endif
+
 static void TIFF_CALLBACK my_errorhandler(const char *module, const char *format, va_list ap)
 {
 	(void)module;

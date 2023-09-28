@@ -49,6 +49,7 @@ static struct _zvpdf_funcs *get_slb_funcs(void)
  * to zero in the header, even if they
  * currently don't do anything
  */
+#pragma GCC diagnostic ignored "-Warray-bounds"
 long __CDECL slb_init(void)
 {
 	const BASEPAGE *bp;
@@ -62,6 +63,7 @@ long __CDECL slb_init(void)
 	my_base = bp;
 	return 0;
 }
+#pragma GCC diagnostic warning "-Warray-bounds"
 
 
 void __CDECL slb_exit(void)
@@ -525,3 +527,9 @@ FILE *fdopen(int fd, const char *mode)
 #undef errno
 /* only referenced from some math functions */
 int errno;
+
+/* newer versions of libstdc++ may have references to strtoul */
+unsigned long strtoul(const char *restrict nptr, char **restrict endptr, int base)
+{
+	return 0;
+}

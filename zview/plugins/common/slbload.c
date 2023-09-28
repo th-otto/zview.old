@@ -77,6 +77,7 @@ typedef struct
 } SLB_HEADER;
 
 #ifndef NO_LOCAL_SLB
+#pragma GCC diagnostic ignored "-Warray-bounds"
 static long localSlbLoad(const char *sharedlib, const char *path, long ver, SLB_HANDLE *slb, SLB_EXEC *slbexec)
 {
 	long *exec_longs;
@@ -196,6 +197,7 @@ static long localSlbLoad(const char *sharedlib, const char *path, long ver, SLB_
 	*slbexec = (SLB_EXEC) __slb_local_exec;
 	return E_OK;
 }
+#pragma GCC diagnostic warning "-Warray-bounds"
 
 static long localSlbUnload(SLB_HANDLE slb)
 {

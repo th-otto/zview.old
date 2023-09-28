@@ -21,10 +21,10 @@ void libshare_dummy( void);
 void 
 libshare_dummy( void)
 {
-	(void)malloc(0);
+	if (malloc(0) == 0);
 	free(0);
-	(void)realloc(0,0);
-	(void)calloc(0,0);
+	if (realloc(0,0) == 0);
+	if (calloc(0,0) == 0);
 	(void)sbrk(0);
 	(void)chdir("");
 }

@@ -32,6 +32,8 @@
 #include "../general.h"
 #include "../winimg.h"
 #include "../pdflib/pdflib.h"
+#elif defined(FREETYPE_SLB)
+#include <slb/freetype.h>
 #endif
 
 #ifdef VMS
