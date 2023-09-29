@@ -834,6 +834,9 @@ void JBIG2Bitmap::combine(JBIG2Bitmap *bitmap, int x, int y,
   } else {
     y0 = 0;
   }
+  if (y > INT_MAX - bitmap->h) {
+    return;
+  }
   if (y + bitmap->h > h) {
     y1 = h - y;
   } else {
@@ -1140,6 +1143,7 @@ JBIG2CodeTable::~JBIG2CodeTable() {
 JBIG2Stream::JBIG2Stream(Stream *strA, Object *globalsStreamA):
   FilterStream(strA)
 {
+  decoded = gFalse;
   pageBitmap = NULL;
 
   arithDecoder = new JArithmeticDecoder();
@@ -1198,34 +1202,9 @@ Stream *JBIG2Stream::copy() {
 }
 
 void JBIG2Stream::reset() {
-  // read the globals stream
-  globalSegments = new GList();
-  if (globalsStream.isStream()) {
-    segments = globalSegments;
-    curStr = globalsStream.getStream();
-    curStr->reset();
-    arithDecoder->setStream(curStr);
-    huffDecoder->setStream(curStr);
-    mmrDecoder->setStream(curStr);
-    readSegments();
-    curStr->close();
-  }
-
-  // read the main stream
   segments = new GList();
-  curStr = str;
-  curStr->reset();
-  arithDecoder->setStream(curStr);
-  huffDecoder->setStream(curStr);
-  mmrDecoder->setStream(curStr);
-  readSegments();
-
-  if (pageBitmap) {
-    dataPtr = pageBitmap->getDataPtr();
-    dataEnd = dataPtr + pageBitmap->getDataSize();
-  } else {
-    dataPtr = dataEnd = NULL;
-  }
+  globalSegments = new GList();
+  decoded = gFalse;
 }
 
 void JBIG2Stream::close() {
@@ -1246,6 +1225,9 @@ void JBIG2Stream::close() {
 }
 
 int JBIG2Stream::getChar() {
+  if (!decoded) {
+    decodeImage();
+  }
   if (dataPtr && dataPtr < dataEnd) {
     return (*dataPtr++ ^ 0xff) & 0xff;
   }
@@ -1253,6 +1235,9 @@ int JBIG2Stream::getChar() {
 }
 
 int JBIG2Stream::lookChar() {
+  if (!decoded) {
+    decodeImage();
+  }
   if (dataPtr && dataPtr < dataEnd) {
     return (*dataPtr ^ 0xff) & 0xff;
   }
@@ -1262,6 +1247,9 @@ int JBIG2Stream::lookChar() {
 int JBIG2Stream::getBlock(char *blk, int size) {
   int n, i;
 
+  if (!decoded) {
+    decodeImage();
+  }
   if (size <= 0) {
     return 0;
   }
@@ -1276,9 +1264,10 @@ int JBIG2Stream::getBlock(char *blk, int size) {
   return n;
 }
 
-GString *JBIG2Stream::getPSFilter(int psLevel, const char *indent) {
+GString *JBIG2Stream::getPSFilter(int psLevel, const char *indent, GBool okToReadStream) {
   (void) psLevel;
   (void) indent;
+  (void) okToReadStream;
   return NULL;
 }
 
@@ -1287,13 +1276,48 @@ GBool JBIG2Stream::isBinary(GBool last) {
   return str->isBinary(gTrue);
 }
 
+void JBIG2Stream::decodeImage() {
+  GList *t;
+
+  // read the globals stream
+  if (globalsStream.isStream()) {
+    curStr = globalsStream.getStream();
+    curStr->reset();
+    arithDecoder->setStream(curStr);
+    huffDecoder->setStream(curStr);
+    mmrDecoder->setStream(curStr);
+    readSegments();
+    curStr->close();
+    // swap the newly read segments list into globalSegments
+    t = segments;
+    segments = globalSegments;
+    globalSegments = t;
+  }
+
+  // read the main stream
+  curStr = str;
+  curStr->reset();
+  arithDecoder->setStream(curStr);
+  huffDecoder->setStream(curStr);
+  mmrDecoder->setStream(curStr);
+  readSegments();
+
+  if (pageBitmap) {
+    dataPtr = pageBitmap->getDataPtr();
+    dataEnd = dataPtr + pageBitmap->getDataSize();
+  } else {
+    dataPtr = dataEnd = NULL;
+  }
+
+  decoded = gTrue;
+}
+
 void JBIG2Stream::readSegments() {
   Guint segNum, segFlags, segType, page, segLength;
   Guint refFlags, nRefSegs;
   Guint *refSegs;
   int c1, c2, c3;
   Guint i;
-  GBool done;
 
   done = gFalse;
   while (!done && readULong(&segNum)) {
@@ -1505,7 +1529,7 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   Guint symHeight, symWidth, totalWidth, x, symID;
   int dh, dw, refAggNum, refDX, refDY, bmSize;
   GBool ex;
-  int run, cnt;
+  int run, prevRun, cnt;
   Guint i, j, k;
 
   (void) length;
@@ -1713,16 +1737,17 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
 	    "Bad delta-height value in JBIG2 symbol dictionary");
       goto syntaxError;
     }
-    // sanity check to avoid extremely long run-times with damaged streams
-    if (dh > 1000000) {
-      error(errSyntaxError, getPos(),
-	    "Bogus delta-height value in JBIG2 symbol dictionary");
-      goto syntaxError;
-    }
     symHeight += dh;
     symWidth = 0;
     totalWidth = 0;
     j = i;
+
+    // sanity check to avoid extremely long run-times with damaged streams
+    if (symHeight > 100000) {
+      error(errSyntaxError, getPos(),
+	    "Bogus symbol height value in JBIG2 symbol dictionary");
+      goto syntaxError;
+    }
 
     // read the symbols in this height class
     while (1) {
@@ -1747,6 +1772,13 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
       if (i >= numNewSyms) {
 	error(errSyntaxError, getPos(),
 	      "Too many symbols in JBIG2 symbol dictionary");
+	goto syntaxError;
+      }
+
+      // sanity check to avoid extremely long run-times with damaged streams
+      if (symWidth > 100000) {
+	error(errSyntaxError, getPos(),
+	      "Bogus symbol width value in JBIG2 symbol dictionary");
 	goto syntaxError;
       }
 
@@ -1853,11 +1885,20 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
   // exported symbol list
   i = j = 0;
   ex = gFalse;
+  prevRun = 1;
   while (i < numInputSyms + numNewSyms) {
     if (huff) {
       huffDecoder->decodeInt(&run, huffTableA);
     } else {
       arithDecoder->decodeInt(&run, iaexStats);
+    }
+    if (run == 0 && prevRun == 0) {
+      // this avoids infinite loops with damaged files (consecutive
+      // zero runs are never useful)
+      error(errSyntaxError, getPos(),
+	    "Invalid exported symbol list in JBIG2 symbol dictionary");
+      delete symbolDict;
+      goto syntaxError;
     }
     if (i + run > numInputSyms + numNewSyms ||
 	(ex && j + run > numExSyms)) {
@@ -1874,6 +1915,7 @@ GBool JBIG2Stream::readSymbolDictSeg(Guint segNum, Guint length,
       i += run;
     }
     ex = !ex;
+    prevRun = run;
   }
   if (j != numExSyms) {
     error(errSyntaxError, getPos(), "Too few symbols in JBIG2 symbol dictionary");
@@ -1959,6 +2001,15 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
     error(errSyntaxError, getPos(), "Bad size in JBIG2 text region segment");
     return;
   }
+  // sanity check: if the w/h/x/y values are way out of range, it likely
+  // indicates a damaged JBIG2 stream
+  if (w / 10 > pageW || h / 10 > pageH ||
+      x / 10 > pageW || y / 10 > pageH) {
+    error(errSyntaxError, getPos(),
+	  "Bad size or position in JBIG2 text region segment");
+    done = gTrue;
+    return;
+  }
   extCombOp = segInfoFlags & 7;
 
   // rest of the text region header
@@ -2008,7 +2059,14 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
   for (i = 0; i < nRefSegs; ++i) {
     if ((seg = findSegment(refSegs[i]))) {
       if (seg->getType() == jbig2SegSymbolDict) {
-	numSyms += ((JBIG2SymbolDict *)seg)->getSize();
+	Guint segSize = ((JBIG2SymbolDict *)seg)->getSize();
+	if (segSize > INT_MAX || numSyms > INT_MAX - segSize) {
+	  error(errSyntaxError, getPos(),
+		"Too many symbols in JBIG2 text region");
+	  delete codeTables;
+	  return;
+	}
+	numSyms += segSize;
       } else if (seg->getType() == jbig2SegCodeTable) {
 	codeTables->append(seg);
       }
@@ -2145,18 +2203,23 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
       runLengthTab[i].val = i;
       runLengthTab[i].prefixLen = huffDecoder->readBits(4);
       runLengthTab[i].rangeLen = 0;
+      runLengthTab[i].prefix = 0;
     }
     runLengthTab[32].val = 0x103;
     runLengthTab[32].prefixLen = huffDecoder->readBits(4);
     runLengthTab[32].rangeLen = 2;
+    runLengthTab[32].prefix = 0;
     runLengthTab[33].val = 0x203;
     runLengthTab[33].prefixLen = huffDecoder->readBits(4);
     runLengthTab[33].rangeLen = 3;
+    runLengthTab[33].prefix = 0;
     runLengthTab[34].val = 0x20b;
     runLengthTab[34].prefixLen = huffDecoder->readBits(4);
     runLengthTab[34].rangeLen = 7;
+    runLengthTab[34].prefix = 0;
     runLengthTab[35].prefixLen = 0;
     runLengthTab[35].rangeLen = jbig2HuffmanEOT;
+    runLengthTab[35].prefix = 0;
     huffDecoder->buildTable(runLengthTab, 35);
     symCodeTab = (JBIG2HuffmanTable *)gmallocn(numSyms + 1,
 					       sizeof(JBIG2HuffmanTable));
@@ -2172,6 +2235,12 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
 	  symCodeTab[i++].prefixLen = 0;
 	}
       } else if (j > 0x100) {
+	if (i == 0) {
+	  error(errSyntaxError, getPos(), "Invalid code in JBIG2 text region");
+	  gfree(syms);
+	  gfree(symCodeTab);
+	  return;
+	}
 	for (j -= 0x100; j && i < numSyms; --j) {
 	  symCodeTab[i].prefixLen = symCodeTab[i-1].prefixLen;
 	  ++i;
@@ -2228,8 +2297,8 @@ void JBIG2Stream::readTextRegionSeg(Guint segNum, GBool imm,
 
  codeTableError:
   error(errSyntaxError, getPos(), "Missing code table in JBIG2 text region");
-  gfree(codeTables);
-  delete syms;
+  delete codeTables;
+  gfree(syms);
   return;
 
  eofError:
@@ -2530,6 +2599,15 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
       !readUByte(&segInfoFlags)) {
     goto eofError;
   }
+  // sanity check: if the w/h/x/y values are way out of range, it likely
+  // indicates a damaged JBIG2 stream
+  if (w / 10 > pageW || h / 10 > pageH ||
+      x / 10 > pageW || y / 10 > pageH) {
+    error(errSyntaxError, getPos(),
+	  "Bad size or position in JBIG2 halftone region segment");
+    done = gTrue;
+    return;
+  }
   extCombOp = segInfoFlags & 7;
 
   // rest of the halftone region header
@@ -2692,6 +2770,15 @@ void JBIG2Stream::readGenericRegionSeg(Guint segNum, GBool imm,
   if (w == 0 || h == 0) {
     error(errSyntaxError, getPos(),
 	  "Bad bitmap size in JBIG2 generic region segment");
+    return;
+  }
+  // sanity check: if the w/h/x/y values are way out of range, it likely
+  // indicates a damaged JBIG2 stream
+  if (w / 10 > pageW || h / 10 > pageH ||
+      x / 10 > pageW || y / 10 > pageH) {
+    error(errSyntaxError, getPos(),
+	  "Bad size or position in JBIG2 generic region segment");
+    done = gTrue;
     return;
   }
   extCombOp = segInfoFlags & 7;
@@ -3599,6 +3686,15 @@ void JBIG2Stream::readGenericRefinementRegionSeg(Guint segNum, GBool imm,
 	  "Bad size in JBIG2 generic refinement region segment");
     return;
   }
+  // sanity check: if the w/h/x/y values are way out of range, it likely
+  // indicates a damaged JBIG2 stream
+  if (w / 10 > pageW || h / 10 > pageH ||
+      x / 10 > pageW || y / 10 > pageH) {
+    error(errSyntaxError, getPos(),
+	  "Bad size or position in JBIG2 generic refinement region segment");
+    done = gTrue;
+    return;
+  }
   extCombOp = segInfoFlags & 7;
 
   // rest of the generic refinement region segment header
@@ -3866,6 +3962,11 @@ void JBIG2Stream::readPageInfoSeg(Guint length) {
   }
   pageDefPixel = (flags >> 2) & 1;
   defCombOp = (flags >> 3) & 3;
+
+  // this will only happen if there are multiple page info segments
+  if (pageBitmap) {
+    delete pageBitmap;
+  }
 
   // allocate the page bitmap
   if (pageH == 0xffffffff) {

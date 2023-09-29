@@ -35,6 +35,7 @@ static GBool dumpRaw;
 static GBool list;
 static char ownerPassword[33];
 static char userPassword[33];
+static GBool verbose;
 static GBool quiet;
 static char cfgFileName[256];
 static GBool printVersion;
@@ -55,6 +56,8 @@ static ArgDesc const argDesc[] = {
    "owner password (for encrypted files)"},
   {"-upw",    argString,   userPassword,   sizeof(userPassword),
    "user password (for encrypted files)"},
+  {"-verbose", argFlag,    &verbose,       0,
+   "print per-page status information"},
   {"-q",      argFlag,     &quiet,         0,
    "don't print any messages or errors"},
   {"-cfg",        argString,      cfgFileName,    sizeof(cfgFileName),
@@ -90,6 +93,7 @@ int main(int argc, char *argv[]) {
   list = gFalse;
   ownerPassword[0] = '\001';
   userPassword[0] = '\001';
+  verbose = gFalse;
   quiet = gFalse;
   cfgFileName[0] = '\0';
   printVersion = gFalse;
@@ -99,7 +103,7 @@ int main(int argc, char *argv[]) {
   fixCommandLine(&argc, &argv);
   ok = parseArgs(argDesc, &argc, argv);
   if (!ok || argc != 3 || printVersion || printHelp) {
-    fprintf(stderr, "pdfimages version %s\n", xpdfVersion);
+    fprintf(stderr, "pdfimages version %s [www.xpdfreader.com]\n", xpdfVersion);
     fprintf(stderr, "%s\n", xpdfCopyright);
     if (!printVersion) {
       printUsage("pdfimages", "<PDF-file> <image-root>", argDesc);
@@ -110,7 +114,14 @@ int main(int argc, char *argv[]) {
   imgRoot = argv[2];
 
   // read config file
+  if (cfgFileName[0] && !pathIsFile(cfgFileName)) {
+    error(errConfig, -1, "Config file '{0:s}' doesn't exist or isn't a file",
+	  cfgFileName);
+  }
   globalParams = new GlobalParams(cfgFileName);
+  if (verbose) {
+    globalParams->setPrintStatusInfo(verbose);
+  }
   if (quiet) {
     globalParams->setErrQuiet(quiet);
   }

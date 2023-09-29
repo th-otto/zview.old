@@ -108,7 +108,7 @@ int Lexer::lookChar() {
 Object *Lexer::getObj(Object *obj) {
   char *p;
   int c, c2;
-  GBool comment, neg, doubleMinus, done;
+  GBool comment, neg, doubleMinus, done, invalid;
   int numParen;
   int xi;
   double xf, scale;
@@ -233,11 +233,6 @@ Object *Lexer::getObj(Object *obj) {
       switch (c = getChar()) {
 
       case EOF:
-#if 0
-      // This breaks some PDF files, e.g., ones from Photoshop.
-      case '\r':
-      case '\n':
-#endif
 	error(errSyntaxError, getPos(), "Unterminated string");
 	done = gTrue;
 	break;
@@ -253,6 +248,16 @@ Object *Lexer::getObj(Object *obj) {
 	} else {
 	  c2 = c;
 	}
+	break;
+
+      case '\r':
+	// The PDF spec says that any literal end-of-line sequence
+	// (LF, CR, CR+LF) is translated to a single LF char.
+	c = lookChar();
+	if (c == '\n') {
+	  getChar();
+	}
+	c2 = '\n';
 	break;
 
       case '\\':
@@ -339,6 +344,7 @@ Object *Lexer::getObj(Object *obj) {
     p = tokBuf;
     n = 0;
     s = NULL;
+    invalid = gFalse;
     while ((c = lookChar()) != EOF && !specialChars[c]) {
       getChar();
       if (c == '#') {
@@ -366,6 +372,9 @@ Object *Lexer::getObj(Object *obj) {
 	  goto notEscChar;
 	}
 	getChar();
+	if (c == 0) {
+	  invalid = gTrue;
+	}
       }
      notEscChar:
       // the PDF spec claims that names are limited to 127 chars, but
@@ -381,7 +390,13 @@ Object *Lexer::getObj(Object *obj) {
 	s->append((char)c);
       }
     }
-    if (n < tokBufSize) {
+    if (invalid) {
+      error(errSyntaxError, getPos(), "Null character in name");
+      obj->initError();
+      if (s) {
+	delete s;
+      }
+    } else if (n < tokBufSize) {
       *p = '\0';
       obj->initName(tokBuf);
     } else {

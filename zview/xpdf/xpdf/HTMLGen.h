@@ -2,7 +2,7 @@
 //
 // HTMLGen.h
 //
-// Copyright 2010 Glyph & Cog, LLC
+// Copyright 2010-2021 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -16,13 +16,14 @@ class PDFDoc;
 class TextOutputDev;
 class TextFontInfo;
 class SplashOutputDev;
+class HTMLGenFontDefn;
 
 //------------------------------------------------------------------------
 
 class HTMLGen {
 public:
 
-  HTMLGen(double backgroundResolutionA);
+  HTMLGen(double backgroundResolutionA, GBool tableMode);
   ~HTMLGen();
 
   GBool isOk() { return ok; }
@@ -34,6 +35,8 @@ public:
   double getZoom() { return zoom; }
   void setZoom(double zoomA) { zoom = zoomA; }
 
+  void setVStretch(double vStretchA) { vStretch = vStretchA; }
+
   GBool getDrawInvisibleText() { return drawInvisibleText; }
   void setDrawInvisibleText(GBool drawInvisibleTextA)
     { drawInvisibleText = drawInvisibleTextA; }
@@ -42,8 +45,20 @@ public:
   void setAllTextInvisible(GBool allTextInvisibleA)
     { allTextInvisible = allTextInvisibleA; }
 
+  void setExtractFontFiles(GBool extractFontFilesA)
+    { extractFontFiles = extractFontFilesA; }
+
+  void setConvertFormFields(GBool convertFormFieldsA)
+    { convertFormFields = convertFormFieldsA; }
+
+  void setEmbedBackgroundImage(GBool embedBackgroundImageA)
+    { embedBackgroundImage = embedBackgroundImageA; }
+
+  void setEmbedFonts(GBool embedFontsA)
+    { embedFonts = embedFontsA; }
+
   void startDoc(PDFDoc *docA);
-  int convertPage(int pg, const char *pngURL,
+  int convertPage(int pg, const char *pngURL, const char *htmlDir,
 		  int (*writeHTML)(void *stream, const char *data, int size),
 		  void *htmlStream,
 		  int (*writePNG)(void *stream, const char *data, int size),
@@ -57,19 +72,36 @@ private:
 		   int primaryDir, int spanDir,
 		   double base, GBool dropCapLine, GString *s);
   void appendUTF8(Unicode u, GString *s);
-  GString *getFontDefn(TextFontInfo *font, double *scale);
+  HTMLGenFontDefn *getFontDefn(TextFontInfo *font, const char *htmlDir);
+  HTMLGenFontDefn *getFontFile(TextFontInfo *font, const char *htmlDir);
+  HTMLGenFontDefn *getSubstituteFont(TextFontInfo *font);
+  void getFontDetails(TextFontInfo *font, const char **family,
+		      const char **weight, const char **style,
+		      double *scale);
 
   double backgroundResolution;
   double zoom;
+  double vStretch;
   GBool drawInvisibleText;
   GBool allTextInvisible;
+  GBool extractFontFiles;
+  GBool convertFormFields;
+  GBool embedBackgroundImage;
+  GBool embedFonts;
 
   PDFDoc *doc;
   TextOutputDev *textOut;
   SplashOutputDev *splashOut;
 
-  GList *fonts;
+  GList *fonts;			// [TextFontInfo]
   double *fontScales;
+
+  GList *fontDefns;		// [HTMLGenFontDefn]
+  int nextFontFaceIdx;
+
+  TextFontInfo *formFieldFont;
+  GList *formFieldInfo;		// [HTMLGenFormFieldInfo]
+  int nextFieldID;
 
   GBool ok;
 };

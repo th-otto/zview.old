@@ -34,6 +34,9 @@ class GfxICCBasedColorSpace;
 class GfxIndexedColorSpace;
 class GfxSeparationColorSpace;
 class GfxDeviceNColorSpace;
+class GfxFunctionShading;
+class GfxAxialShading;
+class GfxRadialShading;
 class PDFRectangle;
 class PSOutCustomColor;
 class PSOutputDev;
@@ -78,7 +81,8 @@ public:
 	      GBool manualCtrlA = gFalse,
 	      PSOutCustomCodeCbk customCodeCbkA = NULL,
 	      void *customCodeCbkDataA = NULL,
-	      GBool honorUserUnitA = gFalse);
+	      GBool honorUserUnitA = gFalse,
+	      GBool fileNameIsUTF8 = gFalse);
 
   // Open a PSOutputDev that will write to a generic stream.
   PSOutputDev(PSOutputFunc outputFuncA, void *outputStreamA,
@@ -113,13 +117,6 @@ public:
   // tiling pattern fills will be reduced to a series of other drawing
   // operations.
   virtual GBool useTilingPatternFill() { return gTrue; }
-
-  // Does this device use functionShadedFill(), axialShadedFill(), and
-  // radialShadedFill()?  If this returns false, these shaded fills
-  // will be reduced to a series of other drawing operations.
-  virtual GBool useShadedFills()
-    { return level == psLevel2 || level == psLevel2Sep ||
-	     level == psLevel3 || level == psLevel3Sep; }
 
   // Does this device use drawForm()?  If this returns false,
   // form-type XObjects will be interpreted (i.e., unrolled).
@@ -210,10 +207,7 @@ public:
 				 double *mat, double *bbox,
 				 int x0, int y0, int x1, int y1,
 				 double xStep, double yStep);
-  virtual GBool functionShadedFill(GfxState *state,
-				   GfxFunctionShading *shading);
-  virtual GBool axialShadedFill(GfxState *state, GfxAxialShading *shading);
-  virtual GBool radialShadedFill(GfxState *state, GfxRadialShading *shading);
+  virtual GBool shadedFill(GfxState *state, GfxShading *shading);
 
   //----- path clipping
   virtual void clip(GfxState *state);
@@ -234,7 +228,8 @@ public:
   virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 			       int width, int height,
 			       GfxImageColorMap *colorMap,
-			       Stream *maskStr, int maskWidth, int maskHeight,
+			       Object *maskRef, Stream *maskStr,
+			       int maskWidth, int maskHeight,
 			       GBool maskInvert, GBool interpolate);
 
 #ifdef OPI_SUPPORT
@@ -265,6 +260,8 @@ public:
     { rotate0 = rotateA; }
   void setClip(double llx, double lly, double urx, double ury)
     { clipLLX0 = llx; clipLLY0 = lly; clipURX0 = urx; clipURY0 = ury; }
+  void setExpandSmallPages(GBool expand)
+    { expandSmallPages = expand; }
   void setUnderlayCbk(void (*cbk)(PSOutputDev *psOut, void *data),
 		      void *data)
     { underlayCbk = cbk; underlayCbkData = data; }
@@ -338,6 +335,10 @@ private:
 			   double *mat, double *bbox,
 			   int x0, int y0, int x1, int y1,
 			   double xStep, double yStep);
+  GBool functionShadedFill(GfxState *state,
+  			   GfxFunctionShading *shading);
+  GBool axialShadedFill(GfxState *state, GfxAxialShading *shading);
+  GBool radialShadedFill(GfxState *state, GfxRadialShading *shading);
   void doPath(GfxPath *path);
   void doImageL1(Object *ref, GfxState *state,
 		 GfxImageColorMap *colorMap,
@@ -471,6 +472,7 @@ private:
   int rotate0;			// rotation angle (0, 90, 180, 270)
   double clipLLX0, clipLLY0,
          clipURX0, clipURY0;
+  GBool expandSmallPages;	// expand smaller pages to fill paper
   double tx, ty;		// global translation for current page
   double xScale, yScale;	// global scaling for current page
   int rotate;			// rotation angle for current page

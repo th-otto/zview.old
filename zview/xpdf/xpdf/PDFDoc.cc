@@ -17,6 +17,7 @@
 #endif
 #include "gmempp.h"
 #include "GString.h"
+#include "gfile.h"
 #include "config.h"
 #include "GlobalParams.h"
 #include "Page.h"
@@ -41,6 +42,15 @@
 
 #define headerSearchSize 1024	// read this many bytes at beginning of
 				//   file to look for '%PDF'
+
+// Avoid sharing files with child processes on Windows, where sharing
+// can cause problems.
+#ifdef _WIN32
+#  define fopenReadMode "rbN"
+#  define wfopenReadMode L"rbN"
+#else
+#  define fopenReadMode "rb"
+#endif
 
 //------------------------------------------------------------------------
 // PDFDoc
@@ -87,18 +97,18 @@ PDFDoc::PDFDoc(GString *fileNameA, GString *ownerPassword, GString *userPassword
   // try to open file
   fileName2 = NULL;
 #ifdef VMS
-  if (!(file = fopen(fileName1->getCString(), "rb", "ctx=stm"))) {
+  if (!(file = fopen(fileName1->getCString(), fopenReadMode, "ctx=stm"))) {
     error(errIO, -1, "Couldn't open file '{0:t}'", fileName1);
     errCode = errOpenFile;
     return;
   }
 #else
-  if (!(file = fopen(fileName1->getCString(), "rb"))) {
+  if (!(file = fopen(fileName1->getCString(), fopenReadMode))) {
     fileName2 = fileName->copy();
     fileName2->lowerCase();
-    if (!(file = fopen(fileName2->getCString(), "rb"))) {
+    if (!(file = fopen(fileName2->getCString(), fopenReadMode))) {
       fileName2->upperCase();
-      if (!(file = fopen(fileName2->getCString(), "rb"))) {
+      if (!(file = fopen(fileName2->getCString(), fopenReadMode))) {
 	error(errIO, -1, "Couldn't open file '{0:t}'", fileName);
 	delete fileName2;
 	errCode = errOpenFile;
@@ -141,23 +151,30 @@ PDFDoc::PDFDoc(const wchar_t *fileNameA, int fileNameLen, GString *ownerPassword
 
   init(coreA);
 
+  // handle a Windows shortcut
+  wchar_t wPath[winMaxLongPath + 1];
+  int n = fileNameLen < winMaxLongPath ? fileNameLen : winMaxLongPath;
+  memcpy(wPath, fileNameA, n * sizeof(wchar_t));
+  wPath[n] = L'\0';
+  readWindowsShortcut(wPath, winMaxLongPath + 1);
+  int wPathLen = (int)wcslen(wPath);
+
   // save both Unicode and 8-bit copies of the file name
   fileName = new GString();
-  fileNameU = (wchar_t *)gmallocn(fileNameLen + 1, sizeof(wchar_t));
-  for (i = 0; i < fileNameLen; ++i) {
+  fileNameU = (wchar_t *)gmallocn(wPathLen + 1, sizeof(wchar_t));
+  memcpy(fileNameU, wPath, (wPathLen + 1) * sizeof(wchar_t));
+  for (i = 0; i < wPathLen; ++i) {
     fileName->append((char)fileNameA[i]);
-    fileNameU[i] = fileNameA[i];
   }
-  fileNameU[fileNameLen] = L'\0';
 
   // try to open file
   // NB: _wfopen is only available in NT
   version.dwOSVersionInfoSize = sizeof(version);
   GetVersionEx(&version);
   if (version.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-    file = _wfopen(fileNameU, L"rb");
+    file = _wfopen(fileNameU, wfopenReadMode);
   } else {
-    file = fopen(fileName->getCString(), "rb");
+    file = fopen(fileName->getCString(), fopenReadMode);
   }
   if (!file) {
     error(errIO, -1, "Couldn't open file '{0:t}'", fileName);
@@ -197,7 +214,7 @@ PDFDoc::PDFDoc(const char *fileNameA, GString *ownerPassword, GString *userPassw
   Object obj;
 #ifdef _WIN32
   Unicode u;
-  int n, i, j;
+  int i, j;
 #endif
 
   init(coreA);
@@ -205,29 +222,31 @@ PDFDoc::PDFDoc(const char *fileNameA, GString *ownerPassword, GString *userPassw
   fileName = new GString(fileNameA);
 
 #if defined(_WIN32)
-  n = 0;
+  wchar_t wPath[winMaxLongPath + 1];
   i = 0;
-  while (getUTF8(fileName, &i, &u)) {
-    ++n;
+  j = 0;
+  while (j < winMaxLongPath && getUTF8(fileName, &i, &u)) {
+    wPath[j++] = (wchar_t)u;
   }
-  fileNameU = (wchar_t *)gmallocn(n + 1, sizeof(wchar_t));
-  i = j = 0;
-  while (j < n && getUTF8(fileName, &i, &u)) {
-    fileNameU[j++] = (wchar_t)u;
-  }
-  fileNameU[n] = L'\0';
+  wPath[j] = L'\0';
+  readWindowsShortcut(wPath, winMaxLongPath + 1);
+  int wPathLen = (int)wcslen(wPath);
+
+  fileNameU = (wchar_t *)gmallocn(wPathLen + 1, sizeof(wchar_t));
+  memcpy(fileNameU, wPath, (wPathLen + 1) * sizeof(wchar_t));
+
   // NB: _wfopen is only available in NT
   version.dwOSVersionInfoSize = sizeof(version);
   GetVersionEx(&version);
   if (version.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-    file = _wfopen(fileNameU, L"rb");
+    file = _wfopen(fileNameU, wfopenReadMode);
   } else {
-    file = fopen(fileName->getCString(), "rb");
+    file = fopen(fileName->getCString(), fopenReadMode);
   }
 #elif defined(VMS)
-  file = fopen(fileName->getCString(), "rb", "ctx=stm");
+  file = fopen(fileName->getCString(), fopenReadMode, "ctx=stm");
 #else
-  file = fopen(fileName->getCString(), "rb");
+  file = fopen(fileName->getCString(), fopenReadMode);
 #endif
 
   if (!file) {
@@ -495,6 +514,13 @@ void PDFDoc::displayPages(OutputDev *out, int firstPage, int lastPage,
   int page;
 
   for (page = firstPage; page <= lastPage; ++page) {
+#ifndef ZVPDF_SLB
+    if (globalParams->getPrintStatusInfo()) {
+      fflush(stderr);
+      printf("[processing page %d]\n", page);
+      fflush(stdout);
+    }
+#endif
     displayPage(out, page, hDPI, vDPI, rotate, useMediaBox, crop, printing,
 		abortCheckCbk, abortCheckCbkData);
     catalog->doneWithPage(page);
@@ -624,12 +650,24 @@ GBool PDFDoc::saveEmbeddedFile(int idx, const char *path) {
   return ret;
 }
 
+GBool PDFDoc::saveEmbeddedFileU(int idx, const char *path) {
+  FILE *f;
+  GBool ret;
+
+  if (!(f = openFile(path, "wb"))) {
+    return gFalse;
+  }
+  ret = saveEmbeddedFile2(idx, f);
+  fclose(f);
+  return ret;
+}
+
 #ifdef _WIN32
 GBool PDFDoc::saveEmbeddedFile(int idx, const wchar_t *path, int pathLen) {
   FILE *f;
   OSVERSIONINFO version;
-  wchar_t path2w[_MAX_PATH + 1];
-  char path2c[_MAX_PATH + 1];
+  wchar_t path2w[winMaxLongPath + 1];
+  char path2c[MAX_PATH + 1];
   int i;
   GBool ret;
 
@@ -637,13 +675,13 @@ GBool PDFDoc::saveEmbeddedFile(int idx, const wchar_t *path, int pathLen) {
   version.dwOSVersionInfoSize = sizeof(version);
   GetVersionEx(&version);
   if (version.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-    for (i = 0; i < pathLen && i < _MAX_PATH; ++i) {
+    for (i = 0; i < pathLen && i < winMaxLongPath; ++i) {
       path2w[i] = path[i];
     }
     path2w[i] = 0;
     f = _wfopen(path2w, L"wb");
   } else {
-    for (i = 0; i < pathLen && i < _MAX_PATH; ++i) {
+    for (i = 0; i < pathLen && i < MAX_PATH; ++i) {
       path2c[i] = (char)path[i];
     }
     path2c[i] = 0;

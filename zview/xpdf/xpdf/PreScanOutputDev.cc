@@ -81,36 +81,7 @@ void PreScanOutputDev::tilingPatternFill(GfxState *state, Gfx *gfx,
   }
 }
 
-GBool PreScanOutputDev::functionShadedFill(GfxState *state,
-					   GfxFunctionShading *shading) {
-  if (shading->getColorSpace()->getMode() != csDeviceGray &&
-      shading->getColorSpace()->getMode() != csCalGray) {
-    gray = gFalse;
-  }
-  mono = gFalse;
-  if (state->getFillOpacity() != 1 ||
-      state->getBlendMode() != gfxBlendNormal) {
-    transparency = gTrue;
-  }
-  return gTrue;
-}
-
-GBool PreScanOutputDev::axialShadedFill(GfxState *state,
-					GfxAxialShading *shading) {
-  if (shading->getColorSpace()->getMode() != csDeviceGray &&
-      shading->getColorSpace()->getMode() != csCalGray) {
-    gray = gFalse;
-  }
-  mono = gFalse;
-  if (state->getFillOpacity() != 1 ||
-      state->getBlendMode() != gfxBlendNormal) {
-    transparency = gTrue;
-  }
-  return gTrue;
-}
-
-GBool PreScanOutputDev::radialShadedFill(GfxState *state,
-					 GfxRadialShading *shading) {
+GBool PreScanOutputDev::shadedFill(GfxState *state, GfxShading *shading) {
   if (shading->getColorSpace()->getMode() != csDeviceGray &&
       shading->getColorSpace()->getMode() != csCalGray) {
     gray = gFalse;
@@ -259,7 +230,7 @@ void PreScanOutputDev::drawMaskedImage(GfxState *state, Object *ref,
 				       Stream *str,
 				       int width, int height,
 				       GfxImageColorMap *colorMap,
-				       Stream *maskStr,
+				       Object *maskRef, Stream *maskStr,
 				       int maskWidth, int maskHeight,
 				       GBool maskInvert, GBool interpolate) {
   GfxColorSpace *colorSpace;
@@ -298,7 +269,7 @@ void PreScanOutputDev::drawSoftMaskedImage(GfxState *state, Object *ref,
 					   Stream *str,
 					   int width, int height,
 					   GfxImageColorMap *colorMap,
-					   Stream *maskStr,
+					   Object *maskRef, Stream *maskStr,
 					   int maskWidth, int maskHeight,
 					   GfxImageColorMap *maskColorMap,
 					   double *matte, GBool interpolate) {
@@ -329,11 +300,11 @@ void PreScanOutputDev::drawSoftMaskedImage(GfxState *state, Object *ref,
   gdi = gFalse;
 }
 
-void PreScanOutputDev::beginTransparencyGroup(
-			   GfxState *state, double *bbox,
-			   GfxColorSpace *blendingColorSpace,
-			   GBool isolated, GBool knockout,
-			   GBool forSoftMask) {
+GBool PreScanOutputDev::beginTransparencyGroup(
+			    GfxState *state, double *bbox,
+			    GfxColorSpace *blendingColorSpace,
+			    GBool isolated, GBool knockout,
+			    GBool forSoftMask) {
   (void) state;
   (void) bbox;
   (void) blendingColorSpace;
@@ -342,6 +313,7 @@ void PreScanOutputDev::beginTransparencyGroup(
   (void) forSoftMask;
   transparency = gTrue;
   gdi = gFalse;
+  return gTrue;
 }
 
 void PreScanOutputDev::check(GfxState *state,

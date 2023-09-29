@@ -12,5 +12,6 @@ libgoo_a_SOURCES = \
 	gmem.cc gmem.h \
 	gmempp.cc gmempp.h \
 	gtypes.h \
-	parseargs.c parseargs.c \
+	parseargs.c parseargs.h \
+	Trace.cc Trace.h \
 	$(empty)

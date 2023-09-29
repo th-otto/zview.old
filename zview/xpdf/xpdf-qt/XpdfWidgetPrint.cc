@@ -24,8 +24,8 @@
 #elif defined(__linux__)
 #  include "PSOutputDev.h"
 #  include <cups/cups.h>
-#include "XpdfWidgetPrint.h"
 #endif
+#include "XpdfWidgetPrint.h"
 
 #include "gmempp.h"
 
@@ -326,7 +326,7 @@ XpdfWidget::ErrorCode printPDF(PDFDoc *doc, QPrinter *prt,
 			       int hDPI, int vDPI,
 			       XpdfWidget *widget) {
   int startPage, endPage;
-  QPrinter::PaperSize paperSize;
+  QPageSize paperSize;
   QSizeF paperSizePts;
   QPrinter::PaperSource paperSource;
   QPrinter::DuplexMode duplex;
@@ -359,8 +359,8 @@ XpdfWidget::ErrorCode printPDF(PDFDoc *doc, QPrinter *prt,
 
   //--- get other parameters
 
-  paperSize = prt->paperSize();
-  paperSizePts = prt->paperSize(QPrinter::Point);
+  paperSize = prt->pageLayout().pageSize();
+  paperSizePts = paperSize.size(QPageSize::Point);
   paperSource = prt->paperSource();
   duplex = prt->duplex();
 
@@ -427,12 +427,12 @@ XpdfWidget::ErrorCode printPDF(PDFDoc *doc, QPrinter *prt,
     options = NULL;
     nOptions = 0;
 
-    switch (paperSize) {
-    case QPrinter::A4:      paperSizeStr = "A4";     break;
-    case QPrinter::Comm10E: paperSizeStr = "COM10";  break;
-    case QPrinter::DLE:     paperSizeStr = "DL";     break;
-    case QPrinter::Legal:   paperSizeStr = "Legal";  break;
-    case QPrinter::Letter:  paperSizeStr = "Letter"; break;
+    switch (paperSize.id()) {
+    case QPageSize::A4:      paperSizeStr = "A4";     break;
+    case QPageSize::Comm10E: paperSizeStr = "COM10";  break;
+    case QPageSize::DLE:     paperSizeStr = "DL";     break;
+    case QPageSize::Legal:   paperSizeStr = "Legal";  break;
+    case QPageSize::Letter:  paperSizeStr = "Letter"; break;
     default:                paperSizeStr = NULL;     break;
     }
     switch (paperSource) {

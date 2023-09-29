@@ -37,7 +37,8 @@ Function::Function() {
 Function::~Function() {
 }
 
-Function *Function::parse(Object *funcObj, int recursion) {
+Function *Function::parse(Object *funcObj, int expectedInputs,
+			  int expectedOutputs, int recursion) {
   Function *func;
   Dict *dict;
   int funcType;
@@ -53,7 +54,11 @@ Function *Function::parse(Object *funcObj, int recursion) {
   } else if (funcObj->isDict()) {
     dict = funcObj->getDict();
   } else if (funcObj->isName("Identity")) {
-    return new IdentityFunction();
+    if (expectedInputs != expectedOutputs) {
+      error(errSyntaxError, -1, "Invalid use of identity function");
+      return NULL;
+    }
+    return new IdentityFunction(expectedInputs);
   } else {
     error(errSyntaxError, -1, "Expected function dictionary or stream");
     return NULL;
@@ -72,7 +77,8 @@ Function *Function::parse(Object *funcObj, int recursion) {
   } else if (funcType == 2) {
     func = new ExponentialFunction(funcObj, dict);
   } else if (funcType == 3) {
-    func = new StitchingFunction(funcObj, dict, recursion);
+    func = new StitchingFunction(funcObj, dict, expectedInputs,
+				 expectedOutputs, recursion);
   } else if (funcType == 4) {
     func = new PostScriptFunction(funcObj, dict);
   } else {
@@ -80,6 +86,14 @@ Function *Function::parse(Object *funcObj, int recursion) {
     return NULL;
   }
   if (!func->isOk()) {
+    delete func;
+    return NULL;
+  }
+
+  if (func->getInputSize() != expectedInputs ||
+      (expectedOutputs >= 0 && func->getOutputSize() != expectedOutputs)) {
+    error(errSyntaxError, -1,
+	  "Incorrect number of function inputs or outputs");
     delete func;
     return NULL;
   }
@@ -165,14 +179,12 @@ GBool Function::init(Dict *dict) {
 // IdentityFunction
 //------------------------------------------------------------------------
 
-IdentityFunction::IdentityFunction() {
+IdentityFunction::IdentityFunction(int nInputs) {
   int i;
 
-  // fill these in with arbitrary values just in case they get used
-  // somewhere
-  m = funcMaxInputs;
-  n = funcMaxOutputs;
-  for (i = 0; i < funcMaxInputs; ++i) {
+  m = n = nInputs;
+  // domain info shouldn't be used anywhere
+  for (i = 0; i < nInputs; ++i) {
     domain[i][0] = 0;
     domain[i][1] = 1;
   }
@@ -185,7 +197,7 @@ IdentityFunction::~IdentityFunction() {
 void IdentityFunction::transform(double *in, double *out) {
   int i;
 
-  for (i = 0; i < funcMaxOutputs; ++i) {
+  for (i = 0; i < m; ++i) {
     out[i] = in[i];
   }
 }
@@ -343,8 +355,13 @@ SampledFunction::SampledFunction(Object *funcObj, Dict *dict) {
 
   //----- samples
   nSamples = n;
-  for (i = 0; i < m; ++i)
+  for (i = 0; i < m; ++i) {
+    if (nSamples > INT_MAX / sampleSize[i]) {
+      error(errSyntaxError, -1, "Integer overflow in sampled function setup");
+      goto err1;
+    }
     nSamples *= sampleSize[i];
+  }
   samples = (double *)gmallocn(nSamples, sizeof(double));
   buf = 0;
   bits = 0;
@@ -621,6 +638,7 @@ void ExponentialFunction::transform(double *in, double *out) {
 //------------------------------------------------------------------------
 
 StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict,
+				     int expectedInputs, int expectedOutputs,
 				     int recursion) {
   Object obj1, obj2;
   int i;
@@ -642,7 +660,8 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict,
   }
 
   //----- Functions
-  if (!dict->lookup("Functions", &obj1)->isArray()) {
+  if (!dict->lookup("Functions", &obj1)->isArray() ||
+      obj1.arrayGetLength() < 1) {
     error(errSyntaxError, -1,
 	  "Missing 'Functions' entry in stitching function");
     goto err1;
@@ -657,11 +676,14 @@ StitchingFunction::StitchingFunction(Object *funcObj, Dict *dict,
   }
   for (i = 0; i < k; ++i) {
     if (!(funcs[i] = Function::parse(obj1.arrayGet(i, &obj2),
+				     expectedInputs, expectedOutputs,
 				     recursion + 1))) {
       goto err2;
     }
-    if (funcs[i]->getInputSize() != 1 ||
-	(i > 0 && funcs[i]->getOutputSize() != funcs[0]->getOutputSize())) {
+    if (i == 0) {
+      n = funcs[0]->getOutputSize();
+    }
+    if (funcs[i]->getInputSize() != 1 || funcs[i]->getOutputSize() != n) {
       error(errSyntaxError, -1,
 	    "Incompatible subfunctions in stitching function");
       goto err2;
@@ -1304,6 +1326,9 @@ int PostScriptFunction::exec(double *stack, int sp0) {
       if (sp + 1 >= psStackSize) {
 	goto underflow;
       }
+      if (stack[sp] == 0) {
+	goto invalidArg;
+      }
       stack[sp + 1] = stack[sp + 1] / stack[sp];
       ++sp;
       break;
@@ -1370,7 +1395,11 @@ int PostScriptFunction::exec(double *stack, int sp0) {
       if (sp + 1 >= psStackSize) {
 	goto underflow;
       }
-      stack[sp + 1] = (int)stack[sp + 1] / (int)stack[sp];
+      k = (int)stack[sp];
+      if (k == 0) {
+	goto invalidArg;
+      }
+      stack[sp + 1] = (int)stack[sp + 1] / k;
       ++sp;
       break;
     case psOpIndex:
@@ -1416,7 +1445,11 @@ int PostScriptFunction::exec(double *stack, int sp0) {
       if (sp + 1 >= psStackSize) {
 	goto underflow;
       }
-      stack[sp + 1] = (int)stack[sp + 1] % (int)stack[sp];
+      k = (int)stack[sp];
+      if (k == 0) {
+	goto invalidArg;
+      }
+      stack[sp + 1] = (int)stack[sp + 1] % k;
       ++sp;
       break;
     case psOpMul:
@@ -1467,22 +1500,24 @@ int PostScriptFunction::exec(double *stack, int sp0) {
       if (nn < 0) {
 	goto invalidArg;
       }
-      if (sp + nn > psStackSize) {
-	goto underflow;
-      }
-      if (k >= 0) {
-	k %= nn;
-      } else {
-	k = -k % nn;
-	if (k) {
-	  k = nn - k;
+      if (nn > 0) {
+	if (sp + nn > psStackSize) {
+	  goto underflow;
 	}
-      }
-      for (i = 0; i < nn; ++i) {
-	tmp[i] = stack[sp + i];
-      }
-      for (i = 0; i < nn; ++i) {
-	stack[sp + i] = tmp[(i + k) % nn];
+	if (k >= 0) {
+	  k %= nn;
+	} else {
+	  k = -k % nn;
+	  if (k) {
+	    k = nn - k;
+	  }
+	}
+	for (i = 0; i < nn; ++i) {
+	  tmp[i] = stack[sp + i];
+	}
+	for (i = 0; i < nn; ++i) {
+	  stack[sp + i] = tmp[(i + k) % nn];
+	}
       }
       break;
     case psOpRound:

@@ -9,6 +9,7 @@
   <file alias="fitPageOn-button">fitPageOn.svg</file>
   <file alias="fitWidth-button">fitWidth.svg</file>
   <file alias="fitWidthOn-button">fitWidthOn.svg</file>
+  <file alias="toggleSidebar-button">toggleSidebar.svg</file>
   <file alias="zoomIn-button">zoomIn.svg</file>
   <file alias="zoomOut-button">zoomOut.svg</file>
   <file alias="indicator-icon0">indicator-icon0.svg</file>

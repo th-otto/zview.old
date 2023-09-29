@@ -203,6 +203,11 @@ public:
   // Return the color space's overprint mask.
   Guint getOverprintMask() { return overprintMask; }
 
+  // Return true if this color space object is the result of
+  // substituting a DefaultGray/RGB/CMYK color space for
+  // DeviceGray/RGB/CMYK.
+  GBool isDefaultColorSpace() { return defaultColorSpace; }
+
   // Return the number of color space modes
   static int getNumColorSpaceModes();
 
@@ -212,6 +217,7 @@ public:
 protected:
 
   Guint overprintMask;
+  GBool defaultColorSpace;
 };
 
 //------------------------------------------------------------------------
@@ -873,6 +879,7 @@ public:
   void getTriangle(int i, double *x0, double *y0, double *color0,
 		   double *x1, double *y1, double *color1,
 		   double *x2, double *y2, double *color2);
+  void getBBox(double *xMin, double *yMin, double *xMax, double *yMax);
   void getColor(double *in, GfxColor *out);
 
 private:
@@ -912,6 +919,7 @@ public:
   int getNComps() { return nComps; }
   int getNPatches() { return nPatches; }
   GfxPatch *getPatch(int i) { return &patches[i]; }
+  void getBBox(double *xMin, double *yMin, double *xMax, double *yMax);
   void getColor(double *in, GfxColor *out);
 
 private:
@@ -1064,6 +1072,10 @@ public:
   double getLastX() { return subpaths[n-1]->getLastX(); }
   double getLastY() { return subpaths[n-1]->getLastY(); }
 
+  // Get the current point
+  double getCurX();
+  double getCurY();
+
   // Move the current point.
   void moveTo(double x, double y);
 
@@ -1179,7 +1191,7 @@ public:
   void getUserClipBBox(double *xMin, double *yMin, double *xMax, double *yMax);
   double getLineX() { return lineX; }
   double getLineY() { return lineY; }
-  GBool getInCachedT3Char() { return inCachedT3Char; }
+  GBool getIgnoreColorOps() { return ignoreColorOps; }
 
   // Is there a current point/path?
   GBool isCurPt() { return path->isCurPt(); }
@@ -1276,8 +1288,9 @@ public:
   void textShift(double tx, double ty);
   void shift(double dx, double dy);
   
-  // Cached Type 3 char status.
-  void setInCachedT3Char(GBool in) { inCachedT3Char = in; }
+  // Ignore color operators (in cached/uncolored Type 3 chars, and
+  // uncolored tiling patterns).  Cached Type 3 char status.
+  void setIgnoreColorOps(GBool ignore) { ignoreColorOps = ignore; }
 
   // Push/pop GfxState on/off stack.
   GfxState *save();
@@ -1340,7 +1353,9 @@ private:
   double clipXMin, clipYMin,	// bounding box for clip region
          clipXMax, clipYMax;
 
-  GBool inCachedT3Char;		// in a cached (uncolored) Type 3 char
+  GBool ignoreColorOps;		// ignore color ops (in cached/uncolored
+				//   Type 3 chars, and uncolored tiling
+				//   patterns)
 
   GfxState *saved;		// next GfxState on stack
 

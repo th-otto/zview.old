@@ -25,7 +25,8 @@ class PageAttrs;
 struct Ref;
 class LinkDest;
 class PageTreeNode;
-class Form;
+class PageLabelNode;
+class AcroForm;
 class TextString;
 
 //------------------------------------------------------------------------
@@ -83,7 +84,7 @@ public:
 
   Object *getAcroForm() { return &acroForm; }
 
-  Form *getForm() { return form; }
+  AcroForm *getForm() { return form; }
 
   GBool getNeedsRendering() { return needsRendering; }
 
@@ -99,9 +100,19 @@ public:
   Object *getEmbeddedFileStreamRef(int idx);
   Object *getEmbeddedFileStreamObj(int idx, Object *strObj);
 
+  // Return true if the document has page labels.
+  GBool hasPageLabels() { return pageLabels != NULL; }
+
   // Get the page label for page number [pageNum].  Returns NULL if
   // the PDF file doesn't have page labels.
   TextString *getPageLabel(int pageNum);
+
+  // Returns the page number corresponding to [pageLabel].  Returns -1
+  // if there is no matching page label, or if the document doesn't
+  // have page labels.
+  int getPageNumFromPageLabel(TextString *pageLabel);
+
+  Object *getViewerPreferences() { return &viewerPrefs; }
 
 private:
 
@@ -121,10 +132,12 @@ private:
   Object structTreeRoot;	// structure tree root dictionary
   Object outline;		// outline dictionary
   Object acroForm;		// AcroForm dictionary
+  AcroForm *form;		// parsed form
   GBool needsRendering;		// NeedsRendering flag
-  Form *form;			// parsed form
   Object ocProperties;		// OCProperties dictionary
   GList *embeddedFiles;		// embedded file list [EmbeddedFile]
+  GList *pageLabels;		// page labels [PageLabelNode]
+  Object viewerPrefs;		// ViewerPreferences object
   GBool ok;			// true if catalog is valid
 
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
@@ -137,10 +150,13 @@ private:
   void readFileAttachmentAnnots(Object *pageNodeRef,
 				char *touchedObjs);
   void readEmbeddedFile(Object *fileSpec, Object *name1);
-  GBool findPageLabel(Object *node, int pageIndex,
-		      Object *pageLabelObj, int *firstPageIndex);
+  void readPageLabelTree(Object *root);
+  void readPageLabelTree2(Object *node);
+  PageLabelNode *findPageLabel(int pageNum);
   GString *makeRomanNumeral(int num, GBool uppercase);
   GString *makeLetterLabel(int num, GBool uppercase);
+  GBool convertPageLabelToInt(TextString *pageLabel, int prefixLength,
+			      char style, int *n);
 };
 
 #endif

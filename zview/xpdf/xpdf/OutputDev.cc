@@ -125,7 +125,7 @@ void OutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
 void OutputDev::drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 				int width, int height,
 				GfxImageColorMap *colorMap,
-				Stream *maskStr,
+				Object *maskRef, Stream *maskStr,
 				int maskWidth, int maskHeight,
 				GBool maskInvert, GBool interpolate) {
   (void) maskStr;
@@ -139,7 +139,7 @@ void OutputDev::drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 void OutputDev::drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
 				    int width, int height,
 				    GfxImageColorMap *colorMap,
-				    Stream *maskStr,
+				    Object *maskRef, Stream *maskStr,
 				    int maskWidth, int maskHeight,
 				    GfxImageColorMap *maskColorMap,
 				    double *matte, GBool interpolate) {

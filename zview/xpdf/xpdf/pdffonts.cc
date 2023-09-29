@@ -23,7 +23,7 @@
 #include "Dict.h"
 #include "GfxFont.h"
 #include "Annot.h"
-#include "Form.h"
+#include "AcroForm.h"
 #include "PDFDoc.h"
 #include "config.h"
 
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
   Page *page;
   Dict *resDict;
   Annots *annots;
-  Form *form;
+  AcroForm *form;
   Object obj1, obj2;
   int pg, i, j;
   int exitCode;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   fixCommandLine(&argc, &argv);
   ok = parseArgs(argDesc, &argc, argv);
   if (!ok || argc != 2 || printVersion || printHelp) {
-    fprintf(stderr, "pdffonts version %s\n", xpdfVersion);
+    fprintf(stderr, "pdffonts version %s [www.xpdfreader.com]\n", xpdfVersion);
     fprintf(stderr, "%s\n", xpdfCopyright);
     if (!printVersion) {
       printUsage("pdffonts", "<PDF-file>", argDesc);
@@ -133,6 +133,10 @@ int main(int argc, char *argv[]) {
   fileName = argv[1];
 
   // read config file
+  if (cfgFileName[0] && !pathIsFile(cfgFileName)) {
+    error(errConfig, -1, "Config file '{0:s}' doesn't exist or isn't a file",
+	  cfgFileName);
+  }
   globalParams = new GlobalParams(cfgFileName);
   globalParams->setupBaseFonts(NULL);
 
@@ -169,11 +173,11 @@ int main(int argc, char *argv[]) {
 
   // scan the fonts
   if (showFontLoc || showFontLocPS) {
-    printf("name                                 type              emb sub uni prob object ID location\n");
-    printf("------------------------------------ ----------------- --- --- --- ---- --------- --------\n");
+    printf("name                                           type              emb sub uni prob object ID location\n");
+    printf("---------------------------------------------- ----------------- --- --- --- ---- --------- --------\n");
   } else {
-    printf("name                                 type              emb sub uni prob object ID\n");
-    printf("------------------------------------ ----------------- --- --- --- ---- ---------\n");
+    printf("name                                           type              emb sub uni prob object ID\n");
+    printf("---------------------------------------------- ----------------- --- --- --- ---- ---------\n");
   }
   fonts = NULL;
   fontsLen = fontsSize = 0;
@@ -312,7 +316,7 @@ static void scanFonts(Dict *resDict, PDFDoc *doc) {
   resDict->lookupNF("ExtGState", &gsDict1);
   if (checkObject(&gsDict1, &gsDict2) && gsDict2.isDict()) {
     for (i = 0; i < gsDict2.dictGetLength(); ++i) {
-      gsDict1.dictGetValNF(i, &gs1);
+      gsDict2.dictGetValNF(i, &gs1);
       if (checkObject(&gs1, &gs2) && gs2.isDict()) {
 	gs2.dictLookupNF("SMask", &smask1);
 	if (checkObject(&smask1, &smask2) && smask2.isDict()) {
@@ -385,7 +389,7 @@ static void scanFont(GfxFont *font, PDFDoc *doc) {
   }
 
   // print the font info
-  printf("%-36s %-17s %-3s %-3s %-3s %-4s",
+  printf("%-46s %-17s %-3s %-3s %-3s %-4s",
 	 name ? name->getCString() : "[none]",
 	 fontTypeNames[font->getType()],
 	 emb ? "yes" : "no",

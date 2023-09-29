@@ -51,7 +51,9 @@ struct _zvpdf_funcs {
 	char *(*p_strchr)(const char *str, int c);
 	char *(*p_strrchr)(const char *str, int c);
 	int (*p_strcasecmp)(const char *d, const char *s);
+	int (*p_strncasecmp)(const char *d, const char *s, size_t n);
 	size_t (*p_strcspn)(const char *s, const char *reject);
+	unsigned long (*p_strtoul)(const char *restrict nptr, char **restrict endptr, int base);
 	
 	char *(*p_getcwd)(char *buf, size_t size);
 	void (*p_qsort)(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *));

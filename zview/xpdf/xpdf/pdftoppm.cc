@@ -26,6 +26,7 @@
 #include "SplashBitmap.h"
 #include "Splash.h"
 #include "SplashOutputDev.h"
+#include "Error.h"
 #include "config.h"
 
 static int firstPage;
@@ -36,12 +37,14 @@ static GBool gray = gFalse;
 #ifdef SPLASH_CMYK
 static GBool cmyk = gFalse;
 #endif
+static int rotate;
 static char enableFreeTypeStr[16];
 static char antialiasStr[16];
 static char vectorAntialiasStr[16];
 static char ownerPassword[33];
 static char userPassword[33];
-static GBool quiet = gFalse;
+static GBool verbose;
+static GBool quiet;
 static char cfgFileName[256];
 static GBool printVersion;
 static GBool printHelp;
@@ -61,6 +64,8 @@ static ArgDesc const argDesc[] = {
   {"-cmyk",   argFlag,     &cmyk,          0,
    "generate a CMYK PAM file"},
 #endif
+  {"-rot",    argInt,      &rotate,        0,
+   "set page rotation: 0, 90, 180, or 270"},
 #ifdef HAVE_FREETYPE
   {"-freetype",   argString,      enableFreeTypeStr, sizeof(enableFreeTypeStr),
    "enable FreeType font rasterizer: yes, no"},
@@ -73,6 +78,8 @@ static ArgDesc const argDesc[] = {
    "owner password (for encrypted files)"},
   {"-upw",    argString,   userPassword,   sizeof(userPassword),
    "user password (for encrypted files)"},
+  {"-verbose", argFlag,    &verbose,       0,
+   "print per-page status information"},
   {"-q",      argFlag,     &quiet,         0,
    "don't print any messages or errors"},
   {"-cfg",        argString,      cfgFileName,    sizeof(cfgFileName),
@@ -98,7 +105,7 @@ int main(int argc, char *argv[]) {
   GString *ownerPW, *userPW;
   SplashColor paperColor;
   SplashOutputDev *splashOut;
-  GBool ok;
+  GBool ok, toStdout, printStatusInfo;
   int exitCode;
   int pg, n;
   const char *ext;
@@ -128,9 +135,11 @@ int main(int argc, char *argv[]) {
 #ifdef SPLASH_CMYK
   cmyk = gFalse;
 #endif
+  rotate = 0;
   enableFreeTypeStr[0] = '\0';
   antialiasStr[0] = '\0';
   vectorAntialiasStr[0] = '\0';
+  verbose = gFalse;
   quiet = gFalse;
   ownerPassword[0] = '\0';
   userPassword[0] = '\0';
@@ -151,7 +160,7 @@ int main(int argc, char *argv[]) {
     ok = gFalse;
   }
   if (!ok || argc != 3 || printVersion || printHelp) {
-    fprintf(stderr, "pdftoppm version %s\n", xpdfVersion);
+    fprintf(stderr, "pdftoppm version %s [www.xpdfreader.com]\n", xpdfVersion);
     fprintf(stderr, "%s\n", xpdfCopyright);
     if (!printVersion) {
       printUsage("pdftoppm", "<PDF-file> <PPM-root>", argDesc);
@@ -162,6 +171,10 @@ int main(int argc, char *argv[]) {
   ppmRoot = argv[2];
 
   // read config file
+  if (cfgFileName[0] && !pathIsFile(cfgFileName)) {
+    error(errConfig, -1, "Config file '{0:s}' doesn't exist or isn't a file",
+	  cfgFileName);
+  }
   globalParams = new GlobalParams(cfgFileName);
   globalParams->setupBaseFonts(NULL);
   if (enableFreeTypeStr[0]) {
@@ -178,6 +191,9 @@ int main(int argc, char *argv[]) {
     if (!globalParams->setVectorAntialias(vectorAntialiasStr)) {
       fprintf(stderr, "Bad '-aaVector' value on command line\n");
     }
+  }
+  if (verbose) {
+    globalParams->setPrintStatusInfo(verbose);
   }
   if (quiet) {
     globalParams->setErrQuiet(quiet);
@@ -226,6 +242,10 @@ int main(int argc, char *argv[]) {
   }
 
 
+  // check for stdout; set up to print per-page status info
+  toStdout = !strcmp(ppmRoot, "-");
+  printStatusInfo = !toStdout && globalParams->getPrintStatusInfo();
+
   // write PPM files
   if (mono) {
     paperColor[0] = 0xff;
@@ -244,9 +264,14 @@ int main(int argc, char *argv[]) {
   }
   splashOut->startDoc(doc->getXRef());
   for (pg = firstPage; pg <= lastPage; ++pg) {
-    doc->displayPage(splashOut, pg, resolution, resolution, 0,
+    if (printStatusInfo) {
+      fflush(stderr);
+      printf("[processing page %d]\n", pg);
+      fflush(stdout);
+    }
+    doc->displayPage(splashOut, pg, resolution, resolution, rotate,
 		     gFalse, gTrue, gFalse);
-    if (!strcmp(ppmRoot, "-")) {
+    if (toStdout) {
 #ifdef _WIN32
       _setmode(_fileno(stdout), _O_BINARY);
 #endif

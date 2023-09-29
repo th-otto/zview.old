@@ -237,7 +237,7 @@ long zvpdf_open(void)
 	zvpdf_funcs.int_size = sizeof(int);
 	if (zvpdf_funcs.int_size != sizeof(long))
 		return -EINVAL;
-	zvpdf_funcs.interface_version = PLUGIN_INTERFACE_VERSION;
+	zvpdf_funcs.interface_version = XPDF_INTERFACE_VERSION;
 	zvpdf_funcs.p_slb_open = plugin_slb_open;
 	zvpdf_funcs.p_slb_close = plugin_slb_close;
 	zvpdf_funcs.p_slb_get = plugin_slb_get;
@@ -264,7 +264,9 @@ long zvpdf_open(void)
 	S(strchr);
 	S(strrchr);
 	S(strcasecmp);
+	S(strncasecmp);
 	S(strcspn);
+	S(strtoul);
 
 	S(getcwd);
 	S(qsort);

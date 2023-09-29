@@ -28,7 +28,7 @@ class LinkDest;
 class LinkAction;
 class Annot;
 class Annots;
-class FormField;
+class AcroFormField;
 class TextPage;
 class HighlightFile;
 class OptionalContentGroup;
@@ -59,6 +59,17 @@ struct PDFHistory {
 enum SelectMode {
   selectModeBlock,
   selectModeLinear
+};
+
+//------------------------------------------------------------------------
+// FindResult
+//------------------------------------------------------------------------
+
+struct FindResult {
+  FindResult(int pageA, double xMinA, double yMinA, double xMaxA, double yMaxA)
+    : page(pageA), xMin(xMinA), yMin(yMinA), xMax(xMaxA), yMax(yMaxA) {}
+  int page;
+  double xMin, yMin, xMax, yMax;
 };
 
 //------------------------------------------------------------------------
@@ -131,13 +142,13 @@ public:
   virtual GBool goBackward();
   virtual void scrollLeft(int nCols = 16);
   virtual void scrollRight(int nCols = 16);
-  virtual void scrollUp(int nLines = 16);
+  virtual void scrollUp(int nLines = 16, GBool snapToPage = gFalse);
   virtual void scrollUpPrevPage(int nLines = 16);
-  virtual void scrollDown(int nLines = 16);
+  virtual void scrollDown(int nLines = 16, GBool snapToPage = gFalse);
   virtual void scrollDownNextPage(int nLines = 16);
   virtual void scrollPageUp();
   virtual void scrollPageDown();
-  virtual void scrollTo(int x, int y);
+  virtual void scrollTo(int x, int y, GBool snapToPage = gFalse);
   virtual void scrollToLeftEdge();
   virtual void scrollToRightEdge();
   virtual void scrollToTopEdge();
@@ -172,6 +183,8 @@ public:
   void startSelectionDrag(int pg, int x, int y);
   void moveSelectionDrag(int pg, int x, int y);
   void finishSelectionDrag();
+  void selectWord(int pg, int x, int y);
+  void selectLine(int pg, int x, int y);
 
   // Retrieve the current selection.  This function uses user
   // coordinates.  Returns false if there is no selection.
@@ -194,6 +207,8 @@ public:
   virtual GBool findU(Unicode *u, int len, GBool caseSensitive,
 		      GBool next, GBool backward, GBool wholeWord,
 		      GBool onePageOnly);
+  GList *findAll(Unicode *u, int len, GBool caseSensitive,
+		 GBool wholeWord, int firstPage, int lastPage);
 
 
   //----- coordinate conversion
@@ -238,9 +253,9 @@ public:
   Annot *findAnnot(int pg, double x, double y);
   int findAnnotIdx(int pg, double x, double y);
   Annot *getAnnot(int idx);
-  FormField *findFormField(int pg, double x, double y);
+  AcroFormField *findFormField(int pg, double x, double y);
   int findFormFieldIdx(int pg, double x, double y);
-  FormField *getFormField(int idx);
+  AcroFormField *getFormField(int idx);
   GBool overText(int pg, double x, double y);
   void forceRedraw();
   void setTileDoneCbk(void (*cbk)(void *data), void *data);

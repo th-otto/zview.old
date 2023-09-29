@@ -38,6 +38,7 @@ class QSignalMapper;
 class QSplitter;
 class QStackedLayout;
 class QStackedWidget;
+class QTextBrowser;
 class QTimer;
 class QToolBar;
 class QToolButton;
@@ -121,7 +122,7 @@ public:
   XpdfViewer(XpdfApp *appA, GBool fullScreen);
 
   static XpdfViewer *create(XpdfApp *app, QString fileName, int page,
-			    QString destName, QString password,
+			    QString destName, int rot, QString password,
 			    GBool fullScreen);
 
   virtual ~XpdfViewer();
@@ -132,12 +133,12 @@ public:
 
   // Open a file in the current tab.  Returns a boolean indicating
   // success.
-  GBool open(QString fileName, int page, QString destName,
+  GBool open(QString fileName, int page, QString destName, int rot,
 	     QString password);
 
   // Open a file in a new tab.  Returns a boolean indicating success.
   GBool openInNewTab(QString fileName, int page, QString destName,
-		     QString password, GBool switchToTab);
+		     int rot, QString password, GBool switchToTab);
 
   // Check that [fileName] is open in the current tab -- if not, open
   // it.  In either case, switch to [page] or [destName].  Returns a
@@ -153,6 +154,10 @@ public:
   // Execute a command [cmd], with [event] for context.
   void execCmd(const char *cmd, QInputEvent *event);
 
+public slots:
+
+  bool close();
+
 private slots:
 
   void remoteServerConnection();
@@ -165,9 +170,13 @@ private slots:
   void keyPress(QKeyEvent *e);
   void mousePress(QMouseEvent *e);
   void mouseRelease(QMouseEvent *e);
+  void mouseClick(QMouseEvent *e);
+  void mouseDoubleClick(QMouseEvent *e);
+  void mouseTripleClick(QMouseEvent *e);
   void mouseWheel(QWheelEvent *e);
   void mouseMove(QMouseEvent *e);
   void pageChange(int pg);
+  void sidebarSplitterMoved(int pos, int index);
 #ifdef XPDFWIDGET_PRINTING
   void printStatus(int nextPage, int firstPage, int lastPage);
   void cancelPrint();
@@ -192,22 +201,28 @@ private slots:
   void rotateClockwiseMenuAction();
   void rotateCounterclockwiseMenuAction();
   void zoomToSelectionMenuAction();
+  void toggleToolbarMenuAction(bool checked);
+  void toggleSidebarMenuAction(bool checked);
+  void viewPageLabelsMenuAction(bool checked);
+  void documentInfoMenuAction();
   void newTabMenuAction();
   void newWindowMenuAction();
   void closeTabMenuAction();
   void closeWindowMenuAction();
   void openErrorWindowMenuAction();
   void helpMenuAction();
+  void keyBindingsMenuAction();
   void aboutMenuAction();
 
   void popupMenuAction(int idx);
 
+  void toggleSidebarButtonPressed();
   void pageNumberChanged();
   void backButtonPressed();
   void forwardButtonPressed();
   void zoomOutButtonPressed();
   void zoomInButtonPressed();
-  void zoomIndexChanged(const QString &zoomText);
+  void zoomIndexChanged(int idx);
   void zoomEditingFinished();
   void fitWidthButtonPressed();
   void fitPageButtonPressed();
@@ -219,6 +234,8 @@ private slots:
   void newTabButtonPressed();
 
   void switchTab(QListWidgetItem *current, QListWidgetItem *previous);
+  void tabsReordered(const QModelIndex &srcParent, int srcStart, int srcEnd,
+		     const QModelIndex &destParent, int destRow);
   void infoComboBoxChanged(int idx);
   void outlineItemClicked(const QModelIndex& idx);
   void layerItemClicked(const QModelIndex& idx);
@@ -245,11 +262,13 @@ private:
   void cmdCloseWindowOrQuit(GString *args[], int nArgs, QInputEvent *event);
   void cmdContinuousMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdCopy(GString *args[], int nArgs, QInputEvent *event);
+  void cmdCopyLinkTarget(GString *args[], int nArgs, QInputEvent *event);
 #if 0 // for debugging
   void cmdDebug1(GString *args[], int nArgs, QInputEvent *event);
 #endif
   void cmdEndPan(GString *args[], int nArgs, QInputEvent *event);
   void cmdEndSelection(GString *args[], int nArgs, QInputEvent *event);
+  void cmdExpandSidebar(GString *args[], int nArgs, QInputEvent *event);
   void cmdFind(GString *args[], int nArgs, QInputEvent *event);
   void cmdFindFirst(GString *args[], int nArgs, QInputEvent *event);
   void cmdFindNext(GString *args[], int nArgs, QInputEvent *event);
@@ -269,6 +288,8 @@ private:
   void cmdGotoLastPage(GString *args[], int nArgs, QInputEvent *event);
   void cmdGotoPage(GString *args[], int nArgs, QInputEvent *event);
   void cmdHelp(GString *args[], int nArgs, QInputEvent *event);
+  void cmdHideMenuBar(GString *args[], int nArgs, QInputEvent *event);
+  void cmdHideToolbar(GString *args[], int nArgs, QInputEvent *event);
   void cmdHorizontalContinuousMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdLinearSelectMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdLoadTabState(GString *args[], int nArgs, QInputEvent *event);
@@ -280,8 +301,13 @@ private:
   void cmdOpen(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenErrorWindow(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenFile(GString *args[], int nArgs, QInputEvent *event);
+  void cmdOpenFile2(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenFileAtDest(GString *args[], int nArgs, QInputEvent *event);
+  void cmdOpenFileAtDestIn(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenFileAtPage(GString *args[], int nArgs, QInputEvent *event);
+  void cmdOpenFileAtPageIn(GString *args[], int nArgs, QInputEvent *event);
+  void cmdOpenFileIn(GString *args[], int nArgs, QInputEvent *event);
+  void cmdOpenIn(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenSidebar(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenSidebarMoveResizeWin(GString *args[], int nArgs, QInputEvent *event);
   void cmdOpenSidebarResizeWin(GString *args[], int nArgs, QInputEvent *event);
@@ -295,6 +321,7 @@ private:
   void cmdPrint(GString *args[], int nArgs, QInputEvent *event);
 #endif
   void cmdQuit(GString *args[], int nArgs, QInputEvent *event);
+  void cmdRaise(GString *args[], int nArgs, QInputEvent *event);
   void cmdReload(GString *args[], int nArgs, QInputEvent *event);
   void cmdRotateCW(GString *args[], int nArgs, QInputEvent *event);
   void cmdRotateCCW(GString *args[], int nArgs, QInputEvent *event);
@@ -316,18 +343,33 @@ private:
   void cmdScrollToTopLeft(GString *args[], int nArgs, QInputEvent *event);
   void cmdScrollUp(GString *args[], int nArgs, QInputEvent *event);
   void cmdScrollUpPrevPage(GString *args[], int nArgs, QInputEvent *event);
+  void cmdSelectLine(GString *args[], int nArgs, QInputEvent *event);
+  void cmdSelectWord(GString *args[], int nArgs, QInputEvent *event);
   void cmdSetSelection(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowAttachmentsPane(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowDocumentInfo(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowKeyBindings(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowLayersPane(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowMenuBar(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowOutlinePane(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShowToolbar(GString *args[], int nArgs, QInputEvent *event);
+  void cmdShrinkSidebar(GString *args[], int nArgs, QInputEvent *event);
   void cmdSideBySideContinuousMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdSideBySideSingleMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdSinglePageMode(GString *args[], int nArgs, QInputEvent *event);
+  void cmdStartExtendedSelection(GString *args[], int nArgs, QInputEvent *event);
   void cmdStartPan(GString *args[], int nArgs, QInputEvent *event);
   void cmdStartSelection(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleContinuousMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleFullScreenMode(GString *args[], int nArgs, QInputEvent *event);
+  void cmdToggleMenuBar(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleSelectMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleSidebar(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleSidebarMoveResizeWin(GString *args[], int nArgs, QInputEvent *event);
   void cmdToggleSidebarResizeWin(GString *args[], int nArgs, QInputEvent *event);
+  void cmdToggleToolbar(GString *args[], int nArgs, QInputEvent *event);
+  void cmdViewPageLabels(GString *args[], int nArgs, QInputEvent *event);
+  void cmdViewPageNumbers(GString *args[], int nArgs, QInputEvent *event);
   void cmdWindowMode(GString *args[], int nArgs, QInputEvent *event);
   void cmdZoomFitPage(GString *args[], int nArgs, QInputEvent *event);
   void cmdZoomFitWidth(GString *args[], int nArgs, QInputEvent *event);
@@ -344,6 +386,9 @@ private:
   int getContext(Qt::KeyboardModifiers qtMods);
   int getMouseButton(Qt::MouseButton qtBtn);
   virtual void keyPressEvent(QKeyEvent *e);
+  virtual void dragEnterEvent(QDragEnterEvent *e);
+  virtual void dropEvent(QDropEvent *e);
+  virtual bool eventFilter(QObject *watched, QEvent *event);
 
   //--- GUI setup
   void createWindow();
@@ -370,6 +415,7 @@ private:
   void updateZoomInfo();
   void updateSelectModeInfo();
   void updateDocInfo();
+  void updatePageNumberOrLabel(int pg);
   void updateOutline(int pg);
   void setOutlineOpenItems(const QModelIndex &idx);
   void fillAttachmentList();
@@ -378,6 +424,12 @@ private:
   void statusIndicatorOk();
   void statusIndicatorError();
   void showFindError();
+  void createDocumentInfoDialog();
+  void updateDocumentInfoDialog(XpdfWidget *view);
+  QString createDocumentInfoMetadataHTML(XpdfWidget *view);
+  QString createDocumentInfoFontsHTML(XpdfWidget *view);
+  void createKeyBindingsDialog();
+  QString createKeyBindingsHTML();
   void createAboutDialog();
   void execSaveImageDialog();
 
@@ -389,6 +441,9 @@ private:
   QMenuBar *mainMenu;
   QMenu *displayModeSubmenu;
   QAction *fullScreenMenuItem;
+  QAction *toggleToolbarMenuItem;
+  QAction *toggleSidebarMenuItem;
+  QAction *viewPageLabelsMenuItem;
 
   // popup menu
   QMenu *popupMenu;
@@ -412,6 +467,7 @@ private:
 
   // sidebar pane
   QSplitter *sidebarSplitter;
+  int initialSidebarWidth;
   int sidebarWidth;
   QListWidget *tabList;
   QComboBox *infoComboBox;
@@ -425,17 +481,20 @@ private:
 
   GList *tabInfo;		// [XpdfTabInfo]
   XpdfTabInfo *currentTab;
+  XpdfTabInfo *lastOpenedTab;
 
   double scaleFactor;
 
   XpdfWidget::DisplayMode fullScreenPreviousDisplayMode;
   double fullScreenPreviousZoom;
 
-  int lastMousePressX, lastMousePressY;
-
   QTimer *findErrorTimer;
 
   XpdfErrorWindow *errorWindow;
+  QDialog *documentInfoDialog;
+  QTextBrowser *documentInfoMetadataTab;
+  QTextBrowser *documentInfoFontsTab;
+  QDialog *keyBindingsDialog;
   QDialog *aboutDialog;
 #ifdef XPDFWIDGET_PRINTING
   QProgressDialog *printStatusDialog;

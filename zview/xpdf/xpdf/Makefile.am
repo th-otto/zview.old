@@ -31,7 +31,6 @@ libxpdf_a_SOURCES = \
 	Dict.cc Dict.h \
 	Error.cc Error.h ErrorCodes.h \
 	FontEncodingTables.cc FontEncodingTables.h \
-	Form.cc Form.h \
 	Function.cc Function.h \
 	Gfx.cc Gfx.h \
 	GfxFont.cc GfxFont.h \
@@ -61,7 +60,7 @@ libxpdf_a_SOURCES = \
 	UnicodeMap.cc UnicodeMap.h UnicodeMapTables.h \
 	UnicodeRemapping.cc UnicodeRemapping.h \
 	UnicodeTypeTable.cc UnicodeTypeTable.h \
-	XFAForm.cc XFAForm.h \
+	XFAScanner.cc XFAScanner.h \
 	XRef.cc XRef.h \
 	Zoox.cc Zoox.h \
 	$(empty)
@@ -87,6 +86,7 @@ if HAVE_FREETYPE
 libxpdf_widget_a_SOURCES += \
 	PSOutputDev.cc PSOutputDev.h \
 	SplashOutputDev.cc SplashOutputDev.h \
+	ShadingImage.cc ShadingImage.h \
 	$(empty)
 endif
 if HIGHLIGHTED_REGIONS
@@ -106,6 +106,7 @@ pdftops_SOURCES = pdftops.cc \
 	PreScanOutputDev.cc PreScanOutputDev.h \
 	PSOutputDev.cc PSOutputDev.h \
 	SplashOutputDev.cc SplashOutputDev.h \
+	ShadingImage.cc ShadingImage.h \
 	$(empty)
 pdftops_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi
 pdftops_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
@@ -126,13 +127,15 @@ pdfdetach_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
 pdfdetach_LDADD += $(LCMS_LIBS)
 
 pdftoppm_SOURCES = pdftoppm.cc \
-	SplashOutputDev.cc SplashOutputDev.h
+	SplashOutputDev.cc SplashOutputDev.h \
+	ShadingImage.cc ShadingImage.h
 pdftoppm_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi -L../splash -lsplash
 pdftoppm_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a ../splash/libsplash.a
 pdftoppm_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)
 
 pdftopng_SOURCES = pdftopng.cc \
-	SplashOutputDev.cc SplashOutputDev.h
+	SplashOutputDev.cc SplashOutputDev.h \
+	ShadingImage.cc ShadingImage.h
 pdftopng_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi -L../splash -lsplash
 pdftopng_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a ../splash/libsplash.a
 pdftopng_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS) $(PNG_LIBS)
@@ -143,7 +146,9 @@ pdfinfo_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
 pdfinfo_LDADD += $(LCMS_LIBS)
 
 pdftohtml_SOURCES = pdftohtml.cc HTMLGen.cc HTMLGen.h \
-	SplashOutputDev.cc SplashOutputDev.h
+	SplashOutputDev.cc SplashOutputDev.h \
+	ShadingImage.cc ShadingImage.h \
+	WebFont.cc WebFont.h
 pdftohtml_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi -L../splash -lsplash
 pdftohtml_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a ../splash/libsplash.a
 pdftohtml_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS) $(PNG_LIBS)

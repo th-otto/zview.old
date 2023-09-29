@@ -13,6 +13,7 @@
 
 #include "gtypes.h"
 class GString;
+class GList;
 
 class SplashFTFontEngine;
 class SplashDTFontEngine;
@@ -50,6 +51,10 @@ public:
   // matching entry in the cache.
   SplashFontFile *getFontFile(SplashFontFileID *id);
 
+  // Returns true if [id] refers to a bad font file, i.e., if one of
+  // the loadXXXFont functions has returned NULL for that ID.
+  GBool checkForBadFontFile(SplashFontFileID *id);
+
   // Load fonts - these create new SplashFontFile objects.
   SplashFontFile *loadType1Font(SplashFontFileID *idA,
 #ifdef LOAD_FONTS_FROM_MEM
@@ -64,14 +69,14 @@ public:
 #else
 				 char *fileName, GBool deleteFile,
 #endif
-				 const char **enc);
+				 int *codeToGID, const char **enc);
   SplashFontFile *loadOpenTypeT1CFont(SplashFontFileID *idA,
 #ifdef LOAD_FONTS_FROM_MEM
 				      GString *fontBuf,
 #else
 				      char *fileName, GBool deleteFile,
 #endif
-				      const char **enc);
+				      int *codeToGID, const char **enc);
   SplashFontFile *loadCIDFont(SplashFontFileID *idA,
 #ifdef LOAD_FONTS_FROM_MEM
 			      GString *fontBuf,
@@ -110,6 +115,7 @@ public:
 private:
 
   SplashFont *fontCache[splashFontCacheSize];
+  GList *badFontFiles;		// [SplashFontFileID]
 
 #ifdef HAVE_FREETYPE
   SplashFTFontEngine *ftEngine;

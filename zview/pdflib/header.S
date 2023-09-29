@@ -17,7 +17,7 @@
 C_SYMBOL_NAME(slb_header):
 	.dc.l	0x70004afc	                    /* magic value (clr.l d0, illegal) */
 	.dc.l	_slbname	                    /* pointer to library's (file)name */
-	.dc.l	PLUGIN_INTERFACE_VERSION		/* version number */
+	.dc.l	XPDF_INTERFACE_VERSION			/* version number */
 	.dc.l	0	                            /* flags, currently 0L */
 	.dc.l	C_SYMBOL_NAME(slb_init)			/* called when the library's been loaded */
 	.dc.l	C_SYMBOL_NAME(slb_exit)			/* called before the library is removed */

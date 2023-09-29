@@ -160,7 +160,8 @@ GfxFontLoc::~GfxFontLoc() {
 // GfxFont
 //------------------------------------------------------------------------
 
-GfxFont *GfxFont::makeFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict) {
+GfxFont *GfxFont::makeFont(XRef *xref, const char *tagA,
+			   Ref idA, Dict *fontDict) {
   GString *nameA;
   Ref embFontIDA;
   GfxFontType typeA;
@@ -193,7 +194,28 @@ GfxFont *GfxFont::makeFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict) {
   return font;
 }
 
-GfxFont::GfxFont(char *tagA, Ref idA, GString *nameA,
+GfxFont *GfxFont::makeDefaultFont(XRef *xref) {
+  Object type, subtype, baseFont;
+  type.initName("Font");
+  subtype.initName("Type1");
+  baseFont.initName("Helvetica");
+  Object fontDict;
+  fontDict.initDict(xref);
+  fontDict.dictAdd(copyString("Type"), &type);
+  fontDict.dictAdd(copyString("Subtype"), &subtype);
+  fontDict.dictAdd(copyString("BaseFont"), &baseFont);
+
+  Ref r;
+  r.gen = 100000;
+  r.num = GfxFontDict::hashFontObject(&fontDict);
+
+  GfxFont *font = makeFont(xref, "undef", r, fontDict.getDict());
+  fontDict.free();
+
+  return font;
+}
+
+GfxFont::GfxFont(const char *tagA, Ref idA, GString *nameA,
 		 GfxFontType typeA, Ref embFontIDA) {
   ok = gFalse;
   tag = new GString(tagA);
@@ -463,6 +485,9 @@ void GfxFont::readFontDescriptor(XRef *xref, Dict *fontDict) {
       } else {
 	t2 = 0;
       }
+      if (t != 0 && t < 1.9) {
+	declaredAscent = t;
+      }
       // if both Ascent and CapHeight are set, use the smaller one
       // (because the most common problem is that Ascent is too large)
       if (t2 != 0 && (t == 0 || t2 < t)) {
@@ -538,6 +563,7 @@ CharCodeToUnicode *GfxFont::readToUnicodeCMap(Dict *fontDict, int nBits,
 GfxFontLoc *GfxFont::locateFont(XRef *xref, GBool ps) {
   GfxFontLoc *fontLoc;
   SysFontType sysFontType;
+  FoFiIdentifierType fft;
   GString *path, *base14Name, *substName;
   PSFontParam16 *psFont16;
   Object refObj, embFontObj;
@@ -632,32 +658,43 @@ GfxFontLoc *GfxFont::locateFont(XRef *xref, GBool ps) {
   //----- system font
   if (name && (path = globalParams->findSystemFontFile(name, &sysFontType,
 						       &fontNum))) {
+    fontLoc = new GfxFontLoc();
+    fontLoc->locType = gfxFontLocExternal;
+    fontLoc->path = path;
+    fontLoc->fontNum = fontNum;
     if (isCIDFont()) {
       if (sysFontType == sysFontTTF || sysFontType == sysFontTTC) {
-	fontLoc = new GfxFontLoc();
-	fontLoc->locType = gfxFontLocExternal;
 	fontLoc->fontType = fontCIDType2;
-	fontLoc->path = path;
-	fontLoc->fontNum = fontNum;
 	return fontLoc;
+      } else if (sysFontType == sysFontOTF) {
+	fft = FoFiIdentifier::identifyFile(fontLoc->path->getCString());
+	if (fft == fofiIdOpenTypeCFFCID) {
+	  fontLoc->fontType = fontCIDType0COT;
+	  return fontLoc;
+	} else if (fft == fofiIdTrueType) {
+	  fontLoc->fontType = fontCIDType2;
+	  return fontLoc;
+	}
       }
     } else {
       if (sysFontType == sysFontTTF || sysFontType == sysFontTTC) {
-	fontLoc = new GfxFontLoc();
-	fontLoc->locType = gfxFontLocExternal;
 	fontLoc->fontType = fontTrueType;
-	fontLoc->path = path;
-	fontLoc->fontNum = fontNum;
 	return fontLoc;
       } else if (sysFontType == sysFontPFA || sysFontType == sysFontPFB) {
-	fontLoc = new GfxFontLoc();
-	fontLoc->locType = gfxFontLocExternal;
 	fontLoc->fontType = fontType1;
-	fontLoc->path = path;
 	return fontLoc;
+      } else if (sysFontType == sysFontOTF) {
+	fft = FoFiIdentifier::identifyFile(fontLoc->path->getCString());
+	if (fft == fofiIdOpenTypeCFF8Bit) {
+	  fontLoc->fontType = fontType1COT;
+	  return fontLoc;
+	} else if (fft == fofiIdTrueType) {
+	  fontLoc->fontType = fontTrueTypeOT;
+	  return fontLoc;
+	}
       }
     }
-    delete path;
+    delete fontLoc;
   }
 
   if (!isCIDFont()) {
@@ -835,19 +872,22 @@ char *GfxFont::readEmbFontFile(XRef *xref, int *len) {
   }
   str = obj2.getStream();
 
-  size = 0;
-  buf = NULL;
+  size = 4096;
+  buf = (char *)gmalloc(size);
+  *len = 0;
   str->reset();
   do {
-    if (size > INT_MAX - 4096) {
-      error(errSyntaxError, -1, "Embedded font file is too large");
-      break;
+    if (*len > size - 4096) {
+      if (size > INT_MAX / 2) {
+	error(errSyntaxError, -1, "Embedded font file is too large");
+	break;
+      }
+      size *= 2;
+      buf = (char *)grealloc(buf, size);
     }
-    buf = (char *)grealloc(buf, size + 4096);
-    n = str->getBlock(buf + size, 4096);
-    size += n;
+    n = str->getBlock(buf + *len, 4096);
+    *len += n;
   } while (n == 4096);
-  *len = size;
   str->close();
 
   obj2.free();
@@ -860,7 +900,7 @@ char *GfxFont::readEmbFontFile(XRef *xref, int *len) {
 // Gfx8BitFont
 //------------------------------------------------------------------------
 
-Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
+Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 			 GfxFontType typeA, Ref embFontIDA, Dict *fontDict):
   GfxFont(tagA, idA, nameA, typeA, embFontIDA)
 {
@@ -931,6 +971,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
     missingWidth = builtinFont->missingWidth;
     ascent = 0.001 * builtinFont->ascent;
     descent = 0.001 * builtinFont->descent;
+    declaredAscent = ascent;
     fontBBox[0] = 0.001 * builtinFont->bbox[0];
     fontBBox[1] = 0.001 * builtinFont->bbox[1];
     fontBBox[2] = 0.001 * builtinFont->bbox[2];
@@ -939,6 +980,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
     missingWidth = 0;
     ascent = 0.75;
     descent = -0.25;
+    declaredAscent = ascent;
     fontBBox[0] = fontBBox[1] = fontBBox[2] = fontBBox[3] = 0;
   }
 
@@ -950,6 +992,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   if (builtinFont) {
     ascent = 0.001 * builtinFont->ascent;
     descent = 0.001 * builtinFont->descent;
+    declaredAscent = ascent;
     fontBBox[0] = 0.001 * builtinFont->bbox[0];
     fontBBox[1] = 0.001 * builtinFont->bbox[1];
     fontBBox[2] = 0.001 * builtinFont->bbox[2];
@@ -1444,13 +1487,20 @@ int *Gfx8BitFont::getCodeToGIDMap(FoFiTrueType *ff) {
   }
 
   // reverse map the char names through MacRomanEncoding, then map the
-  // char codes through the cmap
+  // char codes through the cmap; fall back on Unicode if that doesn't
+  // work
   if (useMacRoman) {
     for (i = 0; i < 256; ++i) {
       if ((charName = enc[i])) {
 	if ((code = globalParams->getMacRomanCharCode(charName))) {
 	  map[i] = ff->mapCodeToGID(cmap, code);
+	} else if (unicodeCmap >= 0 &&
+		   (u = globalParams->mapNameToUnicode(charName))) {
+	  map[i] = ff->mapCodeToGID(unicodeCmap, u);
 	}
+      } else if (unicodeCmap >= 0 &&
+		 (n = ctu->mapToUnicode((CharCode)i, &u, 1))) {
+	map[i] = ff->mapCodeToGID(cmap, u);
       } else {
 	map[i] = -1;
       }
@@ -1484,6 +1534,33 @@ int *Gfx8BitFont::getCodeToGIDMap(FoFiTrueType *ff) {
       map[i] = ff->mapNameToGID(charName);
     }
   }
+
+  return map;
+}
+
+int *Gfx8BitFont::getCodeToGIDMap(FoFiType1C *ff) {
+  int *map;
+  GHash *nameToGID;
+  int i, gid;
+
+  map = (int *)gmallocn(256, sizeof(int));
+  for (i = 0; i < 256; ++i) {
+    map[i] = 0;
+  }
+
+  nameToGID = ff->getNameToGIDMap();
+  for (i = 0; i < 256; ++i) {
+    if (!enc[i]) {
+      continue;
+    }
+    gid = nameToGID->lookupInt(enc[i]);
+    if (gid < 0 || gid >= 65536) {
+      continue;
+    }
+    map[i] = gid;
+  }
+
+  delete nameToGID;
 
   return map;
 }
@@ -1573,7 +1650,7 @@ GBool Gfx8BitFont::problematicForUnicode() {
 // GfxCIDFont
 //------------------------------------------------------------------------
 
-GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
+GfxCIDFont::GfxCIDFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 		       GfxFontType typeA, Ref embFontIDA, Dict *fontDict):
   GfxFont(tagA, idA, nameA, typeA, embFontIDA)
 {
@@ -1589,6 +1666,7 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   missingWidth = 0;
   ascent = 0.95;
   descent = -0.35;
+  declaredAscent = ascent;
   fontBBox[0] = fontBBox[1] = fontBBox[2] = fontBBox[3] = 0;
   collection = NULL;
   cMap = NULL;
@@ -1642,53 +1720,6 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   obj2.free();
   obj1.free();
 
-  // look for a ToUnicode CMap
-  hasKnownCollection = gFalse;
-  if (!(ctu = readToUnicodeCMap(fontDict, 16, NULL))) {
-    ctuUsesCharCode = gFalse;
-
-    // use an identity mapping for the "Adobe-Identity" and
-    // "Adobe-UCS" collections
-    if (!collection->cmp("Adobe-Identity") ||
-	!collection->cmp("Adobe-UCS")) {
-      ctu = CharCodeToUnicode::makeIdentityMapping();
-
-    // look for a user-supplied .cidToUnicode file
-    } else if ((ctu = globalParams->getCIDToUnicode(collection))) {
-      hasKnownCollection = gTrue;
-
-    } else {
-      error(errSyntaxError, -1,
-	    "Unknown character collection '{0:t}'", collection);
-
-      // fall back to an identity mapping
-      ctu = CharCodeToUnicode::makeIdentityMapping();
-    }
-  }
-
-  // look for a Unicode-to-Unicode mapping
-  if (name && (utu = globalParams->getUnicodeToUnicode(name))) {
-    if (ctu) {
-      if (ctu->isIdentity()) {
-	ctu->decRefCnt();
-	ctu = utu;
-      } else {
-	for (c = 0; c < ctu->getLength(); ++c) {
-	  n = ctu->mapToUnicode(c, uBuf, 8);
-	  if (n >= 1) {
-	    n = utu->mapToUnicode((CharCode)uBuf[0], uBuf, 8);
-	    if (n >= 1) {
-	      ctu->setMapping(c, uBuf, n);
-	    }
-	  }
-	}
-	utu->decRefCnt();
-      }
-    } else {
-      ctu = utu;
-    }
-  }
-
   // encoding (i.e., CMap)
   if (fontDict->lookup("Encoding", &obj1)->isNull()) {
     error(errSyntaxError, -1, "Missing Encoding entry in Type 0 font");
@@ -1733,11 +1764,64 @@ GfxCIDFont::GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
   }
   obj1.free();
 
+  // look for a ToUnicode CMap
+  hasKnownCollection = gFalse;
+  if (globalParams->getUseTrueTypeUnicodeMapping()) {
+    readTrueTypeUnicodeMapping(xref);
+  }
+  if (!ctu) {
+    ctu = readToUnicodeCMap(fontDict, 16, NULL);
+  }
+  if (!ctu) {
+    ctuUsesCharCode = gFalse;
+
+    // use an identity mapping for the "Adobe-Identity" and
+    // "Adobe-UCS" collections
+    if (!collection->cmp("Adobe-Identity") ||
+	!collection->cmp("Adobe-UCS")) {
+      ctu = CharCodeToUnicode::makeIdentityMapping();
+
+    // look for a user-supplied .cidToUnicode file
+    } else if ((ctu = globalParams->getCIDToUnicode(collection))) {
+      hasKnownCollection = gTrue;
+
+    } else {
+      error(errSyntaxError, -1,
+	    "Unknown character collection '{0:t}'", collection);
+
+      // fall back to an identity mapping
+      ctu = CharCodeToUnicode::makeIdentityMapping();
+    }
+  }
+
+  // look for a Unicode-to-Unicode mapping
+  if (name && (utu = globalParams->getUnicodeToUnicode(name))) {
+    if (ctu) {
+      if (ctu->isIdentity()) {
+	ctu->decRefCnt();
+	ctu = utu;
+      } else {
+	for (c = 0; c < ctu->getLength(); ++c) {
+	  n = ctu->mapToUnicode(c, uBuf, 8);
+	  if (n >= 1) {
+	    n = utu->mapToUnicode((CharCode)uBuf[0], uBuf, 8);
+	    if (n >= 1) {
+	      ctu->setMapping(c, uBuf, n);
+	    }
+	  }
+	}
+	utu->decRefCnt();
+      }
+    } else {
+      ctu = utu;
+    }
+  }
+
   //----- character metrics -----
 
   // default char width
-  if (desFontDict->lookup("DW", &obj1)->isInt()) {
-    widths.defWidth = obj1.getInt() * 0.001;
+  if (desFontDict->lookup("DW", &obj1)->isNum()) {
+    widths.defWidth = obj1.getNum() * 0.001;
   }
   obj1.free();
 
@@ -1909,6 +1993,91 @@ GfxCIDFont::~GfxCIDFont() {
   }
 }
 
+// Construct a code-to-Unicode mapping, based on the TrueType Unicode
+// cmap (if present).  Constructs ctu if succesful; leaves ctu = null
+// otherwise.  Always leaves ctu = null for non-TrueType fonts.
+void GfxCIDFont::readTrueTypeUnicodeMapping(XRef *xref) {
+  char *buf;
+  FoFiTrueType *ff;
+  Unicode *gidToUnicode, *codeToUnicode;
+  Unicode u;
+  int bufLen, cmapPlatform, cmapEncoding, unicodeCmap;
+  int nGlyphs, nMappings, gid, i;
+
+  // must be an embedded TrueType font, with an unknown char collection
+  if ((type != fontCIDType2 && type == fontCIDType2OT) ||
+      embFontID.num < 0 ||
+      hasKnownCollection) {
+    goto err0;
+  }
+
+  // read the embedded font and construct a FoFiTrueType
+  if (!(buf = readEmbFontFile(xref, &bufLen))) {
+    goto err0;
+  }
+  if (!(ff = FoFiTrueType::make(buf, bufLen, 0))) {
+    goto err1;
+  }
+
+  // find the TrueType Unicode cmap
+  unicodeCmap = -1;
+  for (i = 0; i < ff->getNumCmaps(); ++i) {
+    cmapPlatform = ff->getCmapPlatform(i);
+    cmapEncoding = ff->getCmapEncoding(i);
+    if ((cmapPlatform == 3 && cmapEncoding == 1) ||
+	(cmapPlatform == 0 && cmapEncoding <= 4)) {
+      unicodeCmap = i;
+      break;
+    }
+  }
+  if (unicodeCmap < 0) {
+    goto err2;
+  }
+
+  // construct reverse GID-to-Unicode map
+  nGlyphs = ff->getNumGlyphs();
+  gidToUnicode = (Unicode *)gmallocn(nGlyphs, sizeof(Unicode));
+  memset(gidToUnicode, 0, nGlyphs * sizeof(Unicode));
+  nMappings = 0;
+  for (u = 1; u <= 0xffff; ++u) {
+    gid = ff->mapCodeToGID(unicodeCmap, (int)u);
+    if (gid > 0 && gid < nGlyphs) {
+      gidToUnicode[gid] = u;
+      ++nMappings;
+    }
+  }
+  // bail out if the Unicode cmap was completely empty
+  if (nMappings == 0) {
+    goto err3;
+  }
+
+  // construct code-to-Unicode map
+  codeToUnicode = (Unicode *)gmallocn(65536, sizeof(Unicode));
+  memset(codeToUnicode, 0, 65536 * sizeof(Unicode));
+  for (i = 0; i <= 0xffff; ++i) {
+    // we've already checked for an identity encoding, so CID = i
+    if (cidToGID && i < cidToGIDLen) {
+      gid = cidToGID[i];
+    } else {
+      gid = i;
+    }
+    if (gid < nGlyphs && gidToUnicode[gid] > 0) {
+      codeToUnicode[i] = gidToUnicode[gid];
+    }
+  }
+  ctu = CharCodeToUnicode::make16BitToUnicode(codeToUnicode);
+
+  gfree(codeToUnicode);
+ err3:
+  gfree(gidToUnicode);
+ err2:
+  delete ff;
+ err1:
+  gfree(buf);
+ err0:
+  return;
+}
+
 int GfxCIDFont::getNextChar(char *s, int len, CharCode *code,
 			    Unicode *u, int uSize, int *uLen,
 			    double *dx, double *dy, double *ox, double *oy) {
@@ -1997,6 +2166,13 @@ CharCodeToUnicode *GfxCIDFont::getToUnicode() {
 
 GString *GfxCIDFont::getCollection() {
   return cMap ? cMap->getCollection() : (GString *)NULL;
+}
+
+double GfxCIDFont::getWidth(CID cid) {
+  double w;
+
+  getHorizontalMetrics(cid, &w);
+  return w;
 }
 
 GBool GfxCIDFont::problematicForUnicode() {

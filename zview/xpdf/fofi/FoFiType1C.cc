@@ -14,12 +14,15 @@
 #include "gmem.h"
 #include "gmempp.h"
 #include "GString.h"
+#include "GHash.h"
 #include "FoFiEncodings.h"
 #include "FoFiType1C.h"
 
 //------------------------------------------------------------------------
 
 static char const hexChars[17] = "0123456789ABCDEF";
+
+#define type1cSubrRecursionLimit 20
 
 //------------------------------------------------------------------------
 
@@ -34,28 +37,52 @@ GBool Type1COp::isZero() {
 
 GBool Type1COp::isNegative() {
   switch (kind) {
-  case type1COpInteger:  return intgr < 0;
-  case type1COpFloat:    return flt < 0;
-  case type1COpRational: return (rat.num < 0) != (rat.den < 0);
-  default:               return gFalse;   // shouldn't happen
+  case type1COpInteger:
+    return intgr < 0;
+  case type1COpFloat:
+    return flt < 0;
+  case type1COpRational:
+    return (rat.num < 0) != (rat.den < 0);
+  default:
+    // shouldn't happen
+    return gFalse;
   }
 }
 
 int Type1COp::toInt() {
   switch (kind) {
-  case type1COpInteger:  return intgr;
-  case type1COpFloat:    return (int)flt;
-  case type1COpRational: return rat.num / rat.den;
-  default:               return 0;   // shouldn't happen
+  case type1COpInteger:
+    return intgr;
+  case type1COpFloat:
+    if (flt < -2e9 || flt > 2e9) {
+      return 0;
+    }
+    return (int)flt;
+  case type1COpRational:
+    if (rat.den == 0) {
+      return 0;
+    }
+    return rat.num / rat.den;
+  default:
+    // shouldn't happen
+    return 0;
   }
 }
 
 double Type1COp::toFloat() {
   switch (kind) {
-  case type1COpInteger:  return (double)intgr;
-  case type1COpFloat:    return flt;
-  case type1COpRational: return (double)rat.num / (double)rat.den;
-  default:               return 0.0;   // shouldn't happen
+  case type1COpInteger:
+    return (double)intgr;
+  case type1COpFloat:
+    return flt;
+  case type1COpRational:
+    if (rat.den == 0) {
+      return 0;
+    }
+    return (double)rat.num / (double)rat.den;
+  default:
+    // shouldn't happen
+    return 0.0;
   }
 }
 
@@ -146,6 +173,23 @@ GString *FoFiType1C::getGlyphName(int gid) {
     return NULL;
   }
   return new GString(buf);
+}
+
+GHash *FoFiType1C::getNameToGIDMap() {
+  GHash *map;
+  char glyphname[256];
+  GBool ok;
+  int gid;
+
+  map = new GHash(gTrue);
+  for (gid = 0; gid < nGlyphs; ++gid) {
+    ok = gTrue;
+    getString(charset[gid], glyphname, &ok);
+    if (ok) {
+      map->add(new GString(glyphname), gid);
+    }
+  }
+  return map;
 }
 
 int *FoFiType1C::getCIDToGIDMap(int *nCIDs) {
@@ -357,7 +401,9 @@ void FoFiType1C::convertToType1(char *psName, const char **newEncoding,
   eexecWrite(&eb, "/password 5839 def\n");
   if (privateDicts[0].nBlueValues) {
     eexecWrite(&eb, "/BlueValues [");
-    for (i = 0; i < privateDicts[0].nBlueValues; ++i) {
+    // number of entries must be even
+    int n = privateDicts[0].nBlueValues & ~1;
+    for (i = 0; i < n; ++i) {
       buf = GString::format("{0:s}{1:d}",
 			    i > 0 ? " " : "", privateDicts[0].blueValues[i]);
       eexecWrite(&eb, buf->getCString());
@@ -367,7 +413,9 @@ void FoFiType1C::convertToType1(char *psName, const char **newEncoding,
   }
   if (privateDicts[0].nOtherBlues) {
     eexecWrite(&eb, "/OtherBlues [");
-    for (i = 0; i < privateDicts[0].nOtherBlues; ++i) {
+    // number of entries must be even
+    int n = privateDicts[0].nOtherBlues & ~1;
+    for (i = 0; i < n; ++i) {
       buf = GString::format("{0:s}{1:d}",
 			    i > 0 ? " " : "", privateDicts[0].otherBlues[i]);
       eexecWrite(&eb, buf->getCString());
@@ -377,7 +425,9 @@ void FoFiType1C::convertToType1(char *psName, const char **newEncoding,
   }
   if (privateDicts[0].nFamilyBlues) {
     eexecWrite(&eb, "/FamilyBlues [");
-    for (i = 0; i < privateDicts[0].nFamilyBlues; ++i) {
+    // number of entries must be even
+    int n = privateDicts[0].nFamilyBlues & ~1;
+    for (i = 0; i < n; ++i) {
       buf = GString::format("{0:s}{1:d}",
 			    i > 0 ? " " : "", privateDicts[0].familyBlues[i]);
       eexecWrite(&eb, buf->getCString());
@@ -387,7 +437,9 @@ void FoFiType1C::convertToType1(char *psName, const char **newEncoding,
   }
   if (privateDicts[0].nFamilyOtherBlues) {
     eexecWrite(&eb, "/FamilyOtherBlues [");
-    for (i = 0; i < privateDicts[0].nFamilyOtherBlues; ++i) {
+    // number of entries must be even
+    int n = privateDicts[0].nFamilyOtherBlues & ~1;
+    for (i = 0; i < n; ++i) {
       buf = GString::format("{0:s}{1:d}", i > 0 ? " " : "",
 			    privateDicts[0].familyOtherBlues[i]);
       eexecWrite(&eb, buf->getCString());
@@ -585,7 +637,8 @@ void FoFiType1C::convertToCIDType0(char *psName, int *codeMap, int nCodes,
 	  subrIdx.pos = -1;
 	}
 	cvtGlyph(val.pos, val.len, charStrings,
-		 &subrIdx, &privateDicts[fdSelect ? fdSelect[gid] : 0], gTrue);
+		 &subrIdx, &privateDicts[fdSelect ? fdSelect[gid] : 0],
+		 gTrue, 0);
       }
     }
   }
@@ -947,6 +1000,10 @@ void FoFiType1C::convertToType0(char *psName, int *codeMap, int nCodes,
 	}
       }
     }
+    if (fd < 0 || fd >= nFDs) {
+      // this will only happen in a broken/damaged font
+      fd = 0;
+    }
 
     // font dictionary (unencrypted section)
     (*outputFunc)(outputStream, "16 dict begin\n", 14);
@@ -1247,7 +1304,7 @@ void FoFiType1C::eexecCvtGlyph(Type1CEexecBuf *eb, const char *glyphName,
 
   // generate the charstring
   charBuf = new GString();
-  cvtGlyph(offset, nBytes, charBuf, subrIdx, pDict, gTrue);
+  cvtGlyph(offset, nBytes, charBuf, subrIdx, pDict, gTrue, 0);
 
   buf = GString::format("/{0:s} {1:d} RD ", glyphName, charBuf->getLength());
   eexecWrite(eb, buf->getCString());
@@ -1261,7 +1318,7 @@ void FoFiType1C::eexecCvtGlyph(Type1CEexecBuf *eb, const char *glyphName,
 
 void FoFiType1C::cvtGlyph(int offset, int nBytes, GString *charBuf,
 			  Type1CIndex *subrIdx, Type1CPrivateDict *pDict,
-			  GBool top) {
+			  GBool top, int recursion) {
   Type1CIndexVal val;
   Type1COp zero, tmp;
   GBool ok, dInt;
@@ -1269,6 +1326,11 @@ void FoFiType1C::cvtGlyph(int offset, int nBytes, GString *charBuf,
   Gushort r2;
   Guchar byte;
   int pos, subrBias, start, num, den, i, k;
+
+  if (recursion > type1cSubrRecursionLimit) {
+    //~ error(-1, "Recursive loop in Type1C glyph");
+    return;
+  }
 
   start = charBuf->getLength();
   if (top) {
@@ -1482,7 +1544,8 @@ void FoFiType1C::cvtGlyph(int offset, int nBytes, GString *charBuf,
 	  ok = gTrue;
 	  getIndexVal(subrIdx, k, &val, &ok);
 	  if (ok) {
-	    cvtGlyph(val.pos, val.len, charBuf, subrIdx, pDict, gFalse);
+	    cvtGlyph(val.pos, val.len, charBuf, subrIdx, pDict, gFalse,
+		     recursion + 1);
 	  }
 	} else {
 	  //~ error(-1, "Too few args to Type 2 callsubr");
@@ -1717,7 +1780,8 @@ void FoFiType1C::cvtGlyph(int offset, int nBytes, GString *charBuf,
 	  ok = gTrue;
 	  getIndexVal(&gsubrIdx, k, &val, &ok);
 	  if (ok) {
-	    cvtGlyph(val.pos, val.len, charBuf, subrIdx, pDict, gFalse);
+	    cvtGlyph(val.pos, val.len, charBuf, subrIdx, pDict, gFalse,
+		     recursion + 1);
 	  }
 	} else {
 	  //~ error(-1, "Too few args to Type 2 callgsubr");
@@ -2179,6 +2243,371 @@ void FoFiType1C::writePSString(char *s, FoFiOutputFunc outputFunc,
   (*outputFunc)(outputStream, buf, i);
 }
 
+void FoFiType1C::convertToOpenType(FoFiOutputFunc outputFunc,
+				   void *outputStream,
+				   int nWidths, Gushort *widths,
+				   Guchar *cmapTable, int cmapTableLen) {
+  // dummy OS/2 table (taken from FoFiTrueType::writeTTF)
+  static Guchar os2Tab[86] = {
+    0, 1,			// version
+    0, 1,			// xAvgCharWidth
+    0x01, 0x90,			// usWeightClass
+    0, 5,			// usWidthClass
+    0, 0,			// fsType
+    0, 0,			// ySubscriptXSize
+    0, 0,			// ySubscriptYSize
+    0, 0,			// ySubscriptXOffset
+    0, 0,			// ySubscriptYOffset
+    0, 0,			// ySuperscriptXSize
+    0, 0,			// ySuperscriptYSize
+    0, 0,			// ySuperscriptXOffset
+    0, 0,			// ySuperscriptYOffset
+    0, 0,			// yStrikeoutSize
+    0, 0,			// yStrikeoutPosition
+    0, 0,			// sFamilyClass
+    0, 0, 0, 0, 0,		// panose
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0,			// ulUnicodeRange1
+    0, 0, 0, 0,			// ulUnicodeRange2
+    0, 0, 0, 0,			// ulUnicodeRange3
+    0, 0, 0, 0,			// ulUnicodeRange4
+    0, 0, 0, 0,			// achVendID
+    0, 0,			// fsSelection
+    0, 0,			// usFirstCharIndex
+    0, 0,			// usLastCharIndex
+    0, 0,			// sTypoAscender
+    0, 0,			// sTypoDescender
+    0, 0,			// sTypoLineGap
+    0x20, 0x00,			// usWinAscent
+    0x20, 0x00,			// usWinDescent
+    0, 0, 0, 1,			// ulCodePageRange1
+    0, 0, 0, 0			// ulCodePageRange2
+  };
+  Guchar headTable[54], hheaTable[36], maxpTable[6];
+  Guchar nameTable[26], postTable[32];
+  Guchar *hmtxTable;
+  static const char *tableTag[9] = {
+    "CFF ",
+    "OS/2",
+    "cmap",
+    "head",
+    "hhea",
+    "hmtx",
+    "maxp",
+    "name",
+    "post"
+  };
+  Guchar *tableData[9];
+  int tableLength[9];
+  Guchar header[12 + 9*16];
+  double mat[6];
+  Gushort maxWidth;
+  Guint checksum, fileChecksum;
+  int unitsPerEm, xMin, yMin, xMax, yMax, offset, i;
+
+  //--- CFF_ table
+  tableData[0] = file;
+  tableLength[0] = len;
+
+  //--- OS/2 table
+  tableData[1] = os2Tab;
+  tableLength[1] = 86;
+
+  //--- cmap table
+  tableData[2] = cmapTable;
+  tableLength[2] = cmapTableLen;
+
+  //--- head table
+  getFontMatrix(mat);
+  if (mat[0] == 0) {
+    unitsPerEm = 1000;
+  } else {
+    unitsPerEm = (int)(1 / mat[0] + 0.5);
+  }
+  xMin = (int)(topDict.fontBBox[0] + 0.5);
+  yMin = (int)(topDict.fontBBox[1] + 0.5);
+  xMax = (int)(topDict.fontBBox[2] + 0.5);
+  yMax = (int)(topDict.fontBBox[3] + 0.5);
+  headTable[ 0] = 0x00;				// version
+  headTable[ 1] = 0x01;
+  headTable[ 2] = 0x00;
+  headTable[ 3] = 0x00;
+  headTable[ 4] = 0x00;				// revision
+  headTable[ 5] = 0x00;
+  headTable[ 6] = 0x00;
+  headTable[ 7] = 0x00;
+  headTable[ 8] = 0x00;				// checksumAdjustment
+  headTable[ 9] = 0x00;				//   (set later)
+  headTable[10] = 0x00;
+  headTable[11] = 0x00;
+  headTable[12] = 0x5f;				// magicNumber
+  headTable[13] = 0x0f;
+  headTable[14] = 0x3c;
+  headTable[15] = 0xf5;
+  headTable[16] = 0x00;				// flags
+  headTable[17] = 0x03;
+  headTable[18] = (Guchar)(unitsPerEm >> 8);	// unitsPerEm
+  headTable[19] = (Guchar)unitsPerEm;
+  headTable[20] = 0x00;				// created
+  headTable[21] = 0x00;
+  headTable[22] = 0x00;
+  headTable[23] = 0x00;
+  headTable[24] = 0x00;
+  headTable[25] = 0x00;
+  headTable[26] = 0x00;
+  headTable[27] = 0x00;
+  headTable[28] = 0x00;				// modified
+  headTable[29] = 0x00;
+  headTable[30] = 0x00;
+  headTable[31] = 0x00;
+  headTable[32] = 0x00;
+  headTable[33] = 0x00;
+  headTable[34] = 0x00;
+  headTable[35] = 0x00;
+  headTable[36] = (Guchar)(xMin >> 8);		// xMin
+  headTable[37] = (Guchar)xMin;
+  headTable[38] = (Guchar)(yMin >> 8);		// yMin
+  headTable[39] = (Guchar)yMin;
+  headTable[40] = (Guchar)(xMax >> 8);		// xMax
+  headTable[41] = (Guchar)xMax;
+  headTable[42] = (Guchar)(yMax >> 8);		// yMax
+  headTable[43] = (Guchar)yMax;
+  headTable[44] = 0;				// macStyle
+  headTable[45] = 0;
+  headTable[46] = 0;				// lowestRecPPEM
+  headTable[47] = 3;
+  headTable[48] = 0;				// fontDirectionHint
+  headTable[49] = 2;				//   (deprecated)
+  headTable[50] = 0;				// indexToLocFormat
+  headTable[51] = 0;				//   (n/a to CFF fonts)
+  headTable[52] = 0;				// glyphDataFormat
+  headTable[53] = 0;				//   (n/a to CFF fonts)
+  tableData[3] = headTable;
+  tableLength[3] = 54;
+
+  //--- hhea table
+  maxWidth = widths[0];
+  for (i = 1; i < nWidths; ++i) {
+    if (widths[i] > maxWidth) {
+      maxWidth = widths[i];
+    }
+  }
+  hheaTable[ 0] = 0x00;				// version
+  hheaTable[ 1] = 0x01;
+  hheaTable[ 2] = 0x00;
+  hheaTable[ 3] = 0x00;
+  hheaTable[ 4] = (Guchar)(yMax >> 8);		// ascender
+  hheaTable[ 5] = (Guchar)yMax;
+  hheaTable[ 6] = (Guchar)(yMin >> 8);		// descender
+  hheaTable[ 7] = (Guchar)yMin;
+  hheaTable[ 8] = 0;				// lineGap
+  hheaTable[ 9] = 0;
+  hheaTable[10] = (Guchar)(maxWidth >> 8);	// advanceWidthMax
+  hheaTable[11] = (Guchar)maxWidth;
+  hheaTable[12] = 0;				// minLeftSideBearing
+  hheaTable[13] = 0;
+  hheaTable[14] = 0;				// minRightSideBearing
+  hheaTable[15] = 0;
+  hheaTable[16] = (Guchar)(maxWidth >> 8);	// xMaxExtent
+  hheaTable[17] = (Guchar)maxWidth;
+  hheaTable[18] = 0;				// caretSlopeRise
+  hheaTable[19] = 1;
+  hheaTable[20] = 0;				// caretSlopeRun
+  hheaTable[21] = 0;
+  hheaTable[22] = 0;				// caretOffset
+  hheaTable[23] = 0;
+  hheaTable[24] = 0;				// reserved
+  hheaTable[25] = 0;
+  hheaTable[26] = 0;				// reserved
+  hheaTable[27] = 0;
+  hheaTable[28] = 0;				// reserved
+  hheaTable[29] = 0;
+  hheaTable[30] = 0;				// reserved
+  hheaTable[31] = 0;
+  hheaTable[32] = 0;				// metricDataFormat
+  hheaTable[33] = 0;
+  hheaTable[34] = (Guchar)(nWidths >> 8);	// numberOfHMetrics
+  hheaTable[35] = (Guchar)nWidths;
+  tableData[4] = hheaTable;
+  tableLength[4] = 36;
+
+  //--- hmtx table
+  //~ this currently sets LSB to 0 for all glyphs
+  hmtxTable = (Guchar *)gmallocn(nWidths, 4);
+  for (i = 0; i < nWidths; ++i) {
+    hmtxTable[4*i  ] = (Guchar)(widths[i] >> 8);
+    hmtxTable[4*i+1] = (Guchar)widths[i];
+    hmtxTable[4*i+2] = 0;
+    hmtxTable[4*i+3] = 0;
+  }
+  tableData[5] = hmtxTable;
+  tableLength[5] = 4 * nWidths;
+
+  //--- maxp table
+  maxpTable[0] = 0x00;				// version = 0.5
+  maxpTable[1] = 0x00;
+  maxpTable[2] = 0x50;
+  maxpTable[3] = 0x00;
+  maxpTable[4] = (Guchar)(nGlyphs >> 8);	// numGlyphs
+  maxpTable[5] = (Guchar)nGlyphs;
+  tableData[6] = maxpTable;
+  tableLength[6] = 6;
+
+  //--- name table
+  nameTable[ 0] = 0x00;				// format
+  nameTable[ 1] = 0x00;
+  nameTable[ 2] = 0x00;				// count
+  nameTable[ 3] = 0x01;
+  nameTable[ 4] = 0x00;				// stringOffset
+  nameTable[ 5] = 0x12;
+  nameTable[ 6] = 0x00;				// platformID
+  nameTable[ 7] = 0x00;
+  nameTable[ 8] = 0x00;				// encodingID
+  nameTable[ 9] = 0x03;
+  nameTable[10] = 0x00;				// languageID
+  nameTable[11] = 0x00;
+  nameTable[12] = 0x00;				// nameID
+  nameTable[13] = 0x00;
+  nameTable[14] = 0x00;				// length
+  nameTable[15] = 0x08;
+  nameTable[16] = 0x00;				// offset
+  nameTable[17] = 0x00;
+  nameTable[18] = 0x00;				// string data
+  nameTable[19] = (Guchar)'n';
+  nameTable[20] = 0x00;
+  nameTable[21] = (Guchar)'o';
+  nameTable[22] = 0x00;
+  nameTable[23] = (Guchar)'n';
+  nameTable[24] = 0x00;
+  nameTable[25] = (Guchar)'e';
+  tableData[7] = nameTable;
+  tableLength[7] = 26;
+
+  //--- post table
+  postTable[ 0] = 0x00;				// version = 3.0
+  postTable[ 1] = 0x03;
+  postTable[ 2] = 0x00;
+  postTable[ 3] = 0x00;
+  postTable[ 4] = 0x00;				// italicAngle
+  postTable[ 5] = 0x00;
+  postTable[ 6] = 0x00;
+  postTable[ 7] = 0x00;
+  postTable[ 8] = 0x00;				// underlinePosition
+  postTable[ 9] = 0x00;
+  postTable[10] = 0x00;				// underlineThickness
+  postTable[11] = 0x00;
+  postTable[12] = 0x00;				// isFixedPitch
+  postTable[13] = 0x00;
+  postTable[14] = 0x00;
+  postTable[15] = 0x00;
+  postTable[16] = 0x00;				// minMemType42
+  postTable[17] = 0x00;
+  postTable[18] = 0x00;
+  postTable[19] = 0x00;
+  postTable[20] = 0x00;				// maxMemType42
+  postTable[21] = 0x00;
+  postTable[22] = 0x00;
+  postTable[23] = 0x00;
+  postTable[24] = 0x00;				// minMemType1
+  postTable[25] = 0x00;
+  postTable[26] = 0x00;
+  postTable[27] = 0x00;
+  postTable[28] = 0x00;				// maxMemType1
+  postTable[29] = 0x00;
+  postTable[30] = 0x00;
+  postTable[31] = 0x00;
+  tableData[8] = postTable;
+  tableLength[8] = 32;
+
+  //--- header and table directory
+  header[ 0] = 'O';				// sfnt version
+  header[ 1] = 'T';
+  header[ 2] = 'T';
+  header[ 3] = 'O';
+  header[ 4] = 0x00;				// numTables
+  header[ 5] = 0x09;
+  header[ 6] = 0x00;				// searchRange
+  header[ 7] = 0x80;
+  header[ 8] = 0x00;				// entrySelector
+  header[ 9] = 0x03;
+  header[10] = 0x00;				// rangeShift
+  header[11] = 0x10;
+  offset = 12 + 9*16;
+  fileChecksum = 0;
+  for (i = 0; i < 9; ++i) {
+    header[12 + i*16 +  0] = tableTag[i][0];
+    header[12 + i*16 +  1] = tableTag[i][1];
+    header[12 + i*16 +  2] = tableTag[i][2];
+    header[12 + i*16 +  3] = tableTag[i][3];
+    checksum = computeOpenTypeTableChecksum(tableData[i], tableLength[i]);
+    fileChecksum += checksum;
+    header[12 + i*16 +  4] = (Guchar)(checksum >> 24);
+    header[12 + i*16 +  5] = (Guchar)(checksum >> 16);
+    header[12 + i*16 +  6] = (Guchar)(checksum >> 8);
+    header[12 + i*16 +  7] = (Guchar)checksum;
+    header[12 + i*16 +  8] = (Guchar)(offset >> 24);
+    header[12 + i*16 +  9] = (Guchar)(offset >> 16);
+    header[12 + i*16 + 10] = (Guchar)(offset >> 8);
+    header[12 + i*16 + 11] = (Guchar)offset;
+    header[12 + i*16 + 12] = (Guchar)(tableLength[i] >> 24);
+    header[12 + i*16 + 13] = (Guchar)(tableLength[i] >> 16);
+    header[12 + i*16 + 14] = (Guchar)(tableLength[i] >> 8);
+    header[12 + i*16 + 15] = (Guchar)tableLength[i];
+    offset += tableLength[i];
+    if (tableLength[i] & 3) {
+      offset += 4 - (tableLength[i] & 3);
+    }
+  }
+
+  //--- file checksum
+  fileChecksum += computeOpenTypeTableChecksum(header, 12 + 9*16);
+  fileChecksum = 0xb1b0afba - fileChecksum;
+  headTable[ 8] = (Guchar)(fileChecksum >> 24);
+  headTable[ 9] = (Guchar)(fileChecksum >> 16);
+  headTable[10] = (Guchar)(fileChecksum >>  8);
+  headTable[11] = (Guchar)fileChecksum;
+
+  //--- write the OpenType font
+  (*outputFunc)(outputStream, (char *)header, 12 + 9*16);
+  for (i = 0; i < 9; ++i) {
+    (*outputFunc)(outputStream, (char *)tableData[i], tableLength[i]);
+    if (tableLength[i] & 3) {
+      (*outputFunc)(outputStream, "\0\0\0", 4 - (tableLength[i] & 3));
+    }
+  }
+
+  gfree(hmtxTable);
+}
+
+Guint FoFiType1C::computeOpenTypeTableChecksum(Guchar *data, int length) {
+  Guint checksum, word;
+  int i;
+
+  checksum = 0;
+  for (i = 0; i+3 < length; i += 4) {
+    word = ((data[i  ] & 0xff) << 24) +
+           ((data[i+1] & 0xff) << 16) +
+           ((data[i+2] & 0xff) <<  8) +
+            (data[i+3] & 0xff);
+    checksum += word;
+  }
+  if (length & 3) {
+    word = 0;
+    i = length & ~3;
+    switch (length & 3) {
+    case 3:
+      word |= (data[i+2] & 0xff) <<  8;
+    case 2:
+      word |= (data[i+1] & 0xff) << 16;
+    case 1:
+      word |= (data[i  ] & 0xff) << 24;
+      break;
+    }
+    checksum += word;
+  }
+  return checksum;
+}
+
 GBool FoFiType1C::parse() {
   Type1CIndex fdIdx;
   Type1CIndexVal val;
@@ -2558,11 +2987,10 @@ void FoFiType1C::readFDSelect() {
   int fdSelectFmt, pos, nRanges, gid0, gid1, fd, i, j;
 
   fdSelect = (Guchar *)gmalloc(nGlyphs);
-  if (topDict.fdSelectOffset == 0) {
-    for (i = 0; i < nGlyphs; ++i) {
-      fdSelect[i] = 0;
-    }
-  } else {
+  for (i = 0; i < nGlyphs; ++i) {
+    fdSelect[i] = 0;
+  }
+  if (topDict.fdSelectOffset != 0) {
     pos = topDict.fdSelectOffset;
     fdSelectFmt = getU8(pos++, &parsedOk);
     if (!parsedOk) {
@@ -2573,7 +3001,14 @@ void FoFiType1C::readFDSelect() {
 	parsedOk = gFalse;
 	return;
       }
-      memcpy(fdSelect, file + pos, nGlyphs);
+      for (gid0 = 0; gid0 < nGlyphs; ++gid0) {
+	if (file[pos + gid0] >= nFDs) {
+	  //~ error(-1, "Bad FDSelect table in CID font");
+	  parsedOk = gFalse;
+	  return;
+	}
+	fdSelect[gid0] = file[pos + gid0];
+      }
     } else if (fdSelectFmt == 3) {
       nRanges = getU16BE(pos, &parsedOk);
       pos += 2;
@@ -2586,7 +3021,7 @@ void FoFiType1C::readFDSelect() {
 	  return;
 	}
 	pos += 2;
-	if (gid0 > gid1 || gid1 > nGlyphs) {
+	if (gid0 > gid1 || gid1 > nGlyphs || fd >= nFDs) {
 	  //~ error(-1, "Bad FDSelect table in CID font");
 	  parsedOk = gFalse;
 	  return;
@@ -2598,9 +3033,6 @@ void FoFiType1C::readFDSelect() {
       }
     } else {
       //~ error(-1, "Unknown FDSelect table format in CID font");
-      for (i = 0; i < nGlyphs; ++i) {
-	fdSelect[i] = 0;
-      }
     }
   }
 }
@@ -2699,10 +3131,19 @@ GBool FoFiType1C::readCharset() {
 
   if (topDict.charsetOffset == 0) {
     charset = const_cast<Gushort *>(fofiType1CISOAdobeCharset);
+    if (nGlyphs > 229) {
+      nGlyphs = 229;
+    }
   } else if (topDict.charsetOffset == 1) {
     charset = const_cast<Gushort *>(fofiType1CExpertCharset);
+    if (nGlyphs > 166) {
+      nGlyphs = 166;
+    }
   } else if (topDict.charsetOffset == 2) {
     charset = const_cast<Gushort *>(fofiType1CExpertSubsetCharset);
+    if (nGlyphs > 87) {
+      nGlyphs = 87;
+    }
   } else {
     charset = (Gushort *)gmallocn(nGlyphs, sizeof(Gushort));
     for (i = 0; i < nGlyphs; ++i) {

@@ -131,7 +131,6 @@ struct JPXCodeBlock {
 
 struct JPXSubband {
   //----- computed
-  Guint x0, y0, x1, y1;		// bounds
   Guint nXCBs, nYCBs;		// number of code-blocks in the x and y
 				//   directions
 
@@ -148,9 +147,6 @@ struct JPXSubband {
 //------------------------------------------------------------------------
 
 struct JPXPrecinct {
-  //----- computed
-  Guint x0, y0, x1, y1;		// bounds of the precinct
-
   //----- children
   JPXSubband *subbands;		// the subbands
 };
@@ -161,12 +157,18 @@ struct JPXResLevel {
   //----- from the COD and COC segments (main and tile)
   Guint precinctWidth;		// log2(precinct width)
   Guint precinctHeight;		// log2(precinct height)
+  Guint nPrecincts;
 
   //----- computed
-  Guint x0, y0, x1, y1;		// bounds of the tile-comp (for this res level)
+  Guint x0, y0, x1, y1;		// bounds of this tile-comp at this res level
   Guint bx0[3], by0[3],		// subband bounds
         bx1[3], by1[3];
-  GBool empty;			// true if all subbands are zero width or height
+  Guint codeBlockW;		// log2(code-block width)
+  Guint codeBlockH;		// log2(code-block height)
+  Guint cbW;			// code-block width
+  Guint cbH;			// code-block height
+  GBool empty;			// true if all subbands and precincts are
+				//   zero width or height
 
   //---- children
   JPXPrecinct *precincts;	// the precincts
@@ -196,9 +198,8 @@ struct JPXTileComp {
 
   //----- computed
   Guint x0, y0, x1, y1;		// bounds of the tile-comp, in ref coords
+  Guint x0r, y0r;		// x0 >> reduction, y0 >> reduction
   Guint w, h;			// data size = {x1 - x0, y1 - y0} >> reduction
-  Guint cbW;			// code-block width
-  Guint cbH;			// code-block height
 
   //----- image data
   int *data;			// the decoded image data
@@ -224,12 +225,15 @@ struct JPXTile {
   Guint x0, y0, x1, y1;		// bounds of the tile, in ref coords
   Guint maxNDecompLevels;	// max number of decomposition levels used
 				//   in any component in this tile
+  Guint maxNPrecincts;		// max number of precints in any
+				//   component/res level in this tile
 
   //----- progression order loop counters
-  Guint comp;			//   component
-  Guint res;			//   resolution level
-  Guint precinct;		//   precinct
-  Guint layer;			//   layer
+  Guint comp;			// component
+  Guint res;			// resolution level
+  Guint precinct;		// precinct
+  Guint layer;			// layer
+  GBool done;			// set when this tile is done
 
   //----- tile part info
   Guint nextTilePart;		// next expected tile-part
@@ -249,9 +253,6 @@ struct JPXImage {
         yTileOffset;
   Guint xSizeR, ySizeR;		// size of reference grid >> reduction
   Guint xOffsetR, yOffsetR;	// image offset >> reduction
-  Guint xTileSizeR, yTileSizeR;	// size of tiles >> reduction
-  Guint xTileOffsetR,		// offset of first tile >> reduction
-        yTileOffsetR;
   Guint nComps;			// number of components
 
   //----- computed
@@ -283,7 +284,8 @@ public:
   virtual void close();
   virtual int getChar();
   virtual int lookChar();
-  virtual GString *getPSFilter(int psLevel, const char *indent);
+  virtual GString *getPSFilter(int psLevel, const char *indent,
+			       GBool okToReadStream);
   virtual GBool isBinary(GBool last = gTrue);
   virtual void getImageParams(int *bitsPerComponent,
 			      StreamColorSpaceMode *csMode);
@@ -291,6 +293,7 @@ public:
 
 private:
 
+  void decodeImage();
   void fillReadBuf();
   void getImageParams2(int *bitsPerComponent, StreamColorSpaceMode *csMode);
   JPXDecodeResult readBoxes();
@@ -326,6 +329,7 @@ private:
 
   BufStream *bufStr;		// buffered stream (for lookahead)
 
+  GBool decoded;		// set when the image has been decoded
   Guint nComps;			// number of components
   Guint *bpc;			// bits per component, for each component
   Guint width, height;		// image size

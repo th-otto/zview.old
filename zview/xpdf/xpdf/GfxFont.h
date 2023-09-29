@@ -22,6 +22,7 @@ class Dict;
 class CMap;
 class CharCodeToUnicode;
 class FoFiTrueType;
+class FoFiType1C;
 struct GfxFontCIDWidths;
 struct Base14FontMapEntry;
 class FNVHash;
@@ -127,9 +128,14 @@ class GfxFont {
 public:
 
   // Build a GfxFont object.
-  static GfxFont *makeFont(XRef *xref, char *tagA, Ref idA, Dict *fontDict);
+  static GfxFont *makeFont(XRef *xref, const char *tagA,
+			   Ref idA, Dict *fontDict);
 
-  GfxFont(char *tagA, Ref idA, GString *nameA,
+  // Create a simple default font, to substitute for an undefined font
+  // object.
+  static GfxFont *makeDefaultFont(XRef *xref);
+
+  GfxFont(const char *tagA, Ref idA, GString *nameA,
 	  GfxFontType typeA, Ref embFontIDA);
 
   virtual ~GfxFont();
@@ -179,6 +185,7 @@ public:
   // Return the ascent and descent values.
   double getAscent() { return ascent; }
   double getDescent() { return descent; }
+  double getDeclaredAscent() { return declaredAscent; }
 
   // Return the writing mode (0=horizontal, 1=vertical).
   virtual int getWMode() { return 0; }
@@ -228,6 +235,7 @@ protected:
   double missingWidth;		// "default" width
   double ascent;		// max height above baseline
   double descent;		// max depth below baseline
+  double declaredAscent;	// ascent value, before munging
   GBool hasToUnicode;		// true if the font has a ToUnicode map
   GBool ok;
 };
@@ -239,7 +247,7 @@ protected:
 class Gfx8BitFont: public GfxFont {
 public:
 
-  Gfx8BitFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
+  Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 	      GfxFontType typeA, Ref embFontIDA, Dict *fontDict);
 
   virtual ~Gfx8BitFont();
@@ -269,6 +277,10 @@ public:
   // Return a char code-to-GID mapping for the provided font file.
   // (This is only useful for TrueType fonts.)
   int *getCodeToGIDMap(FoFiTrueType *ff);
+
+  // Return a char code-to-GID mapping for the provided font file.
+  // (This is only useful for Type1C fonts.)
+  int *getCodeToGIDMap(FoFiType1C *ff);
 
   // Return the Type 3 CharProc dictionary, or NULL if none.
   Dict *getCharProcs();
@@ -307,7 +319,7 @@ private:
 class GfxCIDFont: public GfxFont {
 public:
 
-  GfxCIDFont(XRef *xref, char *tagA, Ref idA, GString *nameA,
+  GfxCIDFont(XRef *xref, const char *tagA, Ref idA, GString *nameA,
 	     GfxFontType typeA, Ref embFontIDA, Dict *fontDict);
 
   virtual ~GfxCIDFont();
@@ -327,6 +339,9 @@ public:
   // Get the collection name (<registry>-<ordering>).
   GString *getCollection();
 
+  // Return the horizontal width for <cid>.
+  double getWidth(CID cid);
+
   // Return the CID-to-GID mapping table.  These should only be called
   // if type is fontCIDType2.
   int *getCIDToGID() { return cidToGID; }
@@ -342,6 +357,7 @@ public:
 
 private:
 
+  void readTrueTypeUnicodeMapping(XRef *xref);
   void getHorizontalMetrics(CID cid, double *w);
   void getVerticalMetrics(CID cid, double *h,
 			  double *vx, double *vy);
@@ -383,8 +399,10 @@ public:
 
 private:
 
-  int hashFontObject(Object *obj);
-  void hashFontObject1(Object *obj, FNVHash *h);
+  friend class GfxFont;
+
+  static int hashFontObject(Object *obj);
+  static void hashFontObject1(Object *obj, FNVHash *h);
 
   GHash *fonts;			// hash table of fonts -- this may
 				//   include duplicates, i.e., when

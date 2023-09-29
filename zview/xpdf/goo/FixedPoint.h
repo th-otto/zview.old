@@ -32,7 +32,8 @@ public:
   FixedPoint(const FixedPoint &x) { val = x.val; }
   FixedPoint(double x) { val = (int)(x * (1 << fixptShift) + 0.5); }
   FixedPoint(int x) { val = x << fixptShift; }
-  FixedPoint(long x) { val = x << fixptShift; }
+  FixedPoint(Guint x) { val = x << fixptShift; }
+  FixedPoint(long x) { val = (int)(x << fixptShift); }
 
   operator float()
     { return (float) val * ((float)1 / (float)(1 << fixptShift)); }
@@ -48,31 +49,37 @@ public:
   bool operator ==(FixedPoint x) const { return val == x.val; }
   bool operator ==(double x) const { return *this == (FixedPoint)x; }
   bool operator ==(int x) const { return *this == (FixedPoint)x; }
+  bool operator ==(Guint x) const { return *this == (FixedPoint)x; }
   bool operator ==(long x) const { return *this == (FixedPoint)x; }
 
   bool operator !=(FixedPoint x) const { return val != x.val; }
   bool operator !=(double x) const { return *this != (FixedPoint)x; }
   bool operator !=(int x) const { return *this != (FixedPoint)x; }
+  bool operator !=(Guint x) const { return *this != (FixedPoint)x; }
   bool operator !=(long x) const { return *this != (FixedPoint)x; }
 
   bool operator <(FixedPoint x) const { return val < x.val; }
   bool operator <(double x) const { return *this < (FixedPoint)x; }
   bool operator <(int x) const { return *this < (FixedPoint)x; }
+  bool operator <(Guint x) const { return *this < (FixedPoint)x; }
   bool operator <(long x) const { return *this < (FixedPoint)x; }
 
   bool operator <=(FixedPoint x) const { return val <= x.val; }
   bool operator <=(double x) const { return *this <= (FixedPoint)x; }
   bool operator <=(int x) const { return *this <= (FixedPoint)x; }
+  bool operator <=(Guint x) const { return *this <= (FixedPoint)x; }
   bool operator <=(long x) const { return *this <= (FixedPoint)x; }
 
   bool operator >(FixedPoint x) const { return val > x.val; }
   bool operator >(double x) const { return *this > (FixedPoint)x; }
   bool operator >(int x) const { return *this > (FixedPoint)x; }
+  bool operator >(Guint x) const { return *this > (FixedPoint)x; }
   bool operator >(long x) const { return *this > (FixedPoint)x; }
 
   bool operator >=(FixedPoint x) const { return val >= x.val; }
   bool operator >=(double x) const { return *this >= (FixedPoint)x; }
   bool operator >=(int x) const { return *this >= (FixedPoint)x; }
+  bool operator >=(Guint x) const { return *this >= (FixedPoint)x; }
   bool operator >=(long x) const { return *this >= (FixedPoint)x; }
 
   FixedPoint operator -() { return make(-val); }
@@ -80,41 +87,49 @@ public:
   FixedPoint operator +(FixedPoint x) { return make(val + x.val); }
   FixedPoint operator +(double x) { return *this + (FixedPoint)x; }
   FixedPoint operator +(int x) { return *this + (FixedPoint)x; }
+  FixedPoint operator +(Guint x) { return *this + (FixedPoint)x; }
   FixedPoint operator +(long x) { return *this + (FixedPoint)x; }
 
   FixedPoint operator +=(FixedPoint x) { val = val + x.val; return *this; }
   FixedPoint operator +=(double x) { return *this += (FixedPoint)x; }
   FixedPoint operator +=(int x) { return *this += (FixedPoint)x; }
+  FixedPoint operator +=(Guint x) { return *this += (FixedPoint)x; }
   FixedPoint operator +=(long x) { return *this += (FixedPoint)x; }
 
   FixedPoint operator -(FixedPoint x) { return make(val - x.val); }
   FixedPoint operator -(double x) { return *this - (FixedPoint)x; }
   FixedPoint operator -(int x) { return *this - (FixedPoint)x; }
+  FixedPoint operator -(Guint x) { return *this - (FixedPoint)x; }
   FixedPoint operator -(long x) { return *this - (FixedPoint)x; }
 
   FixedPoint operator -=(FixedPoint x) { val = val - x.val; return *this; }
   FixedPoint operator -=(double x) { return *this -= (FixedPoint)x; }
   FixedPoint operator -=(int x) { return *this -= (FixedPoint)x; }
+  FixedPoint operator -=(Guint x) { return *this -= (FixedPoint)x; }
   FixedPoint operator -=(long x) { return *this -= (FixedPoint)x; }
 
   FixedPoint operator *(FixedPoint x) { return make(mul(val, x.val)); }
   FixedPoint operator *(double x) { return *this * (FixedPoint)x; }
   FixedPoint operator *(int x) { return *this * (FixedPoint)x; }
+  FixedPoint operator *(Guint x) { return *this * (FixedPoint)x; }
   FixedPoint operator *(long x) { return *this * (FixedPoint)x; }
 
   FixedPoint operator *=(FixedPoint x) { val = mul(val, x.val); return *this; }
   FixedPoint operator *=(double x) { return *this *= (FixedPoint)x; }
   FixedPoint operator *=(int x) { return *this *= (FixedPoint)x; }
+  FixedPoint operator *=(Guint x) { return *this *= (FixedPoint)x; }
   FixedPoint operator *=(long x) { return *this *= (FixedPoint)x; }
 
   FixedPoint operator /(FixedPoint x) { return make(div(val, x.val)); }
   FixedPoint operator /(double x) { return *this / (FixedPoint)x; }
   FixedPoint operator /(int x) { return *this / (FixedPoint)x; }
+  FixedPoint operator /(Guint x) { return *this / (FixedPoint)x; }
   FixedPoint operator /(long x) { return *this / (FixedPoint)x; }
 
   FixedPoint operator /=(FixedPoint x) { val = div(val, x.val); return *this; }
   FixedPoint operator /=(double x) { return *this /= (FixedPoint)x; }
   FixedPoint operator /=(int x) { return *this /= (FixedPoint)x; }
+  FixedPoint operator /=(Guint x) { return *this /= (FixedPoint)x; }
   FixedPoint operator /=(long x) { return *this /= (FixedPoint)x; }
 
   static FixedPoint abs(FixedPoint x) { return make(::abs(x.val)); }

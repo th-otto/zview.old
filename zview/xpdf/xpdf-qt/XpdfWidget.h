@@ -2,15 +2,17 @@
 //
 // XpdfWidget.h
 //
-// Copyright 2009-2019 Glyph & Cog, LLC
+// Copyright 2009-2021 Glyph & Cog, LLC
 //
 //========================================================================
 
 //! \mainpage
 //!
 //! XpdfWidget is a PDF viewer widget class for Qt.
-//! <br><br><br>
-//! Copyright 2009-2019 Glyph & Cog, LLC
+//! <br><br>
+//! <a href="changes.html">Change history</a>
+//! <br><br>
+//! Copyright 2009-2022 Glyph & Cog, LLC
 
 //! \file
 
@@ -52,6 +54,27 @@ typedef void *XpdfFormFieldHandle;
 
 /*! Opaque handle used to represent a PDF document. */
 typedef void *XpdfDocHandle;
+
+//------------------------------------------------------------------------
+
+/*! Text search result, returned by XpdfWidget::findAll(). */
+struct XpdfFindResult {
+
+  //! \cond PROTECTED
+  XpdfFindResult(int pageA, double xMinA, double yMinA,
+		 double xMaxA, double yMaxA)
+    : page(pageA), xMin(xMinA), yMin(yMinA), xMax(xMaxA), yMax(yMaxA) {}
+  XpdfFindResult(): page(0), xMin(0), yMin(0), xMax(0), yMax(0) {}
+  //! \endcond
+
+  /*! Page number. */
+  int page;
+
+  /*! \name Bounding box. */
+  ///@{
+  double xMin, yMin, xMax, yMax;
+  ///@}
+};
 
 //------------------------------------------------------------------------
 
@@ -164,6 +187,14 @@ public:
   //! button clicks on hyperlinks.  The default is enabled.
   void enableHyperlinks(bool on);
 
+  //! Control handling of external hyperlinks.
+  //! This setting allows disabling external hyperlinks (links that
+  //! open another PDF file, or that involve a URL), independent of
+  //! internal hyperlinks (links to locations within the same PDF
+  //! file).  This setting is ignored if all hyperlinks are disabled
+  //! (enableHyperlinks(false)).  The default is enabled.
+  void enableExternalHyperlinks(bool on);
+
   //! Control handling of text selection.
   //! If enabled, the viewer will allow the user to select rectangular
   //! regions of text when the user drags with the left mouse button.  If
@@ -176,6 +207,16 @@ public:
   //! the page.  If disabled, the middle button is ignored.  The default
   //! is enabled.
   void enablePan(bool on);
+
+  //! Control touchscreen panning.
+  //! If enabled, QPanGestures are recognized and used to pan the PDF
+  //! view.
+  void enableTouchPan(bool on);
+
+  //! Control touchscreen zooming.
+  //! If enabled QPinchGestures are recognized and used to pinch-zoom
+  //! the PDF view.
+  void enableTouchZoom(bool on);
 
   //! Control keypress passthrough.
   //! If enabled, XpdfWidget will pass keypress events through to the
@@ -595,15 +636,20 @@ public:
 
   //! Convert a page to a color image.
   //! This function converts the page number \a page to a 24-bit RGB
-  //! bitmap, at a resolution of \a dpi dots per inch.
-  QImage convertPageToImage(int page, double dpi);
+  //! bitmap, at a resolution of \a dpi dots per inch.  If \a
+  //! transparent is true, the returned image will be 32-bit ARGB
+  //! instead, and will include an alpha channel.
+  QImage convertPageToImage(int page, double dpi, bool transparent = false);
 
   //! Convert a rectangular region of a page to a color image.
-  //! This function converts a rectangular region, defined by
-  //! corners (\a x0,\a y0) and (\a x1,\a y1), of page number \a page
-  //! to a 24-bit RGB bitmap, at a resolution of \a dpi dots per inch.
+  //! This function converts a rectangular region, defined by corners
+  //! (\a x0,\a y0) and (\a x1,\a y1), of page number \a page to a
+  //! 24-bit RGB bitmap, at a resolution of \a dpi dots per inch.  If
+  //! \a transparent is true, the returned image will be 32-bit ARGB
+  //! instead, and will include an alpha channel.
   QImage convertRegionToImage(int page, double x0, double y0,
-			      double x1, double y1, double dpi);
+			      double x1, double y1, double dpi,
+			      bool transparent = false);
 
   //! Retrieve an embedded thumbnail image.
   //! This function returns the embedded thumbnail image for the
@@ -665,6 +711,33 @@ public:
   //!   - \c findOnePageOnly - limit the search to the current page
   //!   - \c findWholeWord - limit the search to whole words
   bool find(const QString &text, int flags = 0);
+
+  //! Find all occurrences of a text string.
+  //! This function searches for a Unicode text string, in pages
+  //! \a firstPage .. \a lastPage.  The \a flags argument consists of
+  //! zero or more of the following, or-ed together:
+  //!   - \c findCaseSensitive - perform a case-sensitive search
+  //!     (default is case-insensitive)
+  //!   - \c findWholeWord - limit the search to whole words
+  //! Returns a list of search results.
+  QVector<XpdfFindResult> findAll(const QString &text, int firstPage,
+				  int lastPage, int flags = 0);
+
+  //! Check if the PDF file has page labels.
+  //! Return true if the currently open PDF file has page labels.
+  bool hasPageLabels();
+
+  //! Convert a page number to a page label.
+  //! Return the page label for page number \a pageNum.  Returns an
+  //! empty string if the page number is invalid or if the PDF file
+  //! doesn't have page labels.
+  QString getPageLabelFromPageNum(int pageNum);
+
+  //! Convert a page label to a page number.
+  //! Return the page number for \a pageLabel.  Returns -1 if there is
+  //! no matching page label or if the PDF file doesn't have page
+  //! labels.
+  int getPageNumFromPageLabel(QString pageLabel);
 
   //! Return the number of children of an outline tree node.
   //! This function returns the number of children of node \a outline,
@@ -806,6 +879,30 @@ signals:
   //! This signal is emitted whenever a mouse button is released.
   void mouseRelease(QMouseEvent *e);
 
+  //! This signal is emitted whenever a mouse button is clicked.
+  //! A click is defined as a button press and release within a short
+  //! distance of each other (a few pixels).  The sequence of signals
+  //! is: mousePress, possibly a few mouseMoves, mouseRelease, and
+  //! then mouseClick.
+  void mouseClick(QMouseEvent *e);
+
+  //! This signal is emitted whenever a mouse button is double-clicked.
+  //! Double clicks are two clicks within a few pixels of each other,
+  //! and within a certain time of each other.  The sequence of
+  //! signals is: mousePress, mouseRelease, mouseClick, mousePress,
+  //! mouseRelease, mouseDoubleClick.  There may also be mouseMoves
+  //! between the presses and releases.
+  void mouseDoubleClick(QMouseEvent *e);
+
+  //! This signal is emitted whenever a mouse button is triple-clicked.
+  //! Triple clicks are three clicks within a few pixels of each
+  //! other, and within a certain time of each other.  The sequence of
+  //! signals is: mousePress, mouseRelease, mouseClick, mousePress,
+  //! mouseRelease, mouseDoubleClick, mousePress, mouseRelease,
+  //! mouseTripleClick.  There may also be mouseMoves between the
+  //! presses and releases.
+  void mouseTripleClick(QMouseEvent *e);
+
   //! This signal is emitted whenever the mouse pointer is moved.
   void mouseMove(QMouseEvent *e);
 
@@ -871,6 +968,7 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *e);
   virtual void mouseMoveEvent(QMouseEvent *e);
   virtual void wheelEvent(QWheelEvent *e);
+  virtual bool eventFilter(QObject *obj, QEvent *event);
 
   //! \endcond
 
@@ -913,6 +1011,13 @@ private:
 
   bool keyPassthrough;
   bool mousePassthrough;
+  int lastMousePressX[3], lastMousePressY[3];
+  ulong lastMousePressTime[3];
+  bool lastMouseEventWasPress;
+
+  bool touchPanEnabled;
+  bool touchZoomEnabled;
+  double pinchZoomStart;
 
   QTimer *tickTimer;
 };

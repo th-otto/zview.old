@@ -63,7 +63,7 @@ SplashBitmap *TileCompositor::getBitmap(GBool *finished) {
     }
     bitmap = new SplashBitmap(state->getWinW(), state->getWinH(),
 			      state->getBitmapRowPad(), state->getColorMode(),
-			      gFalse);
+			      gFalse, gTrue, NULL);
   }
   clearBitmap();
 

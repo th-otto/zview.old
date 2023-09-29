@@ -43,6 +43,6 @@ extern void operator delete[](void *p, int dummy);
 #define debug_new new (1)
 #define new debug_new
 
-#endif // DEBUG_MEM
+#endif /* DEBUG_MEM */
 
-#endif // GMEMPP_H
+#endif /* GMEMPP_H */

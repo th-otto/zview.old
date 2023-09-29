@@ -93,9 +93,11 @@ public:
 
   void startPan(int wx, int wy);
   void endPan(int wx, int wy);
-  void startSelection(int wx, int wy);
+  void startSelection(int wx, int wy, GBool extend);
   void endSelection(int wx, int wy);
   void mouseMove(int wx, int wy);
+  void selectWord(int wx, int wy);
+  void selectLine(int wx, int wy);
   QString getSelectedTextQString();
   void copySelection(GBool toClipboard);
 
@@ -129,6 +131,8 @@ public:
   double getScaleFactor() { return scaleFactor; }
   void enableHyperlinks(GBool on) { hyperlinksEnabled = on; }
   GBool getHyperlinksEnabled() { return hyperlinksEnabled; }
+  void enableExternalHyperlinks(GBool on) { externalHyperlinksEnabled = on; }
+  GBool getExternalHyperlinksEnabled() { return externalHyperlinksEnabled; }
   void enableSelect(GBool on) { selectEnabled = on; }
   void enablePan(GBool on) { panEnabled = on; }
   void setShowPasswordDialog(GBool show) { showPasswordDialog = show; }
@@ -210,6 +214,7 @@ private:
   void *paintDoneCbkData;
 
   GBool hyperlinksEnabled;
+  GBool externalHyperlinksEnabled;
   GBool selectEnabled;
   GBool panEnabled;
   GBool showPasswordDialog;

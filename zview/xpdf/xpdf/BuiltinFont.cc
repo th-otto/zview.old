@@ -56,6 +56,7 @@ GBool BuiltinFontWidths_getWidth(const struct BuiltinFont *font, const char *nam
       return gTrue;
     }
   }
+  *width = 0;
   return gFalse;
 }
 

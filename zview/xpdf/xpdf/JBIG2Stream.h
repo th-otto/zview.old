@@ -38,11 +38,13 @@ public:
   virtual int getChar();
   virtual int lookChar();
   virtual int getBlock(char *blk, int size);
-  virtual GString *getPSFilter(int psLevel, const char *indent);
+  virtual GString *getPSFilter(int psLevel, const char *indent,
+			       GBool okToReadStream);
   virtual GBool isBinary(GBool last = gTrue);
 
 private:
 
+  void decodeImage();
   void readSegments();
   GBool readSymbolDictSeg(Guint segNum, Guint length,
 			  const Guint *refSegs, Guint nRefSegs);
@@ -112,6 +114,7 @@ private:
   GBool readULong(Guint *x);
   GBool readLong(int *x);
 
+  GBool decoded;
   Object globalsStream;
   Guint pageW, pageH, curPageH;
   Guint pageDefPixel;
@@ -123,6 +126,7 @@ private:
   Guchar *dataPtr;
   Guchar *dataEnd;
   Guint byteCounter;
+  GBool done;
 
   JArithmeticDecoder *arithDecoder;
   JArithmeticDecoderStats *genericRegionStats;

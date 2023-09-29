@@ -2,7 +2,7 @@
 //
 // HTMLGen.cc
 //
-// Copyright 2010 Glyph & Cog, LLC
+// Copyright 2010-2021 Glyph & Cog, LLC
 //
 //========================================================================
 
@@ -13,9 +13,8 @@
 //~     generic serif/sans-serif/monospace name)
 //~ - check that htmlDir exists and is a directory
 //~ - links:
-//~   - links to pages
-//~   - links to named destinations
-//~   - links to URLs
+//~   - internal links (to pages, to named destinations)
+//~   - links from non-text content
 //~ - rotated text should go in the background image
 //~ - metadata
 //~ - PDF outline
@@ -30,9 +29,12 @@
 #include "GList.h"
 #include "SplashBitmap.h"
 #include "PDFDoc.h"
+#include "GfxFont.h"
+#include "AcroForm.h"
 #include "TextOutputDev.h"
 #include "SplashOutputDev.h"
 #include "ErrorCodes.h"
+#include "WebFont.h"
 #include "HTMLGen.h"
 
 #ifdef _WIN32
@@ -58,11 +60,14 @@ static FontStyleTagInfo const fontStyleTags[] = {
   {"CondensedBold",           13, gTrue,  gFalse},
   {"CondensedLight",          14, gFalse, gFalse},
   {"SemiBold",                 8, gTrue,  gFalse},
+  {"BoldItalicMT",            12, gTrue,  gTrue},
   {"BoldItalic",              10, gTrue,  gTrue},
   {"Bold_Italic",             11, gTrue,  gTrue},
   {"BoldOblique",             11, gTrue,  gTrue},
   {"Bold_Oblique",            12, gTrue,  gTrue},
+  {"BoldMT",                   6, gTrue,  gFalse},
   {"Bold",                     4, gTrue,  gFalse},
+  {"ItalicMT",                 8, gFalse, gTrue},
   {"Italic",                   6, gFalse, gTrue},
   {"Oblique",                  7, gFalse, gTrue},
   {"Light",                    5, gFalse, gFalse},
@@ -167,10 +172,113 @@ static const char *const vertAlignNames[] = {
 
 //------------------------------------------------------------------------
 
+class HTMLGenFontDefn {
+public:
+
+  HTMLGenFontDefn(Ref fontIDA, GString *fontFaceA, GString *fontSpecA,
+		  double scaleA)
+    : fontID(fontIDA), fontFace(fontFaceA), fontSpec(fontSpecA)
+    , scale(scaleA), used(gFalse) {}
+  ~HTMLGenFontDefn() { delete fontFace; delete fontSpec; }
+  GBool match(Ref fontIDA)
+    { return fontIDA.num == fontID.num && fontIDA.gen == fontID.gen; }
+
+  Ref fontID;
+  GString *fontFace;		// NULL for substituted fonts
+  GString *fontSpec;
+  double scale;
+  GBool used;			// set when used (per page)
+};
 
 //------------------------------------------------------------------------
 
-HTMLGen::HTMLGen(double backgroundResolutionA) {
+class HTMLGenFormFieldInfo {
+public:
+
+  HTMLGenFormFieldInfo(AcroFormField *acroFormFieldA)
+    : acroFormField(acroFormFieldA) {}
+
+  AcroFormField *acroFormField;
+};
+
+//------------------------------------------------------------------------
+
+class Base64Encoder {
+public:
+
+  Base64Encoder(int (*writeFuncA)(void *stream, const char *data, int size),
+		void *streamA);
+  void encode(const unsigned char *data, size_t size);
+  void flush();
+
+private:
+
+  int (*writeFunc)(void *stream, const char *data, int size);
+  void *stream;
+  unsigned char buf[3];
+  int bufLen;
+};
+
+static char base64Chars[65] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+Base64Encoder::Base64Encoder(int (*writeFuncA)(void *stream, const char *data,
+					       int size),
+			     void *streamA) {
+  writeFunc = writeFuncA;
+  stream = streamA;
+  bufLen = 0;
+}
+
+void Base64Encoder::encode(const unsigned char *data, size_t size) {
+  size_t i = 0;
+  while (1) {
+    while (bufLen < 3) {
+      if (i >= size) {
+	return;
+      }
+      buf[bufLen++] = data[i++];
+    }
+    char out[4];
+    out[0] = base64Chars[(buf[0] >> 2) & 0x3f];
+    out[1] = base64Chars[((buf[0] << 4) | (buf[1] >> 4)) & 0x3f];
+    out[2] = base64Chars[((buf[1] << 2) | (buf[2] >> 6)) & 0x3f];
+    out[3] = base64Chars[buf[2] & 0x3f];
+    writeFunc(stream, out, 4);
+    bufLen = 0;
+  }
+}
+
+void Base64Encoder::flush() {
+  // if bufLen == 0, this does nothing
+  // bufLen should never be 3 here
+  char out[4];
+  if (bufLen == 1) {
+    out[0] = base64Chars[(buf[0] >> 2) & 0x3f];
+    out[1] = base64Chars[(buf[0] << 4) & 0x3f];
+    out[2] = '=';
+    out[3] = '=';
+    writeFunc(stream, out, 4);
+  } else if (bufLen == 2) {
+    out[0] = base64Chars[(buf[0] >> 2) & 0x3f];
+    out[1] = base64Chars[((buf[0] << 4) | (buf[1] >> 4)) & 0x3f];
+    out[2] = base64Chars[(buf[1] << 2) & 0x3f];
+    out[3] = '=';
+    writeFunc(stream, out, 4);
+  }
+}
+
+static int writeToString(void *stream, const char *data, int size) {
+  ((GString *)stream)->append(data, size);
+  return size;
+}
+
+//------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------
+
+HTMLGen::HTMLGen(double backgroundResolutionA, GBool tableMode) {
   TextOutputControl textOutControl;
   SplashColor paperColor;
 
@@ -178,12 +286,18 @@ HTMLGen::HTMLGen(double backgroundResolutionA) {
 
   backgroundResolution = backgroundResolutionA;
   zoom = 1.0;
+  vStretch = 1.0;
   drawInvisibleText = gTrue;
   allTextInvisible = gFalse;
+  extractFontFiles = gFalse;
+  convertFormFields = gFalse;
+  embedBackgroundImage = gFalse;
+  embedFonts = gFalse;
 
   // set up the TextOutputDev
-  textOutControl.mode = textOutReadingOrder;
+  textOutControl.mode = tableMode ? textOutTableLayout : textOutReadingOrder;
   textOutControl.html = gTrue;
+  textOutControl.splitRotatedWords = gTrue;
   textOut = new TextOutputDev(NULL, &textOutControl, gFalse);
   if (!textOut->isOk()) {
     ok = gFalse;
@@ -192,16 +306,27 @@ HTMLGen::HTMLGen(double backgroundResolutionA) {
   // set up the SplashOutputDev
   paperColor[0] = paperColor[1] = paperColor[2] = 0xff;
   splashOut = new SplashOutputDev(splashModeRGB8, 1, gFalse, paperColor);
+
+  fontDefns = NULL;
 }
 
 HTMLGen::~HTMLGen() {
   delete textOut;
   delete splashOut;
+  if (fontDefns) {
+    deleteGList(fontDefns, HTMLGenFontDefn);
+  }
 }
 
 void HTMLGen::startDoc(PDFDoc *docA) {
   doc = docA;
   splashOut->startDoc(doc->getXRef());
+
+  if (fontDefns) {
+    deleteGList(fontDefns, HTMLGenFontDefn);
+  }
+  fontDefns = new GList();
+  nextFontFaceIdx = 0;
 }
 
 static inline int pr(int (*writeFunc)(void *stream, const char *data, int size),
@@ -224,19 +349,22 @@ static int pf(int (*writeFunc)(void *stream, const char *data, int size),
 }
 
 struct PNGWriteInfo {
+  Base64Encoder *base64;
   int (*writePNG)(void *stream, const char *data, int size);
   void *pngStream;
 };
 
 static void pngWriteFunc(png_structp png, png_bytep data, png_size_t size) {
-  PNGWriteInfo *info;
-
-  info = (PNGWriteInfo *)png_get_progressive_ptr(png);
-  info->writePNG(info->pngStream, (char *)data, (int)size);
+  PNGWriteInfo *info = (PNGWriteInfo *)png_get_progressive_ptr(png);
+  if (info->base64) {
+    info->base64->encode(data, size);
+  } else {
+    info->writePNG(info->pngStream, (char *)data, (int)size);
+  }
 }
 
 int HTMLGen::convertPage(
-		 int pg, const char *pngURL,
+		 int pg, const char *pngURL, const char *htmlDir,
 		 int (*writeHTML)(void *stream, const char *data, int size),
 		 void *htmlStream,
 		 int (*writePNG)(void *stream, const char *data, int size),
@@ -253,6 +381,7 @@ int HTMLGen::convertPage(
   TextColumn *col;
   TextParagraph *par;
   TextLine *line;
+  HTMLGenFontDefn *fontDefn;
   GString *s;
   double base;
   int primaryDir, spanDir;
@@ -261,31 +390,10 @@ int HTMLGen::convertPage(
 
   // generate the background bitmap
   splashOut->setSkipText(!allTextInvisible, gFalse);
-  doc->displayPage(splashOut, pg, backgroundResolution, backgroundResolution,
+  doc->displayPage(splashOut, pg,
+		   backgroundResolution, backgroundResolution * vStretch,
 		   0, gFalse, gTrue, gFalse);
   bitmap = splashOut->getBitmap();
-  if (!(png = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-				       NULL, NULL, NULL)) ||
-      !(pngInfo = png_create_info_struct(png))) {
-    return errFileIO;
-  }
-  if (setjmp(png_jmpbuf(png))) {
-    return errFileIO;
-  }
-  writeInfo.writePNG = writePNG;
-  writeInfo.pngStream = pngStream;
-  png_set_write_fn(png, &writeInfo, pngWriteFunc, NULL);
-  png_set_IHDR(png, pngInfo, bitmap->getWidth(), bitmap->getHeight(),
-	       8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
-	       PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-  png_write_info(png, pngInfo);
-  p = bitmap->getDataPtr();
-  for (y = 0; y < bitmap->getHeight(); ++y) {
-    png_write_row(png, (png_bytep)p);
-    p += bitmap->getRowSize();
-  }
-  png_write_end(png, pngInfo);
-  png_destroy_write_struct(&png, &pngInfo);
 
   // page size
   if (doc->getPageRotate(pg) == 90 || doc->getPageRotate(pg) == 270) {
@@ -302,19 +410,101 @@ int HTMLGen::convertPage(
   text = textOut->takeText();
   primaryDir = text->primaryDirectionIsLR() ? 1 : -1;
 
+  // insert a special character for each form field;
+  // remove existing characters inside field bboxes;
+  // erase background content inside field bboxes
+  formFieldFont = NULL;
+  formFieldInfo = NULL;
+  if (convertFormFields) {
+    AcroForm *form = doc->getCatalog()->getForm();
+    if (form) {
+      formFieldInfo = new GList();
+      formFieldFont = new TextFontInfo();
+      double yTop = doc->getCatalog()->getPage(pg)->getMediaBox()->y2;
+      for (i = 0; i < form->getNumFields(); ++i) {
+	AcroFormField *field = form->getField(i);
+	AcroFormFieldType fieldType = field->getAcroFormFieldType();
+	if (field->getPageNum() == pg &&
+	    (fieldType == acroFormFieldText ||
+	     fieldType == acroFormFieldCheckbox)) {
+	  double llx, lly, urx, ury;
+	  field->getBBox(&llx, &lly, &urx, &ury);
+	  lly = yTop - lly;
+	  ury = yTop - ury;
+
+	  // add the field info
+	  int fieldIdx = formFieldInfo->getLength();
+	  formFieldInfo->append(new HTMLGenFormFieldInfo(field));
+
+	  // remove exsting chars
+	  text->removeChars(llx, ury, urx, lly, 0.75, 0.5);
+	
+	  // erase background content
+	  int llxI = (int)(llx * backgroundResolution / 72 + 0.5);
+	  int llyI = (int)(lly * backgroundResolution * vStretch / 72 + 0.5);
+	  int urxI = (int)(urx * backgroundResolution / 72 + 0.5);
+	  int uryI = (int)(ury * backgroundResolution * vStretch / 72 + 0.5);
+	  llyI += (int)(backgroundResolution * vStretch / 20);
+	  if (llxI < 0) {
+	    llxI = 0;
+	  }
+	  if (urxI >= bitmap->getWidth()) {
+	    urxI = bitmap->getWidth() - 1;
+	  }
+	  if (uryI < 0) {
+	    uryI = 0;
+	  }
+	  if (llyI > bitmap->getHeight()) {
+	    llyI = bitmap->getHeight() - 1;
+	  }
+	  if (uryI <= llyI && llxI <= urxI) {
+	    SplashColorPtr p = bitmap->getDataPtr()
+	                         + uryI * bitmap->getRowSize() + llxI * 3;
+	    for (int y = uryI; y <= llyI; ++y) {
+	      memset(p, 0xff, (urxI - llxI + 1) * 3);
+	      p += bitmap->getRowSize();
+	    }
+	  }
+
+	  // add a special char
+	  // (the font size is unused -- 10 is an arbitrary value)
+	  text->addSpecialChar(llx, ury, urx, lly,
+			       0, formFieldFont, 10, 0x80000000 + fieldIdx);
+	}
+      }
+    }
+  }
+
   // HTML header
   pr(writeHTML, htmlStream, "<html>\n");
   pr(writeHTML, htmlStream, "<head>\n");
   pr(writeHTML, htmlStream, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
   pr(writeHTML, htmlStream, "<style type=\"text/css\">\n");
   pr(writeHTML, htmlStream, ".txt { white-space:nowrap; }\n");
+  if (convertFormFields) {
+    pr(writeHTML, htmlStream, ".textfield {\n");
+    pr(writeHTML, htmlStream, "  border: 0;\n");
+    pr(writeHTML, htmlStream, "  padding: 0;\n");
+    pr(writeHTML, htmlStream, "  background: #ccccff;\n");
+    pr(writeHTML, htmlStream, "}\n");
+    pr(writeHTML, htmlStream, ".checkbox {\n");
+    pr(writeHTML, htmlStream, "}\n");
+  }
   fonts = text->getFonts();
   fontScales = (double *)gmallocn(fonts->getLength(), sizeof(double));
+  for (i = 0; i < fontDefns->getLength(); ++i) {
+    fontDefn = (HTMLGenFontDefn *)fontDefns->get(i);
+    fontDefn->used = gFalse;
+  }
   for (i = 0; i < fonts->getLength(); ++i) {
     font = (TextFontInfo *)fonts->get(i);
-    s = getFontDefn(font, &fontScales[i]);
-    pf(writeHTML, htmlStream, "#f{0:d} {{ {1:t} }}\n", i, s);
-    delete s;
+    fontDefn = getFontDefn(font, htmlDir);
+    if (!fontDefn->used && fontDefn->fontFace) {
+      pr(writeHTML, htmlStream, fontDefn->fontFace->getCString());
+    }
+    pf(writeHTML, htmlStream, ".f{0:d} {{ {1:t} }}\n", i, fontDefn->fontSpec);
+    fontScales[i] = fontDefn->scale;
+    fontDefn->used = gTrue;
   }
   pr(writeHTML, htmlStream, "</style>\n");
   pr(writeHTML, htmlStream, "</head>\n");
@@ -323,15 +513,59 @@ int HTMLGen::convertPage(
   } else {
     pr(writeHTML, htmlStream, "<body dir=\"rtl\">\n");
   }
+
+  // background image element (part 1)
   if (primaryDir >= 0) {
-    pf(writeHTML, htmlStream, "<img id=\"background\" style=\"position:absolute; left:0px; top:0px;\" width=\"{0:d}\" height=\"{1:d}\" src=\"{2:s}\">\n",
-       (int)(pageW * zoom), (int)(pageH * zoom), pngURL);
+    pf(writeHTML, htmlStream, "<img style=\"position:absolute; left:0px; top:0px;\" width=\"{0:d}\" height=\"{1:d}\" ",
+       (int)(pageW * zoom), (int)(pageH * zoom * vStretch));
   } else {
-    pf(writeHTML, htmlStream, "<img id=\"background\" style=\"position:absolute; right:0px; top:0px;\" width=\"{0:d}\" height=\"{1:d}\" src=\"{2:s}\">\n",
-       (int)(pageW * zoom), (int)(pageH * zoom), pngURL);
+    pf(writeHTML, htmlStream, "<img style=\"position:absolute; right:0px; top:0px;\" width=\"{0:d}\" height=\"{1:d}\" ",
+       (int)(pageW * zoom), (int)(pageH * zoom * vStretch));
+  }
+  if (embedBackgroundImage) {
+    pr(writeHTML, htmlStream, "src=\"data:image/png;base64,\n");
+    writeInfo.base64 = new Base64Encoder(writeHTML, htmlStream); 
+    writeInfo.writePNG = NULL;
+    writeInfo.pngStream = NULL;
+  } else {
+    pf(writeHTML, htmlStream, "src=\"{0:s}\"", pngURL);
+    writeInfo.base64 = NULL;
+    writeInfo.writePNG = writePNG;
+    writeInfo.pngStream = pngStream;
   }
 
+  // background image data - writing to a separate file, or embedding
+  // with base64 encoding
+  if (!(png = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+				      NULL, NULL, NULL)) ||
+      !(pngInfo = png_create_info_struct(png))) {
+    return errFileIO;
+  }
+  if (setjmp(png_jmpbuf(png))) {
+    return errFileIO;
+  }
+  png_set_write_fn(png, &writeInfo, pngWriteFunc, NULL);
+  png_set_IHDR(png, pngInfo, bitmap->getWidth(), bitmap->getHeight(),
+	       8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
+	       PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+  png_write_info(png, pngInfo);
+  p = bitmap->getDataPtr();
+  for (y = 0; y < bitmap->getHeight(); ++y) {
+    png_write_row(png, (png_bytep)p);
+    p += bitmap->getRowSize();
+  }
+  png_write_end(png, pngInfo);
+  png_destroy_write_struct(&png, &pngInfo);
+  if (embedBackgroundImage) {
+    writeInfo.base64->flush();
+    delete writeInfo.base64;
+  }
+
+  // background image element (part 2)
+  pr(writeHTML, htmlStream, "\">\n");
+
   // generate the HTML text
+  nextFieldID = 0;
   cols = text->makeColumns();
   for (colIdx = 0; colIdx < cols->getLength(); ++colIdx) {
     col = (TextColumn *)cols->get(colIdx);
@@ -365,11 +599,11 @@ int HTMLGen::convertPage(
 	if (primaryDir >= 0) {
 	  pf(writeHTML, htmlStream, "<div class=\"txt\" style=\"position:absolute; left:{0:d}px; top:{1:d}px;\">{2:t}</div>\n",
 	     (int)(line->getXMin() * zoom),
-	     (int)(line->getYMin() * zoom), s);
+	     (int)(line->getYMin() * zoom * vStretch), s);
 	} else {
 	  pf(writeHTML, htmlStream, "<div class=\"txt\" style=\"position:absolute; right:{0:d}px; top:{1:d}px;\">{2:t}</div>\n",
 	     (int)((pageW - line->getXMax()) * zoom),
-	     (int)(line->getYMin() * zoom), s);
+	     (int)(line->getYMin() * zoom * vStretch), s);
 	}
 	delete s;
       }
@@ -378,6 +612,14 @@ int HTMLGen::convertPage(
   gfree(fontScales);
   delete text;
   deleteGList(cols, TextColumn);
+  if (formFieldFont) {
+    delete formFieldFont;
+    formFieldFont = NULL;
+  }
+  if (formFieldInfo) {
+    deleteGList(formFieldInfo, HTMLGenFormFieldInfo);
+    formFieldInfo = NULL;
+  }
 
   // HTML trailer
   pr(writeHTML, htmlStream, "</body>\n");
@@ -420,133 +662,200 @@ int HTMLGen::findDirSpan(GList *words, int firstWordIdx, int primaryDir,
 void HTMLGen::appendSpans(GList *words, int firstWordIdx, int lastWordIdx,
 			  int primaryDir, int spanDir,
 			  double base, GBool dropCapLine, GString *s) {
-  TextWord *word0, *word1;
-  VerticalAlignment vertAlign0, vertAlign1;
-  const char *dirTag;
-  Unicode u;
-  GBool invisible, sp;
-  double r0, g0, b0, r1, g1, b1;
-  double base1;
-  int wordIdx, t, i;
+  if (allTextInvisible && !drawInvisibleText) {
+    return;
+  }
 
   if (spanDir != primaryDir) {
-    t = firstWordIdx;
+    int t = firstWordIdx;
     firstWordIdx = lastWordIdx;
     lastWordIdx = t;
   }
 
-  word0 = NULL;
-  vertAlign0 = vertAlignBaseline; // make gcc happy
-  r0 = g0 = b0 = 0; // make gcc happy
-  for (wordIdx = firstWordIdx;
-       (spanDir >= 0) ? wordIdx <= lastWordIdx : wordIdx >= lastWordIdx;
-       wordIdx += spanDir) {
-    word1 = (TextWord *)words->get(wordIdx);
-    invisible = allTextInvisible || word1->isInvisible();
-    if (!drawInvisibleText && invisible) {
-      continue;
-    }
-    word1->getColor(&r1, &g1, &b1);
-    base1 = word1->getBaseline();
-    if (dropCapLine) {
-      //~ this will fail if there are subscripts or superscripts in
-      //~   the first line of a paragraph with a drop cap
-      vertAlign1 = vertAlignTop;
-    } else if (base1 - base < -1) {
-      vertAlign1 = vertAlignSuper;
-    } else if (base1 - base > 1) {
-      vertAlign1 = vertAlignSub;
-    } else {
-      vertAlign1 = vertAlignBaseline;
-    }
-    if (!word0 ||
-	word1->getFontInfo() != word0->getFontInfo() ||
-	word1->getFontSize() != word0->getFontSize() ||
-	word1->isInvisible() != word0->isInvisible() ||
-	vertAlign1 != vertAlign0 ||
-	r1 != r0 || g1 != g0 || b1 != b0) {
-      if (word0) {
-	s->append("</span>");
-      }
-      for (i = 0; i < fonts->getLength(); ++i) {
-	if (word1->getFontInfo() == (TextFontInfo *)fonts->get(i)) {
-	  break;
-	}
-      }
-      // we force spans to be LTR or RTL; this is a kludge, but it's
-      // far easier than implementing the full Unicode bidi algorithm
-      if (spanDir == primaryDir) {
-	dirTag = "";
-      } else if (spanDir < 0) {
-	dirTag = " dir=\"rtl\"";
-      } else {
-	dirTag = " dir=\"ltr\"";
-      }
-      s->appendf("<span id=\"f{0:d}\"{1:s} style=\"font-size:{2:d}px;vertical-align:{3:s};{4:s}color:rgba({5:d},{6:d},{7:d},{8:d});\">",
-		 i,
-		 dirTag,
-		 (int)(fontScales[i] * word1->getFontSize() * zoom),
-		 vertAlignNames[vertAlign1],
-		 (dropCapLine && wordIdx == 0) ? "line-height:75%;" : "",
-		 (int)(r1 * 255), (int)(g1 * 255), (int)(b1 * 255),
-		 invisible ? 0 : 1);
-    }
+  int wordIdx = firstWordIdx;
+  while ((spanDir >= 0) ? wordIdx <= lastWordIdx
+	                : wordIdx >= lastWordIdx) {
+    TextWord *word0 = (TextWord *)words->get(wordIdx);
 
-    // add a space before the word, if needed
-    // -- this only happens with the first word in a reverse section
-    if (spanDir != primaryDir && wordIdx == firstWordIdx) {
-      if (spanDir >= 0) {
-	if (wordIdx > 0) {
-	  sp = ((TextWord *)words->get(wordIdx - 1))->getSpaceAfter();
-	} else {
-	  sp = gFalse;
+    // form field(s): generate <input> element(s)
+    if (convertFormFields && word0->getFontInfo() == formFieldFont) {
+      for (int i = (spanDir >= 0) ? 0 : word0->getLength() - 1;
+	   (spanDir >= 0) ? i < word0->getLength() : i >= 0;
+	   i += spanDir) {
+	int fieldIdx = word0->getChar(0) - 0x80000000;
+	if (fieldIdx >= 0 && fieldIdx < formFieldInfo->getLength()) {
+	  HTMLGenFormFieldInfo *ffi =
+	      (HTMLGenFormFieldInfo *)formFieldInfo->get(fieldIdx);
+	  AcroFormField *field = ffi->acroFormField;
+	  AcroFormFieldType fieldType = field->getAcroFormFieldType();
+	  double llx, lly, urx, ury;
+	  field->getBBox(&llx, &lly, &urx, &ury);
+	  int width = (int)(urx - llx);
+	  Ref fontID;
+	  double fontSize;
+	  field->getFont(&fontID, &fontSize);
+	  if (fontSize == 0) {
+	    fontSize = 12;
+	  }
+	  if (fieldType == acroFormFieldText) {
+	    s->appendf("<input type=\"text\" class=\"textfield\" id=\"textfield{0:d}\" style=\"width:{1:d}px; font-size:{2:d}px;\">", nextFieldID, width, (int)(fontSize + 0.5));
+	    ++nextFieldID;
+	  } else if (fieldType == acroFormFieldCheckbox) {
+	    s->appendf("<input type=\"checkbox\" class=\"checkbox\" id=\"checkbox{0:d}\" style=\"width:{1:d}px; font-size:{2:d}px;\">", nextFieldID, width, (int)(fontSize + 0.5));
+	    ++nextFieldID;
+	  }
 	}
-      } else {
-	sp = word1->getSpaceAfter();
       }
-      if (sp) {
+
+      if (word0->getSpaceAfter()) {
 	s->append(' ');
       }
-    }
 
-    for (i = (spanDir >= 0) ? 0 : word1->getLength() - 1;
-	 (spanDir >= 0) ? i < word1->getLength() : i >= 0;
-	 i += spanDir) {
-      u = word1->getChar(i);
-      if (u >= privateUnicodeMapStart &&
-	  u <= privateUnicodeMapEnd &&
-	  privateUnicodeMap[u - privateUnicodeMapStart]) {
-	u = privateUnicodeMap[u - privateUnicodeMapStart];
-      }
-      appendUTF8(u, s);
-    }
+      wordIdx += spanDir;
 
-    // add a space after the word, if needed
-    // -- there is never a space after the last word in a reverse
-    //    section (this will be handled as a space after the last word
-    //    in the previous primary-direction section)
-    if (spanDir != primaryDir && wordIdx == lastWordIdx) {
-      sp = gFalse;
-    } else if (spanDir >= 0) {
-      sp = word1->getSpaceAfter();
+    // skip invisible words
+    } else if (!drawInvisibleText &&
+	       (word0->isInvisible() || word0->isRotated())) {
+      wordIdx += spanDir;
+
+    // generate a <span> containing one or more words
     } else {
-      if (wordIdx > 0) {
-	sp = ((TextWord *)words->get(wordIdx - 1))->getSpaceAfter();
-      } else {
-	sp = gFalse;
+
+      double r0 = 0, g0 = 0, b0 = 0; // make gcc happy
+      VerticalAlignment vertAlign0 = vertAlignBaseline; // make gcc happy
+      GString *linkURI0 = NULL;
+
+      GBool invisible = word0->isInvisible() || word0->isRotated();
+
+      do {
+	TextWord *word1 = (TextWord *)words->get(wordIdx);
+
+	// get word parameters
+	double r1, g1, b1;
+	word0->getColor(&r1, &g1, &b1);
+	double base1 = word1->getBaseline();
+	VerticalAlignment vertAlign1;
+	if (dropCapLine) {
+	  //~ this will fail if there are subscripts or superscripts in
+	  //~   the first line of a paragraph with a drop cap
+	  vertAlign1 = vertAlignTop;
+	} else if (base1 - base < -1) {
+	  vertAlign1 = vertAlignSuper;
+	} else if (base1 - base > 1) {
+	  vertAlign1 = vertAlignSub;
+	} else {
+	  vertAlign1 = vertAlignBaseline;
+	}
+	GString *linkURI1 = word1->getLinkURI();
+
+	// start of span
+	if (word1 == word0) {
+	  r0 = r1;
+	  g0 = g1;
+	  b0 = b1;
+	  vertAlign0 = vertAlign1;
+	  linkURI0 = linkURI1;
+
+	  int i;
+	  for (i = 0; i < fonts->getLength(); ++i) {
+	    if (word1->getFontInfo() == (TextFontInfo *)fonts->get(i)) {
+	      break;
+	    }
+	  }
+	  if (linkURI1) {
+	    s->appendf("<a href=\"{0:t}\">", linkURI0);
+	  }
+	  // we force spans to be LTR or RTL; this is a kludge, but it's
+	  // far easier than implementing the full Unicode bidi algorithm
+	  const char *dirTag;
+	  if (spanDir == primaryDir) {
+	    dirTag = "";
+	  } else if (spanDir < 0) {
+	    dirTag = " dir=\"rtl\"";
+	  } else {
+	    dirTag = " dir=\"ltr\"";
+	  }
+	  s->appendf("<span class=\"f{0:d}\"{1:s} style=\"font-size:{2:d}px;vertical-align:{3:s};{4:s}color:rgba({5:d},{6:d},{7:d},{8:d});\">",
+		     i,
+		     dirTag,
+		     (int)(fontScales[i] * word1->getFontSize() * zoom),
+		     vertAlignNames[vertAlign1],
+		     (dropCapLine && wordIdx == 0) ? "line-height:75%;" : "",
+		     (int)(r0 * 255), (int)(g0 * 255), (int)(b0 * 255),
+		     invisible ? 0 : 1);
+
+	// end of span
+	} else if (word1->getFontInfo() != word0->getFontInfo() ||
+		   word1->getFontSize() != word0->getFontSize() ||
+		   word1->isInvisible() != word0->isInvisible() ||
+		   word1->isRotated() != word0->isRotated() ||
+		   vertAlign1 != vertAlign0 ||
+		   r1 != r0 || g1 != g0 || b1 != b0 ||
+		   linkURI1 != linkURI0) {
+	  break;
+	}
+
+	// add a space before the word, if needed
+	// -- this only happens with the first word in a reverse section
+	if (spanDir != primaryDir && wordIdx == firstWordIdx) {
+	  GBool sp;
+	  if (spanDir >= 0) {
+	    if (wordIdx > 0) {
+	      sp = ((TextWord *)words->get(wordIdx - 1))->getSpaceAfter();
+	    } else {
+	      sp = gFalse;
+	    }
+	  } else {
+	    sp = word1->getSpaceAfter();
+	  }
+	  if (sp) {
+	    s->append(' ');
+	  }
+	}
+
+	// generate the word text
+	for (int i = (spanDir >= 0) ? 0 : word1->getLength() - 1;
+	     (spanDir >= 0) ? i < word1->getLength() : i >= 0;
+	     i += spanDir) {
+	  Unicode u = word1->getChar(i);
+	  if (u >= privateUnicodeMapStart &&
+	      u <= privateUnicodeMapEnd &&
+	      privateUnicodeMap[u - privateUnicodeMapStart]) {
+	    u = privateUnicodeMap[u - privateUnicodeMapStart];
+	  }
+	  appendUTF8(u, s);
+	}
+
+	// add a space after the word, if needed
+	// -- there is never a space after the last word in a reverse
+	//    section (this will be handled as a space after the last
+	//    word in the previous primary-direction section)
+	GBool sp;
+	if (spanDir != primaryDir && wordIdx == lastWordIdx) {
+	  sp = gFalse;
+	} else if (spanDir >= 0) {
+	  sp = word1->getSpaceAfter();
+	} else {
+	  if (wordIdx > 0) {
+	    sp = ((TextWord *)words->get(wordIdx - 1))->getSpaceAfter();
+	  } else {
+	    sp = gFalse;
+	  }
+	}
+	if (sp) {
+	  s->append(' ');
+	}
+
+	wordIdx += spanDir;
+      } while ((spanDir >= 0) ? wordIdx <= lastWordIdx
+	                      : wordIdx >= lastWordIdx);
+
+      s->append("</span>");
+      if (linkURI0) {
+	s->append("</a>");
       }
     }
-    if (sp) {
-      s->append(' ');
-    }
-
-    word0 = word1;
-    vertAlign0 = vertAlign1;
-    r0 = r1;
-    g0 = g1;
-    b0 = b1;
   }
-  s->append("</span>");
 }
 
 void HTMLGen::appendUTF8(Unicode u, GString *s) {
@@ -588,7 +897,146 @@ void HTMLGen::appendUTF8(Unicode u, GString *s) {
   }
 }
 
-GString *HTMLGen::getFontDefn(TextFontInfo *font, double *scale) {
+HTMLGenFontDefn *HTMLGen::getFontDefn(TextFontInfo *font,
+				      const char *htmlDir) {
+  Ref id;
+  HTMLGenFontDefn *fontDefn;
+  int i;
+
+  // check the existing font defns
+  id = font->getFontID();
+  if (id.num >= 0) {
+    for (i = 0; i < fontDefns->getLength(); ++i) {
+      fontDefn = (HTMLGenFontDefn *)fontDefns->get(i);
+      if (fontDefn->match(id)) {
+	return fontDefn;
+      }
+    }
+  }
+
+  // try to extract a font file
+  if (!extractFontFiles ||
+      !(fontDefn = getFontFile(font, htmlDir))) {
+
+    // get a substitute font
+    fontDefn = getSubstituteFont(font);
+  }
+
+  fontDefns->append(fontDefn);
+  return fontDefn;
+}
+
+HTMLGenFontDefn *HTMLGen::getFontFile(TextFontInfo *font,
+				      const char *htmlDir) {
+  Ref id;
+  HTMLGenFontDefn *fontDefn;
+  Object fontObj;
+  GfxFont *gfxFont;
+  WebFont *webFont;
+  GString *fontFile, *fontPath, *fontFace, *fontSpec;
+  const char *family, *weight, *style;
+  double scale;
+
+  id = font->getFontID();
+  if (id.num < 0) {
+    return NULL;
+  }
+
+  doc->getXRef()->fetch(id.num, id.gen, &fontObj);
+  if (!fontObj.isDict()) {
+    fontObj.free();
+    return NULL;
+  }
+
+  gfxFont = GfxFont::makeFont(doc->getXRef(), "F", id, fontObj.getDict());
+  webFont = new WebFont(gfxFont, doc->getXRef());
+  fontDefn = NULL;
+  fontFace = NULL;
+
+  if (webFont->canWriteTTF()) {
+    if (embedFonts) {
+      GString *ttfData = webFont->getTTFData();
+      if (ttfData) {
+	fontFace = GString::format("@font-face {{ font-family: ff{0:d}; src: url(\"data:font/ttf;base64,",
+				   nextFontFaceIdx);
+	Base64Encoder enc(writeToString, fontFace);
+	enc.encode((unsigned char *)ttfData->getCString(),
+		   (size_t)ttfData->getLength());
+	enc.flush();
+	fontFace->append("\"); }\n");
+	delete ttfData;
+      }
+    } else {
+      fontFile = GString::format("{0:d}.ttf", nextFontFaceIdx);
+      fontPath = GString::format("{0:s}/{1:t}", htmlDir, fontFile);
+      if (webFont->writeTTF(fontPath->getCString())) {
+	fontFace = GString::format("@font-face {{ font-family: ff{0:d}; src: url(\"{1:t}\"); }}\n",
+				   nextFontFaceIdx, fontFile);
+      }
+      delete fontPath;
+      delete fontFile;
+    }
+    if (fontFace) {
+      getFontDetails(font, &family, &weight, &style, &scale);
+      fontSpec = GString::format("font-family:ff{0:d},{1:s}; font-weight:{2:s}; font-style:{3:s};",
+				 nextFontFaceIdx, family, weight, style);
+      ++nextFontFaceIdx;
+      fontDefn = new HTMLGenFontDefn(id, fontFace, fontSpec, 1.0);
+    }
+
+  } else if (webFont->canWriteOTF()) {
+    if (embedFonts) {
+      GString *otfData = webFont->getOTFData();
+      if (otfData) {
+	fontFace = GString::format("@font-face {{ font-family: ff{0:d}; src: url(\"data:font/otf;base64,",
+				   nextFontFaceIdx);
+	Base64Encoder enc(writeToString, fontFace);
+	enc.encode((unsigned char *)otfData->getCString(),
+		   (size_t)otfData->getLength());
+	enc.flush();
+	fontFace->append("\"); }\n");
+	delete otfData;
+      }
+    } else {
+      fontFile = GString::format("{0:d}.otf", nextFontFaceIdx);
+      fontPath = GString::format("{0:s}/{1:t}", htmlDir, fontFile);
+      if (webFont->writeOTF(fontPath->getCString())) {
+	fontFace = GString::format("@font-face {{ font-family: ff{0:d}; src: url(\"{1:t}\"); }}\n",
+				   nextFontFaceIdx, fontFile);
+      }
+      delete fontPath;
+      delete fontFile;
+    }
+    if (fontFace) {
+      getFontDetails(font, &family, &weight, &style, &scale);
+      fontSpec = GString::format("font-family:ff{0:d},{1:s}; font-weight:{2:s}; font-style:{3:s};",
+				 nextFontFaceIdx, family, weight, style);
+      ++nextFontFaceIdx;
+      fontDefn = new HTMLGenFontDefn(id, fontFace, fontSpec, 1.0);
+    }
+  }
+
+  delete webFont;
+  delete gfxFont;
+  fontObj.free();
+
+  return fontDefn;
+}
+
+HTMLGenFontDefn *HTMLGen::getSubstituteFont(TextFontInfo *font) {
+  const char *family, *weight, *style;
+  double scale;
+  GString *fontSpec;
+
+  getFontDetails(font, &family, &weight, &style, &scale);
+  fontSpec = GString::format("font-family:{0:s}; font-weight:{1:s}; font-style:{2:s};",
+			     family, weight, style);
+  return new HTMLGenFontDefn(font->getFontID(), NULL, fontSpec, scale);
+}
+
+void HTMLGen::getFontDetails(TextFontInfo *font, const char **family,
+			     const char **weight, const char **style,
+			     double *scale) {
   GString *fontName;
   char *fontName2;
   const FontStyleTagInfo *fst;
@@ -662,11 +1110,7 @@ GString *HTMLGen::getFontDefn(TextFontInfo *font, double *scale) {
     }
   }
 
-  // generate the CSS markup
-  return GString::format("font-family:{0:s}; font-weight:{1:s}; font-style:{2:s};",
-			 fixedWidth ? "monospace"
-			            : serif ? "serif"
-			                    : "sans-serif",
-			 bold ? "bold" : "normal",
-			 italic ? "italic" : "normal");
+  *family = fixedWidth ? "monospace" : serif ? "serif" : "sans-serif";
+  *weight = bold ? "bold" : "normal";
+  *style = italic ? "italic" : "normal";
 }

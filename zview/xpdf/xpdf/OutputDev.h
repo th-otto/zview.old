@@ -20,9 +20,7 @@ class GfxState;
 struct GfxColor;
 class GfxColorSpace;
 class GfxImageColorMap;
-class GfxFunctionShading;
-class GfxAxialShading;
-class GfxRadialShading;
+class GfxShading;
 class Stream;
 class Links;
 class Link;
@@ -56,11 +54,6 @@ public:
   // tiling pattern fills will be reduced to a series of other drawing
   // operations.
   virtual GBool useTilingPatternFill() { return gFalse; }
-
-  // Does this device use functionShadedFill(), axialShadedFill(), and
-  // radialShadedFill()?  If this returns false, these shaded fills
-  // will be reduced to a series of other drawing operations.
-  virtual GBool useShadedFills() { return gFalse; }
 
   // Does this device use drawForm()?  If this returns false,
   // form-type XObjects will be interpreted (i.e., unrolled).
@@ -169,12 +162,7 @@ public:
 				 (void) resDict; (void) mat; (void) bbox;
 				 (void) x0; (void) y0; (void) x1; (void) y1;
 				 (void) xStep; (void) yStep; }
-  virtual GBool functionShadedFill(GfxState *state,
-				   GfxFunctionShading *shading)
-    { (void) state; (void) shading; return gFalse; }
-  virtual GBool axialShadedFill(GfxState *state, GfxAxialShading *shading)
-    { (void) state; (void) shading; return gFalse; }
-  virtual GBool radialShadedFill(GfxState *state, GfxRadialShading *shading)
+  virtual GBool shadedFill(GfxState *state, GfxShading *shading)
     { (void) state; (void) shading; return gFalse; }
 
   //----- path clipping
@@ -218,12 +206,13 @@ public:
   virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 			       int width, int height,
 			       GfxImageColorMap *colorMap,
-			       Stream *maskStr, int maskWidth, int maskHeight,
+			       Object *maskRef, Stream *maskStr,
+			       int maskWidth, int maskHeight,
 			       GBool maskInvert, GBool interpolate);
   virtual void drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
 				   int width, int height,
 				   GfxImageColorMap *colorMap,
-				   Stream *maskStr,
+				   Object *maskRef, Stream *maskStr,
 				   int maskWidth, int maskHeight,
 				   GfxImageColorMap *maskColorMap,
 				   double *matte, GBool interpolate);
@@ -247,12 +236,10 @@ public:
   virtual void psXObject(Stream *psStream, Stream *level1Stream) {(void) psStream; (void) level1Stream; }
 
   //----- transparency groups and soft masks
-  virtual void beginTransparencyGroup(GfxState *state, double *bbox,
-				      GfxColorSpace *blendingColorSpace,
-				      GBool isolated, GBool knockout,
-				      GBool forSoftMask) {(void) state;
-				      (void) bbox; (void) blendingColorSpace; (void) isolated;
-				      (void) knockout; (void) forSoftMask; }
+  virtual GBool beginTransparencyGroup(GfxState *state, double *bbox,
+				       GfxColorSpace *blendingColorSpace,
+				       GBool isolated, GBool knockout,
+				       GBool forSoftMask) { (void) state; (void) bbox; (void) blendingColorSpace; (void) isolated; (void) knockout; (void) forSoftMask; return gTrue; }
   virtual void endTransparencyGroup(GfxState *state) {(void) state;}
   virtual void paintTransparencyGroup(GfxState *state, double *bbox) {(void) state;(void) bbox;}
   virtual void setSoftMask(GfxState *state, double *bbox, GBool alpha,
@@ -262,10 +249,6 @@ public:
 
   //----- links
   virtual void processLink(Link *link) {(void) link;}
-
-#if 1 //~tmp: turn off anti-aliasing temporarily
-  virtual void setInShading(GBool sh) {(void) sh; }
-#endif
 
 private:
 

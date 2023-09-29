@@ -97,6 +97,7 @@ static const char *const gfxColorSpaceModeNames[] = {
 
 GfxColorSpace::GfxColorSpace() {
   overprintMask = 0x0f;
+  defaultColorSpace = gFalse;
 }
 
 GfxColorSpace::~GfxColorSpace() {
@@ -1297,7 +1298,7 @@ GfxColorSpace *GfxSeparationColorSpace::parse(Array *arr,
   }
   obj1.free();
   arr->get(3, &obj1);
-  if (!(funcA = Function::parse(&obj1))) {
+  if (!(funcA = Function::parse(&obj1, 1, altA->getNComps()))) {
     goto err4;
   }
   obj1.free();
@@ -1492,7 +1493,7 @@ GfxColorSpace *GfxDeviceNColorSpace::parse(Array *arr,
   }
   obj1.free();
   arr->get(3, &obj1);
-  if (!(funcA = Function::parse(&obj1))) {
+  if (!(funcA = Function::parse(&obj1, nCompsA, altA->getNComps()))) {
     goto err4;
   }
   obj1.free();
@@ -2093,6 +2094,7 @@ GfxFunctionShading *GfxFunctionShading::parse(Dict *dict
   Function *funcsA[gfxColorMaxComps];
   int nFuncsA;
   Object obj1, obj2;
+  GBool ok;
   int i;
 
   x0A = y0A = 0;
@@ -2140,14 +2142,14 @@ GfxFunctionShading *GfxFunctionShading::parse(Dict *dict
     }
     for (i = 0; i < nFuncsA; ++i) {
       obj1.arrayGet(i, &obj2);
-      if (!(funcsA[i] = Function::parse(&obj2))) {
+      if (!(funcsA[i] = Function::parse(&obj2, 2, 1))) {
 	goto err2;
       }
       obj2.free();
     }
   } else {
     nFuncsA = 1;
-    if (!(funcsA[0] = Function::parse(&obj1))) {
+    if (!(funcsA[0] = Function::parse(&obj1, 2, -1))) {
       goto err1;
     }
   }
@@ -2160,6 +2162,23 @@ GfxFunctionShading *GfxFunctionShading::parse(Dict *dict
     delete shading;
     return NULL;
   }
+
+  ok = gFalse;
+  if (shading->nFuncs == 1) {
+    ok = shading->funcs[0]->getOutputSize()
+           == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == shading->getColorSpace()->getNComps()) {
+    ok = gTrue;
+    for (i = 0; i < shading->nFuncs; ++i) {
+      ok = ok && shading->funcs[i]->getOutputSize() == 1;
+    }
+  }
+  if (!ok) {
+    error(errSyntaxError, -1, "Invalid function in shading dictionary");
+    delete shading;
+    return NULL;
+  }
+
   return shading;
 
  err2:
@@ -2253,7 +2272,7 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict
   double t0A, t1A;
   Function *funcsA[gfxColorMaxComps];
   int nFuncsA;
-  GBool extend0A, extend1A;
+  GBool extend0A, extend1A, ok;
   Object obj1, obj2;
   int i;
 
@@ -2297,7 +2316,7 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict
     }
     for (i = 0; i < nFuncsA; ++i) {
       obj1.arrayGet(i, &obj2);
-      if (!(funcsA[i] = Function::parse(&obj2))) {
+      if (!(funcsA[i] = Function::parse(&obj2, 1, 1))) {
 	obj1.free();
 	obj2.free();
 	goto err1;
@@ -2306,7 +2325,7 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict
     }
   } else {
     nFuncsA = 1;
-    if (!(funcsA[0] = Function::parse(&obj1))) {
+    if (!(funcsA[0] = Function::parse(&obj1, 1, -1))) {
       obj1.free();
       goto err1;
     }
@@ -2330,6 +2349,23 @@ GfxAxialShading *GfxAxialShading::parse(Dict *dict
     delete shading;
     return NULL;
   }
+
+  ok = gFalse;
+  if (shading->nFuncs == 1) {
+    ok = shading->funcs[0]->getOutputSize()
+           == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == shading->getColorSpace()->getNComps()) {
+    ok = gTrue;
+    for (i = 0; i < shading->nFuncs; ++i) {
+      ok = ok && shading->funcs[i]->getOutputSize() == 1;
+    }
+  }
+  if (!ok) {
+    error(errSyntaxError, -1, "Invalid function in shading dictionary");
+    delete shading;
+    return NULL;
+  }
+
   return shading;
 
  err1:
@@ -2422,7 +2458,7 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict
   double t0A, t1A;
   Function *funcsA[gfxColorMaxComps];
   int nFuncsA;
-  GBool extend0A, extend1A;
+  GBool extend0A, extend1A, ok;
   Object obj1, obj2;
   int i;
 
@@ -2469,7 +2505,7 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict
     }
     for (i = 0; i < nFuncsA; ++i) {
       obj1.arrayGet(i, &obj2);
-      if (!(funcsA[i] = Function::parse(&obj2))) {
+      if (!(funcsA[i] = Function::parse(&obj2, 1, 1))) {
 	obj1.free();
 	obj2.free();
 	goto err1;
@@ -2478,7 +2514,7 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict
     }
   } else {
     nFuncsA = 1;
-    if (!(funcsA[0] = Function::parse(&obj1))) {
+    if (!(funcsA[0] = Function::parse(&obj1, 1, -1))) {
       obj1.free();
       goto err1;
     }
@@ -2502,6 +2538,23 @@ GfxRadialShading *GfxRadialShading::parse(Dict *dict
     delete shading;
     return NULL;
   }
+
+  ok = gFalse;
+  if (shading->nFuncs == 1) {
+    ok = shading->funcs[0]->getOutputSize()
+           == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == shading->getColorSpace()->getNComps()) {
+    ok = gTrue;
+    for (i = 0; i < shading->nFuncs; ++i) {
+      ok = ok && shading->funcs[i]->getOutputSize() == 1;
+    }
+  }
+  if (!ok) {
+    error(errSyntaxError, -1, "Invalid function in shading dictionary");
+    delete shading;
+    return NULL;
+  }
+
   return shading;
 
  err1:
@@ -2667,6 +2720,7 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
   Guint c[gfxColorMaxComps];
   GfxShadingBitBuf *bitBuf;
   Object obj1, obj2;
+  GBool ok;
   int i, j, k, state;
 
   if (dict->lookup("BitsPerCoordinate", &obj1)->isInt()) {
@@ -2676,12 +2730,22 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
 	  "Missing or invalid BitsPerCoordinate in shading dictionary");
     goto err2;
   }
+  if (coordBits <= 0 || coordBits > 32) {
+    error(errSyntaxError, -1,
+	  "Invalid BitsPerCoordinate in shading dictionary");
+    goto err2;
+  }
   obj1.free();
   if (dict->lookup("BitsPerComponent", &obj1)->isInt()) {
     compBits = obj1.getInt();
   } else {
     error(errSyntaxError, -1,
 	  "Missing or invalid BitsPerComponent in shading dictionary");
+    goto err2;
+  }
+  if (compBits <= 0 || compBits > 16) {
+    error(errSyntaxError, -1,
+	  "Invalid BitsPerComponent in shading dictionary");
     goto err2;
   }
   obj1.free();
@@ -2694,6 +2758,10 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
 	    "Missing or invalid BitsPerFlag in shading dictionary");
       goto err2;
     }
+    if (flagBits < 2 || flagBits > 8) {
+      error(errSyntaxError, -1, "Invalid BitsPerFlag in shading dictionary");
+      goto err2;
+    }
     obj1.free();
   } else {
     if (dict->lookup("VerticesPerRow", &obj1)->isInt()) {
@@ -2704,6 +2772,11 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
       goto err2;
     }
     obj1.free();
+    if (vertsPerRow < 2) {
+      error(errSyntaxError, -1,
+	    "Invalid VerticesPerRow in shading dictionary");
+      goto err2;
+    }
   }
   if (dict->lookup("Decode", &obj1)->isArray() &&
       obj1.arrayGetLength() >= 6) {
@@ -2742,7 +2815,7 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
       }
       for (i = 0; i < nFuncsA; ++i) {
 	obj1.arrayGet(i, &obj2);
-	if (!(funcsA[i] = Function::parse(&obj2))) {
+	if (!(funcsA[i] = Function::parse(&obj2, 1, 1))) {
 	  obj1.free();
 	  obj2.free();
 	  goto err1;
@@ -2751,7 +2824,7 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
       }
     } else {
       nFuncsA = 1;
-      if (!(funcsA[0] = Function::parse(&obj1))) {
+      if (!(funcsA[0] = Function::parse(&obj1, 1, -1))) {
 	obj1.free();
 	goto err1;
       }
@@ -2855,6 +2928,25 @@ GfxGouraudTriangleShading *GfxGouraudTriangleShading::parse(
     delete shading;
     return NULL;
   }
+
+  ok = gFalse;
+  if (shading->nFuncs == 0) {
+    ok = shading->nComps == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == 1) {
+    ok = shading->funcs[0]->getOutputSize()
+           == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == shading->getColorSpace()->getNComps()) {
+    ok = gTrue;
+    for (i = 0; i < shading->nFuncs; ++i) {
+      ok = ok && shading->funcs[i]->getOutputSize() == 1;
+    }
+  }
+  if (!ok) {
+    error(errSyntaxError, -1, "Invalid function in shading dictionary");
+    delete shading;
+    return NULL;
+  }
+
   return shading;
 
  err2:
@@ -2892,6 +2984,34 @@ void GfxGouraudTriangleShading::getTriangle(
   for (j = 0; j < nComps; ++j) {
     color2[j] = vertices[v].color[j];
   }
+}
+
+void GfxGouraudTriangleShading::getBBox(double *_xmin, double *_yMin,
+					double *_xMax, double *_yMax) {
+  double xxMin = 0;
+  double yyMin = 0;
+  double xxMax = 0;
+  double yyMax = 0;
+  if (nVertices > 0) {
+    xxMin = xxMax = vertices[0].x;
+    yyMin = yyMax = vertices[0].y;
+  }
+  for (int i = 1; i < nVertices; ++i) {
+    if (vertices[i].x < xxMin) {
+      xxMin = vertices[i].x;
+    } else if (vertices[i].x > xxMax) {
+      xxMax = vertices[i].x;
+    }
+    if (vertices[i].y < yyMin) {
+      yyMin = vertices[i].y;
+    } else if (vertices[i].y > yyMax) {
+      yyMax = vertices[i].y;
+    }
+  }
+  *_xmin = xxMin;
+  *_yMin = yyMin;
+  *_xMax = xxMax;
+  *_yMax = yyMax;
 }
 
 void GfxGouraudTriangleShading::getColor(double *in, GfxColor *out) {
@@ -2977,13 +3097,23 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
   Guint ci;
   GfxShadingBitBuf *bitBuf;
   Object obj1, obj2;
+  GBool ok;
   int i, j;
+
+  nPatchesA = 0;
+  patchesA = NULL;
+  patchesSize = 0;
 
   if (dict->lookup("BitsPerCoordinate", &obj1)->isInt()) {
     coordBits = obj1.getInt();
   } else {
     error(errSyntaxError, -1,
 	  "Missing or invalid BitsPerCoordinate in shading dictionary");
+    goto err2;
+  }
+  if (coordBits <= 0 || coordBits > 32) {
+    error(errSyntaxError, -1,
+	  "Invalid BitsPerCoordinate in shading dictionary");
     goto err2;
   }
   obj1.free();
@@ -2994,12 +3124,21 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
 	  "Missing or invalid BitsPerComponent in shading dictionary");
     goto err2;
   }
+  if (compBits <= 0 || compBits > 16) {
+    error(errSyntaxError, -1,
+	  "Invalid BitsPerComponent in shading dictionary");
+    goto err2;
+  }
   obj1.free();
   if (dict->lookup("BitsPerFlag", &obj1)->isInt()) {
     flagBits = obj1.getInt();
   } else {
     error(errSyntaxError, -1,
 	  "Missing or invalid BitsPerFlag in shading dictionary");
+    goto err2;
+  }
+  if (flagBits < 2 || flagBits > 8) {
+    error(errSyntaxError, -1, "Invalid BitsPerFlag in shading dictionary");
     goto err2;
   }
   obj1.free();
@@ -3040,7 +3179,7 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
       }
       for (i = 0; i < nFuncsA; ++i) {
 	obj1.arrayGet(i, &obj2);
-	if (!(funcsA[i] = Function::parse(&obj2))) {
+	if (!(funcsA[i] = Function::parse(&obj2, 1, 1))) {
 	  obj1.free();
 	  obj2.free();
 	  goto err1;
@@ -3049,7 +3188,7 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
       }
     } else {
       nFuncsA = 1;
-      if (!(funcsA[0] = Function::parse(&obj1))) {
+      if (!(funcsA[0] = Function::parse(&obj1, 1, -1))) {
 	obj1.free();
 	goto err1;
       }
@@ -3059,13 +3198,16 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
   }
   obj1.free();
 
-  nPatchesA = 0;
-  patchesA = NULL;
-  patchesSize = 0;
   bitBuf = new GfxShadingBitBuf(str);
   while (1) {
     if (!bitBuf->getBits(flagBits, &flag)) {
       break;
+    }
+    flag &= 3;
+    if (flag != 0 && nPatchesA == 0) {
+      error(errSyntaxError, -1, "Invalid patch in patch mesh shading");
+      delete bitBuf;
+      goto err1;
     }
     if (typeA == 6) {
       switch (flag) {
@@ -3468,16 +3610,70 @@ GfxPatchMeshShading *GfxPatchMeshShading::parse(int typeA, Dict *dict,
     delete shading;
     return NULL;
   }
+
+  ok = gFalse;
+  if (shading->nFuncs == 0) {
+    ok = shading->nComps == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == 1) {
+    ok = shading->funcs[0]->getOutputSize()
+           == shading->getColorSpace()->getNComps();
+  } else if (shading->nFuncs == shading->getColorSpace()->getNComps()) {
+    ok = gTrue;
+    for (i = 0; i < shading->nFuncs; ++i) {
+      ok = ok && shading->funcs[i]->getOutputSize() == 1;
+    }
+  }
+  if (!ok) {
+    error(errSyntaxError, -1, "Invalid function in shading dictionary");
+    delete shading;
+    return NULL;
+  }
+
   return shading;
 
  err2:
   obj1.free();
  err1:
+  if (patchesA) {
+    gfree(patchesA);
+  }
   return NULL;
 }
 
 GfxShading *GfxPatchMeshShading::copy() {
   return new GfxPatchMeshShading(this);
+}
+
+void GfxPatchMeshShading::getBBox(double *_xMin, double *_yMin,
+				  double *_xMax, double *_yMax) {
+  double xxMin = 0;
+  double yyMin = 0;
+  double xxMax = 0;
+  double yyMax = 0;
+  if (nPatches > 0) {
+    xxMin = patches[0].x[0][0];
+    yyMin = patches[0].y[0][0];
+  }
+  for (int i = 0; i < nPatches; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      for (int k = 0; k < 4; ++k) {
+	if (patches[i].x[j][k] < xxMin) {
+	  xxMin = patches[i].x[j][k];
+	} else if (patches[i].x[j][k] > xxMax) {
+	  xxMax = patches[i].x[j][k];
+	}
+	if (patches[i].y[j][k] < yyMin) {
+	  yyMin = patches[i].y[j][k];
+	} else if (patches[i].y[j][k] > yyMax) {
+	  yyMax = patches[i].y[j][k];
+	}
+      }
+    }
+  }
+  *_xMin = xxMin;
+  *_yMin = yyMin;
+  *_xMax = xxMax;
+  *_yMax = yyMax;
 }
 
 void GfxPatchMeshShading::getColor(double *in, GfxColor *out) {
@@ -3960,6 +4156,26 @@ GfxPath::GfxPath(GBool justMoved1, double firstX1, double firstY1,
     subpaths[i] = subpaths1[i]->copy();
 }
 
+double GfxPath::getCurX() {
+  if (justMoved) {
+    return firstX;
+  } else if (n > 0) {
+    return subpaths[n-1]->getLastX();
+  } else {
+    return 0;
+  }
+}
+
+double GfxPath::getCurY() {
+  if (justMoved) {
+    return firstY;
+  } else if (n > 0) {
+    return subpaths[n-1]->getLastY();
+  } else {
+    return 0;
+  }
+}
+
 void GfxPath::moveTo(double x, double y) {
   justMoved = gTrue;
   firstX = x;
@@ -4145,7 +4361,7 @@ GfxState::GfxState(double hDPIA, double vDPIA, PDFRectangle *pageBox,
   clipXMax = pageWidth;
   clipYMax = pageHeight;
 
-  inCachedT3Char = gFalse;
+  ignoreColorOps = gFalse;
 
   saved = NULL;
 }
@@ -4450,65 +4666,143 @@ void GfxState::clip() {
 }
 
 void GfxState::clipToStrokePath() {
-  double xMin, yMin, xMax, yMax, x, y, t0, t1;
-  GfxSubpath *subpath;
-  int i, j;
-
-  xMin = xMax = yMin = yMax = 0; // make gcc happy
-  for (i = 0; i < path->getNumSubpaths(); ++i) {
-    subpath = path->getSubpath(i);
-    for (j = 0; j < subpath->getNumPoints(); ++j) {
-      transform(subpath->getX(j), subpath->getY(j), &x, &y);
+  // We compute the stroke path bbox in user space (line width and
+  // miter limt are handled in user space), and then transform the
+  // bbox to device space.  This can result in a larger-than-needed
+  // bbox if the matrix isn't "square", but that's ok.
+  //
+  // There are two cases for each point on the path:
+  // (1) miter join, under miter limit => compute the miter point
+  // (2) all other joins and caps => use the path point +/- 0.5 * line width
+  double xMin = 0, yMin = 0, xMax = 0, yMax = 0;
+  double w = 0.5 * lineWidth;
+  for (int i = 0; i < path->getNumSubpaths(); ++i) {
+    GfxSubpath *subpath = path->getSubpath(i);
+    for (int j = 0; j < subpath->getNumPoints(); ++j) {
+      double x1 = subpath->getX(j);
+      double y1 = subpath->getY(j);
       if (i == 0 && j == 0) {
-	xMin = xMax = x;
-	yMin = yMax = y;
-      } else {
-	if (x < xMin) {
-	  xMin = x;
-	} else if (x > xMax) {
-	  xMax = x;
+	xMin = xMax = x1;
+	yMin = yMax = y1;
+      }
+      GBool useMiter = gFalse;
+      if (lineJoin == 0 &&  // miter join
+	  ((j > 0 && j < subpath->getNumPoints() - 1) || subpath->isClosed())) {
+	double x0, y0, x2, y2;
+	if (j > 0) {
+	  x0 = subpath->getX(j - 1);
+	  y0 = subpath->getY(j - 1);
+	} else {
+	  x0 = subpath->getLastX();
+	  y0 = subpath->getLastY();
 	}
-	if (y < yMin) {
-	  yMin = y;
-	} else if (y > yMax) {
-	  yMax = y;
+	if (j < subpath->getNumPoints() - 1) {
+	  x2 = subpath->getX(j + 1);
+	  y2 = subpath->getY(j + 1);
+	} else {
+	  x2 = subpath->getX(0);
+	  y2 = subpath->getY(0);
+	}
+	if ((fabs(x1 - x0) > 0.0001 || fabs(y1 - y0) > 0.0001) &&
+	    (fabs(x2 - x1) > 0.0001 || fabs(y2 - y1) > 0.0001)) {
+	  double d01 = 1 / sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+	  double ux = (x1 - x0) * d01;
+	  double uy = (y1 - y0) * d01;
+	  double d12 = 1 / sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	  double vx = (x2 - x1) * d12;
+	  double vy = (y2 - y1) * d12;
+	  double dot = -ux * vx - uy * vy;
+	  if (dot < 0.9999) {
+	    double miter = sqrt(2 / (1 - dot));
+	    if (miter <= miterLimit) {
+	      double cross = ux * vy - uy * vx;
+	      double m = sqrt(2 / (1 - dot) - 1);
+	      double ax, ay;
+	      if (cross >= 0) {
+		ax = x1 + w * uy;
+		ay = y1 - w * ux;
+	      } else {
+		ax = x1 - w * uy;
+		ay = y1 + w * ux;
+	      }
+	      double mx = ax + m * w * ux;
+	      double my = ay + m * w * uy;
+	      if (mx < xMin) {
+		xMin = mx;
+	      } else if (mx > xMax) {
+		xMax = mx;
+	      }
+	      if (my < yMin) {
+		yMin = my;
+	      } else if (my > yMax) {
+		yMax = my;
+	      }
+	      useMiter = gTrue;
+	    }
+	  }
+	}
+      }
+      if (!useMiter) {
+	if (x1 - w < xMin) {
+	  xMin = x1 - w;
+	}
+	if (x1 + w > xMax) {
+	  xMax = x1 + w;
+	}
+	if (y1 - w < yMin) {
+	  yMin = y1 - w;
+	}
+	if (y1 + w > yMax) {
+	  yMax = y1 + w;
 	}
       }
     }
   }
 
-  // allow for the line width
-  //~ miter joins can extend farther than this
-  t0 = fabs(ctm[0]);
-  t1 = fabs(ctm[2]);
-  if (t0 > t1) {
-    xMin -= 0.5 * lineWidth * t0;
-    xMax += 0.5 * lineWidth * t0;
-  } else {
-    xMin -= 0.5 * lineWidth * t1;
-    xMax += 0.5 * lineWidth * t1;
+  double xx, yy;
+  transform(xMin, yMin, &xx, &yy);
+  if (xx < clipXMin) {
+    clipXMin = xx;
+  } else if (xx > clipXMax) {
+    clipXMax = xx;
   }
-  t0 = fabs(ctm[0]);
-  t1 = fabs(ctm[3]);
-  if (t0 > t1) {
-    yMin -= 0.5 * lineWidth * t0;
-    yMax += 0.5 * lineWidth * t0;
-  } else {
-    yMin -= 0.5 * lineWidth * t1;
-    yMax += 0.5 * lineWidth * t1;
+  if (yy < clipYMin) {
+    clipYMin = yy;
+  } else if (yy > clipYMax) {
+    clipYMax = yy;
   }
-
-  if (xMin > clipXMin) {
-    clipXMin = xMin;
+  transform(xMin, yMax, &xx, &yy);
+  if (xx < clipXMin) {
+    clipXMin = xx;
+  } else if (xx > clipXMax) {
+    clipXMax = xx;
   }
-  if (yMin > clipYMin) {
-    clipYMin = yMin;
+  if (yy < clipYMin) {
+    clipYMin = yy;
+  } else if (yy > clipYMax) {
+    clipYMax = yy;
   }
-  if (xMax < clipXMax) {
-    clipXMax = xMax;
+  transform(xMax, yMin, &xx, &yy);
+  if (xx < clipXMin) {
+    clipXMin = xx;
+  } else if (xx > clipXMax) {
+    clipXMax = xx;
   }
-  if (yMax < clipYMax) {
-    clipYMax = yMax;
+  if (yy < clipYMin) {
+    clipYMin = yy;
+  } else if (yy > clipYMax) {
+    clipYMax = yy;
+  }
+  transform(xMax, yMax, &xx, &yy);
+  if (xx < clipXMin) {
+    clipXMin = xx;
+  } else if (xx > clipXMax) {
+    clipXMax = xx;
+  }
+  if (yy < clipYMin) {
+    clipYMin = yy;
+  } else if (yy > clipYMax) {
+    clipYMax = yy;
   }
 }
 

@@ -101,7 +101,7 @@ static long set_imports(struct _zvpdf_funcs *funcs)
 {
 	if (funcs->struct_size != sizeof(*funcs))
 		return -EINVAL;
-	if (funcs->interface_version > PLUGIN_INTERFACE_VERSION)
+	if (funcs->interface_version > XPDF_INTERFACE_VERSION)
 		return -EBADARG;
 	if (funcs->int_size != sizeof(int))
 		return -ERANGE;
@@ -285,6 +285,12 @@ int strcasecmp(const char *d, const char *s)
 {
 	CHECK(strcasecmp, return 0);
 	return get_slb_funcs()->p_strcasecmp(d, s);
+}
+
+int strncasecmp(const char *d, const char *s, size_t n)
+{
+	CHECK(strncasecmp, return 0);
+	return get_slb_funcs()->p_strncasecmp(d, s, n);
 }
 
 size_t strcspn(const char *s, const char *reject)
@@ -531,5 +537,6 @@ int errno;
 /* newer versions of libstdc++ may have references to strtoul */
 unsigned long strtoul(const char *restrict nptr, char **restrict endptr, int base)
 {
-	return 0;
+	CHECK(strtoul, return NULL);
+	return get_slb_funcs()->p_strtoul(nptr, endptr, base);
 }

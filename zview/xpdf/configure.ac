@@ -2,9 +2,9 @@ dnl configure.ac, used by autoconf
 dnl to create the configure script
 dnl @(#) Thorsten Otto, 26.04.2019
 dnl
-AC_PREREQ(2.52)
+AC_PREREQ([2.69])
 
-AC_INIT(xpdf, 4.01.01, [https://www.xpdfreader.com/],,[https://www.xpdfreader.com/])
+AC_INIT([xpdf],[4.04],[https://www.xpdfreader.com/],[],[https://www.xpdfreader.com/])
 AC_CONFIG_SRCDIR(xpdf/Gfx.cc)
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -55,7 +55,7 @@ if test "$ECHO_E" = ""; then
 fi
 AC_SUBST(ECHO_E)
 
-AC_CONFIG_HEADER(aconf.h)
+AC_CONFIG_HEADERS([aconf.h])
 
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE([enable])
@@ -67,7 +67,7 @@ case " [$]$1 " in
 *) AC_MSG_CHECKING([whether the compiler understands] $flag)
    saved_$1="[$]$1"
    $1="[$]$1 $flag"
-   AC_TRY_COMPILE(, , result=yes, $1="$saved_$1"; result=no)
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[result=yes],[$1="$saved_$1"; result=no])
    AC_MSG_RESULT([$result])
    ;;
 esac
@@ -88,7 +88,7 @@ m4_define(ac_option_lcase, [translit($1,-ABCDEFGHIJKLMNOPQRSTUVWXYZ,_abcdefghijk
 AC_DEFUN([AC_OPTION], [
 AH_TEMPLATE([ac_option_ucase(m4_case($4,,$1,$4))], [$2])
 AC_ARG_ENABLE($1,
-[AC_HELP_STRING(--m4_case($3,,enable,no,enable,yes,disable,must-be-yes-or-no)-[]$1, [$2])],
+[AS_HELP_STRING([--m4_case($3,,enable,no,enable,yes,disable,must-be-yes-or-no)-$1],[$2])],
 [case [$]enableval in
 yes|no)
      enable_[]ac_option_lcase($1)=[$]enableval
@@ -194,7 +194,7 @@ if test "$cross_compiling" = no; then
 fi
 
 AC_ARG_ENABLE(warnings,
-[AC_HELP_STRING(--enable-warnings, [enable compiler warnings])],
+[AS_HELP_STRING([--enable-warnings],[enable compiler warnings])],
 [case $enableval in
 yes)
      for arg in -Wall -W -Wstrict-prototypes -Wmissing-prototypes \
@@ -215,7 +215,7 @@ esac
 ])
 
 AC_ARG_ENABLE(fatal-warnings,
-[AC_HELP_STRING(--enable-fatal-warnings, [Turn compiler warnings into errors [default=disabled]])],
+[AS_HELP_STRING([--enable-fatal-warnings],[Turn compiler warnings into errors [default=disabled]])],
 [case $enableval in
 yes) enable_fatal_warnings=yes
      ;;
@@ -234,7 +234,7 @@ AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" != no)
 dnl ##### Switch over to C++.  This will make the checks below a little
 dnl ##### bit stricter (requiring function prototypes in include files).
 dnl ##### (99% of xpdf is written in C++.)
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 AC_CHECK_HEADERS([argz.h limits.h locale.h nl_types.h malloc.h string.h strings.h unistd.h process.h sys/param.h endian.h io.h fcntl.h dlfcn.h pwd.h wchar.h])
 
@@ -268,6 +268,8 @@ AH_TEMPLATE([USE_FIXEDPOINT], [use fixed point (instead of floating point) arith
 AC_OPTION(fixedpoint, [use fixed point (instead of floating point) arithmetic], yes, [USE_FIXEDPOINT])
 AH_TEMPLATE([SPLASH_CMYK], [include support for CMYK rasterization])
 AC_OPTION(cmyk, [include support for CMYK rasterization], yes, [SPLASH_CMYK])
+AH_TEMPLATE([NO_FONTCONFIG], [disable support for libfontconfig])
+AC_OPTION(no-fontconfig, [disable support for libfontconfig], no, [NO_FONTCONFIG])
 AH_TEMPLATE([SPLASH_DEVICEN], [Enable support for DeviceN output.])
 AC_OPTION(devicen, [Enable support for DeviceN output.], yes, [SPLASH_DEVICEN])
 AH_TEMPLATE([XPDFWIDGET_PRINTING], [include printing support in XpdfWidget])
@@ -289,7 +291,7 @@ AH_TEMPLATE([APPDEFDIR], [directory name for application defaults])
 AC_ARG_WITH([appdef-dir],
   AS_HELP_STRING([--with-appdef-dir],
                  [set app-defaults directory]))
-if test "$with_appdef_dir" != "no" -a "$with_appdef_dir" != "yes"; then
+if test "$with_appdef_dir" != "no" -a "$with_appdef_dir" != "yes" -a "$with_appdef_dir" != ""; then
       AC_DEFINE_UNQUOTED(APPDEFDIR, "$with_appdef_dir")
 fi
 
@@ -306,6 +308,22 @@ else
   system_xpdfrc="$sysconfdir/xpdfrc"
 fi
 AC_DEFINE_UNQUOTED(SYSTEM_XPDFRC, "$system_xpdfrc", [directory for system wide xpdfrc])
+
+AH_TEMPLATE([XPDFRC_DATADIR], [directory to use for the DATADIR xpdfrc variable])
+AC_ARG_WITH([xpdfrc-datadir],
+  AS_HELP_STRING([--with-xpdfrc-datadir],
+                 [set directory to use for the DATADIR xpdfrc variable]))
+if test "$with_xpdfrc_datadir" != "no" -a "$with_xpdfrc_datadir" != "yes" -a "$with_xpdfrc_datadir" != ""; then
+      AC_DEFINE_UNQUOTED(XPDFRC_DATADIR, "$with_xpdfrc_datadir")
+fi
+
+AH_TEMPLATE([USE_FORMS], [Support Forms])
+case $TARGET_OS in
+  tos)
+    ;;
+  *) AC_DEFINE([USE_FORMS], 1)
+    ;;
+esac
 
 ###############################################################################
 #
@@ -422,6 +440,16 @@ AM_CONDITIONAL(HAVE_QT, test "$have_qt5" = yes -o "$have_qt4" = yes)
 
 AC_CHECK_LIB(paper, paperinit)
 AC_CHECK_HEADERS([paper.h])
+
+###############################################################################
+#
+#       look for fontconfig
+#
+###############################################################################
+if test "$enable_no_fontconfig" != yes; then
+  AC_CHECK_LIB(fontconfig, FcConfigCreate)
+  AC_CHECK_HEADERS([fontconfig.h])
+fi
 
 ###############################################################################
 #
@@ -558,7 +586,7 @@ if test "$GCC" = "yes" -a "$enable_fatal_warnings" = "yes"; then
 fi
 ])
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 	Makefile
 	doc/Makefile
 	fofi/Makefile
@@ -567,3 +595,4 @@ AC_OUTPUT([
 	xpdf/Makefile
 	xpdf-qt/Makefile
 ])
+AC_OUTPUT

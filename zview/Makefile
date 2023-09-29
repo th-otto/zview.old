@@ -55,7 +55,7 @@ main.o: version_date.h
 
 ##############################################################################
 
-XPDF_VERSION			= 4.01.01
+XPDF_VERSION			= 4.04
 
 PDF_OBJ				= xpdf/xpdf/Annot.o xpdf/xpdf/Array.o xpdf/xpdf/BuiltinFont.o xpdf/xpdf/BuiltinFontTables.o \
                                   xpdf/xpdf/Catalog.o xpdf/xpdf/CharCodeToUnicode.o xpdf/xpdf/CMap.o xpdf/xpdf/Decrypt.o xpdf/xpdf/Dict.o xpdf/xpdf/Error.o \
@@ -65,26 +65,21 @@ PDF_OBJ				= xpdf/xpdf/Annot.o xpdf/xpdf/Array.o xpdf/xpdf/BuiltinFont.o xpdf/xp
                                   xpdf/xpdf/Page.o xpdf/xpdf/Parser.o xpdf/xpdf/SecurityHandler.o xpdf/xpdf/PDFDoc.o xpdf/xpdf/PDFDocEncoding.o xpdf/xpdf/PSTokenizer.o \
                                   xpdf/xpdf/SplashOutputDev.o xpdf/xpdf/Stream.o xpdf/xpdf/TextOutputDev.o xpdf/xpdf/TextString.o xpdf/xpdf/UnicodeMap.o \
                                   xpdf/xpdf/UnicodeTypeTable.o xpdf/xpdf/XRef.o xpdf/xpdf/OptionalContent.o \
+				  xpdf/xpdf/PDF417Barcode.o xpdf/xpdf/UTF8.o xpdf/xpdf/UnicodeRemapping.o xpdf/xpdf/ShadingImage.o xpdf/xpdf/AcroForm.o xpdf/xpdf/XFAScanner.o xpdf/xpdf/Zoox.o \
 				  xpdf/fofi/FoFiBase.o xpdf/fofi/FoFiEncodings.o xpdf/fofi/FoFiIdentifier.o \
 				  xpdf/fofi/FoFiTrueType.o xpdf/fofi/FoFiType1.o xpdf/fofi/FoFiType1C.o \
 				  xpdf/goo/FixedPoint.o xpdf/goo/GHash.o xpdf/goo/GList.o xpdf/goo/GString.o \
-				  xpdf/goo/gfile.o xpdf/goo/gmem.o xpdf/goo/gmempp.o xpdf/goo/parseargs.o \
+				  xpdf/goo/gfile.o xpdf/goo/gmem.o xpdf/goo/gmempp.o xpdf/goo/parseargs.o xpdf/goo/Trace.o \
 				  xpdf/splash/Splash.o xpdf/splash/SplashBitmap.o xpdf/splash/SplashClip.o \
 				  xpdf/splash/SplashFTFont.o xpdf/splash/SplashFTFontEngine.o xpdf/splash/SplashFTFontFile.o \
 				  xpdf/splash/SplashFont.o xpdf/splash/SplashFontEngine.o xpdf/splash/SplashFontFile.o \
 				  xpdf/splash/SplashFontFileID.o xpdf/splash/SplashPath.o xpdf/splash/SplashPattern.o \
 				  xpdf/splash/SplashScreen.o xpdf/splash/SplashState.o xpdf/splash/SplashXPath.o xpdf/splash/SplashXPathScanner.o
 
-ifeq ($(firstword $(subst ., ,$(XPDF_VERSION))),4)
-PDF_OBJ				+= xpdf/xpdf/PDF417Barcode.o
-PDF_OBJ				+= xpdf/xpdf/UTF8.o
-PDF_OBJ				+= xpdf/xpdf/UnicodeRemapping.o
-endif
-
 xpdf-${XPDF_VERSION}.tar.gz:
 	: wget ftp://ftp.foolabs.com/pub/xpdf/xpdf-${XPDF_VERSION}.tar.gz
 	: wget https://xpdfreader-dl.s3.amazonaws.com/old/xpdf-${XPDF_VERSION}.tar.gz
-	wget https://dl.xpdfreader.com/old/xpdf-${XPDF_VERSION}.tar.gz
+	wget https://dl.xpdfreader.com/xpdf-${XPDF_VERSION}.tar.gz
 
 $(PDF_OBJ): xpdf/config.status
 
@@ -115,7 +110,7 @@ include $(top_srcdir)/rules
 
 ##############################################################################
 
-libpdf.a: $(PDF_OBJ)
+libpdf.a: $(PDF_OBJ) Makefile
 	$(RM) $@
 	$(AR) rcs $@ $(PDF_OBJ)
 

@@ -65,11 +65,6 @@ public:
   // operations.
   virtual GBool useTilingPatternFill() { return gTrue; }
 
-  // Does this device use functionShadedFill(), axialShadedFill(), and
-  // radialShadedFill()?  If this returns false, these shaded fills
-  // will be reduced to a series of other drawing operations.
-  virtual GBool useShadedFills() { return gTrue; }
-
   // Does this device use beginType3Char/endType3Char?  Otherwise,
   // text in Type 3 fonts will be drawn with drawChar/drawString.
   virtual GBool interpretType3Chars() { return gTrue; }
@@ -119,8 +114,7 @@ public:
 				 double *mat, double *bbox,
 				 int x0, int y0, int x1, int y1,
 				 double xStep, double yStep);
-  virtual GBool axialShadedFill(GfxState *state, GfxAxialShading *shading);
-  virtual GBool radialShadedFill(GfxState *state, GfxRadialShading *shading);
+  virtual GBool shadedFill(GfxState *state, GfxShading *shading);
 
   //----- path clipping
   virtual void clip(GfxState *state);
@@ -152,12 +146,13 @@ public:
   virtual void drawMaskedImage(GfxState *state, Object *ref, Stream *str,
 			       int width, int height,
 			       GfxImageColorMap *colorMap,
-			       Stream *maskStr, int maskWidth, int maskHeight,
+			       Object *maskRef, Stream *maskStr,
+			       int maskWidth, int maskHeight,
 			       GBool maskInvert, GBool interpolate);
   virtual void drawSoftMaskedImage(GfxState *state, Object *ref, Stream *str,
 				   int width, int height,
 				   GfxImageColorMap *colorMap,
-				   Stream *maskStr,
+				   Object *maskRef, Stream *maskStr,
 				   int maskWidth, int maskHeight,
 				   GfxImageColorMap *maskColorMap,
 				   double *matte, GBool interpolate);
@@ -168,10 +163,10 @@ public:
 		       double llx, double lly, double urx, double ury);
 
   //----- transparency groups and soft masks
-  virtual void beginTransparencyGroup(GfxState *state, double *bbox,
-				      GfxColorSpace *blendingColorSpace,
-				      GBool isolated, GBool knockout,
-				      GBool forSoftMask);
+  virtual GBool beginTransparencyGroup(GfxState *state, double *bbox,
+				       GfxColorSpace *blendingColorSpace,
+				       GBool isolated, GBool knockout,
+				       GBool forSoftMask);
   virtual void endTransparencyGroup(GfxState *state);
   virtual void paintTransparencyGroup(GfxState *state, double *bbox);
   virtual void setSoftMask(GfxState *state, double *bbox, GBool alpha,
@@ -236,10 +231,6 @@ public:
   // Get the screen parameters.
   SplashScreenParams *getScreenParams() { return &screenParams; }
 
-#if 1 //~tmp: turn off anti-aliasing temporarily
-  virtual void setInShading(GBool sh);
-#endif
-
 private:
 
   void setupScreenParams(double hDPI, double vDPI);
@@ -256,10 +247,6 @@ private:
   void setOverprintMask(GfxState *state, GfxColorSpace *colorSpace,
 			GBool overprintFlag, int overprintMode,
 			GfxColor *singleColor);
-  void computeShadingColor(GfxState *state,
-			   SplashColorMode mode,
-			   GfxColor *color,
-			   SplashColorPtr sColor);
   SplashPath *convertPath(GfxState *state, GfxPath *path,
 			  GBool dropEmptySubpaths);
   void doUpdateFont(GfxState *state);
@@ -275,6 +262,8 @@ private:
   static GBool softMaskMatteImageSrc(void *data,
 				     SplashColorPtr colorLine,
 				     Guchar *alphaLine);
+  GString *makeImageTag(Object *ref, GfxRenderingIntent ri,
+			GfxColorSpace *colorSpace);
   void reduceImageResolution(Stream *str, double *mat,
 			     int *width, int *height);
   void clearMaskRegion(GfxState *state,
@@ -282,6 +271,9 @@ private:
 		       double xMin, double yMin,
 		       double xMax, double yMax);
   void copyState(Splash *oldSplash, GBool copyColors);
+#if 1 //~tmp: turn off anti-aliasing temporarily
+  void setInShading(GBool sh);
+#endif
 
   SplashColorMode colorMode;
   int bitmapRowPad;
@@ -291,6 +283,7 @@ private:
   GBool allowAntialias;
   GBool vectorAntialias;
   GBool reverseVideo;		// reverse video mode
+  GBool reverseVideoInvertImages;
   SplashColor paperColor;	// paper color
   SplashScreenParams screenParams;
   GBool skipHorizText;
