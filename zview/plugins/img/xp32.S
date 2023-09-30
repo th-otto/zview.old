@@ -1,4 +1,4 @@
-#include "symbols.h"
+#include "asmdefs.h"
 
 	.text
 

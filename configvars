@@ -43,7 +43,7 @@ CXXFLAGS = $(DEBUG) $(CPU_CFLAGS) $(CPPFLAGS) $(WINDOM_CFLAGS) $(OPTIMISATION) -
 LDFLAGS  = -s
 ARFLAGS  = rcs
 
-LDSHARED = $(CC) -s -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k
+LDSHARED = $(CC) -s -nostartfiles -Wl,--mprg-flags,0x0f
 LDSHAREDLIBC = -nostdlib -lgcc
 SFLAGS =
 

@@ -129,7 +129,7 @@ endif
 
 slb/$(SLB_SUBDIR)zvpdf.slb: pdflib/header.lo pdflib/zvpdf.lo pdflib/pdflib.lo libpdf.a
 	@mkdir -p slb/$(SLB_SUBDIR)
-	$(CXX) -nostartfiles -Wl,--mprg-flags,0x0f -Wl,--stack,1k $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) -nostdlib -lgcc -lstdc++ -lm -lgcc
+	$(CXX) -nostartfiles -Wl,--mprg-flags,0x0f $(CXXFLAGS) -o $@ $^ -lfreetype.slb $(LDFLAGS) -nostdlib -lgcc -lstdc++ -lm -lgcc
 
 pdflib/header.lo: plugins/common/plugin.h plugins/common/zview.h pdflib/exports.h
 
@@ -143,7 +143,7 @@ $(STRIPEX): $(top_srcdir)/zview/tools/stripex.c
 ##############################################################################
 
 clean_zview:
-	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o pdflib/*.o pdflib/*.lo slb/*/*.slb xpdf*/*/*.o
+	rm -f *~ *.o *.app zvdi/*.o zedit/*.o file/*.o catalog/*.o pdflib/*.o pdflib/*.lo slb/*/*.slb xpdf*/*/*.o ldglib/*.o ldglib/*.a
 	$(RM) $(STRIPEX)
 	$(MAKE) -C plugins clean
 

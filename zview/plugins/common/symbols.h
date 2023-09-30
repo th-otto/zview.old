@@ -3,9 +3,8 @@
  * Add (or not) underscores to external symbol names
  *
  * Copyright (C) 2018 Thorsten Otto
- *
- * For conditions of distribution and use, see copyright notice in zlib.h
  */
+
 #ifndef __USER_LABEL_PREFIX__
 #  if defined(__ELF__)
 #    define __USER_LABEL_PREFIX__
@@ -26,10 +25,15 @@
 # ifdef __ASSEMBLER__
 #   define C_SYMBOL_NAME2(pref, name) pref##name
 #   define C_SYMBOL_NAME1(pref, name) C_SYMBOL_NAME2(pref, name)
-#   define C_SYMBOL_NAME(name) C_SYMBOL_NAME1(__ASM_SYMBOL_PREFIX, name)
+    /* avoid empty macro arguments */
+#   define _ 2
+#   if (__ASM_SYMBOL_PREFIX + 0) > 1
+#     define C_SYMBOL_NAME(name) C_SYMBOL_NAME1(__ASM_SYMBOL_PREFIX, name)
+#   else
+#     define C_SYMBOL_NAME(name) name
+#   endif
+#   undef _
 # else
 #   define C_SYMBOL_NAME(name) __SYMBOL_PREFIX #name
 # endif
 #endif
-
-

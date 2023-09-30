@@ -18,7 +18,7 @@ static JPGD_ENUM JPGDOpenDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDOpenDriver;
 	__asm__ volatile(
-	"	movl	%[jpgd],a0\n"
+	"	movl	%[jpgd],%%a0\n"
 	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
 	:	[jpgd]"a"		(jpgd)		/* in */
@@ -33,7 +33,7 @@ static JPGD_ENUM JPGDCloseDriver(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDCloseDriver;
 	__asm__ volatile(
-	"	movl	%[jpgd],a0\n"
+	"	movl	%[jpgd],%%a0\n"
 	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
 	:	[jpgd]"a"		(jpgd)		/* in */
@@ -48,7 +48,7 @@ static JPGD_ENUM JPGDGetImageInfo(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageInfo;
 	__asm__ volatile(
-	"	movl	%[jpgd],a0\n"
+	"	movl	%[jpgd],%%a0\n"
 	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
 	:	[jpgd]"a"		(jpgd)		/* in */
@@ -63,7 +63,7 @@ static JPGD_ENUM JPGDGetImageSize(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDGetImageSize;
 	__asm__ volatile(
-	"	movl	%[jpgd],a0\n"
+	"	movl	%[jpgd],%%a0\n"
 	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
 	:	[jpgd]"a"		(jpgd)		/* in */
@@ -78,7 +78,7 @@ static JPGD_ENUM JPGDDecodeImage(JPGD_PTR jpgd, JPGDDRV_PTR drv)
 	register int32_t retv __asm__("d0");
 	register JPGD_ENUM	(*func)(JPGD_PTR) __asm__("a1") = drv->JPGDDecodeImage;
 	__asm__ volatile(
-	"	movl	%[jpgd],a0\n"
+	"	movl	%[jpgd],%%a0\n"
 	"	jsr		(%[func])\n"
 	:	"=r"	(retv)		/* out */
 	:	[jpgd]"a"		(jpgd)		/* in */
