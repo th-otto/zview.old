@@ -97,6 +97,19 @@ static ArgDesc const argDesc[] = {
 
 //------------------------------------------------------------------------
 
+#include "xpdftools.h"
+
+#ifdef ZVPDF_SLB
+int makeDir(const char *path, int mode) {
+#ifdef _WIN32
+  wchar_t wPath[winMaxLongPath + 1];
+  return _wmkdir(fileNameToUCS2(path, wPath, winMaxLongPath + 1));
+#else
+  return mkdir(path, (mode_t)mode);
+#endif
+}
+#endif
+
 static int writeToFile(void *file, const char *data, int size) {
   return (int)fwrite(data, 1, size, (FILE *)file);
 }

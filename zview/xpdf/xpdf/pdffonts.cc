@@ -95,6 +95,8 @@ static int fontsSize;
 static char *seenObjs;
 static int numObjects;
 
+#include "xpdftools.h"
+
 int main(int argc, char *argv[]) {
   char *fileName;
   GString *ownerPW, *userPW;

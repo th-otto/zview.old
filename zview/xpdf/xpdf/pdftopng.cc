@@ -98,6 +98,8 @@ static void setupPNG(png_structp *png, png_infop *pngInfo, FILE *f,
 static void writePNGData(png_structp png, SplashBitmap *bitmap);
 static void finishPNG(png_structp *png, png_infop *pngInfo);
 
+#include "xpdftools.h"
+
 int main(int argc, char *argv[]) {
   PDFDoc *doc;
   char *fileName;

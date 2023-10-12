@@ -31,6 +31,8 @@ static char cfgFileName[256];
 static GBool printVersion;
 static GBool printHelp;
 
+#include "xpdftools.h"
+
 static ArgDesc const argDesc[] = {
   {"-list",   argFlag,     &doList,        0,
    "list all embedded files"},

@@ -119,12 +119,12 @@ pdftops_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS) $(PNG_LIBS)
 pdffonts_SOURCES = pdffonts.cc
 pdffonts_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi
 pdffonts_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
-pdffonts_LDADD += $(LCMS_LIBS)
+pdffonts_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)
 
 pdfdetach_SOURCES = pdfdetach.cc
 pdfdetach_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi
 pdfdetach_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
-pdfdetach_LDADD += $(LCMS_LIBS)
+pdfdetach_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)
 
 pdftoppm_SOURCES = pdftoppm.cc \
 	SplashOutputDev.cc SplashOutputDev.h \
@@ -143,7 +143,7 @@ pdftopng_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS) $(PNG_LIBS)
 pdfinfo_SOURCES = pdfinfo.cc
 pdfinfo_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi
 pdfinfo_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
-pdfinfo_LDADD += $(LCMS_LIBS)
+pdfinfo_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)
 
 pdftohtml_SOURCES = pdftohtml.cc HTMLGen.cc HTMLGen.h \
 	SplashOutputDev.cc SplashOutputDev.h \
@@ -161,4 +161,4 @@ pdftotext_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)
 pdfimages_SOURCES = pdfimages.cc ImageOutputDev.cc ImageOutputDev.h
 pdfimages_LDADD = -L. -lxpdf -L../goo -lgoo -L../fofi -lfofi
 pdfimages_DEPENDENCIES = libxpdf.a ../goo/libgoo.a ../fofi/libfofi.a
-pdfimages_LDADD += $(LCMS_LIBS)
+pdfimages_LDADD += $(LCMS_LIBS) $(FREETYPE2_LIBS)

@@ -152,6 +152,8 @@ static ArgDesc const argDesc[] = {
   {NULL, argFlag, 0, 0, 0 }
 };
 
+#include "xpdftools.h"
+
 int main(int argc, char *argv[]) {
   PDFDoc *doc;
   char *fileName;
