@@ -1,7 +1,6 @@
-[![Build Status](https://travis-ci.org/th-otto/zview.svg?branch=master)](https://travis-ci.org/th-otto/zview)
+[![Build Status](https://github.com/th-otto/zview/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/th-otto/zview/actions) 
 
-Latest snapshot: [![Download](https://api.bintray.com/packages/th-otto/zview-files/snapshots/images/download.svg) ](https://bintray.com/th-otto/zview-files/snapshots/_latestVersion#files)
-Latest release: [![Download](https://api.bintray.com/packages/th-otto/zview-files/releases/images/download.svg) ](https://bintray.com/th-otto/zview-files/releases/_latestVersion#files)
+Latest snapshot: [![Download](https://tho-otto.de/snapshots/zview)](https://tho-otto.de/snapshots/zview) 
 
 
 # What is this?
