@@ -457,7 +457,7 @@ boolean __CDECL encoder_init( const char *name, IMGINFO info)
 
 
 /*==================================================================================*
- * boolean __CDECLencoder_write:													*
+ * boolean __CDECL encoder_write:													*
  *		This function write data from buffer to file								*
  *----------------------------------------------------------------------------------*
  * input:																			*
