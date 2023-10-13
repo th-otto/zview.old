@@ -14,6 +14,7 @@ PLUGINS = \
 	png \
 	tga \
 	tiff \
+	webp \
 	$(empty)
 
 all:: $(PLUGINS)

@@ -78,6 +78,8 @@
 #define LIB_EXIF     5
 #define LIB_BZIP2    6
 #define LIB_FREETYPE 7
+#define LIB_WEBP     8
+#define LIB_ZSTD     9
 
 #include "plugver.h"
 

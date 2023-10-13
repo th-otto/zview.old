@@ -290,6 +290,28 @@ void slb_freetype_close(void)
 }
 
 
+#ifdef WEBP_SLB
+static SLB webp_slb = { 0, slb_not_loaded };
+
+SLB *slb_webp_get(void)
+{
+	return &webp_slb;
+}
+
+
+void slb_webp_close(void)
+{
+	SLB *webp = slb_webp_get();
+
+	if (!webp->handle)
+		return;
+	slb_unload(webp->handle);
+	webp->handle = 0;
+	webp->exec = slb_unloaded;
+}
+#endif
+
+
 static long __CDECL plugin_slb_try_open(zv_int_t lib, const char *path)
 {
 	switch (lib)
@@ -310,6 +332,10 @@ static long __CDECL plugin_slb_try_open(zv_int_t lib, const char *path)
 		return slb_bzip2_open(path);
 	case LIB_FREETYPE:
 		return slb_freetype_open(path);
+#ifdef WEBP_SLB
+	case LIB_WEBP:
+		return slb_webp_open(path);
+#endif
 	}
 	return -ENOENT;
 }
@@ -363,6 +389,11 @@ void __CDECL plugin_slb_close(zv_int_t lib)
 	case LIB_FREETYPE:
 		slb_freetype_close();
 		break;
+	case LIB_WEBP:
+#ifdef WEBP_SLB
+		slb_webp_close();
+#endif
+		break;
 	}
 }
 
@@ -387,6 +418,10 @@ SLB *__CDECL plugin_slb_get(zv_int_t lib)
 		return slb_bzip2_get();
 	case LIB_FREETYPE:
 		return slb_freetype_get();
+#ifdef WEBP_SLB
+	case LIB_WEBP:
+		return slb_webp_get();
+#endif
 	}
 	return NULL;
 }
