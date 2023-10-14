@@ -249,6 +249,8 @@ void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int 
 {
 	return get_slb_funcs()->p_bsearch(key, base, nmemb, size, compar);
 }
+
+/* only referenced from some math functions */
 #undef errno
 int errno;
 

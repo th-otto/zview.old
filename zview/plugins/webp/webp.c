@@ -19,7 +19,7 @@
 #define DATE     __DATE__ " " __TIME__
 #define MISCINFO "Using libwep version " WEBP_VERSION_STR
 
-#define NF_DEBUG 0
+#define NF_DEBUG 1
 
 #define MKFOURCC(a, b, c, d) ((a) | (b) << 8 | (c) << 16 | (uint32_t)(d) << 24)
 
@@ -1115,6 +1115,7 @@ struct _myencode_info {
 static int MyWriter(const uint8_t *data, size_t data_size, const WebPPicture *pic)
 {
 	FILE *out = (FILE *)pic->custom_ptr;
+	nf_debugprint((DEBUG_PREFIX "mywrite: %ld\n", data_size));
 	return data_size ? fwrite(data, data_size, 1, out) == 1 : 1;
 }
 
@@ -1175,7 +1176,7 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
 	if (myinfo->lossless)
 		ret = WebPConfigLosslessPreset(&myinfo->config, compression_level);
 	else
-		ret = WebPConfigPreset(&myinfo->config, WEBP_PRESET_PHOTO, quality);
+		ret = WebPConfigPreset(&myinfo->config, WEBP_PRESET_DEFAULT, quality);
 	if (ret)
 		ret = WebPPictureInit(&myinfo->picture);
 	if (!ret)
@@ -1226,11 +1227,14 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 			b = *buf_ptr++;
 			*dst++ = 0xff000000L | ((uint32_t)r << 16) | ((uint32_t)g << 8) | ((uint32_t)b << 0);
 		}
-		reader_cur_row(info)++;
-		if (reader_cur_row(info) == info->height)
+		if (++reader_cur_row(info) == info->height)
 		{
+			nf_debugprint((DEBUG_PREFIX "encoder_write: encode image\n"));
 			if (!WebPEncode(&myinfo->config, &myinfo->picture))
+			{
+				nf_debugprint((DEBUG_PREFIX "WebPEncode failed\n"));
 				return FALSE;
+			}
 			reader_cur_row(info) = 0;
 		}
 	}

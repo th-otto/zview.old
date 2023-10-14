@@ -82,13 +82,15 @@ static int16 setup_encoder ( IMGINFO in_info, IMGINFO out_info, DECDATA data)
  *----------------------------------------------------------------------------------*
  * returns: 	-																	*
  *==================================================================================*/
-static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
+static boolean write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 {
 	int16  	y, img_h = in_info->height;
 	uint8  	*dst	 = data->DstBuf;
+	boolean ret;
 
 	in_info->page_wanted = 0;
 
+	ret = TRUE;
 	if( in_info->orientation == UP_TO_DOWN)
 	{	
 		for( y = 0; y < img_h; y++)
@@ -101,9 +103,11 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 			( *raster)( data, dst);
 	
 			if (curr_output_plugin)
-				plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
+				ret &= plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
 			else
-				ldg_funcs.encoder_write(out_info, dst);
+				ret &= ldg_funcs.encoder_write(out_info, dst);
+			if (!ret)
+				break;
 
 			if( show_write_progress_bar)
 				win_progress(( int16)((( int32)y * 150L) / img_h));
@@ -136,9 +140,11 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 		for( ; y < h; y++)
 		{
 			if (curr_output_plugin)
-				plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
+				ret &= plugin_encoder_write(&curr_output_plugin->c.slb, out_info, dst);
 			else
-				ldg_funcs.encoder_write(out_info, dst);
+				ret &= ldg_funcs.encoder_write(out_info, dst);
+			if (!ret)
+				break;
 
 			dst += data->LnSize;
 
@@ -146,6 +152,8 @@ static void write_img( IMGINFO in_info, IMGINFO out_info, DECDATA data)
 				win_progress(( int16)((( int32)y * 75L) / img_h));
 		}
 	}
+
+	return ret;
 }
 
 
@@ -203,21 +211,22 @@ int16 pic_save( const char *in_file, const char *out_file)
 	IMGINFO in_info;
 	IMGINFO out_info;
 	DECDATA data;
+	int16 ret;
 
-    graf_mouse( BUSYBEE, NULL);	
+    graf_mouse(BUSYBEE, NULL);
 
-	in_info 	= ( img_info *) calloc(1, sizeof( img_info));
-	out_info 	= ( img_info *) calloc(1, sizeof( img_info));	
-	data 		= ( dec_data *) malloc( sizeof( dec_data));
+	in_info 	= (img_info *) calloc(1, sizeof(img_info));
+	out_info 	= (img_info *) calloc(1, sizeof(img_info));
+	data 		= (dec_data *) malloc(sizeof(dec_data));
 	
-	if ( !in_info || !out_info || !data)
+	if (!in_info || !out_info || !data)
 	{
-		free( data);
-		free( out_info);
-		free( in_info);
+		free(data);
+		free(out_info);
+		free(in_info);
 
 		errshow(NULL, -ENOMEM);		
-		return( 0);
+		return FALSE;
 	}
 
 	data->DthBuf = NULL;
@@ -228,15 +237,15 @@ int16 pic_save( const char *in_file, const char *out_file)
 	in_info->background_color	= 0xFFFFFF;
 	in_info->thumbnail			= FALSE;
 
-	if(( decoder_init_done = get_pic_info( in_file, in_info)) == FALSE)
+	if ((decoder_init_done = get_pic_info(in_file, in_info)) == FALSE)
 	{
+		exit_pic_save(in_info, out_info, data);
 		errshow(in_file, CANT_SAVE_IMG);
-		exit_pic_save( in_info, out_info, data);
-		return ( 0);
+		return FALSE;
 	}
 
-	if( show_write_progress_bar)
-		win_progress_begin( get_string( SAVE_TITLE));
+	if (show_write_progress_bar)
+		win_progress_begin(get_string(SAVE_TITLE));
 
 	/* copy information from input's information to output's information struct */
 	*out_info = *in_info;
@@ -248,27 +257,30 @@ int16 pic_save( const char *in_file, const char *out_file)
 	if (encoder_init_done == FALSE)
 	{
 		errshow(out_file, CANT_SAVE_IMG);
-		exit_pic_save( in_info, out_info, data);
+		exit_pic_save(in_info, out_info, data);
 		win_progress_end();
-		return ( 0);
+		return FALSE;
 	}
 
 
-	if( !setup_encoder( in_info, out_info, data))
+	if (!setup_encoder(in_info, out_info, data))
 	{
 		errshow(NULL, -ENOMEM);	
-		exit_pic_save( in_info, out_info, data);
+		exit_pic_save(in_info, out_info, data);
 		win_progress_end();
-		return ( 0);
+		return FALSE;
 	}
 
 
-	write_img( in_info, out_info, data);
+	ret = write_img(in_info, out_info, data);
 
-	exit_pic_save( in_info, out_info, data);
+	exit_pic_save(in_info, out_info, data);
 
-	graf_mouse( ARROW, NULL);
+	graf_mouse(ARROW, NULL);
 	win_progress_end();
 
-	return ( 1);
+	if (!ret)
+		errshow(out_file, CANT_SAVE_IMG);
+
+	return ret;
 }
