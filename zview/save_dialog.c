@@ -27,6 +27,7 @@ unsigned int get_option_mask(CODEC *codec)
 
 	ldg_funcs.set_jpg_option = NULL;	
 	ldg_funcs.set_tiff_option = NULL;
+	ldg_funcs.set_webp_option = NULL;
 	switch (codec->type)
 	{
 	case CODEC_LDG:
@@ -37,6 +38,9 @@ unsigned int get_option_mask(CODEC *codec)
 		ldg_funcs.set_tiff_option = ldg_find( "set_tiff_option", ldg);
 		if (ldg_funcs.set_tiff_option)
 			have_options |= (1 << OPTION_QUALITY) | (1 << OPTION_COMPRESSION);
+		ldg_funcs.set_webp_option = ldg_find( "set_webp_option", ldg);
+		if (ldg_funcs.set_webp_option)
+			have_options |= (1 << OPTION_QUALITY) | (1 << OPTION_COMPRLEVEL);
 		break;
 	case CODEC_SLB:
 		slb = &codec->c.slb;

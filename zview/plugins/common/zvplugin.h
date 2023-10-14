@@ -33,7 +33,8 @@ void __CDECL plugin_encoder_quit(SLB *slb, IMGINFO info);
 #define OPTION_QUALITY      2
 #define OPTION_COLOR_SPACE  3
 #define OPTION_PROGRESSIVE  4
-#define OPTION_COMPRESSION  5
+#define OPTION_COMPRESSION  5 /* set compression method: LZW, deflate etc. */
+#define OPTION_COMPRLEVEL  11 /* set compression level: for deflate, zstd etc. */
 
 /*
  * below are only used to display codec information

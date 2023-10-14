@@ -18,6 +18,7 @@ struct _ldg_funcs {
 	boolean	__CDECL ( *encoder_init)	(const char *, struct _img_info *);
 	void 	__CDECL ( *set_jpg_option)  (int16 set_quality, int /* J_COLOR_SPACE */ set_color_space, boolean set_progressive);
 	void 	__CDECL ( *set_tiff_option) (int16 set_quality, uint16 set_encode_compression);
+	void 	__CDECL ( *set_webp_option) (int16 set_quality, uint16 set_compression_level);
 };
 
 typedef struct {

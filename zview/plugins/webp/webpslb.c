@@ -215,7 +215,6 @@ void *(memset)(void *dest, int c, size_t len)
 
 
 #if !defined(WEBP_SLB)
-
 /*
  * resolve references for statically linked webp
  */
@@ -238,6 +237,21 @@ void (free)(void *p)
 {
 	free(p);
 }
+
+#undef qsort
+void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
+{
+	get_slb_funcs()->p_qsort(base, nmemb, size, compar);
+}
+
+#undef bsearch
+void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
+{
+	return get_slb_funcs()->p_bsearch(key, base, nmemb, size, compar);
+}
+#undef errno
+int errno;
+
 #endif
 
 

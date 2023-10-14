@@ -169,6 +169,7 @@ int nf_debugprintf(const char *format, ...)
 
 uint16_t compression_level = 6;
 int quality = 75;
+J_COLOR_SPACE color_space = JCS_RGB;
 
 #ifdef PLUGIN_SLB
 long __CDECL get_option(zv_int_t which)
@@ -183,7 +184,9 @@ long __CDECL get_option(zv_int_t which)
 
 	case OPTION_QUALITY:
 		return quality;
-	case OPTION_COMPRESSION:
+	case OPTION_COLOR_SPACE:
+		return color_space;
+	case OPTION_COMPRLEVEL:
 		return compression_level;
 
 	case INFO_NAME:
@@ -213,8 +216,19 @@ long __CDECL set_option(zv_int_t which, zv_int_t value)
 			return -ERANGE;
 		quality = value;
 		return value;
-	case OPTION_COMPRESSION:
+	case OPTION_COMPRLEVEL:
 		compression_level = value;
+		return value;
+	case OPTION_COLOR_SPACE:
+		if (value < JCS_UNKNOWN || value >
+#if JPEG_LIB_VERSION >= 90
+			JCS_BG_YCC
+#else
+			JCS_YCCK
+#endif
+			)
+			return -ERANGE;
+		color_space = value;
 		return value;
 	}
 	return -ENOSYS;
@@ -251,7 +265,6 @@ static long init_webp_slb(void)
 typedef struct _mywebp_info {
 	VP8StatusCode status;
 	WebPData input_data;
-	FILE *webp_file;
 	uint32_t feature_flags;
 	int has_alpha;
 	int has_animation;
@@ -1090,7 +1103,20 @@ void __CDECL reader_quit(IMGINFO info)
 	}
 }
 
+struct _myencode_info {
+	WebPConfig config;
+	FILE *webp_file;
+	int lossless;
+	WebPPicture picture;
+	uint32_t *argb;
+};
 
+
+static int MyWriter(const uint8_t *data, size_t data_size, const WebPPicture *pic)
+{
+	FILE *out = (FILE *)pic->custom_ptr;
+	return data_size ? fwrite(data, data_size, 1, out) == 1 : 1;
+}
 
 /*==================================================================================*
  * boolean __CDECL encoder_init:													*
@@ -1106,20 +1132,65 @@ void __CDECL reader_quit(IMGINFO info)
  *==================================================================================*/
 boolean __CDECL encoder_init(const char *name, IMGINFO info)
 {
-	(void)(name);
+	struct _myencode_info *myinfo;
+	int ret;
+	size_t argb_size;
+	
+#ifdef PLUGIN_SLB
+#ifdef WEBP_SLB
+	if (init_webp_slb() < 0)
+	{
+		nf_debugprint((DEBUG_PREFIX "init_webp_slb() failed\n"));
+		return FALSE;
+	}
+#endif
+#endif
+
+	argb_size = (size_t) info->width * info->height * sizeof(*myinfo->argb);
+	if ((myinfo = malloc(sizeof(*myinfo) + argb_size)) == NULL)
+	{
+		nf_debugprint((DEBUG_PREFIX "malloc() failed\n"));
+		return FALSE;
+	}
+	memset(myinfo, 0, sizeof(*myinfo));
+	myinfo->argb = (uint32_t *)(myinfo + 1);
+
+	if ((myinfo->webp_file = fopen(name, "wb")) == NULL)
+		return FALSE;
+	info->_priv_ptr = myinfo;
 
 	info->planes   			= 24;
-	info->colors  			= 16777215L;
+	info->colors  			= 1L << info->planes;
 	info->orientation		= UP_TO_DOWN;
 	info->memory_alloc 		= TT_RAM;
 	info->indexed_color	 	= FALSE;
 	info->page			 	= 1;
 	info->delay 		 	= 0;
-	info->_priv_ptr	 		= 0;
 	info->_priv_ptr_more	= NULL;
 	info->__priv_ptr_more	= NULL;
 	info->_priv_var	 		= 0;
 	info->_priv_var_more	= 0;
+
+	myinfo->lossless = quality >= 100;
+	if (myinfo->lossless)
+		ret = WebPConfigLosslessPreset(&myinfo->config, compression_level);
+	else
+		ret = WebPConfigPreset(&myinfo->config, WEBP_PRESET_PHOTO, quality);
+	if (ret)
+		ret = WebPPictureInit(&myinfo->picture);
+	if (!ret)
+	{
+		encoder_quit(info);
+		return FALSE;
+	}
+	
+	myinfo->picture.writer = MyWriter;
+	myinfo->picture.custom_ptr = myinfo->webp_file;
+	myinfo->picture.width = info->width;
+	myinfo->picture.height = info->height;
+	myinfo->picture.argb_stride = info->width;
+	myinfo->picture.argb = myinfo->argb;
+	myinfo->picture.use_argb = myinfo->lossless;
 
 	return TRUE;
 }
@@ -1138,8 +1209,32 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
  *==================================================================================*/
 boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 {
-	(void) info;
-	(void) buffer;
+	struct _myencode_info *myinfo = (struct _myencode_info *)info->_priv_ptr;
+	int16_t i;
+
+#define encoder_cur_row(info) ((info)->_priv_var_more)
+	if (reader_cur_row(info) < info->height)
+	{
+		uint32_t *dst = myinfo->picture.argb + reader_cur_row(info) * myinfo->picture.argb_stride;
+		uint8_t *buf_ptr = buffer;
+		uint8_t r, g, b;
+		
+		for (i = info->width; i > 0; --i)
+		{
+			r = *buf_ptr++;
+			g = *buf_ptr++;
+			b = *buf_ptr++;
+			*dst++ = 0xff000000L | ((uint32_t)r << 16) | ((uint32_t)g << 8) | ((uint32_t)b << 0);
+		}
+		reader_cur_row(info)++;
+		if (reader_cur_row(info) == info->height)
+		{
+			if (!WebPEncode(&myinfo->config, &myinfo->picture))
+				return FALSE;
+			reader_cur_row(info) = 0;
+		}
+	}
+
 	return TRUE;
 }
 
@@ -1157,7 +1252,7 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
  *==================================================================================*/
 void __CDECL encoder_quit(IMGINFO info)
 {
-	WebPInfo *myinfo = (WebPInfo *)info->_priv_ptr;
+	struct _myencode_info *myinfo = (struct _myencode_info *)info->_priv_ptr;
 
 	if (myinfo)
 	{

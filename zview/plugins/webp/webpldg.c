@@ -14,9 +14,9 @@
  * return:	 																		*
  *      --																			*
  *==================================================================================*/
-static void __CDECL set_webp_option( int16_t set_quality, uint16_t set_encode_compression)
+static void __CDECL set_webp_option(int16_t set_quality, uint16_t set_compression_level)
 {
-	compression_level = set_encode_compression;
+	compression_level = set_compression_level;
 	quality = set_quality;
 }
 
