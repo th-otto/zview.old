@@ -17,9 +17,9 @@
 #define NAME    "Image format for the Web"
 #define AUTHOR  "Thorsten Otto"
 #define DATE     __DATE__ " " __TIME__
-#define MISCINFO "Using libwep version " WEBP_VERSION_STR
+#define MISCINFO "Using libwebp version " WEBP_VERSION_STR
 
-#define NF_DEBUG 1
+#define NF_DEBUG 0
 
 #define MKFOURCC(a, b, c, d) ((a) | (b) << 8 | (c) << 16 | (uint32_t)(d) << 24)
 
@@ -1119,6 +1119,46 @@ static int MyWriter(const uint8_t *data, size_t data_size, const WebPPicture *pi
 	return data_size ? fwrite(data, data_size, 1, out) == 1 : 1;
 }
 
+/*
+ * tests copied from WebPValidateConfig,
+ * so the error can be reported
+ */
+static int my_validate_config(const WebPConfig* config)
+{
+#define fail_if(x) if (x) { nf_debugprint((DEBUG_PREFIX "WebpValidateConfig: " #x "\n")); return 0; }
+	fail_if(config == NULL);
+	fail_if(config->quality < 0 || config->quality > 100);
+	fail_if(config->target_size < 0);
+	fail_if(config->target_PSNR < 0);
+	fail_if(config->method < 0 || config->method > 6);
+	fail_if(config->segments < 1 || config->segments > 4);
+	fail_if(config->sns_strength < 0 || config->sns_strength > 100);
+	fail_if(config->filter_strength < 0 || config->filter_strength > 100);
+	fail_if(config->filter_sharpness < 0 || config->filter_sharpness > 7);
+	fail_if(config->filter_type < 0 || config->filter_type > 1);
+	fail_if(config->autofilter < 0 || config->autofilter > 1);
+	fail_if(config->pass < 1 || config->pass > 10);
+	fail_if(config->qmin < 0 || config->qmax > 100 || config->qmin > config->qmax);
+	fail_if(config->show_compressed < 0 || config->show_compressed > 1);
+	fail_if(config->preprocessing < 0 || config->preprocessing > 7);
+	fail_if(config->partitions < 0 || config->partitions > 3);
+	fail_if(config->partition_limit < 0 || config->partition_limit > 100);
+	fail_if(config->alpha_compression < 0);
+	fail_if(config->alpha_filtering < 0);
+	fail_if(config->alpha_quality < 0 || config->alpha_quality > 100);
+	fail_if(config->lossless < 0 || config->lossless > 1);
+	fail_if(config->near_lossless < 0 || config->near_lossless > 100);
+	fail_if(config->image_hint >= WEBP_HINT_LAST);
+	fail_if(config->emulate_jpeg_size < 0 || config->emulate_jpeg_size > 1);
+	fail_if(config->thread_level < 0 || config->thread_level > 1);
+	fail_if(config->low_memory < 0 || config->low_memory > 1);
+	fail_if(config->exact < 0 || config->exact > 1);
+	fail_if(config->use_delta_palette < 0 || config->use_delta_palette > 1);
+	fail_if(config->use_sharp_yuv < 0 || config->use_sharp_yuv > 1);
+#undef fail_if
+	return 1;
+}
+
 /*==================================================================================*
  * boolean __CDECL encoder_init:													*
  *		Open the file "name", fit the "info" struct. ( see zview.h) and make others	*
@@ -1147,7 +1187,9 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
 #endif
 #endif
 
-	argb_size = (size_t) info->width * info->height * sizeof(*myinfo->argb);
+#define WEBP_ALIGN_CST 31
+	argb_size = ((size_t) info->width * info->height + WEBP_ALIGN_CST) * sizeof(*myinfo->argb);
+
 	if ((myinfo = malloc(sizeof(*myinfo) + argb_size)) == NULL)
 	{
 		nf_debugprint((DEBUG_PREFIX "malloc() failed\n"));
@@ -1157,7 +1199,11 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
 	myinfo->argb = (uint32_t *)(myinfo + 1);
 
 	if ((myinfo->webp_file = fopen(name, "wb")) == NULL)
+	{
+		nf_debugprint((DEBUG_PREFIX "fopen() failed\n"));
 		return FALSE;
+	}
+
 	info->_priv_ptr = myinfo;
 
 	info->planes   			= 24;
@@ -1172,19 +1218,35 @@ boolean __CDECL encoder_init(const char *name, IMGINFO info)
 	info->_priv_var	 		= 0;
 	info->_priv_var_more	= 0;
 
+	WebPConfigInit(&myinfo->config);
+
 	myinfo->lossless = quality >= 100;
+	/* FIXME: does not work yet; crashes in WebPEncode */
+	myinfo->lossless = FALSE;
 	if (myinfo->lossless)
+	{
 		ret = WebPConfigLosslessPreset(&myinfo->config, compression_level);
-	else
+		if (!ret)
+			nf_debugprint((DEBUG_PREFIX "WebPConfigLosslessPreset() failed\n"));
+	} else
+	{
 		ret = WebPConfigPreset(&myinfo->config, WEBP_PRESET_DEFAULT, quality);
+		if (!ret)
+			nf_debugprint((DEBUG_PREFIX "WebPConfigreset() failed\n"));
+	}
 	if (ret)
+	{
 		ret = WebPPictureInit(&myinfo->picture);
+		if (!ret)
+			nf_debugprint((DEBUG_PREFIX "WebPPictureInit() failed\n"));
+	}
 	if (!ret)
 	{
 		encoder_quit(info);
 		return FALSE;
 	}
-	
+	my_validate_config(&myinfo->config);
+
 	myinfo->picture.writer = MyWriter;
 	myinfo->picture.custom_ptr = myinfo->webp_file;
 	myinfo->picture.width = info->width;
@@ -1232,7 +1294,7 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 			nf_debugprint((DEBUG_PREFIX "encoder_write: encode image\n"));
 			if (!WebPEncode(&myinfo->config, &myinfo->picture))
 			{
-				nf_debugprint((DEBUG_PREFIX "WebPEncode failed\n"));
+				nf_debugprint((DEBUG_PREFIX "WebPEncode failed: %ld\n", (long) myinfo->picture.error_code));
 				return FALSE;
 			}
 			reader_cur_row(info) = 0;

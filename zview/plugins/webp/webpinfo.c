@@ -825,8 +825,7 @@ static void Help(void)
 		   "  -version ........... Print version number and exit.\n"
 		   "  -quiet ............. Do not show chunk parsing information.\n"
 		   "  -diag .............. Show parsing error diagnosis.\n"
-		   "  -summary ........... Show chunk stats summary.\n"
-		   "  -bitstream_info .... Parse bitstream header.\n");
+		   "  -summary ........... Show chunk stats summary.\n");
 }
 
 int main(int argc, const char *argv[])
