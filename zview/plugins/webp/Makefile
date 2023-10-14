@@ -21,7 +21,7 @@ webp.ldg: webpldg.o webp.o $(LDGOBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) -Wl,--stack,$(STACKSIZE) $(LIB)
 
 zvwebp.slb: header.lo webpslb.lo webp.lo $(webp_SOBJS)
-	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lwebpdemux -lwebp $(LDSHAREDLIBC)
+	$(LDSHARED) $(CFLAGS) -o $@ $^ $(LDFLAGS) -lwebpdemux -lwebp -lm $(LDSHAREDLIBC)
 	$(STRIPEX) $@
 
 header.lo webpslb.lo webp.lo: ../common/plugin.h ../common/zview.h

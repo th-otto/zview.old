@@ -60,7 +60,8 @@ for f in mintlib-0.60.1-mint-dev.tar.xz \
 	windom-2.0.1-mint-dev.tar.xz \
 	windom1-1.21.3-mint-dev.tar.xz \
 	giflib-5.1.4-mint-dev.tar.xz \
-	zstd-1.5.5-mint-dev.tar.xz
+	zstd-1.5.5-mint-dev.tar.xz \
+	libwebp-1.3.2-mint-dev.tar.xz
 do
 	wget -q -O - $URL/$f | sudo tar -C / -xJf - || exit 1
 done
