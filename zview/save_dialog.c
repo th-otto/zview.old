@@ -290,6 +290,7 @@ void save_dialog( const char *fullfilename)
 				format_type(input, name);
 				encoder_plugin_setup(NULL, i, name);
 				last_choice = i + 1;
+				tree[SAVE_DIAL_SAVE].ob_state &= ~OS_DISABLED;
 				break;
 			}
 	}
