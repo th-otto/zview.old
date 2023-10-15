@@ -227,9 +227,7 @@ Catalog::Catalog(PDFDoc *docA) {
   // create the Form
   // (if acroForm is a null object, this will still create an AcroForm
   // if there are unattached Widget-type annots)
-#ifdef USE_FORMS
   form = AcroForm::load(doc, this, &acroForm);
-#endif
 
   // get the OCProperties dictionary
   catDict.dictLookup("OCProperties", &ocProperties);
@@ -282,11 +280,9 @@ Catalog::~Catalog() {
   structTreeRoot.free();
   outline.free();
   acroForm.free();
-#ifdef USE_FORMS
   if (form) {
     delete form;
   }
-#endif
   ocProperties.free();
   if (embeddedFiles) {
     deleteGList(embeddedFiles, EmbeddedFile);

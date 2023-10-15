@@ -206,9 +206,6 @@
 /* use fixed point (instead of floating point) arithmetic */
 #undef USE_FIXEDPOINT
 
-/* Support Forms */
-#undef USE_FORMS
-
 /* Version number of package */
 #undef VERSION
 

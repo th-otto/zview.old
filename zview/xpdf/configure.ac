@@ -317,14 +317,6 @@ if test "$with_xpdfrc_datadir" != "no" -a "$with_xpdfrc_datadir" != "yes" -a "$w
       AC_DEFINE_UNQUOTED(XPDFRC_DATADIR, "$with_xpdfrc_datadir")
 fi
 
-AH_TEMPLATE([USE_FORMS], [Support Forms])
-case $TARGET_OS in
-  tos)
-    ;;
-  *) AC_DEFINE([USE_FORMS], 1)
-    ;;
-esac
-
 ###############################################################################
 #
 # check for libpng
