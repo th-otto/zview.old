@@ -90,7 +90,7 @@ xpdf/config.status: xpdf/configure
 	cd xpdf && \
 	export PKG_CONFIG_LIBDIR=/usr/$${TARGET}/lib/pkgconfig && \
 	export PKG_CONFIG_PATH=/usr/$${TARGET}/lib/pkgconfig && \
-	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --disable-multithreaded --disable-exceptions --host=$${TARGET} || \
+	CFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' CXXFLAGS='$(OPTIMISATION) $(CPU_CFLAGS) $(XPDF_CPPFLAGS)' ./configure --without-x --disable-exceptions --disable-multithreaded --disable-exceptions --disable-cmyk --host=$${TARGET} || \
 		{ test "$$TRAVIS_REPO_SLUG" != "" && cat config.log; exit 1; }
 
 xpdf/configure: xpdf/configure.ac xpdf/Makefile.am
