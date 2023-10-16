@@ -70,11 +70,13 @@ typedef unsigned int zv_uint_t;
 #endif
 #endif
 
+#define ZVIEW_MAX_IMAGES 1024
+
 typedef struct _img_data
 {
 	int16_t		imagecount;
-	uint16_t	delay[1024];
-	uint8_t		*image_buf[1024];
+	uint16_t	delay[ZVIEW_MAX_IMAGES];
+	uint8_t		*image_buf[ZVIEW_MAX_IMAGES];
 } img_data;
 
 

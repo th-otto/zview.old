@@ -10,6 +10,7 @@
 #include "zvplugin.h"
 #include <webp/decode.h>
 #include <webp/encode.h>
+#include <webp/demux.h>
 #include <webp/mux_types.h>
 #include "zvwebp.h"
 
@@ -265,6 +266,8 @@ static long init_webp_slb(void)
 typedef struct _mywebp_info {
 	VP8StatusCode status;
 	WebPData input_data;
+	WebPDemuxer *demux;
+	WebPIterator iter;
 	uint32_t feature_flags;
 	int has_alpha;
 	int has_animation;
@@ -274,10 +277,14 @@ typedef struct _mywebp_info {
 	int loop_count;
 	uint32_t bgcolor;
 	int32_t num_frames;
+	uint16_t last_page_read;
+	int32_t cur_row;
 	uint8_t *bmap;
+	size_t bitmap_size;
 	uint8_t channels;
 	size_t stride_width;
 	size_t row_width;
+	img_data img;
 	/* used for parsing */
 	int chunk_counts[CHUNK_TYPES];
 	int anmf_subchunk_counts[3];		/* 0 VP8; 1 VP8L; 2 ALPH. */
@@ -474,6 +481,7 @@ static WebPInfoStatus ProcessVP8XChunk(const ChunkData *chunk_data, WebPInfo *we
 {
 	const uint8_t *data = chunk_data->payload_;
 
+	nf_debugprint((DEBUG_PREFIX "VP8X\n"));
 	if (webp_info->chunk_counts[CHUNK_VP8] ||
 		webp_info->chunk_counts[CHUNK_VP8L] ||
 		webp_info->chunk_counts[CHUNK_VP8X])
@@ -553,7 +561,9 @@ static WebPInfoStatus ProcessANMFChunk(const ChunkData *chunk_data, WebPInfo *we
 	(void) offset_y;
 	(void) dispose;
 	(void) blend;
-	(void) duration;
+	nf_debugprint((DEBUG_PREFIX "frame %ld: %ld\n", (long) webp_info->num_frames, (long) duration));
+	if (webp_info->num_frames >= 0 && webp_info->num_frames < ZVIEW_MAX_IMAGES)
+		webp_info->img.delay[webp_info->num_frames] = MIN(duration, 32000);
 	++webp_info->chunk_counts[CHUNK_ANMF];
 	webp_info->has_animation = TRUE;
 	webp_info->feature_flags |= ANIMATION_FLAG;
@@ -573,6 +583,7 @@ static WebPInfoStatus ProcessImageChunk(const ChunkData *chunk_data, WebPInfo *w
 	WebPBitstreamFeatures features;
 	const VP8StatusCode vp8_status = WebPGetFeatures(data, chunk_data->size_, &features);
 
+	nf_debugprint((DEBUG_PREFIX "VP8\n"));
 	if (vp8_status != VP8_STATUS_OK)
 	{
 		LOG_ERROR("VP8/VP8L bitstream error.");
@@ -881,7 +892,6 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	WebPInfo *myinfo;
 	uint32_t file_length;
 	int16_t handle;
-	size_t bitmap_size;
 
 	nf_debugprint((DEBUG_PREFIX "reader_init: %p %s\n", (void *)info, name));
 
@@ -938,21 +948,22 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		nf_debugprint((DEBUG_PREFIX "image too large: %ldx%ld\n", (long)myinfo->canvas_width, (long)myinfo->canvas_height));
 		reader_quit(info);
 	}
-	nf_debugprint((DEBUG_PREFIX "width: %u\n", myinfo->canvas_width));
-	nf_debugprint((DEBUG_PREFIX "height: %u\n", myinfo->canvas_height));
-	nf_debugprint((DEBUG_PREFIX "frames: %u\n", myinfo->num_frames));
+	nf_debugprint((DEBUG_PREFIX "width: %lu\n", (long) myinfo->canvas_width));
+	nf_debugprint((DEBUG_PREFIX "height: %lu\n", (long) myinfo->canvas_height));
+	nf_debugprint((DEBUG_PREFIX "frames: %lu\n", (long) myinfo->num_frames));
 
 	myinfo->channels = myinfo->has_alpha ? 4 : 3;
 	myinfo->stride_width = myinfo->canvas_width * myinfo->channels;
 	myinfo->row_width = myinfo->canvas_width * 3;
-	bitmap_size = myinfo->stride_width * myinfo->canvas_height;
-	myinfo->bmap = WebPMalloc(bitmap_size);
+	myinfo->bitmap_size = myinfo->stride_width * myinfo->canvas_height;
+	myinfo->bmap = WebPMalloc(myinfo->bitmap_size);
 	if (myinfo->bmap == NULL)
 	{
 		nf_debugprint((DEBUG_PREFIX "malloc() failed\n"));
 		reader_quit(info);
 		return FALSE;
 	}
+	myinfo->img.imagecount = MIN(myinfo->num_frames, ZVIEW_MAX_IMAGES);
 	
 	strcpy(info->info, "WebP image format");
 	info->width = myinfo->canvas_width;
@@ -963,8 +974,8 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 	info->components = myinfo->channels > 3 ? 3 : myinfo->channels;
 	info->planes = myinfo->channels * 8;
 	info->colors = 1L << MIN(info->planes, 24);
-	info->page = 1;
-	info->delay = 0;
+	info->page = MIN(myinfo->num_frames, 32000); /* lets be paranoid; pagenumber is only 16 bit */
+	info->delay = myinfo->img.delay[0];
 	info->num_comments = 0;
 	info->max_comments_length = 0;
 	info->indexed_color = FALSE;
@@ -972,20 +983,34 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 
 	/* Attention: compression field is only 5 chars */
 	strcpy(info->compression, "Unkn");
-	if (myinfo->chunk_counts[CHUNK_VP8L] > 0)
+	if (myinfo->chunk_counts[CHUNK_VP8L] > 0 || myinfo->anmf_subchunk_counts[1] > 0)
 	{
 		strcpy(info->compression, "VP8L");
-	} else if (myinfo->chunk_counts[CHUNK_VP8] > 0)
+	} else if (myinfo->chunk_counts[CHUNK_VP8] > 0 || myinfo->anmf_subchunk_counts[0] > 0)
 	{
 		strcpy(info->compression, "VP8");
 	}
 	if (myinfo->lossless)
 		strcat(info->info, " (lossless)");
 
-	if (myinfo->channels == 4)
-		WebPDecodeRGBAInto(myinfo->input_data.bytes, myinfo->input_data.size, myinfo->bmap, bitmap_size, myinfo->stride_width);
-	else
-		WebPDecodeRGBInto(myinfo->input_data.bytes, myinfo->input_data.size, myinfo->bmap, bitmap_size, myinfo->row_width);
+	if (myinfo->num_frames > 1)
+	{
+		myinfo->demux = WebPDemux(&myinfo->input_data);
+		
+		if (WebPDemuxGetFrame(myinfo->demux, 1, &myinfo->iter))
+		{
+			if (myinfo->channels == 4)
+				WebPDecodeRGBAInto(myinfo->iter.fragment.bytes, myinfo->iter.fragment.size, myinfo->bmap, myinfo->bitmap_size, myinfo->stride_width);
+			else
+				WebPDecodeRGBInto(myinfo->iter.fragment.bytes, myinfo->iter.fragment.size, myinfo->bmap, myinfo->bitmap_size, myinfo->row_width);
+		}
+	} else
+	{
+		if (myinfo->channels == 4)
+			WebPDecodeRGBAInto(myinfo->input_data.bytes, myinfo->input_data.size, myinfo->bmap, myinfo->bitmap_size, myinfo->stride_width);
+		else
+			WebPDecodeRGBInto(myinfo->input_data.bytes, myinfo->input_data.size, myinfo->bmap, myinfo->bitmap_size, myinfo->row_width);
+	}
 
 	return TRUE;
 }
@@ -1027,11 +1052,26 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 	WebPInfo *myinfo = (WebPInfo *)info->_priv_ptr;
 	int16_t i;
 
-#define reader_cur_row(info) ((info)->_priv_var_more)
-
-	if (reader_cur_row(info) < myinfo->canvas_height)
+	if (info->page_wanted != myinfo->last_page_read)
 	{
-		uint8_t *src = myinfo->bmap + reader_cur_row(info) * myinfo->stride_width;
+		myinfo->last_page_read = info->page_wanted;
+		myinfo->cur_row = 0;
+		if (info->page_wanted < myinfo->img.imagecount)
+		{
+			info->delay = myinfo->img.delay[info->page_wanted];
+		}
+		if (WebPDemuxGetFrame(myinfo->demux, info->page_wanted + 1, &myinfo->iter))
+		{
+			if (myinfo->channels == 4)
+				WebPDecodeRGBAInto(myinfo->iter.fragment.bytes, myinfo->iter.fragment.size, myinfo->bmap, myinfo->bitmap_size, myinfo->stride_width);
+			else
+				WebPDecodeRGBInto(myinfo->iter.fragment.bytes, myinfo->iter.fragment.size, myinfo->bmap, myinfo->bitmap_size, myinfo->row_width);
+		}
+	}
+
+	if (myinfo->cur_row < myinfo->canvas_height)
+	{
+		uint8_t *src = myinfo->bmap + myinfo->cur_row * myinfo->stride_width;
 		
 		if (myinfo->channels == 4)
 		{
@@ -1074,7 +1114,7 @@ boolean __CDECL reader_read(IMGINFO info, uint8_t *buffer)
 		{
 			memcpy(buffer, src, myinfo->row_width);
 		}
-		reader_cur_row(info)++;
+		myinfo->cur_row++;
 	}
 	return TRUE;
 }
@@ -1098,6 +1138,11 @@ void __CDECL reader_quit(IMGINFO info)
 	if (myinfo)
 	{
 		WebPFree(myinfo->bmap);
+		if (myinfo->demux)
+		{
+			WebPDemuxReleaseIterator(&myinfo->iter);
+			WebPDemuxDelete(myinfo->demux);
+		}
 		free(myinfo);
 		info->_priv_ptr = NULL;
 	}
@@ -1109,6 +1154,7 @@ struct _myencode_info {
 	int lossless;
 	WebPPicture picture;
 	uint32_t *argb;
+	int32_t cur_row;
 };
 
 
@@ -1275,10 +1321,9 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 	struct _myencode_info *myinfo = (struct _myencode_info *)info->_priv_ptr;
 	int16_t i;
 
-#define encoder_cur_row(info) ((info)->_priv_var_more)
-	if (reader_cur_row(info) < info->height)
+	if (myinfo->cur_row < info->height)
 	{
-		uint32_t *dst = myinfo->picture.argb + reader_cur_row(info) * myinfo->picture.argb_stride;
+		uint32_t *dst = myinfo->picture.argb + myinfo->cur_row * myinfo->picture.argb_stride;
 		uint8_t *buf_ptr = buffer;
 		uint8_t r, g, b;
 		
@@ -1289,7 +1334,7 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 			b = *buf_ptr++;
 			*dst++ = 0xff000000L | ((uint32_t)r << 16) | ((uint32_t)g << 8) | ((uint32_t)b << 0);
 		}
-		if (++reader_cur_row(info) == info->height)
+		if (++myinfo->cur_row == info->height)
 		{
 			nf_debugprint((DEBUG_PREFIX "encoder_write: encode image\n"));
 			if (!WebPEncode(&myinfo->config, &myinfo->picture))
@@ -1297,7 +1342,7 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer)
 				nf_debugprint((DEBUG_PREFIX "WebPEncode failed: %ld\n", (long) myinfo->picture.error_code));
 				return FALSE;
 			}
-			reader_cur_row(info) = 0;
+			myinfo->cur_row = 0;
 		}
 	}
 
