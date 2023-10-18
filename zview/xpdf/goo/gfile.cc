@@ -106,6 +106,7 @@ GString *getHomeDir() {
 }
 #endif
 
+#if 0 /* unused */
 GString *getCurrentDir() {
   char buf[PATH_MAX+1];
 
@@ -121,6 +122,7 @@ GString *getCurrentDir() {
     return new GString(buf);
   return new GString();
 }
+#endif
 
 GString *appendToPath(GString *path, const char *fileName) {
 #if defined(VMS)
