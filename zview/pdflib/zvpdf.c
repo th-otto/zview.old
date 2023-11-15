@@ -535,7 +535,7 @@ FILE *fdopen(int fd, const char *mode)
 int errno;
 
 /* newer versions of libstdc++ may have references to strtoul */
-unsigned long strtoul(const char *restrict nptr, char **restrict endptr, int base)
+unsigned long strtoul(const char *__restrict nptr, char **__restrict endptr, int base)
 {
 	CHECK(strtoul, return NULL);
 	return get_slb_funcs()->p_strtoul(nptr, endptr, base);

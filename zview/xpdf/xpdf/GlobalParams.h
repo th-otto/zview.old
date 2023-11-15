@@ -242,7 +242,9 @@ public:
 #endif
   void setupBaseFonts(const char *dir);
 
+#ifndef ZVPDF_SLB
   void parseLine(char *buf, GString *fileName, int line);
+#endif
 
   //----- accessors
 
