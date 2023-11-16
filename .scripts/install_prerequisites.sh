@@ -19,7 +19,7 @@ cd tmp
 #
 # get & install the sharedlibs
 #
-for f in bzip2108.zip exif0621.zip freetype2101.zip lzma524.zip tiff4010.zip zlib1213.zip jpeg8d.tbz png1637.tbz
+for f in bzip2108.zip exif0622.zip freetype2101.zip lzma544.zip tiff450.zip zlib13-mint.zip jpeg8d.tbz png1639.tbz
 do
 	wget -q $URL/$f || exit 1
 	case $f in
