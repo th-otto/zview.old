@@ -33,6 +33,7 @@
 #include <mint/osbind.h>
 #include <mint/mintbind.h>
 #include <mint/basepage.h>
+#include <mint/cookie.h>
 #include "slbload.h"
 
 
@@ -75,6 +76,41 @@ typedef struct
 	long num_funcs;
 	/* long funcs_table[]; */
 } SLB_HEADER;
+
+
+#ifndef __mcoldfire__
+static void asm_invalidate_cache_030(void)
+{
+	__asm__ __volatile__(
+		"\t.dc.w 0x4e7a,2\n"			/* movec	cacr,d0 */
+		"\tor.l		#0x808,%%d0\n"		/* cd/ci bit (clear d/i-cache) */
+		"\t.dc.w 0x4e7b,2\n"			/* movec	d0,cacr */
+	: : : "d0", "cc", "memory");
+}
+
+
+static void asm_invalidate_cache_040(void)
+{
+	__asm__ __volatile__(
+		"\tnop\n"						/* fix for some broken 040s */
+		"\t.dc.w 0xf4f8\n"				/* cpusha bc; flush to memory */
+		"\t.dc.w 0xf4d8\n"				/* cinva bc; invalidate */
+	: : : "d0", "cc", "memory");
+}
+
+
+static void asm_invalidate_cache(void)
+{
+	long cpu = 0;
+
+	Getcookie(C__CPU, &cpu);
+	if (cpu >= 40)
+		asm_invalidate_cache_040();
+	else if (cpu >= 30)
+		asm_invalidate_cache_030();
+}
+#endif
+
 
 #ifndef NO_LOCAL_SLB
 #pragma GCC diagnostic ignored "-Warray-bounds"
@@ -161,6 +197,14 @@ static long localSlbLoad(const char *sharedlib, const char *path, long ver, SLB_
 		Mfree(bp->p_env);
 		bp->p_env = 0;
 	}
+
+	/*
+	 * CT60 TOS is broken, and does not always invalidate the cache on Pexec(3,...)
+	 * Older FreeMiNT kernels are broken, too
+	 */
+#ifndef __mcoldfire__
+	asm_invalidate_cache();
+#endif
 
 	/* Test for the new programm-format */
 	exec_longs = (long *) ((char *) bp->p_tbase);
