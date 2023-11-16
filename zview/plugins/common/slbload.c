@@ -71,8 +71,9 @@ typedef struct
 	void __CDECL (*slb_open) (BASEPAGE *);
 	void __CDECL (*slb_close) (BASEPAGE *);
 	const char *const *procnames;
-	long next;
-	long reserved[7];
+	long next; /* used by MetaDOS */
+	BASEPAGE *my_bp; /* used by us */
+	long reserved[6];
 	long num_funcs;
 	/* long funcs_table[]; */
 } SLB_HEADER;
@@ -208,10 +209,25 @@ static long localSlbLoad(const char *sharedlib, const char *path, long ver, SLB_
 
 	/* Test for the new programm-format */
 	exec_longs = (long *) ((char *) bp->p_tbase);
-	if ((exec_longs[0] == 0x283a001aL && exec_longs[1] == 0x4efb48faL) ||
-		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))
+	if ((exec_longs[0] == 0x283a001aL && exec_longs[1] == 0x4efb48faL) ||	/* Original binutils */
+		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))     /* binutils >= 2.18-mint-20080209 */
 	{
 		slbheader = (SLB_HEADER *) ((char *) bp->p_tbase + 228L);
+	} else if ((exec_longs[0] & 0xffffff00L) == 0x203a0000L &&              /* binutils >= 2.41-mintelf */
+		exec_longs[1] == 0x4efb08faUL &&
+		/*
+		 * 40 = (minimum) offset of elf header from start of file
+		 * 24 = offset of e_entry in common header
+		 * 30 = branch offset (sizeof(GEMDOS header) + 2)
+		 */
+		(exec_longs[0] & 0xff) >= (40 + 24 - 30))
+	{
+		long elf_offset;
+		long e_entry;
+		
+		elf_offset = (exec_longs[0] & 0xff);
+		e_entry = *((long *)((char *)bp->p_tbase + elf_offset + 2));
+		slbheader = (SLB_HEADER *) ((char *) bp->p_tbase + e_entry);
 	} else
 	{
 		slbheader = (SLB_HEADER *) (bp->p_tbase);
@@ -234,6 +250,8 @@ static long localSlbLoad(const char *sharedlib, const char *path, long ver, SLB_
 		file[127] = 0;
 	strcpy(bp->p_cmdlin, file);
 
+	slbheader->my_bp = bp;
+
 	slbheader->slb_init();
 	slbheader->slb_open(_BasPag);
 
@@ -248,7 +266,8 @@ static long localSlbUnload(SLB_HANDLE slb)
 	((SLB_HEADER *) slb)->slb_close(_BasPag);
 	((SLB_HEADER *) slb)->slb_exit();
 
-	Mfree(slb);
+	Mfree(((SLB_HEADER *) slb)->my_bp);
+
 	return E_OK;
 }
 
