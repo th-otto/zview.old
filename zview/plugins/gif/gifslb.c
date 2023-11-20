@@ -86,15 +86,7 @@ struct _zview_plugin_funcs *get_slb_funcs(void)
 #pragma GCC diagnostic ignored "-Warray-bounds"
 long __CDECL slb_init(void)
 {
-	const BASEPAGE *bp;
-	const long *exec_longs;
-
-	bp = (BASEPAGE *)(slb_header - 256);
-	exec_longs = (const long *)((const char *)bp + 28);
-	if ((exec_longs[0] == 0x283a001aL && exec_longs[1] == 0x4efb48faL) ||
-		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))
-		bp = (const BASEPAGE *)((const char *)bp - 228);
-	my_base = bp;
+	my_base = get_bp_address(slb_header);
 	return 0;
 }
 #pragma GCC diagnostic warning "-Warray-bounds"

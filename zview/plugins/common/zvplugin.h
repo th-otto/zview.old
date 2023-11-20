@@ -95,3 +95,39 @@ boolean __CDECL encoder_write(IMGINFO info, uint8_t *buffer);
 void __CDECL encoder_quit(IMGINFO info);
 long __CDECL get_option(zv_int_t which);
 long __CDECL set_option(zv_int_t which, zv_int_t value);
+
+
+/*
+ * helper function to get the actual basepage start,
+ * if executable has some extended header,
+ * like MiNT a.out/ELF headers
+ */
+static inline const BASEPAGE *get_bp_address(const char *header)
+{
+	const BASEPAGE *bp;
+	const long *exec_longs;
+
+	bp = (const BASEPAGE *)header - 1;
+	exec_longs = (const long *)((const char *)bp + 28);
+	if ((exec_longs[0] == 0x283a001aL && exec_longs[1] == 0x4efb48faL) ||	/* Original binutils */
+		(exec_longs[0] == 0x203a001aL && exec_longs[1] == 0x4efb08faL))     /* binutils >= 2.18-mint-20080209 */
+	{
+		bp = (const BASEPAGE *)((const char *)bp - 228);
+	} else if ((exec_longs[0] & 0xffffff00L) == 0x203a0000L &&              /* binutils >= 2.41-mintelf */
+		exec_longs[1] == 0x4efb08faUL &&
+		/*
+		 * 40 = (minimum) offset of elf header from start of file
+		 * 24 = offset of e_entry in common header
+		 * 30 = branch offset (sizeof(GEMDOS header) + 2)
+		 */
+		(exec_longs[0] & 0xff) >= (40 + 24 - 30))
+	{
+		long elf_offset;
+		long e_entry;
+
+		elf_offset = (exec_longs[0] & 0xff);
+		e_entry = *((long *)((char *)bp + elf_offset + 2));
+		bp = (const BASEPAGE *) ((const char *) bp - e_entry);
+	}
+	return bp;
+}
