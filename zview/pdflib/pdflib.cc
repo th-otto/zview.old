@@ -405,6 +405,7 @@ static char *info_string(Object &info, 	UnicodeMap *uMap, const char *tag, const
 {
 	char text[256];
 	char *str;
+	size_t pfxlen, txtlen;
 
 	if (isdate)
 		InfoDate(info.getDict(), tag, text);
@@ -413,9 +414,15 @@ static char *info_string(Object &info, 	UnicodeMap *uMap, const char *tag, const
 	if (*text == '\0')
 		return NULL;
 	conv_latin1_to_atari(text);
-	str = (char *)malloc(strlen(prefix) + 3 + strlen(text) + 1);
+	pfxlen = strlen(prefix);
+	txtlen = strlen(text) + 1;
+	str = (char *)malloc(pfxlen + 3 + txtlen);
 	if (str != NULL)
-		strcat(strcat(strcpy(str, prefix), ":  "), text);
+	{
+		strcpy(str, prefix);
+		strcpy(str + pfxlen, ":  ");
+		strcpy(str + pfxlen + 3, text);
+	}
 	return str;
 }
 
@@ -500,7 +507,7 @@ void pdf_exit( void)
 extern "C" void
 __cxxabiv1::__cxa_pure_virtual (void)
 {
-  Cconws("pure virtual method called\n");
+  (void) Cconws("pure virtual method called\n");
   Pterm(-1);
   __builtin_unreachable();
 }

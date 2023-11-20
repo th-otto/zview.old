@@ -104,8 +104,6 @@ void __CDECL delete_bookmarks(WINDATA *windata)
 	slb->exec(slb->handle, 11, SLB_NARGS(1), windata);
 }
 
-#define S(x) zvpdf_funcs.p_ ## x = x
-
 
 #define DBG_ALLOC 0
 
@@ -243,6 +241,8 @@ long zvpdf_open(void)
 	zvpdf_funcs.p_slb_get = plugin_slb_get;
 	
 	zvpdf_funcs.stderr_location = stderr;
+
+#define S(x) zvpdf_funcs.p_ ## x = x
 
 	S(get_text_width);
 
