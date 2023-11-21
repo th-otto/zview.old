@@ -577,6 +577,7 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		compressed = BMP_RGB;			/* force */
 		colors_used = 1L << info->planes;	/* force */
 		break;
+	case 16: /* OS/2 BITMAPINFOHEADER2 */
 	case 40: /* BITMAPINFOHEADER */
 	case 52: /* BITMAPV2INFOHEADER */
 	case 56: /* BITMAPV3INFOHEADER */
@@ -586,17 +587,24 @@ boolean __CDECL reader_init(const char *name, IMGINFO info)
 		info->width = (uint16_t) ToL(header.bmp_info_header.bitmapinfoheader.width);
 		info->height = (uint16_t) ToL(header.bmp_info_header.bitmapinfoheader.height);
 		info->planes = ToS(header.bmp_info_header.bitmapinfoheader.bitcount);
-		compressed = (int16_t)ToL(header.bmp_info_header.bitmapinfoheader.compression);
-		colors_used = ToL(header.bmp_info_header.bitmapinfoheader.clrUsed);	/* colors used */
-		if (colors_used > 256)
+		if (hdrsize > 16)
 		{
-			db("invalid number of colors", 0);
-			Fclose(handle);
-			return FALSE;
+			compressed = (int16_t)ToL(header.bmp_info_header.bitmapinfoheader.compression);
+			colors_used = ToL(header.bmp_info_header.bitmapinfoheader.clrUsed);	/* colors used */
+			if (colors_used > 256)
+			{
+				db("invalid number of colors", 0);
+				Fclose(handle);
+				return FALSE;
+			}
+		} else
+		{
+			compressed = BMP_RGB;
+			colors_used = 0;
 		}
 		if (colors_used == 0 && info->planes <= 8)
 			colors_used = 1L << info->planes;
-		if (hdrsize == 64)
+		if (hdrsize == 64 || hdrsize == 16)
 			strcpy(info->info, "OS/2 BitMaP v2");
 		else if (hdrsize >= 124)
 			strcpy(info->info, "Windows BitMaP v5");
