@@ -80,35 +80,91 @@ typedef struct
 
 
 #ifndef __mcoldfire__
-static void asm_invalidate_cache_030(void)
+#ifdef __GNUC__
+static long asm_invalidate_cache_030(void)
 {
 	__asm__ __volatile__(
 		"\t.dc.w 0x4e7a,2\n"			/* movec	cacr,d0 */
-		"\tor.l		#0x808,%%d0\n"		/* cd/ci bit (clear d/i-cache) */
+		"\tori.w	#0x808,%%d0\n"		/* cd/ci bit (clear d/i-cache) */
 		"\t.dc.w 0x4e7b,2\n"			/* movec	d0,cacr */
 	: : : "d0", "cc", "memory");
+	return 0;
 }
 
 
-static void asm_invalidate_cache_040(void)
+static long asm_invalidate_cache_040(void)
 {
 	__asm__ __volatile__(
 		"\tnop\n"						/* fix for some broken 040s */
 		"\t.dc.w 0xf4f8\n"				/* cpusha bc; flush to memory */
 		"\t.dc.w 0xf4d8\n"				/* cinva bc; invalidate */
 	: : : "d0", "cc", "memory");
+	return 0;
+}
+#endif
+
+
+#ifdef __PUREC__
+static void asm_invalidate_cache_030_1(void) 0x4e7a;
+static void asm_invalidate_cache_030_2(void) 0x0002;
+static void asm_invalidate_cache_030_3(void) 0x0040;
+static void asm_invalidate_cache_030_4(void) 0x0808;
+static void asm_invalidate_cache_030_5(void) 0x4e7b;
+static void asm_invalidate_cache_030_6(void) 0x0002;
+
+static long asm_invalidate_cache_030(void)
+{
+	asm_invalidate_cache_030_1();
+	asm_invalidate_cache_030_2();
+	asm_invalidate_cache_030_3();
+	asm_invalidate_cache_030_4();
+	asm_invalidate_cache_030_5();
+	asm_invalidate_cache_030_6();
+	return 0;
+}
+
+static void asm_invalidate_cache_040_1(void) 0x4e71;
+static void asm_invalidate_cache_040_2(void) 0xf4f8;
+static void asm_invalidate_cache_040_3(void) 0xf4d8;
+
+static long asm_invalidate_cache_040(void)
+{
+	asm_invalidate_cache_040_1();
+	asm_invalidate_cache_040_2();
+	asm_invalidate_cache_040_3();
+	return 0;
+}
+
+#endif
+
+
+static long get_cpu(void)
+{
+	long *jar;
+
+	jar = (long *)Setexc(0x5a0 / 4, (void (*)(void))-1);
+	if (jar)
+	{
+		while (jar[0] != 0)
+		{
+			if (jar[0] == C__CPU)
+				return jar[1];
+			jar += 2;
+		}
+	}
+	return 0;
 }
 
 
-static void asm_invalidate_cache(void)
+void asm_invalidate_cache(void)
 {
-	long cpu = 0;
+	long cpu;
 
-	Getcookie(C__CPU, &cpu);
+	cpu = get_cpu();
 	if (cpu >= 40)
-		asm_invalidate_cache_040();
+		Supexec(asm_invalidate_cache_040);
 	else if (cpu >= 30)
-		asm_invalidate_cache_030();
+		Supexec(asm_invalidate_cache_030);
 }
 #endif
 
